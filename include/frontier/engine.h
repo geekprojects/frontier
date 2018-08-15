@@ -1,0 +1,41 @@
+#ifndef __FRONTIER_ENGINE_H_
+#define __FRONTIER_ENGINE_H_
+
+#include <frontier/frontier.h>
+
+#include <geek/core-logger.h>
+
+class FrontierEngine : public Geek::Logger
+{
+ private:
+    FrontierApp* m_app;
+
+ public:
+    FrontierEngine(FrontierApp* app);
+    virtual ~FrontierEngine();
+
+    virtual bool init();
+
+    virtual bool initWindow(FrontierWindow* window);
+
+    virtual bool checkEvents();
+};
+
+class FrontierEngineWindow
+{
+ protected:
+    FrontierWindow* m_window;
+
+ public:
+    FrontierEngineWindow(FrontierWindow* window);
+    virtual ~FrontierEngineWindow();
+
+    virtual bool init();
+    virtual bool show();
+
+    virtual bool update();
+
+    FrontierWindow* getWindow() { return m_window; }
+};
+
+#endif
