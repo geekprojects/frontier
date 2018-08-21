@@ -101,18 +101,19 @@ NSTrackingArea* trackingArea;
 
 - (void)updateTrackingAreas
 {
-/*
-        if (trackingArea != NULL) {
-            [self removeTrackingArea: trackingArea];
-        }
-        NSTrackingAreaOptions options =(NSTrackingActiveAlways | NSTrackingInVisibleRect |  NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
-        trackingArea = [[NSTrackingArea alloc]
-initWithRect: [self bounds]
-options: options
-owner: self
- userInfo: nil];
-        [self addTrackingArea: trackingArea];
-*/
+#if 0
+    if (trackingArea != NULL)
+    {
+        [self removeTrackingArea: trackingArea];
+    }
+    NSTrackingAreaOptions options =(NSTrackingActiveAlways | NSTrackingInVisibleRect |  NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
+    trackingArea = [[NSTrackingArea alloc]
+        initWithRect: [self bounds]
+        options: options
+        owner: self
+         userInfo: nil];
+    [self addTrackingArea: trackingArea];
+#endif
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -178,7 +179,7 @@ int height = [self frame].size.height;
     //msg->event.button.button = 0;//event.button.button;
     //msg->event.button.doubleClick = false;//(event.button.clicks == 2);
 
-int height = [self frame].size.height;
+    int height = [self frame].size.height;
     msg->event.button.x = (int)pos.x;
     msg->event.button.y = height - (int)pos.y;
 
@@ -201,13 +202,12 @@ int height = [self frame].size.height;
     //msg->event.button.button = 0;//event.button.button;
     //msg->event.button.doubleClick = false;//(event.button.clicks == 2);
 
-int height = [self frame].size.height;
+    int height = [self frame].size.height;
     msg->event.button.x = (int)pos.x;
     msg->event.button.y = height - (int)pos.y;
 
     CocoaWindow* cwindow = [window getEngineWindow];
     cwindow->getWindow()->handleMessage(msg);
-
 }
 
 @end
@@ -245,10 +245,12 @@ bool CocoaWindow::createCocoaWindow()
 
 Frontier::Size CocoaWindow::getSize()
 {
-    //Size size;
+/*
+    NSRect rect = [m_cocoaWindow contentRectForFrameRect:[m_cocoaWindow frame]];
 
-
-return Frontier::Size(0, 0);
+    return Frontier::Size(rect.size.width, rect.size.height);
+*/
+    return Frontier::Size(0, 0);
 }
 
 void CocoaWindow::setSize(Frontier::Size size)

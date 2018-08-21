@@ -23,15 +23,21 @@ bool CocoaWindow::show()
     return true;
 }
 
-
 bool CocoaWindow::update()
 {
     Size winSize = m_window->getSize();
-    setSize(winSize);
+    //setSize(winSize);
 
-drawSurface(m_window->getSurface());
+#if 1
+    Size currentSize = getSize();
+    if (currentSize.width != winSize.width || currentSize.height != winSize.height)
+    {
+        setSize(winSize);
+    }
+#endif
+
+    drawSurface(m_window->getSurface());
 
     return true;
 }
-
 
