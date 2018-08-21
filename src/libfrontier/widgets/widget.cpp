@@ -2,6 +2,8 @@
 #include <frontier/frontier.h>
 #include <frontier/widgets.h>
 
+using namespace std;
+using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
@@ -12,8 +14,10 @@ Widget::Widget(FrontierApp* ui)
 
     m_dirty = true;
 
-    m_minWidth = 0;
-    m_minHeight = 0;
+    m_minSize = Size(0, 0);
+    m_maxSize = Size(0, 0);
+    m_setSize = Size(0, 0);
+
     m_margin = 5;
     m_padding = 5;
 }
@@ -24,6 +28,24 @@ Widget::~Widget()
 
 void Widget::calculateSize()
 {
+printf("Widget::calculateSize: Not set!\n");
+}
+
+void Widget::layout()
+{
+}
+
+Size Widget::setSize(Size size)
+{
+    calculateSize();
+
+    // Clip the specified size to our min/max
+    size.setMax(m_minSize);
+    size.setMin(m_maxSize);
+
+    m_setSize = size;
+
+    return size;
 }
 
 bool Widget::draw(Geek::Gfx::Surface* surface)
@@ -72,4 +94,23 @@ Widget* Widget::handleMessage(Message* msg)
 {
     return NULL;
 }
+
+void Widget::dump(int level)
+{
+    string spaces = "";
+int i;
+for (i = 0; i < level; i++)
+{
+    spaces += "    ";
+}
+printf("%s: %p: x=%d, y=%d, size=%s\n", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
+
+vector<Widget*>::iterator it;
+for (it = m_children.begin(); it != m_children.end(); it++)
+{
+(*it)->dump(level + 1);
+}
+
+}
+
 

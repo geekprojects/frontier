@@ -3,6 +3,7 @@
 #include <frontier/widgets.h>
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek::Gfx;
 
 Button::Button(FrontierApp* ui, wstring text) : Widget(ui)
@@ -17,8 +18,12 @@ Button::~Button()
 
 void Button::calculateSize()
 {
-    m_width = m_ui->getTheme()->getTextWidth(m_text) + (5 * 2);
-    m_height = m_ui->getTheme()->getTextHeight() + (5 * 2);
+    m_minSize.width = m_ui->getTheme()->getTextWidth(m_text) + (5 * 2);
+    m_minSize.height = m_ui->getTheme()->getTextHeight() + (5 * 2);
+
+    m_maxSize.width = WIDGET_SIZE_UNLIMITED;
+    m_maxSize.height = m_minSize.height;
+    //m_maxSize.height = WIDGET_SIZE_UNLIMITED;
 
     m_dirty = false;
 }
@@ -26,15 +31,17 @@ void Button::calculateSize()
 bool Button::draw(Surface* surface)
 {
     int w = m_ui->getTheme()->getTextWidth(m_text);
-    int x = (m_width / 2) - (w / 2);
+    int x = (m_setSize.width / 2) - (w / 2);
+
+int y = (m_setSize.height / 2) - (m_ui->getTheme()->getTextHeight() / 2);
 
     m_ui->getTheme()->drawBorder(
         surface,
         BORDER_WIDGET,
         m_state ? STATE_SELECTED : STATE_NONE,
         0, 0,
-        m_width, m_height);
-    m_ui->getTheme()->drawText(surface, x, 2, m_text);
+        m_setSize.width, m_setSize.height);
+    m_ui->getTheme()->drawText(surface, x, y, m_text);
 
     return true;
 }

@@ -3,6 +3,7 @@
 #include <frontier/widgets.h>
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
@@ -18,29 +19,32 @@ List::~List()
 void List::calculateSize()
 {
     vector<ListItem*>::iterator it;
-    m_width = 50;
+
+    m_minSize.set(0, 0);
+    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+
     for (it = m_list.begin(); it != m_list.end(); it++)
     {
         ListItem* item = *it;
         int w = m_ui->getTheme()->getTextWidth(item->getText()) + (5 * 2);
-        if (w > m_width)
+        if (w > m_minSize.width)
         {
-            m_width = w;
+            m_minSize.width = w;
         }
     }
 
     m_itemHeight = m_ui->getTheme()->getTextHeight();
-    m_height = m_itemHeight * m_list.size();
+    m_minSize.height = m_itemHeight * m_list.size();
 
-    m_width += 2 * 2;
-    m_height += 2 * 2;
+    m_minSize.width += 2 * 2;
+    m_minSize.height += 2 * 2;
 
     m_dirty = false;
 }
 
 bool List::draw(Surface* surface)
 {
-    surface->drawRect(0, 0, m_width, m_height, 0xffffffff);
+    surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffffff);
 
     int x = 2;
     int y = 2;
@@ -53,14 +57,14 @@ bool List::draw(Surface* surface)
         if (m_selected == idx)
         {
             c = 0xff000000;
-            surface->drawRectFilled(0, y, m_width, m_itemHeight, 0xffffffff);
+            surface->drawRectFilled(0, y, m_setSize.width, m_itemHeight, 0xffffffff);
         }
 
         m_ui->getTheme()->drawText(surface, x, y, item->getText(), m_selected == idx);
 
         if (it + 1 != m_list.end())
         {
-            surface->drawLine(0, y + m_itemHeight, m_width, y + m_itemHeight, 0xffffffff);
+            surface->drawLine(0, y + m_itemHeight, m_setSize.width, y + m_itemHeight, 0xffffffff);
         }
 
         y += m_itemHeight;

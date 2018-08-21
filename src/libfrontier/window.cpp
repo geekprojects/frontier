@@ -4,12 +4,15 @@
 #include <frontier/widgets.h>
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek::Gfx;
 
 FrontierWindow::FrontierWindow(FrontierApp* app)
 {
     m_app = app;
     m_engineWindow = NULL;
+
+    m_size.set(500, 50);
 }
 
 FrontierWindow::~FrontierWindow()
@@ -40,19 +43,48 @@ void FrontierWindow::show()
     update();
 }
 
+void FrontierWindow::setSize(Size size)
+{
+    m_size = size;
+    update();
+}
+
 void FrontierWindow::update()
 {
     init();
 
     m_widget->calculateSize();
 
-    m_surface = new Surface(getWidth(), getHeight(), 4);
+    Size min = m_widget->getMinSize();
+    Size max = m_widget->getMaxSize();
+
+    m_size.setMax(min);
+    m_size.setMin(max);
+
+    m_size = m_widget->setSize(m_size);
+
+    printf("FrontierWindow::update: Updating window size: %s\n", m_size.toString().c_str());
+
+    m_widget->layout();
+    m_widget->dump(1);
+
+    if (m_surface == NULL || m_surface->getWidth() != m_size.width || m_surface->getHeight() != m_size.height)
+    {
+        if (m_surface != NULL)
+        {
+            delete m_surface;
+        }
+        m_surface = new Surface(m_size.width, m_size.height, 4);
+    }
+
     m_surface->clear(0x0);
+
     m_widget->draw(m_surface);
 
     m_engineWindow->update();
 }
 
+/*
 int FrontierWindow::getWidth()
 {
     if (m_widget != NULL)
@@ -70,6 +102,7 @@ int FrontierWindow::getHeight()
     }
     return 0;
 }
+*/
 
 void FrontierWindow::postMessage(Message* message)
 {
@@ -85,5 +118,6 @@ update();
 }
 
     m_lastEventTarget = t;
+    return true;
 }
 

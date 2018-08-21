@@ -3,12 +3,12 @@
 #include <frontier/widgets.h>
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
 Scroller::Scroller(FrontierApp* ui) : Widget(ui)
 {
-    m_preferredHeight = 200;
     m_child = NULL;
     m_childSurface = NULL;
 
@@ -18,7 +18,6 @@ Scroller::Scroller(FrontierApp* ui) : Widget(ui)
 
 Scroller::Scroller(FrontierApp* ui, Widget* child) : Widget(ui)
 {
-    m_preferredHeight = 200;
     m_childSurface = NULL;
 
     m_scrollBar = new ScrollBar(ui);
@@ -33,25 +32,37 @@ Scroller::~Scroller()
 
 void Scroller::calculateSize()
 {
-    m_width = 100;
-    m_height = m_preferredHeight;
-    m_dirty = false;
 
     m_scrollBar->calculateSize();
-    m_scrollBar->setWidth(20);
 
     if (m_child != NULL)
     {
-        m_child->setPosition(0, 0);
         m_child->calculateSize();
 
-        m_width = m_child->getWidth() + m_scrollBar->getWidth() + 2;
+        //m_width = m_child->getWidth() + m_scrollBar->getWidth() + 2;
 
-        m_scrollBar->set(0, m_child->getHeight(), m_height - 2);
     }
 
+    m_minSize.width = 20 + m_scrollBar->getMinSize().width;
+    m_minSize.height = 50;
+    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+
+    m_dirty = false;
 }
 
+void Scroller::layout()
+{
+    m_child->setPosition(0, 0);
+    m_child->setSize(m_child->getMinSize());
+    m_child->layout();
+
+    m_scrollBar->setPosition(m_setSize.width - m_scrollBar->getMinSize().width, 0);
+    m_scrollBar->setSize(Size(m_scrollBar->getMinSize().width, m_setSize.height));
+
+        m_scrollBar->set(0, m_child->getHeight(), m_setSize.height - 2);
+}
+
+/*
 void Scroller::setWidth(int width)
 {
     m_width = width;
@@ -63,6 +74,7 @@ void Scroller::setWidth(int width)
         }
     }
 }
+*/
 
 void Scroller::checkSurfaceSize()
 {
@@ -80,12 +92,12 @@ void Scroller::checkSurfaceSize()
 
 bool Scroller::draw(Surface* surface)
 {
-    surface->drawRect(0, 0, m_width - (m_scrollBar->getWidth() - 2), m_height, 0xffffffff);
+    surface->drawRect(0, 0, m_setSize.width - (m_scrollBar->getWidth() - 2), m_setSize.height, 0xffffffff);
 
     if (m_child != NULL)
     {
-        int cw = m_width - (m_scrollBar->getWidth() + 2);
-        int ch = m_height - 2;
+        int cw = m_setSize.width - (m_scrollBar->getWidth() + 2);
+        int ch = m_setSize.height - 2;
         if (cw > m_child->getWidth())
         {
             cw = m_child->getWidth();
@@ -108,9 +120,10 @@ bool Scroller::draw(Surface* surface)
         surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), cw, ch);
     }
 
-    m_scrollBar->setPosition(m_width - m_scrollBar->getWidth(), 0);
-    m_scrollBar->setHeight(m_height);
-    SurfaceViewPort scrollbarVP(surface, m_width - m_scrollBar->getWidth(), 0, m_scrollBar->getWidth(), m_height);
+    //m_scrollBar->setPosition(m_setSize.width - m_scrollBar->getWidth(), 0);
+//m_scrollBar.setSize(Size(
+    //m_scrollBar->setHeight(m_setSize.height);
+    SurfaceViewPort scrollbarVP(surface, m_scrollBar->getX(), m_scrollBar->getY(), m_scrollBar->getWidth(), m_scrollBar->getHeight());
     m_scrollBar->draw(&scrollbarVP);
 
     return true;

@@ -1,6 +1,7 @@
 
 #include "sdl_engine.h"
 
+using namespace Frontier;
 using namespace Geek;
 
 FrontierEngineWindowSDL::FrontierEngineWindowSDL(FrontierWindow* win) : FrontierEngineWindow(win)
@@ -39,19 +40,26 @@ bool FrontierEngineWindowSDL::show()
 
 bool FrontierEngineWindowSDL::update()
 {
-    int w = m_window->getWidth();
-    int h = m_window->getHeight();
+    Size winSize = m_window->getSize();
 
-    SDL_SetWindowSize(m_sdlWindow, w, h);
+int w;
+int h;
+SDL_GetWindowSize(m_sdlWindow, &w, &h);
+
+if (w != winSize.width || h != winSize.height)
+{
+    SDL_SetWindowSize(m_sdlWindow, winSize.width, winSize.height);
+printf("FrontierEngineWindowSDL::update: Setting window size: %s\n", winSize.toString().c_str());
+}
 
     SDL_Surface* sdlSurface = SDL_GetWindowSurface(m_sdlWindow);
 
-m_window->getSurface()->drawRectFilled(0, 0, 20, 20, 0xff);
+    m_window->getSurface()->drawRectFilled(0, 0, 20, 20, 0xff);
 
     int res;
     res = SDL_ConvertPixels(
-        w, h,
-        SDL_PIXELFORMAT_ABGR8888, m_window->getSurface()->getData(), w * 4,
+        winSize.width, winSize.height,
+        SDL_PIXELFORMAT_ABGR8888, m_window->getSurface()->getData(), winSize.width * 4,
         sdlSurface->format->format, sdlSurface->pixels, sdlSurface->pitch);
     if (res < 0)
     {

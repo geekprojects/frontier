@@ -2,6 +2,7 @@
 #include <frontier/frontier.h>
 #include <frontier/widgets.h>
 
+
 class DemoApp : public FrontierApp
 {
  private:
@@ -13,8 +14,10 @@ class DemoApp : public FrontierApp
 
     virtual bool init();
 
-    virtual void handleMessage(Message* message);
+    virtual void handleMessage(Frontier::Message* message);
 };
+
+using namespace Frontier;
 
 DemoApp::DemoApp()
 {

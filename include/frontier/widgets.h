@@ -5,19 +5,25 @@
 
 #include <frontier/frontier.h>
 
+#define WIDGET_SIZE_UNLIMITED 0xffff
+
 class Widget
 {
  protected:
     FrontierApp* m_ui;
     Widget* m_parent;
+
+    std::vector<Widget*> m_children;
+
     int m_x;
     int m_y;
-    int m_width;
-    int m_height;
+
+    Frontier::Size m_minSize;
+    Frontier::Size m_maxSize;
+    Frontier::Size m_setSize;
+
     bool m_dirty;
 
-    int m_minWidth;
-    int m_minHeight;
     int m_margin;
     int m_padding;
 
@@ -26,17 +32,20 @@ class Widget
     virtual ~Widget();
 
     virtual void calculateSize();
+    virtual void layout();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     int getX() { return m_x; }
     int getY() { return m_y; }
     void setPosition(int x, int y) { m_x = x; m_y = y; }
-    virtual void setWidth(int width) { m_width = width; }
-    virtual void setHeight(int height) { m_height = height; }
-    virtual int getWidth() { return m_width; }
-    virtual int getHeight() { return m_height; }
-    virtual void setMinWidth(int width) { m_minWidth = width; }
-    virtual void setMinHeight(int height) { m_minHeight = height; }
+
+    Frontier::Size setSize(Frontier::Size size);
+    Frontier::Size getMinSize() { return m_minSize; }
+    Frontier::Size getMaxSize() { return m_maxSize; }
+    virtual int getWidth() { return m_setSize.width; }
+    virtual int getHeight() { return m_setSize.height; }
+
+
     void setParent(Widget* w) { m_parent = w; }
     Widget* getParent() { return m_parent; }
 
@@ -46,7 +55,9 @@ class Widget
     void setDirty();
     bool isDirty() { return m_dirty; }
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
+
+    virtual void dump(int level);
 };
 
 class Frame : public Widget
@@ -54,16 +65,13 @@ class Frame : public Widget
  private:
     bool m_horizontal;
     bool m_border;
-    std::vector<Widget*> m_children;
 
     virtual void calculateSize();
+    virtual void layout();
 
  public:
     Frame(FrontierApp* ui, bool horizontal);
     virtual ~Frame();
-
-    virtual void setWidth(int width);
-    virtual void setHeight(int height);
 
     void setBorder(bool border) { m_border = border; }
 
@@ -71,7 +79,7 @@ class Frame : public Widget
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
 };
 
 class Grid : Widget
@@ -84,7 +92,7 @@ class Grid : Widget
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
 };
 
 class Button : public Widget
@@ -100,7 +108,7 @@ class Button : public Widget
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
 };
 
 class IconButton : public Button
@@ -132,7 +140,7 @@ class Label : public Widget
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
 };
 
 struct ListItem
@@ -163,7 +171,7 @@ class List : public Widget
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
 
     void clearItems();
     void addItem(ListItem* item);
@@ -178,7 +186,6 @@ class ScrollBar : public Widget
     int m_max;
     int m_pos;
     int m_size;
-    int m_preferredLength;
     bool m_dragging;
 
     int getControlPos();
@@ -192,7 +199,7 @@ class ScrollBar : public Widget
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
 
     void set(int min, int max, int size);
     void setPos(int pos);
@@ -202,7 +209,6 @@ class ScrollBar : public Widget
 class Scroller : public Widget
 {
  private:
-    int m_preferredHeight;
 
     ScrollBar* m_scrollBar;
     Widget* m_child;
@@ -217,12 +223,14 @@ class Scroller : public Widget
     ~Scroller();
 
     virtual void calculateSize();
-    virtual void setWidth(int width);
+    virtual void layout();
+    //virtual void setWidth(int width);
+
     int getPos() { return m_scrollBar->getPos(); }
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Message* msg);
+    virtual Widget* handleMessage(Frontier::Message* msg);
 
     void setChild(Widget* child);
 };

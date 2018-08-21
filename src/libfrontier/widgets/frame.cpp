@@ -2,9 +2,12 @@
 #include <frontier/frontier.h>
 #include <frontier/widgets.h>
 
-#undef DEBUG_UI_FRAME
+#include <stdio.h>
+
+#define DEBUG_UI_FRAME
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
@@ -27,30 +30,20 @@ void Frame::add(Widget* widget)
 
 bool Frame::draw(Surface* surface)
 {
-    if (m_border)
+    //if (m_border)
     {
-        surface->drawRect(0, 0, m_width, m_height, 0xffffffff);
+        //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
+        surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xff0000);
     }
 
-    int x = m_margin;
-    int y = m_margin;
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
         Widget* child = *it;
-        SurfaceViewPort viewport(surface, x, y, child->getWidth(), child->getHeight());
-        child->setPosition(x, y);
+        SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
         child->draw(&viewport);
-        if (m_horizontal)
-        {
-            x += child->getWidth();
-            x += m_padding;
-        }
-        else
-        {
-            y += child->getHeight();
-            y += m_padding;
-        }
+
+        viewport.drawRect(0, 0, child->getWidth(), child->getHeight(), 0x00ff00);
     }
     return true;
 }
@@ -60,52 +53,58 @@ void Frame::calculateSize()
 #ifdef DEBUG_UI_FRAME
     printf("Frame::calculateSize: %p: Calculating...\n", this);
 #endif
-    m_width = 0;
-    m_height = 0;
+
+    m_minSize.set(0, 0);
+    m_maxSize.set(0, 0);
+
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
-        Widget* w = *it;
-#ifdef DEBUG_UI_FRAME
-        printf("Frame::calculateSize: %p: calculating child: %p...\n", this, *it);
-#endif
-        w->calculateSize();
-    }
+        Widget* child = *it;
+        child->calculateSize();
 
-    for (it = m_children.begin(); it != m_children.end(); it++)
-    {
-        int childWidth = (*it)->getWidth();
-        int childHeight = (*it)->getHeight();
+        Size childMin = child->getMinSize();
+        Size childMax = child->getMaxSize();
+
 #ifdef DEBUG_UI_FRAME
-        printf("Frame::calculateSize: %p: sizing child: %p: width=%d, height=%d\n", this, (*it), childWidth, childHeight);
+        printf("Frame::calculateSize: %p: sizing child: %p: min=%s, max=%s\n", this, (*it), childMin.toString().c_str(), childMax.toString().c_str());
 #endif
 
         if (m_horizontal)
         {
-            if (childHeight > m_height)
+            m_minSize.setMaxHeight(childMin);
+            m_maxSize.setMaxHeight(childMax);
+
+            if (m_minSize.width > 0)
             {
-                m_height = childHeight;
+                m_minSize.width += m_padding;
             }
-            if (m_width > 0)
+            if (m_maxSize.width > 0)
             {
-                m_width += m_padding;
+                m_maxSize.width += m_padding;
             }
-            m_width += childWidth;
+            m_minSize.width += childMin.width;
+            m_maxSize.width += childMax.width;
         }
         else
         {
-            if (childWidth > m_width)
+            m_minSize.setMaxWidth(childMin);
+            m_maxSize.setMaxWidth(childMax);
+
+            if (m_minSize.height > 0)
             {
-                m_width = childWidth;
+                m_minSize.height += m_padding;
             }
-            if (m_height > 0)
+            if (m_maxSize.height > 0)
             {
-                m_height += m_padding;
+                m_maxSize.height += m_padding;
             }
-            m_height += childHeight;
+            m_minSize.height += childMin.height;
+            m_maxSize.height += childMax.height;
         }
     }
 
+/*
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
 
@@ -118,16 +117,186 @@ void Frame::calculateSize()
             (*it)->setWidth(m_width);
         }
     }
+*/
 
-    m_width += 2 * m_margin;
-    m_height += 2 * m_margin;
+    m_minSize.width += 2 * m_margin;
+    m_minSize.height += 2 * m_margin;
+    m_maxSize.width += 2 * m_margin;
+    m_maxSize.height += 2 * m_margin;
 
     m_dirty = false;
 #ifdef DEBUG_UI_FRAME
-    printf("Frame::calculateSize: %p: Done\n", this);
+    printf("Frame::calculateSize: %p: Done: min=%s, max=%s\n", this, m_minSize.toString().c_str(), m_maxSize.toString().c_str());
 #endif
 }
 
+/*
+ * This assumes that the calculateSize has been called and min/maxes have been set and that a size has been set
+ */
+void Frame::layout()
+{
+    int major;
+    int minor;
+
+    if (m_horizontal)
+    {
+        major = m_setSize.width;
+        minor = m_setSize.height;
+    }
+    else
+    {
+        major = m_setSize.height;
+        minor = m_setSize.width;
+    }
+
+    major -= (2 * m_margin);
+    minor -= 2 * m_margin;
+    if (!m_children.empty())
+    {
+        major -= (m_children.size() - 1) * m_padding;
+    }
+printf("Frame::layout: major=%d, minor=%d\n", major, minor);
+
+    int major2 = major;
+    int q = major / m_children.size();
+    int expandable = 0;
+    int slackable = 0;
+
+    int min = 0;
+
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); it++)
+    {
+        Widget* child = *it;
+        Size childMinSize = child->getMinSize();
+        Size childMaxSize = child->getMaxSize();
+
+        int childMajorMin = childMinSize.get(m_horizontal);
+        int childMajorMax = childMaxSize.get(m_horizontal);
+
+        min += childMajorMin;
+        if (childMajorMax > q)
+        {
+            slackable++;
+        }
+
+
+/*
+        if (childMajorMax < q)
+        {
+            slack -= q - childMajorMax;
+printf("Frame::layout: Max < q: slack=%d\n", (q - childMajorMax));
+        }
+        else if (childMajorMin > q)
+        {
+            slack -= q - childMajorMin;
+printf("Frame::layout: Min < q: slack=%d\n", (q - childMajorMax));
+        }
+else
+{
+slackable++;
+}
+*/
+
+/*
+        if (childMajorMin > q)
+        {
+            slack -= childMajorMin - q;
+            //slackable++;
+        }
+*/
+    }
+
+int slack = major - min;
+printf("Frame::layout: major=%d, slack=%d, slackable=%d\n", major, slack, slackable);
+
+
+/*
+q = major2 / m_children.size();
+printf("Frame::layout: width=%d, height=%d\n", m_setSize.width, m_setSize.height);
+printf("Frame::layout: major=%d, minor=%d, q=%d, slack=%d\n", major, minor, q, slack);
+
+//q += (slack / m_children.size());
+printf("Frame::layout: q(2)=%d\n", q);
+*/
+
+int i;
+
+    int majorPos = m_margin;
+    int minorPos = m_margin;
+
+    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    {
+        Widget* child = *it;
+
+
+        Size childMinSize = child->getMinSize();
+        Size childMaxSize = child->getMaxSize();
+
+        int childMajorMin = childMinSize.get(m_horizontal);
+        int childMajorMax = childMaxSize.get(m_horizontal);
+
+        int childMinorMin = childMinSize.get(!m_horizontal);
+        int childMinorMax = childMaxSize.get(!m_horizontal);
+
+        int childMajor = childMajorMin;
+        int childMinor = minor;
+
+        if (childMajorMax < q)
+        {
+            childMajor = childMajorMax;
+        }
+        if (childMajorMin > q)
+        {
+            childMajor = childMajorMin;
+        }
+
+if (childMajor < childMajorMax)
+{
+int s = slack / slackable;
+slack -= s;
+slackable--;
+
+childMajor += s;
+
+if (childMajor > childMajorMax)
+{
+int d = (childMajor - childMajorMax);
+childMajor -= d;
+slack += d;
+}
+}
+
+        if (childMinor > childMinorMax)
+        {
+            childMinor = childMinorMax;
+        }
+        if (childMinor < childMinorMin)
+        {
+            childMinor = childMinorMin;
+        }
+
+        printf("Frame::layout: Child: min=%d, max=%d, settingTo=%d\n", childMajorMin, childMajorMax, childMajor);
+        Size size;
+        if (m_horizontal)
+        {
+            size = Size(childMajor, childMinor);
+child->setPosition(majorPos, minorPos);
+        }
+        else
+        {
+            size = Size(childMinor, childMajor);
+child->setPosition(minorPos, majorPos);
+        }
+        child->setSize(size);
+
+        majorPos += childMajor + m_padding;
+
+        child->layout();
+    }
+}
+
+#if 0
 void Frame::setWidth(int width)
 {
     if (width < m_width)
@@ -185,6 +354,7 @@ void Frame::setHeight(int height)
         child->setHeight(child->getHeight() + extra);
     }
 }
+#endif
 
 Widget* Frame::handleMessage(Message* msg)
 {

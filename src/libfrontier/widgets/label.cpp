@@ -3,6 +3,7 @@
 #include <frontier/widgets.h>
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek::Gfx;
 
 Label::Label(FrontierApp* ui, wstring text) : Widget(ui)
@@ -22,8 +23,10 @@ void Label::setText(std::wstring text)
 
 void Label::calculateSize()
 {
-    m_width = 0;
     m_lineHeight = m_ui->getTheme()->getTextHeight();
+
+    m_minSize.set(0, 0);
+    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
     int pos = 0;
     int lines = 0;
@@ -38,9 +41,9 @@ void Label::calculateSize()
                 line += m_text[pos];
             }
             int w = m_ui->getTheme()->getTextWidth(line);
-            if (w > m_width)
+            if (w > m_minSize.width)
             {
-                m_width = w;
+                m_minSize.width = w;
             }
             line = L"";
         }
@@ -50,13 +53,10 @@ void Label::calculateSize()
         }
     }
 
-    m_width += (5 * 2);
-    m_height = (m_lineHeight * lines) + (5 * 2);
+    m_minSize.width += (5 * 2);
+    m_minSize.height = (m_lineHeight * lines) + (5 * 2);
 
-    if (m_width < m_minWidth)
-    {
-        m_width = m_minWidth;
-    }
+m_maxSize.height = m_minSize.height;
 
     m_dirty = false;
 }
@@ -68,6 +68,18 @@ bool Label::draw(Surface* surface)
     int y = 5;
 
     int pos = 0;
+
+    int lines = 1;
+    for (pos = 0; pos < m_text.length(); pos++)
+    {
+        if (m_text[pos] == '\n')
+        {
+            lines++;
+        }
+    }
+
+    y = (m_setSize.height / 2) - (lines * m_lineHeight) / 2;
+ 
     wstring line = L"";
     for (pos = 0; pos < m_text.length(); pos++)
     {
@@ -78,7 +90,7 @@ bool Label::draw(Surface* surface)
                 line += m_text[pos];
             }
             int w = m_ui->getTheme()->getTextWidth(line);
-            int x = (m_width / 2) - (w / 2);
+            int x = (m_setSize.width / 2) - (w / 2);
 
             m_ui->getTheme()->drawText(
                 surface,

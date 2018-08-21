@@ -3,16 +3,14 @@
 #include <frontier/widgets.h>
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
 ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui)
 {
-    m_min = 0;
-    m_max = 30;
     m_pos = 0;
     m_size = 10;
-    m_preferredLength = 200;
     m_dragging = false;
 }
 
@@ -22,22 +20,25 @@ ScrollBar::~ScrollBar()
 
 void ScrollBar::calculateSize()
 {
-    m_width = 20;
-    m_height = m_preferredLength;
+    m_minSize.set(20, 20);
+    m_maxSize.set(20, WIDGET_SIZE_UNLIMITED);
     m_dirty = false;
 }
 
 bool ScrollBar::draw(Surface* surface)
 {
-int drawHeight = m_height - (3 * 2);
-int drawWidth = m_width - (3 * 2);
+    int drawWidth = m_setSize.width - (3 * 2);
+    int drawHeight = m_setSize.height - (3 * 2);
 
-    surface->drawRect(0, 0, m_width, m_height, 0xffffffff);
+    printf("ScrollBar::draw: drawWidth=%d, drawHeight=%d\n", drawWidth, drawHeight);
 
-int pos = getControlPos();
-//printf("ScrollBar::draw: m_pos=%d, pos=%d\n", m_pos, pos);
-int sizePix = getControlSize();
-//printf("ScrollBar::draw: sizePix=%d\n", sizePix);
+    surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
+
+    int pos = getControlPos();
+    printf("ScrollBar::draw: m_pos=%d, pos=%d\n", m_pos, pos);
+
+    int sizePix = getControlSize();
+    //printf("ScrollBar::draw: sizePix=%d\n", sizePix);
 
     surface->drawRectFilled(3, pos + 3, drawWidth, sizePix, 0xffffffff);
 
@@ -98,7 +99,7 @@ int range = m_max - (m_min + m_size);
 int y = imsg->event.motion.y - thisPos.y;
 //printf("ScrollBar::handleMessage: y=%d\n", y);
 
-float r = (float)(y - 3) / (float)(m_height - (3 * 2));
+float r = (float)(y - 3) / (float)(m_setSize.height - (3 * 2));
 //printf("ScrollBar::handleMessage: r=%0.2f\n", r);
 m_pos = (int)((float)range * r) + m_min;
 //printf("ScrollBar::handleMessage: m_pos=%d\n", m_pos);
@@ -157,15 +158,26 @@ int ScrollBar::getPos()
 
 int ScrollBar::getControlPos()
 {
-int range = m_max - (m_min + m_size);
-int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_height - (3 * 2)));
-return pos;
+if (m_max == 0)
+{
+return 0;
+}
+
+    int range = m_max - (m_min + m_size);
+
+    int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - (3 * 2)));
+    return pos;
 }
 
 int ScrollBar::getControlSize()
 {
-//int range = m_max - (m_min + m_size);
-int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_height - (3 * 2)));
-return sizePix;
+if (m_max == 0)
+{
+return 0;
+}
+
+    //int range = m_max - (m_min + m_size);
+    int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - (3 * 2)));
+    return sizePix;
 }
 

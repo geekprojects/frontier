@@ -2,6 +2,7 @@
 #include "sdl_engine.h"
 
 using namespace Geek;
+using namespace Frontier;
 
 FrontierEngineSDL::FrontierEngineSDL(FrontierApp* app) : FrontierEngine(app)
 {
@@ -64,87 +65,105 @@ bool FrontierEngineSDL::checkEvents()
             return false;
         } break;
 
-            case SDL_MOUSEBUTTONUP:
-            case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            FrontierEngineWindowSDL* few = getWindow(event.button.windowID);
+            if (few == NULL)
             {
-                FrontierEngineWindowSDL* few = getWindow(event.button.windowID);
-                if (few == NULL)
-                {
-                    return true;
-                }
+                return true;
+            }
 
-                InputMessage* msg = new InputMessage();
-                msg->messageType = FRONTIER_MSG_INPUT;
-                msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_BUTTON;
-                msg->event.button.direction =
-                    (event.button.type == SDL_MOUSEBUTTONDOWN);
-                msg->event.button.button = event.button.button;
-                msg->event.button.doubleClick = (event.button.clicks == 2);
+            InputMessage* msg = new InputMessage();
+            msg->messageType = FRONTIER_MSG_INPUT;
+            msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_BUTTON;
+            msg->event.button.direction =
+                (event.button.type == SDL_MOUSEBUTTONDOWN);
+            msg->event.button.button = event.button.button;
+            msg->event.button.doubleClick = (event.button.clicks == 2);
 
 
 /*
-                if (m_highDPI)
-                {
-                    int screenw;
-                    int screenh;
-                    SDL_GetWindowSize(m_screen, &screenw, &screenh);
-                    int draww;
+            if (m_highDPI)
+            {
+                int screenw;
+                int screenh;
+                SDL_GetWindowSize(m_screen, &screenw, &screenh);
+                int draww;
                     int drawh;
                     SDL_GL_GetDrawableSize(m_screen, &draww, &drawh);
                     msg->event.button.x = (int)((((float)event.button.x / (float)screenw)) * (float)draww);
                     msg->event.button.y = (int)((((float)event.button.y / (float)screenh)) * (float)drawh);
-                }
-                else
+            }
+            else
 */
-                {
-                    msg->event.button.x = event.button.x;
-                    msg->event.button.y = event.button.y;
-                }
+            {
+                msg->event.button.x = event.button.x;
+                msg->event.button.y = event.button.y;
+            }
 printf("FrontierEngineSDL::checkEvents: few=%p, x=%d, y=%d\n", few, msg->event.button.x, msg->event.button.y);
 few->getWindow()->handleMessage(msg);
 } break;
 
-            case SDL_MOUSEMOTION:
+        case SDL_MOUSEMOTION:
+        {
+            FrontierEngineWindowSDL* few = getWindow(event.button.windowID);
+            if (few == NULL)
             {
-                FrontierEngineWindowSDL* few = getWindow(event.button.windowID);
-                if (few == NULL)
-                {
-                    return true;
-                }
+                return true;
+            }
 
-                // Limit motion events to one per frame
+            // Limit motion events to one per frame
 /*
-                uint64_t t = SDL_GetTicks();
-                if ((t - m_lastMotion) < (1000 / 60))
-                {
-                    continue;
-                }
-                m_lastMotion = t;
+            uint64_t t = SDL_GetTicks();
+            if ((t - m_lastMotion) < (1000 / 60))
+            {
+                continue;
+            }
+            m_lastMotion = t;
 */
 
-                InputMessage* msg = new InputMessage();
-                msg->messageType = FRONTIER_MSG_INPUT;
-                msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_MOTION;
+            InputMessage* msg = new InputMessage();
+            msg->messageType = FRONTIER_MSG_INPUT;
+            msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_MOTION;
 /*
-                if (m_highDPI)
-                {
-                    int screenw;
-                    int screenh;
-                    SDL_GetWindowSize(m_screen, &screenw, &screenh);
-                    int draww;
-                    int drawh;
-                    SDL_GL_GetDrawableSize(m_screen, &draww, &drawh);
-                    msg->event.motion.x = (int)((((float)event.motion.x / (float)screenw)) * (float)draww);
-                    msg->event.motion.y = (int)((((float)event.motion.y / (float)screenh)) * (float)drawh);
-                }
-                else
+            if (m_highDPI)
+            {
+                int screenw;
+                int screenh;
+                SDL_GetWindowSize(m_screen, &screenw, &screenh);
+                int draww;
+                int drawh;
+                SDL_GL_GetDrawableSize(m_screen, &draww, &drawh);
+                msg->event.motion.x = (int)((((float)event.motion.x / (float)screenw)) * (float)draww);
+                msg->event.motion.y = (int)((((float)event.motion.y / (float)screenh)) * (float)drawh);
+            }
+            else
 */
-                {
-                    msg->event.button.x = event.button.x;
-                    msg->event.button.y = event.button.y;
-                }
-few->getWindow()->handleMessage(msg);
+            {
+                msg->event.button.x = event.button.x;
+                msg->event.button.y = event.button.y;
+            }
+            few->getWindow()->handleMessage(msg);
+        } break;
+
+case SDL_WINDOWEVENT:
+{
+            FrontierEngineWindowSDL* few = getWindow(event.window.windowID);
+
+switch (event.window.event)
+{
+case SDL_WINDOWEVENT_RESIZED:
+few->getWindow()->setSize(Size(event.window.data1, event.window.data2));
+few->getWindow()->update();
+printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT_RESIZED\n");
+break;
+case SDL_WINDOWEVENT_SIZE_CHANGED:
+printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT_SIZE_CHANGED\n");
+break;
+}
 } break;
+
 
     }
 

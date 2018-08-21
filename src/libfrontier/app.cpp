@@ -1,9 +1,14 @@
 
 #include <frontier/frontier.h>
 
+#if 0
 #include "engines/sdl/sdl_engine.h"
+#else
+#include "engines/cocoa/cocoa_engine.h"
+#endif
 
 using namespace std;
+using namespace Frontier;
 
 FrontierApp::FrontierApp()
 {
@@ -17,7 +22,11 @@ bool FrontierApp::init()
 {
     bool res;
 
+#if 0
     m_engine = new FrontierEngineSDL(this);
+#else
+    m_engine = new CocoaEngine(this);
+#endif
     res = m_engine->init();
     if (!res)
     {

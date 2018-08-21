@@ -12,6 +12,95 @@ class Widget;
 
 struct FrontierEngineWindow;
 
+namespace Frontier
+{
+struct Size
+{
+    int width;
+    int height;
+
+    Size()
+    {
+        width = 0;
+        height = 0;
+    }
+
+    Size(int _w, int _h)
+    {
+        width = _w;
+        height = _h;
+    }
+
+    void set(int _w, int _h)
+    {
+        width = _w;
+        height = _h;
+    }
+
+    std::string toString()
+    {
+        char buffer[32];
+        sprintf(buffer, "%d,%d", width, height);
+        return std::string(buffer);
+    }
+
+    void setMin(Size& other)
+    {
+        setMinWidth(other);
+        setMinHeight(other);
+    }
+
+    void setMax(Size& other)
+    {
+        setMaxWidth(other);
+        setMaxHeight(other);
+    }
+
+    void setMinWidth(Size& other)
+    {
+        if (other.width < width)
+        {
+            width = other.width;
+        }
+    }
+
+    void setMaxWidth(Size& other)
+    {
+        if (other.width > width)
+        {
+            width = other.width;
+        }
+    }
+
+    void setMinHeight(Size& other)
+    {
+        if (other.height < height)
+        {
+            height = other.height;
+        }
+    }
+
+    void setMaxHeight(Size& other)
+    {
+        if (other.height > height)
+        {
+            height = other.height;
+        }
+    }
+
+    int get(bool isHoriz)
+    {
+        if (isHoriz)
+        {
+            return width;
+        }
+        else
+        {
+            return height;
+        }
+    }
+};
+
 struct Message
 {
     uint32_t messageType;
@@ -21,6 +110,7 @@ struct AppMessage : public Message
 {
     uint32_t appMessageType;
 };
+
 
 #define FRONTIER_MSG_APP   1
 #define FRONTIER_MSG_INPUT  2
@@ -71,6 +161,8 @@ struct InputMessage : public Message
 
 struct UIMessage;
 
+};
+
 enum UIBorderType
 {
     BORDER_WIDGET,
@@ -112,11 +204,13 @@ class UITheme
     FrontierApp* getApp() { return m_app; }
 };
 
-struct UIMessage : public Message
+namespace Frontier
+{
+struct UIMessage : public Frontier::Message
 {
     int uiMessageType;
     Widget* widget;
-    Message* source;
+    Frontier::Message* source;
     struct
     {
         bool state;
@@ -132,6 +226,8 @@ struct UIMessage : public Message
 #define FRONTIER_MSG_UI_LIST_SELECTED 0x2000
 
 #define FRONTIER_ICON_CLOSE 0xf00d
+
+};
 
 class FrontierApp
 {
@@ -152,8 +248,8 @@ class FrontierApp
     virtual bool init();
     virtual bool main();
 
-    void postMessage(Message* message);
-    virtual void handleMessage(Message* message);
+    void postMessage(Frontier::Message* message);
+    virtual void handleMessage(Frontier::Message* message);
 };
 
 class FrontierWindow
@@ -161,6 +257,8 @@ class FrontierWindow
  private:
     FrontierApp* m_app;
     FrontierEngineWindow* m_engineWindow;
+
+    Frontier::Size m_size;
 
     Widget* m_widget;
     Widget* m_lastEventTarget;
@@ -181,12 +279,12 @@ class FrontierWindow
     void setEngineWindow(FrontierEngineWindow* few) { m_engineWindow = few; }
     FrontierEngineWindow* getEngineWindow() { return m_engineWindow; }
 
-    int getWidth();
-    int getHeight();
+    void setSize(Frontier::Size size);
+    Frontier::Size getSize() { return m_size; }
     Geek::Gfx::Surface* getSurface() { return m_surface; }
 
-    void postMessage(Message* message);
-    virtual bool handleMessage(Message* message);
+    void postMessage(Frontier::Message* message);
+    virtual bool handleMessage(Frontier::Message* message);
 };
 
 
