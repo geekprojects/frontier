@@ -13,6 +13,9 @@ AC_PROG_LIBTOOL
 AC_PROG_RANLIB
 PKG_PROG_PKG_CONFIG
 
+# XXX If MacOS
+AC_PROG_OBJCXX
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h sys/time.h])
@@ -54,6 +57,7 @@ AC_CONFIG_FILES([Makefile
                  src/libfrontier/fonts/Makefile
                  src/libfrontier/engines/Makefile
                  src/libfrontier/engines/sdl/Makefile
+                 src/libfrontier/engines/cocoa/Makefile
                  src/demo/Makefile
                  include/Makefile
                  include/frontier/Makefile
