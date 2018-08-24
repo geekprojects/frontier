@@ -247,13 +247,13 @@ bool FontManager::write(
 
     int dpiX = 72;
     int dpiY = 72;
-/*
+
+    bool highDPI = false;
     if (surface != NULL)
     {
-        dpiX = surface->getDpiX();
-        dpiY = surface->getDpiY();
+        highDPI = surface->isHighDPI();
     }
-*/
+
 
     int loadFlags = 0;
     if (draw)
@@ -269,6 +269,11 @@ bool FontManager::write(
     scaler.x_res = dpiX;
     scaler.y_res = dpiY;
 
+    if (highDPI)
+    {
+        scaler.height *= 2;
+    }
+
     FT_Size size;
     error = FTC_Manager_LookupSize(m_cacheManager, &scaler, &size);
     if (error)
@@ -282,6 +287,23 @@ bool FontManager::write(
     uint32_t prevGlyph = 0;
 
     bool useKerning = FT_HAS_KERNING(face);
+
+if (surface != NULL)
+{
+Surface* rootSurface = surface->getRoot();
+log(INFO, "write: rootSurface=%p", rootSurface);
+Rect surfaceRect = surface->absolute();
+log(INFO, "write: surfaceRect: %d,%d", surfaceRect.x, surfaceRect.y);
+x += surfaceRect.x;
+y += surfaceRect.y;
+if (highDPI)
+{
+x *= 2;
+y *= 2;
+}
+log(INFO, "write: absolute X=%d, Y=%d", x, y);
+surface = rootSurface;
+}
 
     for (pos = 0; pos < text.length(); pos++)
     {
@@ -404,25 +426,27 @@ bool FontManager::write(
             float g = (float)((col >> 8) & 0xff);
             float b = (float)((col >> 0) & 0xff);
 
-int sh = surface->getHeight();
-int sw = surface->getWidth();
+            int sh = surface->getHeight();
+            int sw = surface->getWidth();
 
             int yp;
             for (yp = 0; yp < bitmap.rows; yp++)
             {
-int y1 = y + yp + yoff;
-if (y1 < 0 || y1 >= sh)
-{
-continue;
-}
+                int y1 = y + yp + yoff;
+                if (y1 < 0 || y1 >= sh)
+                {
+                    continue;
+                }
+
                 int xp;
                 for (xp = 0; xp < bitmap.width; xp++)
                 {
-int x1 = x + xp;
-if (x1 < 0 || x1 >= sw)
-{
-continue;
-}
+                    int x1 = x + xp;
+                    if (x1 < 0 || x1 >= sw)
+                    {
+                        continue;
+                    }
+
                     uint8_t c = bitmap.buffer[(yp * bitmap.width) + xp];
                     if (c > 0)
                     {
@@ -433,10 +457,20 @@ continue;
                         p |= (((uint8_t)(b * a)) << 0);
                         p |= 0xff000000;
 
-                        surface->drawPixel(
-                            x1,
-                            y1,
-                            p);
+                        if (!highDPI)
+                        {
+                            surface->drawPixel(
+                                x1,
+                                y1,
+                                p);
+                        }
+                        else
+                        {
+                            ((HighDPISurface*)surface)->drawSubPixel(
+                                x1,
+                                y1,
+                                p);
+                        }
                     }
                 }
             }

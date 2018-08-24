@@ -68,16 +68,20 @@ void FrontierWindow::update()
     m_widget->layout();
     m_widget->dump(1);
 
+float scale = 1.0;//m_engineWindow->getScaleFactor();
+
     if (m_surface == NULL || m_surface->getWidth() != m_size.width || m_surface->getHeight() != m_size.height)
     {
         if (m_surface != NULL)
         {
             delete m_surface;
         }
-        m_surface = new Surface(m_size.width, m_size.height, 4);
+        m_surface = new HighDPISurface(m_size.width * scale, m_size.height * scale, 4);
     }
+    printf("FrontierWindow::update: Window surface=%p\n", m_surface);
 
-    m_surface->clear(0x0);
+
+    m_app->getTheme()->drawBackground(m_surface);
 
     m_widget->draw(m_surface);
 
@@ -112,10 +116,10 @@ bool FrontierWindow::handleMessage(Message* message)
 {
     Widget* t = m_widget->handleMessage(message);
 
-if (t != NULL && t->isDirty())
-{
-update();
-}
+    if (t != NULL && t->isDirty())
+    {
+        update();
+    }
 
     m_lastEventTarget = t;
     return true;

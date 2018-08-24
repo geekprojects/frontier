@@ -36,6 +36,8 @@ class FrontierEngineWindow
     virtual bool update();
 
     FrontierWindow* getWindow() { return m_window; }
+
+    virtual float getScaleFactor();
 };
 
 #endif

@@ -37,6 +37,8 @@ int h = rect.size.height;
 
 m_engineWindow->getWindow()->setSize(Frontier::Size(w, h));
 m_engineWindow->getWindow()->update();
+
+    NSLog(@"CocoaNSWindow.windowDidResize: (screen) backingScaleFactor=%0.2f", [[self screen] backingScaleFactor]);
 }
 
 @end
@@ -67,7 +69,6 @@ NSTrackingArea* trackingArea;
 @implementation FrontierView
 - (void)drawRect:(NSRect)dirtyRect
 {
-    printf("drawRect: m_image=%p\n", m_image);
     if (m_image != NULL)
     {
         CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext]     graphicsPort];
@@ -76,9 +77,10 @@ NSTrackingArea* trackingArea;
             return;
         }
 
-        int width = [self frame].size.width;
-        int height = [self frame].size.height;
+        float width = [self frame].size.width;// / 2;
+        float height = [self frame].size.height;// / 2;
         CGRect renderRect = CGRectMake(0., 0., width, height);
+printf("drawRect: width=%d, height=%d\n", width, height);
 
         CGContextDrawImage(context, renderRect, m_image);
     }
@@ -270,9 +272,10 @@ void CocoaWindow::setSize(Frontier::Size size)
 
 bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
 {
-
     int width = surface->getWidth();
     int height = surface->getHeight();
+
+    printf("CocoaWindow::drawSurface: width=%d, height=%d, highDPI=%d\n", width, height, surface->isHighDPI());
 
     int len = width * height * 4;
 
@@ -300,5 +303,10 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
     CGDataProviderRelease(provider);
 
     return true;
+}
+
+float CocoaWindow::getScaleFactor()
+{
+    return [[m_cocoaWindow screen] backingScaleFactor];
 }
 

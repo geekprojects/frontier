@@ -33,7 +33,7 @@ class CocoaWindow : public FrontierEngineWindow
     bool drawSurface(Geek::Gfx::Surface* surface);
 
     Frontier::Size getSize();
-void setSize(Frontier::Size size);
+    void setSize(Frontier::Size size);
 
  public:
     CocoaWindow(FrontierWindow* window);
@@ -44,6 +44,7 @@ void setSize(Frontier::Size size);
 
     virtual bool update();
 
+    virtual float getScaleFactor();
 };
 
 #endif
