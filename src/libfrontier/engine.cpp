@@ -1,6 +1,8 @@
 
 #include <frontier/engine.h>
 
+using namespace Frontier;
+
 FrontierEngine::FrontierEngine(FrontierApp* app) : Geek::Logger("FrontierEngine")
 {
     m_app = app;

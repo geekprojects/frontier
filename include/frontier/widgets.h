@@ -9,6 +9,8 @@
 
 #define WIDGET_SIZE_UNLIMITED 0xffff
 
+namespace Frontier {
+
 class Widget
 {
  protected:
@@ -137,7 +139,6 @@ class IconButton : public Button
     virtual bool draw(Geek::Gfx::Surface* surface);
 };
 
-
 class Label : public Widget
 {
  private:
@@ -248,7 +249,6 @@ class Scroller : public Widget
     void setChild(Widget* child);
 };
 
-#define FRONTIER_MSG_UI_BUTTON_PRESSED 0x1000
-#define FRONTIER_MSG_UI_LIST_SELECTED 0x2000
+};
 
 #endif

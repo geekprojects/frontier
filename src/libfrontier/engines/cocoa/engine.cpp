@@ -1,6 +1,8 @@
 
 #include "cocoa_engine.h"
 
+using namespace Frontier;
+
 CocoaEngine::CocoaEngine(FrontierApp* app) : FrontierEngine(app)
 {
 }
@@ -16,7 +18,7 @@ bool CocoaEngine::init()
     res = createApplication();
     if (!res)
     {
-return false;
+        return false;
     }
 
     return true;

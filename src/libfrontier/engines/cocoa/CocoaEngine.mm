@@ -3,6 +3,8 @@
 
 #include <Cocoa/Cocoa.h>
 
+using namespace Frontier;
+
 bool CocoaEngine::createApplication()
 {
     m_application = [NSApplication sharedApplication];

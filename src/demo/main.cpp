@@ -2,6 +2,7 @@
 #include <frontier/frontier.h>
 #include <frontier/widgets.h>
 
+using namespace Frontier;
 
 class DemoApp : public FrontierApp
 {

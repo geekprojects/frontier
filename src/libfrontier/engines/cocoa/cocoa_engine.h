@@ -3,6 +3,8 @@
 
 #include <frontier/engine.h>
 
+namespace Frontier {
+
 class CocoaEngine : public FrontierEngine
 {
  private:
@@ -45,6 +47,8 @@ class CocoaWindow : public FrontierEngineWindow
     virtual bool update();
 
     virtual float getScaleFactor();
+};
+
 };
 
 #endif

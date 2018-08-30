@@ -5,6 +5,8 @@
 
 #include <geek/core-logger.h>
 
+namespace Frontier {
+
 class FrontierEngine : public Geek::Logger
 {
  private:
@@ -38,6 +40,8 @@ class FrontierEngineWindow
     FrontierWindow* getWindow() { return m_window; }
 
     virtual float getScaleFactor();
+};
+
 };
 
 #endif

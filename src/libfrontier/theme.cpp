@@ -2,6 +2,7 @@
 #include <frontier/frontier.h>
 
 using namespace std;
+using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 

@@ -3,6 +3,8 @@
 
 #include <Cocoa/Cocoa.h>
 
+using namespace Frontier;
+
 @interface CocoaNSWindow : NSWindow
 {
     CocoaWindow* m_engineWindow;
