@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#define DEBUG_UI_FRAME
+#undef DEBUG_UI_FRAME
 
 using namespace std;
 using namespace Frontier;
@@ -30,10 +30,10 @@ void Frame::add(Widget* widget)
 
 bool Frame::draw(Surface* surface)
 {
-    //if (m_border)
+    if (m_border)
     {
         //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
-        surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xff0000);
+        //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xff0000);
     }
 
     vector<Widget*>::iterator it;
@@ -43,7 +43,9 @@ bool Frame::draw(Surface* surface)
         SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
         child->draw(&viewport);
 
+#if 0
         viewport.drawRect(0, 0, child->getWidth(), child->getHeight(), 0x00ff00);
+#endif
     }
     return true;
 }
@@ -155,7 +157,8 @@ void Frame::layout()
     {
         major -= (m_children.size() - 1) * m_padding;
     }
-printf("Frame::layout: major=%d, minor=%d\n", major, minor);
+
+    printf("Frame::layout: major=%d, minor=%d\n", major, minor);
 
     int major2 = major;
     int q = major / m_children.size();
@@ -207,20 +210,12 @@ slackable++;
 */
     }
 
-int slack = major - min;
-printf("Frame::layout: major=%d, slack=%d, slackable=%d\n", major, slack, slackable);
+    int slack = major - min;
+#ifdef DEBUG_UI_FRAME
+    printf("Frame::layout: major=%d, slack=%d, slackable=%d\n", major, slack, slackable);
+#endif
 
-
-/*
-q = major2 / m_children.size();
-printf("Frame::layout: width=%d, height=%d\n", m_setSize.width, m_setSize.height);
-printf("Frame::layout: major=%d, minor=%d, q=%d, slack=%d\n", major, minor, q, slack);
-
-//q += (slack / m_children.size());
-printf("Frame::layout: q(2)=%d\n", q);
-*/
-
-int i;
+    int i;
 
     int majorPos = m_margin;
     int minorPos = m_margin;
@@ -251,21 +246,21 @@ int i;
             childMajor = childMajorMin;
         }
 
-if (childMajor < childMajorMax)
-{
-int s = slack / slackable;
-slack -= s;
-slackable--;
+        if (childMajor < childMajorMax)
+        {
+            int s = slack / slackable;
+            slack -= s;
+            slackable--;
 
-childMajor += s;
+            childMajor += s;
 
-if (childMajor > childMajorMax)
-{
-int d = (childMajor - childMajorMax);
-childMajor -= d;
-slack += d;
-}
-}
+            if (childMajor > childMajorMax)
+            {
+                int d = (childMajor - childMajorMax);
+                childMajor -= d;
+                slack += d;
+            }
+        }
 
         if (childMinor > childMinorMax)
         {
@@ -276,17 +271,20 @@ slack += d;
             childMinor = childMinorMin;
         }
 
+#ifdef DEBUG_UI_FRAME
         printf("Frame::layout: Child: min=%d, max=%d, settingTo=%d\n", childMajorMin, childMajorMax, childMajor);
+#endif
+
         Size size;
         if (m_horizontal)
         {
             size = Size(childMajor, childMinor);
-child->setPosition(majorPos, minorPos);
+            child->setPosition(majorPos, minorPos);
         }
         else
         {
             size = Size(childMinor, childMajor);
-child->setPosition(minorPos, majorPos);
+            child->setPosition(minorPos, majorPos);
         }
         child->setSize(size);
 

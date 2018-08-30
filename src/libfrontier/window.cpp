@@ -12,6 +12,8 @@ FrontierWindow::FrontierWindow(FrontierApp* app)
     m_app = app;
     m_engineWindow = NULL;
 
+    m_surface = NULL;
+
     m_size.set(500, 50);
 }
 
@@ -68,7 +70,7 @@ void FrontierWindow::update()
     m_widget->layout();
     m_widget->dump(1);
 
-float scale = 1.0;//m_engineWindow->getScaleFactor();
+    float scale = m_engineWindow->getScaleFactor();
 
     if (m_surface == NULL || m_surface->getWidth() != m_size.width || m_surface->getHeight() != m_size.height)
     {
@@ -76,7 +78,15 @@ float scale = 1.0;//m_engineWindow->getScaleFactor();
         {
             delete m_surface;
         }
-        m_surface = new HighDPISurface(m_size.width * scale, m_size.height * scale, 4);
+
+        if (scale > 1.0)
+        {
+            m_surface = new HighDPISurface(m_size.width, m_size.height, 4);
+        }
+        else
+        {
+            m_surface = new Surface(m_size.width, m_size.height, 4);
+        }
     }
     printf("FrontierWindow::update: Window surface=%p\n", m_surface);
 
@@ -114,14 +124,36 @@ void FrontierWindow::postMessage(Message* message)
 
 bool FrontierWindow::handleMessage(Message* message)
 {
-    Widget* t = m_widget->handleMessage(message);
+    Widget* destWidget = NULL;
+    if (message->messageType == FRONTIER_MSG_INPUT)
+    {
+        InputMessage* imsg = (InputMessage*)message;
+        switch (imsg->inputMessageType)
+        {
+            case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+            case FRONTIER_MSG_INPUT_MOUSE_MOTION:
+                destWidget = m_widget->handleMessage(message);
+                break;
 
-    if (t != NULL && t->isDirty())
+            case FRONTIER_MSG_INPUT_KEY:
+                if (m_activeWidget != NULL)
+                {
+                    destWidget = m_activeWidget->handleMessage(message);
+                }
+                break;
+        }
+    }
+
+    if (destWidget != NULL)
+    {
+        m_activeWidget = destWidget;
+    }
+
+    if (m_widget != NULL && m_widget->isDirty())
     {
         update();
     }
 
-    m_lastEventTarget = t;
     return true;
 }
 

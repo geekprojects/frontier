@@ -59,7 +59,7 @@ void Scroller::layout()
     m_scrollBar->setPosition(m_setSize.width - m_scrollBar->getMinSize().width, 0);
     m_scrollBar->setSize(Size(m_scrollBar->getMinSize().width, m_setSize.height));
 
-        m_scrollBar->set(0, m_child->getHeight(), m_setSize.height - 2);
+    m_scrollBar->set(0, m_child->getHeight(), (m_setSize.height - 2));
 }
 
 /*
@@ -76,7 +76,7 @@ void Scroller::setWidth(int width)
 }
 */
 
-void Scroller::checkSurfaceSize()
+void Scroller::checkSurfaceSize(bool highDPI)
 {
     if (m_childSurface == NULL ||
         m_child->getWidth() != m_childSurface->getWidth() ||
@@ -86,13 +86,26 @@ void Scroller::checkSurfaceSize()
         {
             delete m_childSurface;
         }
+if (highDPI)
+{
+        m_childSurface = new HighDPISurface(m_child->getWidth(), m_child->getHeight(), 4);
+}
+else
+{
         m_childSurface = new Surface(m_child->getWidth(), m_child->getHeight(), 4);
+}
     }
 }
 
 bool Scroller::draw(Surface* surface)
 {
-    surface->drawRect(0, 0, m_setSize.width - (m_scrollBar->getWidth() - 2), m_setSize.height, 0xffffffff);
+    //surface->drawRect(0, 0, m_setSize.width - (m_scrollBar->getWidth() - 2), m_setSize.height, 0xffffffff);
+    m_ui->getTheme()->drawBorder(
+        surface,
+        BORDER_WIDGET,
+        STATE_NONE,
+        0, 0,
+        m_setSize.width - (m_scrollBar->getWidth() + 1), m_setSize.height);
 
     if (m_child != NULL)
     {
@@ -113,7 +126,13 @@ bool Scroller::draw(Surface* surface)
         printf("Scroller::draw: cw=%d, ch=%d\n", cw, ch);
 #endif
 
-        checkSurfaceSize();
+        checkSurfaceSize(surface->isHighDPI());
+
+        if (surface->isHighDPI())
+{
+cw *= 2;
+ch *= 2;
+}
 
         m_childSurface->clear(0);
         m_child->draw(m_childSurface);

@@ -33,11 +33,11 @@ bool Button::draw(Surface* surface)
     int w = m_ui->getTheme()->getTextWidth(m_text);
     int x = (m_setSize.width / 2) - (w / 2);
 
-int y = (m_setSize.height / 2) - (m_ui->getTheme()->getTextHeight() / 2);
+    int y = (m_setSize.height / 2) - (m_ui->getTheme()->getTextHeight() / 2);
 
     m_ui->getTheme()->drawBorder(
         surface,
-        BORDER_WIDGET,
+        BORDER_BUTTON,
         m_state ? STATE_SELECTED : STATE_NONE,
         0, 0,
         m_setSize.width, m_setSize.height);
@@ -67,10 +67,13 @@ Widget* Button::handleMessage(Message* msg)
                     buttonMessage->source = msg;
                     buttonMessage->button.state = m_state;
                     m_ui->postMessage(buttonMessage);
+
+m_clickSignal.emit();
                 }
             }
         }
     }
     return this;
 }
+
 

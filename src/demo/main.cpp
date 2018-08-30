@@ -8,13 +8,14 @@ class DemoApp : public FrontierApp
  private:
     FrontierWindow* m_mainWindow;
 
+    void onTextButton();
+    void onIconButton();
+
  public:
     DemoApp();
     ~DemoApp();
 
     virtual bool init();
-
-    virtual void handleMessage(Frontier::Message* message);
 };
 
 using namespace Frontier;
@@ -38,21 +39,33 @@ bool DemoApp::init()
 
         Frame* frame1 = new Frame(this, false);
 
+        Frame* toolbar = new Frame(this, true);
+        toolbar->add(new IconButton(this, FRONTIER_ICON_FOLDER_OPEN));
+        toolbar->add(new IconButton(this, FRONTIER_ICON_SAVE));
+        toolbar->add(new IconButton(this, FRONTIER_ICON_SYNC));
+        frame1->add(toolbar);
+
     Frame* labelFrame = new Frame(this, true);
     labelFrame->add(new Label(this, L"Label:"));
     labelFrame->add(new Label(this, L"I'm a label!"));
     frame1->add(labelFrame);
 
     Frame* buttonFrame = new Frame(this, true);
+    Button* textButton;
     buttonFrame->add(new Label(this, L"Button:"));
-    buttonFrame->add(new Button(this, L"Click me!"));
+    buttonFrame->add(textButton = new Button(this, L"Click me!"));
     frame1->add(buttonFrame);
 
     Frame* iconButtonFrame = new Frame(this, true);
+    IconButton* iconButton;
     iconButtonFrame->add(new Label(this, L"Icon Button:"));
-    iconButtonFrame->add(new IconButton(this, 0xf0ae));
+    iconButtonFrame->add(iconButton = new IconButton(this, 0xf0ae));
     frame1->add(iconButtonFrame);
 
+    textButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton));
+    iconButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onIconButton));
+
+#if 1
     Frame* listFrame = new Frame(this, true);
     listFrame->add(new Label(this, L"List:"));
 
@@ -67,6 +80,7 @@ bool DemoApp::init()
     scroller->setChild(list);
     listFrame->add(scroller);
     frame1->add(listFrame);
+#endif
 
     m_mainWindow = new FrontierWindow(this);
     m_mainWindow->setContent(frame1);
@@ -76,9 +90,14 @@ bool DemoApp::init()
     return true;
 }
 
-void DemoApp::handleMessage(Message* message)
+void DemoApp::onIconButton()
 {
-    printf("DemoApp::handleMessage: Here!\n");
+    printf("DemoApp::onIconButton: Here!\n");
+}
+
+void DemoApp::onTextButton()
+{
+    printf("DemoApp::onTextButton: Here!\n");
 }
 
 int main(int argc, char** argv)

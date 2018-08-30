@@ -44,7 +44,8 @@ void List::calculateSize()
 
 bool List::draw(Surface* surface)
 {
-    surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffffff);
+    //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffffff);
+    m_ui->getTheme()->drawBackground(surface);
 
     int x = 2;
     int y = 2;
@@ -54,18 +55,24 @@ bool List::draw(Surface* surface)
     {
         ListItem* item = *it;
         uint32_t c = 0xffffffff;
-        if (m_selected == idx)
-        {
-            c = 0xff000000;
-            surface->drawRectFilled(0, y, m_setSize.width, m_itemHeight, 0xffffffff);
-        }
+bool isSelected = m_selected == idx;
+UIState state = STATE_NONE;
+if (isSelected)
+{
+state = STATE_SELECTED;
+}
+UIBorderType border;
+if ((idx % 2) == 0)
+{
+border = BORDER_LIST_ITEM_1;
+}
+else
+{
+border = BORDER_LIST_ITEM_2;
+}
+m_ui->getTheme()->drawBorder(surface, border, state, 0, y, m_setSize.width, m_itemHeight);
 
         m_ui->getTheme()->drawText(surface, x, y, item->getText(), m_selected == idx);
-
-        if (it + 1 != m_list.end())
-        {
-            surface->drawLine(0, y + m_itemHeight, m_setSize.width, y + m_itemHeight, 0xffffffff);
-        }
 
         y += m_itemHeight;
     }

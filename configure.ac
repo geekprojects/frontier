@@ -32,6 +32,10 @@ PKG_CHECK_MODULES(SDL, sdl2 >= 2.0)
 CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
 LIBS="$LIBS $SDL_LIBS"
 
+PKG_CHECK_MODULES(SIGCPLUSPLUS, sigc++-2.0 >= 2.10)
+CPPFLAGS="$CPPFLAGS $SIGCPLUSPLUS_CFLAGS"
+LIBS="$LIBS $SIGCPLUSPLUS_LIBS"
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_INT8_T
 AC_TYPE_UINT8_T
@@ -61,6 +65,7 @@ AC_CONFIG_FILES([Makefile
                  src/demo/Makefile
                  include/Makefile
                  include/frontier/Makefile
+                 libfrontier.pc
 ])
 
 AC_OUTPUT

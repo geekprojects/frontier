@@ -5,6 +5,8 @@
 
 #include <frontier/frontier.h>
 
+#include <sigc++/sigc++.h>
+
 #define WIDGET_SIZE_UNLIMITED 0xffff
 
 class Widget
@@ -18,6 +20,7 @@ class Widget
     int m_x;
     int m_y;
 
+    bool m_packed;
     Frontier::Size m_minSize;
     Frontier::Size m_maxSize;
     Frontier::Size m_setSize;
@@ -39,12 +42,18 @@ class Widget
     int getY() { return m_y; }
     void setPosition(int x, int y) { m_x = x; m_y = y; }
 
+    void setPacked(bool packed) { m_packed = packed; }
+    bool getPacked() { return m_packed; }
     Frontier::Size setSize(Frontier::Size size);
     Frontier::Size getMinSize() { return m_minSize; }
     Frontier::Size getMaxSize() { return m_maxSize; }
     virtual int getWidth() { return m_setSize.width; }
     virtual int getHeight() { return m_setSize.height; }
 
+    virtual void setMargin(int margin) { m_margin = margin; }
+    virtual int getMargin() { return m_margin; }
+    virtual void setPadding(int padding) { m_padding = padding; }
+    virtual int getPadding() { return m_padding; }
 
     void setParent(Widget* w) { m_parent = w; }
     Widget* getParent() { return m_parent; }
@@ -101,6 +110,8 @@ class Button : public Widget
     std::wstring m_text;
     bool m_state;
 
+    sigc::signal<void> m_clickSignal;
+
  public:
     Button(FrontierApp* ui, std::wstring text);
     ~Button();
@@ -109,6 +120,8 @@ class Button : public Widget
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleMessage(Frontier::Message* msg);
+
+    virtual sigc::signal<void> clickSignal() { return m_clickSignal; }
 };
 
 class IconButton : public Button
@@ -214,7 +227,7 @@ class Scroller : public Widget
     Widget* m_child;
     Geek::Gfx::Surface* m_childSurface;
 
-    void checkSurfaceSize();
+    void checkSurfaceSize(bool highDPI);
     int getWidthOverhead() { return (m_scrollBar->getWidth() - 2); }
 
  public:

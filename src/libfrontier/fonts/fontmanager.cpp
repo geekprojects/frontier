@@ -288,22 +288,22 @@ bool FontManager::write(
 
     bool useKerning = FT_HAS_KERNING(face);
 
-if (surface != NULL)
-{
-Surface* rootSurface = surface->getRoot();
-log(INFO, "write: rootSurface=%p", rootSurface);
-Rect surfaceRect = surface->absolute();
-log(INFO, "write: surfaceRect: %d,%d", surfaceRect.x, surfaceRect.y);
-x += surfaceRect.x;
-y += surfaceRect.y;
-if (highDPI)
-{
-x *= 2;
-y *= 2;
-}
-log(INFO, "write: absolute X=%d, Y=%d", x, y);
-surface = rootSurface;
-}
+    if (surface != NULL)
+    {
+        Surface* rootSurface = surface->getRoot();
+        Rect surfaceRect = surface->absolute();
+
+        x += surfaceRect.x;
+        y += surfaceRect.y;
+
+        if (highDPI)
+        {
+            x *= 2;
+            y *= 2;
+        }
+
+        surface = rootSurface;
+    }
 
     for (pos = 0; pos < text.length(); pos++)
     {
@@ -419,6 +419,10 @@ surface = rootSurface;
         if (draw && bitmapValid)
         {
             int ph = font->getPixelHeight(72);
+if (highDPI)
+{
+ph *= 2;
+}
             int yoff = ph - top;
             yoff -= ph / 4;
 

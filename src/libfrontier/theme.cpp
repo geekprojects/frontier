@@ -19,9 +19,20 @@ bool UITheme::init()
     if (!m_initialised)
     {
         m_font = m_app->getFontManager()->openFont(
-            "Lato",
+            "Helvetica Neue",
             FontStyle_Normal,
-            26);
+            12);
+            m_initialised = true;
+
+        if (m_font == NULL)
+        {
+printf("UITheme::init: Failed to find font: Lato\n");
+            return false;
+        }
+        m_fontHighDPI = m_app->getFontManager()->openFont(
+            "Helvetica Neue",
+            FontStyle_Normal,
+            24);
             m_initialised = true;
 
         if (m_font == NULL)
@@ -33,7 +44,18 @@ printf("UITheme::init: Failed to find font: Lato\n");
         m_iconFont = m_app->getFontManager()->openFont(
             "FontAwesome",
             FontStyle_Normal,
-            26);
+            12);
+            m_initialised = true;
+        if (m_font == NULL)
+        {
+printf("UITheme::init: Failed to find font: FontAwesome\n");
+            return false;
+        }
+
+        m_iconFontHighDPI = m_app->getFontManager()->openFont(
+            "FontAwesome",
+            FontStyle_Normal,
+            24);
             m_initialised = true;
         if (m_font == NULL)
         {
@@ -50,31 +72,122 @@ UITheme::~UITheme()
 {
 }
 
+uint32_t UITheme::getColour(ThemeColour colour)
+{
+    switch (colour)
+    {
+        case COLOUR_WINDOW_BACKGROUND:
+            return 0x003e3e3e;
+        case COLOUR_BUTTON_1:
+            return 0xff818181;
+        case COLOUR_BUTTON_2:
+            return 0xff0F0F0F;
+        case COLOUR_WIDGET_GRADIENT_1:
+            return 0xff616161;
+        case COLOUR_WIDGET_GRADIENT_2:
+            return 0xff434343;
+        case COLOUR_SCROLLBAR_BACKGROUND:
+            return 0x00000000;
+        case COLOUR_SCROLLBAR_CONTROL:
+            return 0xff818181;
+        case COLOUR_LIST_ITEM_1:
+            return 0xffcccccc;
+        case COLOUR_LIST_ITEM_2:
+            return 0xff888888;
+        case COLOUR_LIST_ITEM_SELECTED:
+            return 0xffffffff;
+    }
+}
+
+void UITheme::drawBackground(Geek::Gfx::Surface* surface)
+{
+    surface->clear(getColour(COLOUR_WINDOW_BACKGROUND));
+}
+
 void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height)
 {
-    uint32_t g1 = 0xff888888;
-    uint32_t g2 = 0xff555555;
-    uint32_t b1 = 0xffffffff;
-    uint32_t b2 = 0xff000000;
+    bool background = false;
+    bool gradient = false;
+    bool border = false;
 
-    if (state == STATE_SELECTED)
+    uint32_t b1 = getColour(COLOUR_BUTTON_1);
+    uint32_t b2 = getColour(COLOUR_BUTTON_2);
+
+    uint32_t g1 = getColour(COLOUR_WIDGET_GRADIENT_1);
+    uint32_t g2 = getColour(COLOUR_WIDGET_GRADIENT_2);
+
+    uint32_t backgroundColour = getColour(COLOUR_WINDOW_BACKGROUND);
+
+    switch (type)
     {
-        uint32_t tmp;
-        tmp = g1;
-        g1 = g2;
-        g2 = tmp;
-        tmp = b1;
-        b1 = b2;
-        b2 = tmp;
+        case BORDER_WIDGET:
+        {
+            border = true;
+        } break;
+
+        case BORDER_BUTTON:
+        {
+            border = true;
+            gradient = true;
+            if (state == STATE_SELECTED)
+            {
+                uint32_t tmp;
+
+                tmp = b1;
+                b1 = b2;
+                b2 = tmp;
+            }
+        } break;
+
+        case BORDER_SCROLLBAR:
+        {
+            background = true;
+            backgroundColour = getColour(COLOUR_SCROLLBAR_BACKGROUND);
+        } break;
+
+        case BORDER_SCROLLBAR_CONTROL:
+        {
+            background = true;
+            backgroundColour = getColour(COLOUR_SCROLLBAR_CONTROL);
+        } break;
+
+        case BORDER_LIST_ITEM_1:
+        case BORDER_LIST_ITEM_2:
+        {
+background = true;
+if (state == STATE_SELECTED)
+{
+backgroundColour = getColour(COLOUR_LIST_ITEM_SELECTED);
+}
+else if (type == BORDER_LIST_ITEM_1)
+{
+backgroundColour = getColour(COLOUR_LIST_ITEM_1);
+}
+else if (type == BORDER_LIST_ITEM_2)
+{
+backgroundColour = getColour(COLOUR_LIST_ITEM_1);
+}
+        } break;
     }
 
-    surface->drawGrad(x, y, width, height, g1, g2);
+    if (gradient)
+    {
+        surface->drawGrad(x, y, width, height, g1, g2);
+    }
 
+if (background)
+{
+surface->drawRectFilled(x, y, width, height, backgroundColour);
+}
+
+if (border)
+{
     surface->drawLine(x, y, x + width, y, b1);
     surface->drawLine(x, y, x, y + height, b1);
 
     surface->drawLine(x + width, y, x + width, y + height, b2);
     surface->drawLine(x, y + height, x + width, y + height, b2);
+}
 }
 
 void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, bool inverted)
@@ -85,8 +198,10 @@ void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring t
         c = 0xff000000;
     }
 
+FontHandle* font = m_font;
+
     FontManager* fm = m_app->getFontManager();
-    fm->write(m_font,
+    fm->write(font,
         surface,
         x,
         y,

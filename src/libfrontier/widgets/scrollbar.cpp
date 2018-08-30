@@ -32,7 +32,13 @@ bool ScrollBar::draw(Surface* surface)
 
     printf("ScrollBar::draw: drawWidth=%d, drawHeight=%d\n", drawWidth, drawHeight);
 
-    surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
+    //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
+    m_ui->getTheme()->drawBorder(
+        surface,
+        BORDER_SCROLLBAR,
+        STATE_NONE,
+        0, 0,
+        m_setSize.width, m_setSize.height);
 
     int pos = getControlPos();
     printf("ScrollBar::draw: m_pos=%d, pos=%d\n", m_pos, pos);
@@ -40,7 +46,12 @@ bool ScrollBar::draw(Surface* surface)
     int sizePix = getControlSize();
     //printf("ScrollBar::draw: sizePix=%d\n", sizePix);
 
-    surface->drawRectFilled(3, pos + 3, drawWidth, sizePix, 0xffffffff);
+    m_ui->getTheme()->drawBorder(
+        surface,
+        BORDER_SCROLLBAR_CONTROL,
+        STATE_NONE,
+        3, pos + 3,
+        drawWidth, sizePix);
 
     return true;
 }

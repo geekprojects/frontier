@@ -63,6 +63,8 @@ NSTrackingArea* trackingArea;
 - (void)mouseUp:(NSEvent *)theEvent;
 - (void)mouseMoved:(NSEvent *)theEvent;
 - (void)mouseDragged:(NSEvent *)theEvent;
+- (void)keyUp:(NSEvent *)theEvent;
+- (void)keyDown:(NSEvent *)theEvent;
 
 @end
 
@@ -80,7 +82,6 @@ NSTrackingArea* trackingArea;
         float width = [self frame].size.width;// / 2;
         float height = [self frame].size.height;// / 2;
         CGRect renderRect = CGRectMake(0., 0., width, height);
-printf("drawRect: width=%d, height=%d\n", width, height);
 
         CGContextDrawImage(context, renderRect, m_image);
     }
@@ -121,10 +122,9 @@ printf("drawRect: width=%d, height=%d\n", width, height);
 - (void)mouseDown:(NSEvent *)theEvent
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
-    NSLog(@"Mouse was clicked: window=%p", window);
 
     NSPoint pos = [theEvent locationInWindow];
-    NSLog(@"Mouse was clicked: location: %0.2f, %0.2f\n", pos.x, pos.y);
+    //NSLog(@"Mouse was clicked: location: %0.2f, %0.2f\n", pos.x, pos.y);
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
@@ -145,10 +145,9 @@ printf("drawRect: width=%d, height=%d\n", width, height);
 - (void)mouseUp:(NSEvent *)theEvent
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
-    NSLog(@"Mouse was clicked: window=%p", window);
 
     NSPoint pos = [theEvent locationInWindow];
-    NSLog(@"Mouse was clicked: location: %0.2f, %0.2f\n", pos.x, pos.y);
+    //NSLog(@"Mouse was clicked: location: %0.2f, %0.2f\n", pos.x, pos.y);
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
@@ -169,10 +168,9 @@ int height = [self frame].size.height;
 - (void)mouseMoved:(NSEvent *)theEvent
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
-    NSLog(@"Mouse was moved: window=%p", window);
 
     NSPoint pos = [theEvent locationInWindow];
-    NSLog(@"Mouse was moved: location: %0.2f, %0.2f\n", pos.x, pos.y);
+    //NSLog(@"Mouse was moved: location: %0.2f, %0.2f\n", pos.x, pos.y);
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
@@ -192,10 +190,9 @@ int height = [self frame].size.height;
 - (void)mouseDragged:(NSEvent *)theEvent
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
-    NSLog(@"Mouse was dragged: window=%p", window);
 
     NSPoint pos = [theEvent locationInWindow];
-    NSLog(@"Mouse was dragged: location: %0.2f, %0.2f\n", pos.x, pos.y);
+    //NSLog(@"Mouse was dragged: location: %0.2f, %0.2f\n", pos.x, pos.y);
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
@@ -212,6 +209,37 @@ int height = [self frame].size.height;
     cwindow->getWindow()->handleMessage(msg);
 }
 
+- (void)keyUp:(NSEvent *)theEvent
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
+    uint16_t keyCode = [theEvent keyCode];
+    NSLog(@"keyUp: window=%p, keyCode=0x%x", window, keyCode);
+
+    Frontier::InputMessage* msg = new Frontier::InputMessage();
+    msg->messageType = FRONTIER_MSG_INPUT;
+    msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
+    msg->event.key.direction = false;
+    msg->event.key.key = keyCode;
+
+    CocoaWindow* cwindow = [window getEngineWindow];
+    cwindow->getWindow()->handleMessage(msg);
+}
+
+- (void)keyDown:(NSEvent *)theEvent
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
+    uint16_t keyCode = [theEvent keyCode];
+    NSLog(@"keyDown: window=%p, keyCode=0x%x", window, keyCode);
+
+    Frontier::InputMessage* msg = new Frontier::InputMessage();
+    msg->messageType = FRONTIER_MSG_INPUT;
+    msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
+    msg->event.key.direction = true;
+    msg->event.key.key = keyCode;
+
+    CocoaWindow* cwindow = [window getEngineWindow];
+    cwindow->getWindow()->handleMessage(msg);
+}
 @end
 
 bool CocoaWindow::createCocoaWindow()
@@ -239,6 +267,7 @@ bool CocoaWindow::createCocoaWindow()
     FrontierView* view = [[FrontierView alloc] initWithFrame:rect];
     m_cocoaView = view;
     [[window contentView] addSubview: view];
+    [window makeFirstResponder: view];
 
     [window makeKeyAndOrderFront:nil];
 

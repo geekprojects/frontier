@@ -40,6 +40,8 @@ return false;
         return false;
     }
 
+    m_fontManager->scan("/System/Library/Fonts");
+    m_fontManager->scan("/Users/ian/Library/Fonts");
     m_fontManager->scan("fonts");
 
     m_theme = new UITheme(this);

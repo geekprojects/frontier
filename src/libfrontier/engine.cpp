@@ -50,3 +50,8 @@ bool FrontierEngineWindow::update()
     return true;
 }
 
+float FrontierEngineWindow::getScaleFactor()
+{
+    return 1.0;
+}
+
