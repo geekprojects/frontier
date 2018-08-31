@@ -259,6 +259,7 @@ bool FontManager::write(
     if (draw)
     {
         loadFlags |= FT_LOAD_RENDER;
+        col &= 0xffffff;
     }
 
     FTC_ScalerRec scaler;
@@ -335,6 +336,7 @@ bool FontManager::write(
         prevGlyph = glyphIndex;
 
         int top = 0;
+        int left = 0;
         int xAdvance = 0;
         int yAdvance = 0;
         bool bitmapValid = true;
@@ -369,6 +371,7 @@ bool FontManager::write(
             bitmap.width = sbit->width;
             bitmap.pitch = sbit->pitch;
             bitmap.buffer = sbit->buffer;
+            left = sbit->left;
             top = sbit->top;
             xAdvance = sbit->xadvance;
             yAdvance = sbit->yadvance;
@@ -401,6 +404,8 @@ bool FontManager::write(
             {
                 FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
                 bitmap = bitmapGlyph->bitmap;
+                left = bitmapGlyph->left;
+                top = bitmapGlyph->top;
             }
         }
 
@@ -419,16 +424,13 @@ bool FontManager::write(
         if (draw && bitmapValid)
         {
             int ph = font->getPixelHeight(72);
-if (highDPI)
-{
-ph *= 2;
-}
-            int yoff = ph - top;
-            yoff -= ph / 4;
+            if (highDPI)
+            {
+                ph *= 2;
+            }
 
-            float r = (float)((col >> 16) & 0xff);
-            float g = (float)((col >> 8) & 0xff);
-            float b = (float)((col >> 0) & 0xff);
+            int yoff = ph - top;
+            //yoff -= ph / 4;
 
             int sh = surface->getHeight();
             int sw = surface->getWidth();
@@ -445,7 +447,7 @@ ph *= 2;
                 int xp;
                 for (xp = 0; xp < bitmap.width; xp++)
                 {
-                    int x1 = x + xp;
+                    int x1 = x + xp + left;
                     if (x1 < 0 || x1 >= sw)
                     {
                         continue;
@@ -454,12 +456,7 @@ ph *= 2;
                     uint8_t c = bitmap.buffer[(yp * bitmap.width) + xp];
                     if (c > 0)
                     {
-                        float a = (float)c / 255.0;
-                        uint32_t p;
-                        p  = (((uint8_t)(r * a)) << 16);
-                        p |= (((uint8_t)(g * a)) << 8);
-                        p |= (((uint8_t)(b * a)) << 0);
-                        p |= 0xff000000;
+                        uint32_t p = (col & 0xffffff) | (c << 24);
 
                         if (!highDPI)
                         {
