@@ -65,6 +65,7 @@ class Widget
 
     void setDirty();
     bool isDirty() { return m_dirty; }
+    void clearDirty();
 
     virtual Widget* handleMessage(Frontier::Message* msg);
 

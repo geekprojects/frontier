@@ -90,6 +90,17 @@ void Widget::setDirty()
     }
 }
 
+void Widget::clearDirty()
+{
+    m_dirty = false;
+
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); it++)
+    {
+        (*it)->clearDirty();
+    }
+}
+
 Widget* Widget::handleMessage(Message* msg)
 {
     return NULL;
@@ -98,18 +109,18 @@ Widget* Widget::handleMessage(Message* msg)
 void Widget::dump(int level)
 {
     string spaces = "";
-int i;
-for (i = 0; i < level; i++)
-{
-    spaces += "    ";
-}
-printf("%s: %p: x=%d, y=%d, size=%s\n", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
+    int i;
+    for (i = 0; i < level; i++)
+    {
+        spaces += "    ";
+    }
+    printf("%s: %p: x=%d, y=%d, size=%s\n", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
 
-vector<Widget*>::iterator it;
-for (it = m_children.begin(); it != m_children.end(); it++)
-{
-(*it)->dump(level + 1);
-}
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); it++)
+    {
+        (*it)->dump(level + 1);
+    }
 
 }
 

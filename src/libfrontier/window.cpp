@@ -96,6 +96,7 @@ void FrontierWindow::update()
     m_widget->draw(m_surface);
 
     m_engineWindow->update();
+    m_widget->clearDirty();
 }
 
 /*
@@ -147,11 +148,11 @@ bool FrontierWindow::handleMessage(Message* message)
     if (destWidget != NULL)
     {
         m_activeWidget = destWidget;
-    }
 
-    if (m_widget != NULL && m_widget->isDirty())
-    {
-        update();
+        if (m_widget->isDirty())
+        {
+            update();
+        }
     }
 
     return true;
