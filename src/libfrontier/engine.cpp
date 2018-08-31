@@ -1,7 +1,9 @@
 
 #include <frontier/engine.h>
 
+using namespace std;
 using namespace Frontier;
+using namespace Geek;
 
 FrontierEngine::FrontierEngine(FrontierApp* app) : Geek::Logger("FrontierEngine")
 {
@@ -26,6 +28,12 @@ bool FrontierEngine::checkEvents()
 {
     // Just quit
     return false;
+}
+
+string FrontierEngine::chooseFile()
+{
+    log(WARN, "chooseFile not implemented");
+    return "";
 }
 
 FrontierEngineWindow::FrontierEngineWindow(FrontierWindow* window)

@@ -21,6 +21,8 @@ class FrontierEngine : public Geek::Logger
     virtual bool initWindow(FrontierWindow* window);
 
     virtual bool checkEvents();
+
+    virtual std::string chooseFile();
 };
 
 class FrontierEngineWindow

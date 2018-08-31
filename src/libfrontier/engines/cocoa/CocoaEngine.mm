@@ -2,6 +2,7 @@
 #include "cocoa_engine.h"
 
 #include <Cocoa/Cocoa.h>
+#include <Foundation/Foundation.h>
 
 using namespace Frontier;
 
@@ -55,9 +56,30 @@ bool CocoaEngine::createApplication()
 
 bool CocoaEngine::run()
 {
-    [m_application run];
+    NSApplication* app = (NSApplication*)m_application;
+    [app run];
 
     return false;
 }
 
+std::string CocoaEngine::chooseFile()
+{
+    NSOpenPanel* openDlg = [NSOpenPanel openPanel];
+
+    // Enable the selection of files in the dialog.
+    [openDlg setCanChooseFiles:YES];
+
+    // Enable the selection of directories in the dialog.
+    [openDlg setCanChooseDirectories:YES];
+
+    // Display the dialog.  If the OK button was pressed process the files.
+    bool res = [openDlg runModalForDirectory:nil file:nil];
+    if (res)
+    {
+        NSString* filename = [openDlg filename];
+        return std::string([filename UTF8String], [filename lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    }
+
+    return "";
+}
 

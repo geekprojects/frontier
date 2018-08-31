@@ -35,13 +35,13 @@ class FrontierApp
     FontManager* getFontManager() { return m_fontManager; }
     UITheme* getTheme() { return m_theme; }
 
-    void chooseFile();
-
     virtual bool init();
     virtual bool main();
 
     void postMessage(Frontier::Message* message);
     virtual void handleMessage(Frontier::Message* message);
+
+    std::string chooseFile();
 };
 
 class FrontierWindow

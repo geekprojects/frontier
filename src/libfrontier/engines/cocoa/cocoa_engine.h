@@ -22,6 +22,8 @@ class CocoaEngine : public FrontierEngine
     virtual bool initWindow(FrontierWindow* window);
 
     virtual bool checkEvents();
+
+    virtual std::string chooseFile();
 };
 
 class CocoaWindow : public FrontierEngineWindow

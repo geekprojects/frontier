@@ -78,4 +78,8 @@ void FrontierApp::handleMessage(Message* message)
 {
 }
 
+string FrontierApp::chooseFile()
+{
+    return m_engine->chooseFile();
+}
 
