@@ -1,6 +1,10 @@
 #ifndef __FRONTIER_EVENTS_H_
 #define __FRONTIER_EVENTS_H_
 
+#include <frontier/keycodes.h>
+
+#include <string>
+
 namespace Frontier {
 
 enum MessageType
@@ -36,6 +40,7 @@ struct InputMessage : public Message
         {
             bool direction;
             uint32_t key;
+            wchar_t chr;
         } key;
         struct
         {

@@ -5,6 +5,8 @@
 
 using namespace Frontier;
 
+#include "keycode_map.h"
+
 @interface CocoaNSWindow : NSWindow
 {
     CocoaWindow* m_engineWindow;
@@ -34,11 +36,11 @@ using namespace Frontier;
     NSRect rect = [self contentRectForFrameRect:[self frame]];
     NSLog(@"CocoaNSWindow.windowDidResize: w=%0.2f, h=%0.2f", rect.size.width, rect.size.height);
 
-int w = rect.size.width;
-int h = rect.size.height;
+    int w = rect.size.width;
+    int h = rect.size.height;
 
-m_engineWindow->getWindow()->setSize(Frontier::Size(w, h));
-m_engineWindow->getWindow()->update();
+    m_engineWindow->getWindow()->setSize(Frontier::Size(w, h));
+    m_engineWindow->getWindow()->update();
 
     NSLog(@"CocoaNSWindow.windowDidResize: (screen) backingScaleFactor=%0.2f", [[self screen] backingScaleFactor]);
 }
@@ -215,13 +217,38 @@ int height = [self frame].size.height;
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
     uint16_t keyCode = [theEvent keyCode];
+    NSString* chars = [theEvent characters];
+    std::string wchars = std::string([chars UTF8String], [chars lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+
+char c = wchars.at(0);
+
+if (isprint(c))
+{
+    NSLog(@"keyUp: window=%p, keyCode=0x%x, chars=%c", window, keyCode, c);
+}
+else
+{
     NSLog(@"keyUp: window=%p, keyCode=0x%x", window, keyCode);
+}
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
     msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
     msg->event.key.direction = false;
-    msg->event.key.key = keyCode;
+
+    if (wchars.length() > 0)
+    {
+        msg->event.key.chr = wchars.at(0);
+    }
+
+    if (keyCode < 128)
+    {
+        msg->event.key.key = g_darwinKeyCodeMap[keyCode];
+    }
+    else
+    {
+        msg->event.key.key = KC_UNKNOWN;
+    }
 
     CocoaWindow* cwindow = [window getEngineWindow];
     cwindow->getWindow()->handleMessage(msg);
@@ -231,13 +258,29 @@ int height = [self frame].size.height;
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
     uint16_t keyCode = [theEvent keyCode];
+    NSString* chars = [theEvent characters];
+    std::string wchars = std::string([chars UTF8String], [chars lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+
     NSLog(@"keyDown: window=%p, keyCode=0x%x", window, keyCode);
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
     msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
     msg->event.key.direction = true;
-    msg->event.key.key = keyCode;
+
+    if (wchars.length() > 0)
+    {
+        msg->event.key.chr = wchars.at(0);
+    }
+
+    if (keyCode < 128)
+    {
+        msg->event.key.key = g_darwinKeyCodeMap[keyCode];
+    }
+    else
+    {
+        msg->event.key.key = KC_UNKNOWN;
+    }
 
     CocoaWindow* cwindow = [window getEngineWindow];
     cwindow->getWindow()->handleMessage(msg);
@@ -327,6 +370,8 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
         kCGRenderingIntentDefault);
 
     [m_cocoaView setImage: image];
+
+    // Tell Cocoa to redraw the window
     [m_cocoaView setNeedsDisplay:YES];
 
     //Clean up
