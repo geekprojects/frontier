@@ -38,35 +38,50 @@ bool DemoApp::init()
         return false;
     }
 
-        Frame* frame1 = new Frame(this, false);
+    Frame* rootFrame = new Frame(this, false);
+    Tabs* tabs = new Tabs(this);
+    rootFrame->add(tabs);
 
-        Frame* toolbar = new Frame(this, true);
-        toolbar->add(new IconButton(this, FRONTIER_ICON_FOLDER_OPEN));
-        toolbar->add(new IconButton(this, FRONTIER_ICON_SAVE));
-        toolbar->add(new IconButton(this, FRONTIER_ICON_SYNC));
-        frame1->add(toolbar);
+    Frame* toolbarTab = new Frame(this, false);
 
-    Frame* labelFrame = new Frame(this, true);
-    labelFrame->add(new Label(this, L"Label:"));
-    labelFrame->add(new Label(this, L"I'm a label!"));
-    frame1->add(labelFrame);
+    Frame* toolbar1 = new Frame(this, true);
+    toolbar1->add(new IconButton(this, FRONTIER_ICON_FOLDER_OPEN));
+    toolbar1->add(new IconButton(this, FRONTIER_ICON_SAVE));
+    toolbar1->add(new IconButton(this, FRONTIER_ICON_SYNC));
+    toolbarTab->add(toolbar1);
+    tabs->addTab(L"Tool Bars", toolbarTab);
 
-    Frame* buttonFrame = new Frame(this, true);
+    Frame* labelTab = new Frame(this, false);
+    Frame* labelFrame1 = new Frame(this, true);
+    labelFrame1->add(new Label(this, L"Label:"));
+    labelFrame1->add(new Label(this, L"I'm a label!"));
+    labelTab->add(labelFrame1);
+
+    Frame* labelFrame2 = new Frame(this, true);
+    labelFrame2->add(new Label(this, L"Label:"));
+    labelFrame2->add(new Label(this, L"I'm another label!"));
+    labelTab->add(labelFrame2);
+    tabs->addTab(L"Labels", labelTab);
+
+    Frame* buttonTab = new Frame(this, false);
+    Frame* buttonFrame1 = new Frame(this, true);
     Button* textButton;
-    buttonFrame->add(new Label(this, L"Button:"));
-    buttonFrame->add(textButton = new Button(this, L"Click me!"));
-    frame1->add(buttonFrame);
+    buttonFrame1->add(new Label(this, L"Button:"));
+    buttonFrame1->add(textButton = new Button(this, L"Click me!"));
+    buttonTab->add(buttonFrame1);
+    tabs->addTab(L"Buttons", buttonTab);
 
-    Frame* iconButtonFrame = new Frame(this, true);
+    Frame* iconButtonTab = new Frame(this, false);
+    Frame* iconButtonFrame1 = new Frame(this, true);
     IconButton* iconButton;
-    iconButtonFrame->add(new Label(this, L"Icon Button:"));
-    iconButtonFrame->add(iconButton = new IconButton(this, 0xf0ae));
-    frame1->add(iconButtonFrame);
+    iconButtonFrame1->add(new Label(this, L"Icon Button:"));
+    iconButtonFrame1->add(iconButton = new IconButton(this, 0xf0ae));
+    iconButtonTab->add(iconButtonFrame1);
+tabs->addTab(L"Icon Buttons", iconButtonTab);
 
     textButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton));
     iconButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onIconButton));
 
-#if 1
     Frame* listFrame = new Frame(this, true);
     listFrame->add(new Label(this, L"List:"));
 
@@ -80,11 +95,10 @@ bool DemoApp::init()
     Scroller* scroller = new Scroller(this);
     scroller->setChild(list);
     listFrame->add(scroller);
-    frame1->add(listFrame);
-#endif
+    rootFrame->add(listFrame);
 
     m_mainWindow = new FrontierWindow(this);
-    m_mainWindow->setContent(frame1);
+    m_mainWindow->setContent(rootFrame);
 
     m_mainWindow->show();
 
