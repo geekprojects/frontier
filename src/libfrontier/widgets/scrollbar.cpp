@@ -169,12 +169,10 @@ int ScrollBar::getPos()
 
 int ScrollBar::getControlPos()
 {
-if (m_max == 0)
-{
-return 0;
-}
-
-    int range = m_max - (m_min + m_size);
+    if (m_max == 0)
+    {
+        return 0;
+    }
 
     int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - (3 * 2)));
     return pos;
@@ -182,10 +180,10 @@ return 0;
 
 int ScrollBar::getControlSize()
 {
-if (m_max == 0)
-{
-return 0;
-}
+    if (m_max == 0)
+    {
+        return 0;
+    }
 
     //int range = m_max - (m_min + m_size);
     int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - (3 * 2)));

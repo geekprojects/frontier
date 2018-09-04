@@ -52,8 +52,7 @@ using namespace Frontier;
     CocoaWindow* m_engineWindow;
     CGImageRef m_image;
 
-NSTrackingArea* trackingArea;
-
+    NSTrackingArea* trackingArea;
 }
 
 - (void)setImage:(CGImageRef)image;
@@ -341,7 +340,7 @@ void CocoaWindow::setSize(Frontier::Size size)
     rect.origin.x = 0;
     rect.origin.y = 0;
     rect.size = nssize;
-    [m_cocoaView setFrameSize: nssize];
+    [(FrontierView*)m_cocoaView setFrameSize: nssize];
 }
 
 bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
@@ -369,10 +368,11 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
         true,
         kCGRenderingIntentDefault);
 
-    [m_cocoaView setImage: image];
+    FrontierView* view = (FrontierView*)m_cocoaView;
+    [view setImage: image];
 
     // Tell Cocoa to redraw the window
-    [m_cocoaView setNeedsDisplay:YES];
+    [view setNeedsDisplay:YES];
 
     //Clean up
     CGColorSpaceRelease(colorspace);
@@ -383,6 +383,6 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
 
 float CocoaWindow::getScaleFactor()
 {
-    return [[m_cocoaWindow screen] backingScaleFactor];
+    return [[(NSWindow*)m_cocoaWindow screen] backingScaleFactor];
 }
 

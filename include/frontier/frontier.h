@@ -17,7 +17,7 @@ class FrontierApp;
 class Widget;
 class UITheme;
 
-struct FrontierEngineWindow;
+class FrontierEngineWindow;
 
 class FrontierApp
 {

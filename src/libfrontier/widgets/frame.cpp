@@ -160,9 +160,7 @@ void Frame::layout()
 
     printf("Frame::layout: major=%d, minor=%d\n", major, minor);
 
-    int major2 = major;
     int q = major / m_children.size();
-    int expandable = 0;
     int slackable = 0;
 
     int min = 0;
@@ -364,7 +362,7 @@ Widget* Frame::handleMessage(Message* msg)
         {
             int x = imsg->event.button.x;
             int y = imsg->event.button.y;
-            Vector2D thisPos = getAbsolutePosition();
+
             vector<Widget*>::iterator it;
             for (it = m_children.begin(); it != m_children.end(); it++)
             {

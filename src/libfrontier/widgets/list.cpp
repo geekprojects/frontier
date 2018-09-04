@@ -54,23 +54,22 @@ bool List::draw(Surface* surface)
     for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
     {
         ListItem* item = *it;
-        uint32_t c = 0xffffffff;
-bool isSelected = m_selected == idx;
-UIState state = STATE_NONE;
-if (isSelected)
-{
-state = STATE_SELECTED;
-}
-UIBorderType border;
-if ((idx % 2) == 0)
-{
-border = BORDER_LIST_ITEM_1;
-}
-else
-{
-border = BORDER_LIST_ITEM_2;
-}
-m_ui->getTheme()->drawBorder(surface, border, state, 0, y, m_setSize.width, m_itemHeight);
+        bool isSelected = m_selected == idx;
+        UIState state = STATE_NONE;
+        if (isSelected)
+        {
+            state = STATE_SELECTED;
+        }
+        UIBorderType border;
+        if ((idx % 2) == 0)
+        {
+            border = BORDER_LIST_ITEM_1;
+        }
+        else
+        {
+            border = BORDER_LIST_ITEM_2;
+        }
+        m_ui->getTheme()->drawBorder(surface, border, state, 0, y, m_setSize.width, m_itemHeight);
 
         m_ui->getTheme()->drawText(surface, x, y, item->getText(), m_selected == idx);
 
@@ -96,7 +95,6 @@ Widget* List::handleMessage(Message* msg)
             vector<ListItem*>::iterator it;
             for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
             {
-                ListItem* item = *it;
                 if (ey >= y && ey < y + m_itemHeight)
                 {
                     selected = idx;

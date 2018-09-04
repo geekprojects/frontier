@@ -169,6 +169,9 @@ else if (type == BORDER_LIST_ITEM_2)
 backgroundColour = getColour(COLOUR_LIST_ITEM_1);
 }
         } break;
+
+        default:
+            break;
     }
 
     if (gradient)
@@ -220,7 +223,6 @@ int UITheme::getTextWidth(std::wstring text)
 
 int UITheme::getTextHeight()
 {
-    FontManager* fm = m_app->getFontManager();
     return m_font->getPixelHeight(72);
 }
 

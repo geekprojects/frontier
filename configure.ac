@@ -36,6 +36,8 @@ PKG_CHECK_MODULES(SIGCPLUSPLUS, sigc++-2.0 >= 2.10)
 CPPFLAGS="$CPPFLAGS $SIGCPLUSPLUS_CFLAGS"
 LIBS="$LIBS $SIGCPLUSPLUS_LIBS"
 
+CPPFLAGS="$CPPFLAGS -Wall -Werror"
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_INT8_T
 AC_TYPE_UINT8_T
