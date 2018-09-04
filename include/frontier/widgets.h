@@ -264,6 +264,8 @@ class Tabs : public Widget
 
     sigc::signal<void, Widget*> m_changeTabSignal;
 
+    int getTabWidth();
+
  public:
     Tabs(FrontierApp* app);
     virtual ~Tabs();

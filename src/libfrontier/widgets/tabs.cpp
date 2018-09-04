@@ -7,6 +7,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+#define MAX_TAB_SIZE 250
+
 Tabs::Tabs(FrontierApp* ui) : Widget(ui)
 {
     m_activeTab = 0;
@@ -26,10 +28,10 @@ void Tabs::calculateSize()
     }
 
     Widget* activeWidget = getActiveTab();
-if (activeWidget == NULL)
-{
-return;
-}
+    if (activeWidget == NULL)
+    {
+        return;
+    }
 
     activeWidget->calculateSize();
 
@@ -76,10 +78,9 @@ bool Tabs::draw(Surface* surface)
         0, 25,
         m_setSize.width, m_setSize.height - 25);
 
+    int titleWidth = getTabWidth();
 
-    int titleWidth = m_setSize.width / m_tabs.size();
-
-    printf("Tabs::draw: tabs=%d, titleWidth=%d\n", m_tabs.size(), titleWidth);
+    printf("Tabs::draw: tabs=%lu, titleWidth=%d\n", m_tabs.size(), titleWidth);
 
     vector<Tab>::iterator it;
     int x = 0;
@@ -97,6 +98,12 @@ bool Tabs::draw(Surface* surface)
             backgroundCol = m_ui->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
         }
         surface->drawRectFilled(x, 0, titleWidth - 1, 24, backgroundCol);
+    m_ui->getTheme()->drawBorder(
+        surface,
+        BORDER_WIDGET,
+        STATE_NONE,
+        x, 0,
+        titleWidth, 24);
 
         printf("Tabs::draw:  -> %ls: active=%d x=%d\n", it->title.c_str(), isActive, x);
 
@@ -108,11 +115,10 @@ bool Tabs::draw(Surface* surface)
 
         if (tab < m_tabs.size() - 1)
         {
-            surface->drawLine(x + titleWidth - 1, 0, x + titleWidth - 1, 24, 0xffffffff);
+            //surface->drawLine(x + titleWidth - 1, 0, x + titleWidth - 1, 24, 0xffffffff);
         }
         x += titleWidth;
     }
-    surface->drawLine(0, 24, m_setSize.width, 24, 0xffffffff);
 
     Widget* activeWidget = m_tabs.at(m_activeTab).content;
 
@@ -140,44 +146,47 @@ Widget* Tabs::handleMessage(Message* msg)
                 {
                     return this;
                 }
-if (!imsg->event.button.direction)
-{
-return this;
-}
 
-                int titleWidth = m_setSize.width / m_tabs.size();
-                m_activeTab = x / titleWidth;
+                if (!imsg->event.button.direction)
+                {
+                    return NULL;
+                }
 
+                int titleWidth = getTabWidth();
+                int tab = x / titleWidth;
                 printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
+                if (tab >= m_tabs.size())
+                {
+                    return NULL;
+                }
+                m_activeTab = tab;
 
                 setDirty();
 
-Widget* activeTab = getActiveTab();
-printf("Tabs::handleMessage: activeTab=%p\n", activeTab);
+                Widget* activeTab = getActiveTab();
+                printf("Tabs::handleMessage: activeTab=%p\n", activeTab);
 
                 m_changeTabSignal.emit(activeTab);
-if (activeTab != NULL)
-{
-                getActiveTab()->setDirty();
-return activeTab;
-}
-else
-{
-return this;
-}
+                if (activeTab != NULL)
+                {
+                    getActiveTab()->setDirty();
+                    return activeTab;
+                }
+                else
+                {
+                    return this;
+                }
+            }
+            else
+            {
+                Widget* activeWidget = m_tabs.at(m_activeTab).content;
 
-}
-else
-{
-    Widget* activeWidget = m_tabs.at(m_activeTab).content;
+                if (activeWidget != NULL)
+                {
+                    return activeWidget->handleMessage(msg);
+                }
 
-if (activeWidget != NULL)
-{
-return activeWidget->handleMessage(msg);
-}
-
-}
-
+            }
         }
     }
     return NULL;
@@ -190,7 +199,7 @@ void Tabs::addTab(std::wstring title, Widget* content)
     tab.content = content;
     m_tabs.push_back(tab);
 
-content->setParent(this);
+    content->setParent(this);
 
     setDirty();
 }
@@ -210,5 +219,20 @@ void Tabs::dump(int level)
     {
         activeWidget->dump(level + 1);
     }
+}
+
+int Tabs::getTabWidth()
+{
+    if (m_tabs.empty())
+    {
+        return 0;
+    }
+
+    int tabWidth = m_setSize.width / m_tabs.size();
+    if (tabWidth > MAX_TAB_SIZE)
+    {
+        tabWidth = MAX_TAB_SIZE;
+    }
+    return tabWidth;
 }
 
