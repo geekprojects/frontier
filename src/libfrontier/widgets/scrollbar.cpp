@@ -7,6 +7,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+#define SCROLLBAR_BORDER 1
+
 ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui)
 {
     m_pos = 0;
@@ -20,15 +22,15 @@ ScrollBar::~ScrollBar()
 
 void ScrollBar::calculateSize()
 {
-    m_minSize.set(20, 20);
-    m_maxSize.set(20, WIDGET_SIZE_UNLIMITED);
+    m_minSize.set(10, 20);
+    m_maxSize.set(10, WIDGET_SIZE_UNLIMITED);
     m_dirty = false;
 }
 
 bool ScrollBar::draw(Surface* surface)
 {
-    int drawWidth = m_setSize.width - (3 * 2);
-    int drawHeight = m_setSize.height - (3 * 2);
+    int drawWidth = m_setSize.width - (SCROLLBAR_BORDER * 2);
+    int drawHeight = m_setSize.height - (SCROLLBAR_BORDER * 2);
 
     printf("ScrollBar::draw: drawWidth=%d, drawHeight=%d\n", drawWidth, drawHeight);
 
@@ -50,7 +52,7 @@ bool ScrollBar::draw(Surface* surface)
         surface,
         BORDER_SCROLLBAR_CONTROL,
         STATE_NONE,
-        3, pos + 3,
+        SCROLLBAR_BORDER, pos + SCROLLBAR_BORDER,
         drawWidth, sizePix);
 
     return true;
@@ -69,20 +71,20 @@ Widget* ScrollBar::handleMessage(Message* msg)
             int sizePix = getControlSize();
 
             int y = imsg->event.button.y - thisPos.y;
-            y -= 3;
+            y -= SCROLLBAR_BORDER;
 
-if (imsg->event.button.direction)
-{
-if (y >= pos && y < pos + sizePix)
-{
+            if (imsg->event.button.direction)
+            {
+                if (y >= pos && y < pos + sizePix)
+                {
 //printf("ScrollBar::handleMessage: Control!!\n");
-    m_dragging = true;
-}
-}
-else
-{
-    m_dragging = false;
-}
+                    m_dragging = true;
+                }
+            }
+            else
+            {
+                m_dragging = false;
+            }
 
 /*
                 setDirty();
@@ -99,36 +101,31 @@ else
         }
         else if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
         {
-if (m_dragging)
-{
-//printf("ScrollBar::handleMessage: Drag!!\n");
-            Vector2D thisPos = getAbsolutePosition();
+            if (m_dragging)
+            {
+                Vector2D thisPos = getAbsolutePosition();
 
-int range = m_max - (m_min + m_size);
-//int pos = (int)(((float)m_pos / (float)m_max) * (float)(m_height - 3));
+                int range = m_max - (m_min + m_size);
 
-int y = imsg->event.motion.y - thisPos.y;
-//printf("ScrollBar::handleMessage: y=%d\n", y);
+                int y = imsg->event.motion.y - thisPos.y;
 
-float r = (float)(y - 3) / (float)(m_setSize.height - (3 * 2));
-//printf("ScrollBar::handleMessage: r=%0.2f\n", r);
-m_pos = (int)((float)range * r) + m_min;
-//printf("ScrollBar::handleMessage: m_pos=%d\n", m_pos);
+                float r = (float)(y - SCROLLBAR_BORDER) / (float)(m_setSize.height - (SCROLLBAR_BORDER * 2));
+                m_pos = (int)((float)range * r) + m_min;
 
-if (m_pos < m_min)
-{
-m_pos = m_min;
-}
-else if (m_pos > (m_max - m_size))
-{
-m_pos = m_max - m_size;
-}
-//printf("ScrollBar::handleMessage: m_pos(2)=%d\n", m_pos);
+                if (m_pos < m_min)
+                {
+                    m_pos = m_min;
+                }
+                else if (m_pos > (m_max - m_size))
+                {
+                    m_pos = m_max - m_size;
+                }
+                //printf("ScrollBar::handleMessage: m_pos(2)=%d\n", m_pos);
 
-setDirty();
+                setDirty();
 
-}
-}
+            }
+        }
     }
 
     return this;
@@ -174,7 +171,7 @@ int ScrollBar::getControlPos()
         return 0;
     }
 
-    int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - (3 * 2)));
+    int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - (SCROLLBAR_BORDER * 2)));
     return pos;
 }
 
@@ -186,7 +183,7 @@ int ScrollBar::getControlSize()
     }
 
     //int range = m_max - (m_min + m_size);
-    int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - (3 * 2)));
+    int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - (SCROLLBAR_BORDER * 2)));
     return sizePix;
 }
 
