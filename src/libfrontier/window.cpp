@@ -68,7 +68,9 @@ void FrontierWindow::update()
     printf("FrontierWindow::update: Updating window size: %s\n", m_size.toString().c_str());
 
     m_widget->layout();
+#if 0
     m_widget->dump(1);
+#endif
 
     float scale = m_engineWindow->getScaleFactor();
 
@@ -154,6 +156,8 @@ bool FrontierWindow::handleMessage(Message* message)
             update();
         }
     }
+
+    delete message;
 
     return true;
 }
