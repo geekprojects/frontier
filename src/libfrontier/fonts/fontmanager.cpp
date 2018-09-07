@@ -430,7 +430,7 @@ bool FontManager::write(
             }
 
             int yoff = ph - top;
-            //yoff -= ph / 4;
+            yoff -= ph / 4;
 
             int sh = surface->getHeight();
             int sw = surface->getWidth();
