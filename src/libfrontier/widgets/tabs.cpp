@@ -71,6 +71,9 @@ bool Tabs::draw(Surface* surface)
         return true;
     }
 
+    int labelHeight = m_ui->getTheme()->getTextHeight();
+    int labelY = (25 / 2) - (labelHeight / 2);
+
     m_ui->getTheme()->drawBorder(
         surface,
         BORDER_WIDGET,
@@ -98,19 +101,19 @@ bool Tabs::draw(Surface* surface)
             backgroundCol = m_ui->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
         }
         surface->drawRectFilled(x, 0, titleWidth - 1, 24, backgroundCol);
-    m_ui->getTheme()->drawBorder(
-        surface,
-        BORDER_WIDGET,
-        STATE_NONE,
-        x, 0,
-        titleWidth, 24);
+        m_ui->getTheme()->drawBorder(
+            surface,
+            BORDER_WIDGET,
+            STATE_NONE,
+            x, 0,
+            titleWidth, 24);
 
         printf("Tabs::draw:  -> %ls: active=%d x=%d\n", it->title.c_str(), isActive, x);
 
         m_ui->getTheme()->drawText(
             surface,
             x,
-            0,
+            labelY,
            it->title.c_str()); 
 
         if (tab < m_tabs.size() - 1)
