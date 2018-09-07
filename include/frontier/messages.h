@@ -41,6 +41,7 @@ struct InputMessage : public Message
             bool direction;
             uint32_t key;
             wchar_t chr;
+            uint32_t modifiers;
         } key;
         struct
         {

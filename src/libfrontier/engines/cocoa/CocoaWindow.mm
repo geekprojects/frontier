@@ -69,6 +69,8 @@ using namespace Frontier;
 - (void)keyUp:(NSEvent *)theEvent;
 - (void)keyDown:(NSEvent *)theEvent;
 
+- (Frontier::InputMessage*)createKeyMessage:(NSEvent*)event;
+
 @end
 
 @implementation FrontierView
@@ -214,58 +216,50 @@ int height = [self frame].size.height;
 
 - (void)keyUp:(NSEvent *)theEvent
 {
-    CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
-    uint16_t keyCode = [theEvent keyCode];
-    NSString* chars = [theEvent characters];
-    std::string wchars = std::string([chars UTF8String], [chars lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-
-char c = wchars.at(0);
-
-if (isprint(c))
-{
-    NSLog(@"keyUp: window=%p, keyCode=0x%x, chars=%c", window, keyCode, c);
-}
-else
-{
-    NSLog(@"keyUp: window=%p, keyCode=0x%x", window, keyCode);
-}
-
-    Frontier::InputMessage* msg = new Frontier::InputMessage();
-    msg->messageType = FRONTIER_MSG_INPUT;
-    msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
+    Frontier::InputMessage* msg = [self createKeyMessage: theEvent];
     msg->event.key.direction = false;
 
-    if (wchars.length() > 0)
-    {
-        msg->event.key.chr = wchars.at(0);
-    }
-
-    if (keyCode < 128)
-    {
-        msg->event.key.key = g_darwinKeyCodeMap[keyCode];
-    }
-    else
-    {
-        msg->event.key.key = KC_UNKNOWN;
-    }
-
+    CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
     CocoaWindow* cwindow = [window getEngineWindow];
     cwindow->getWindow()->handleMessage(msg);
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
+    Frontier::InputMessage* msg = [self createKeyMessage: theEvent];
+    msg->event.key.direction = true;
+
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
+    CocoaWindow* cwindow = [window getEngineWindow];
+    cwindow->getWindow()->handleMessage(msg);
+}
+
+- (Frontier::InputMessage*)createKeyMessage:(NSEvent*)theEvent
+{
     uint16_t keyCode = [theEvent keyCode];
     NSString* chars = [theEvent characters];
+    int modifierFlags = [theEvent modifierFlags];
+
     std::string wchars = std::string([chars UTF8String], [chars lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 
-    NSLog(@"keyDown: window=%p, keyCode=0x%x", window, keyCode);
+    char c = 0;
+    if (wchars.length() > 0)
+    {
+        c = wchars.at(0);
+    }
+
+    if (c && isprint(c))
+    {
+        NSLog(@"createKeyMessage: keyCode=0x%x, chars=%c", keyCode, c);
+    }
+    else
+    {
+        NSLog(@"createKeyMessage: keyCode=0x%x", keyCode);
+    }
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
     msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
-    msg->event.key.direction = true;
 
     if (wchars.length() > 0)
     {
@@ -281,9 +275,31 @@ else
         msg->event.key.key = KC_UNKNOWN;
     }
 
-    CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    msg->event.key.modifiers = 0;
+    if (modifierFlags & NSEventModifierFlagCapsLock)
+    {
+        msg->event.key.modifiers |= KMOD_CAPS_LOCK;
+    }
+    if (modifierFlags & NSEventModifierFlagShift)
+    {
+        msg->event.key.modifiers |= KMOD_SHIFT;
+    }
+    if (modifierFlags & NSEventModifierFlagControl)
+    {
+        msg->event.key.modifiers |= KMOD_CONTROL;
+    }
+    if (modifierFlags & NSEventModifierFlagOption)
+    {
+        msg->event.key.modifiers |= KMOD_ALT;
+    }
+    if (modifierFlags & NSEventModifierFlagCommand)
+    {
+        msg->event.key.modifiers |= KMOD_COMMAND;
+    }
+
+    return msg;
 }
+
 @end
 
 bool CocoaWindow::createCocoaWindow()
