@@ -51,7 +51,12 @@ bool DemoApp::init()
     toolbarTab->add(toolbar1);
     tabs->addTab(L"Tool Bars", toolbarTab);
 
+    /*
+     * Labels
+     */
     Frame* labelTab = new Frame(this, false);
+    tabs->addTab(L"Labels", labelTab);
+
     Frame* labelFrame1 = new Frame(this, true);
     labelFrame1->add(new Label(this, L"Label:"));
     labelFrame1->add(new Label(this, L"I'm a label!"));
@@ -61,7 +66,25 @@ bool DemoApp::init()
     labelFrame2->add(new Label(this, L"Label:"));
     labelFrame2->add(new Label(this, L"I'm another label!"));
     labelTab->add(labelFrame2);
-    tabs->addTab(L"Labels", labelTab);
+
+    {
+        Frame* labelFrame3 = new Frame(this, true);
+        labelFrame3->add(new Label(this, L"Left Align", ALIGN_LEFT));
+        labelTab->add(labelFrame3);
+    }
+
+    {
+        Frame* labelFrame4 = new Frame(this, true);
+        labelFrame4->add(new Label(this, L"Center Align", ALIGN_CENTER));
+        labelTab->add(labelFrame4);
+    }
+
+    {
+        Frame* labelFrame5 = new Frame(this, true);
+        labelFrame5->add(new Label(this, L"Right Align", ALIGN_RIGHT));
+        labelTab->add(labelFrame5);
+    }
+
 
     Frame* buttonTab = new Frame(this, false);
     Frame* buttonFrame1 = new Frame(this, true);

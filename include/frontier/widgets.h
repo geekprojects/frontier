@@ -11,6 +11,13 @@
 
 namespace Frontier {
 
+enum TextAlign
+{
+    ALIGN_LEFT,
+    ALIGN_CENTER,
+    ALIGN_RIGHT
+};
+
 class Widget
 {
  protected:
@@ -144,13 +151,17 @@ class Label : public Widget
 {
  private:
     std::wstring m_text;
+    TextAlign m_align;
+
     int m_lineHeight;
 
  public:
     Label(FrontierApp* ui, std::wstring text);
+    Label(FrontierApp* ui, std::wstring text, TextAlign align);
     ~Label();
 
     void setText(std::wstring wtext);
+    void setAlign(TextAlign align);
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);

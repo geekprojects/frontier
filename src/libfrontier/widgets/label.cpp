@@ -9,6 +9,13 @@ using namespace Geek::Gfx;
 Label::Label(FrontierApp* ui, wstring text) : Widget(ui)
 {
     m_text = text;
+    m_align = ALIGN_CENTER;
+}
+
+Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui)
+{
+    m_text = text;
+    m_align = align;
 }
 
 Label::~Label()
@@ -18,6 +25,12 @@ Label::~Label()
 void Label::setText(std::wstring text)
 {
     m_text = text;
+    setDirty();
+}
+
+void Label::setAlign(TextAlign align)
+{
+    m_align = align;
     setDirty();
 }
 
@@ -56,7 +69,7 @@ void Label::calculateSize()
     m_minSize.width += (5 * 2);
     m_minSize.height = (m_lineHeight * lines) + (5 * 2);
 
-m_maxSize.height = m_minSize.height;
+    m_maxSize.height = m_minSize.height;
 
     m_dirty = false;
 }
@@ -90,7 +103,20 @@ bool Label::draw(Surface* surface)
                 line += m_text[pos];
             }
             int w = m_ui->getTheme()->getTextWidth(line);
-            int x = (m_setSize.width / 2) - (w / 2);
+            int x;
+
+            switch (m_align)
+            {
+                case ALIGN_LEFT:
+                    x = 0;
+                    break;
+                case ALIGN_CENTER:
+                    x = (m_setSize.width / 2) - (w / 2);
+                    break;
+                case ALIGN_RIGHT:
+                    x = m_setSize.width - w;
+                    break;
+            }
 
             m_ui->getTheme()->drawText(
                 surface,
