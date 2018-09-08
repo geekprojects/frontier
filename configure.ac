@@ -1,9 +1,10 @@
 
 AC_PREREQ(2.61)
 AC_INIT([libfrontier], [0.1], [ian@geekprojects.com])
-AM_INIT_AUTOMAKE([-Wall -Werror])
+AC_CANONICAL_TARGET
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_SRCDIR([include/frontier/frontier.h])
-AC_CONFIG_HEADER([include/config.h])
+AC_CONFIG_HEADER([include/frontier/config.h])
 
 AM_PROG_AR
 AC_PROG_CXX
@@ -11,10 +12,44 @@ AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_PROG_RANLIB
+AC_PROG_OBJCXX
 PKG_PROG_PKG_CONFIG
 
-# XXX If MacOS
-AC_PROG_OBJCXX
+case $target_os in
+     *linux*)   arch=linux;;
+     *netbsd*)  arch=netbsd;;
+     *bsd*)     arch=bsd;;
+     *darwin*)  arch=darwin;;
+     *)         arch=unknown;;
+esac
+
+engine_enabled="no"
+AC_ARG_ENABLE(sdl,
+        [  --enable-sdl            Enable SDL Engine ],
+        [enable_sdl="yes"
+         engine_enabled="yes"],
+        [enable_sdl="no"])
+AC_ARG_ENABLE(cocoa,
+        [  --enable-cocoa          Enable Cocoa Engine ],
+        [enable_cocoa="yes"
+         engine_enabled="yes"],
+        [enable_cocoa="no"])
+
+if test "$enable_sdl" != "no" -a "$enable_cocoa" != "no"
+then
+    AC_MSG_ERROR([You can only enable one engine])
+fi
+
+# If no engine specified then work out a default
+if test "$engine_enabled" = "no"
+then
+    if test "$arch" = darwin
+    then
+        enable_cocoa="yes"
+    else
+        enable_sdl="yes"
+    fi
+fi
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -28,15 +63,29 @@ PKG_CHECK_MODULES(Freetype, freetype2 >= 18)
 CPPFLAGS="$CPPFLAGS $Freetype_CFLAGS"
 LIBS="$LIBS $Freetype_LIBS"
 
-PKG_CHECK_MODULES(SDL, sdl2 >= 2.0)
-CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
-LIBS="$LIBS $SDL_LIBS"
-
 PKG_CHECK_MODULES(SIGCPLUSPLUS, sigc++-2.0 >= 2.10)
 CPPFLAGS="$CPPFLAGS $SIGCPLUSPLUS_CFLAGS"
 LIBS="$LIBS $SIGCPLUSPLUS_LIBS"
 
-CPPFLAGS="$CPPFLAGS -Wall -Werror"
+if test "$enable_cocoa" != "no"
+then
+    AC_MSG_NOTICE([Using Cocoa Engine])
+    AC_DEFINE(FRONTIER_ENGINE_COCOA, 1, [Cocoa Engine])
+fi
+
+if test "$enable_sdl" != "no"
+then
+    AC_MSG_NOTICE([Using SDL Engine])
+    PKG_CHECK_MODULES(SDL, sdl2 >= 2.0)
+    CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+    LIBS="$LIBS $SDL_LIBS"
+    AC_DEFINE(FRONTIER_ENGINE_SDL, 1, [SDL Engine])
+fi
+
+AM_CONDITIONAL([FRONTIER_ENGINE_COCOA], test "$enable_cocoa" = "yes")
+AM_CONDITIONAL([FRONTIER_ENGINE_SDL], test "$enable_sdl" = "yes")
+
+CPPFLAGS="$CPPFLAGS -Wall -Werror -Werror=sign-compare"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_INT8_T
@@ -48,8 +97,6 @@ AC_TYPE_UINT32_T
 AC_TYPE_INT64_T
 AC_TYPE_UINT64_T
 AC_HEADER_STDBOOL
-AC_C_CONST
-AC_C_INLINE
 
 # Checks for library functions.
 AC_CHECK_FUNCS([memset strdup gettimeofday sqrt])

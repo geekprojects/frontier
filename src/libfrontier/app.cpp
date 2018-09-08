@@ -1,10 +1,13 @@
 
 #include <frontier/frontier.h>
+#include <frontier/config.h>
 
-#if 0
-#include "engines/sdl/sdl_engine.h"
+#ifdef FRONTIER_ENGINE_SDL
+#   include "engines/sdl/sdl_engine.h"
+#elif FRONTIER_ENGINE_COCOA
+#   include "engines/cocoa/cocoa_engine.h"
 #else
-#include "engines/cocoa/cocoa_engine.h"
+#   error No engine defined
 #endif
 
 using namespace std;
@@ -22,11 +25,14 @@ bool FrontierApp::init()
 {
     bool res;
 
-#if 0
+#ifdef FRONTIER_ENGINE_SDL
     m_engine = new FrontierEngineSDL(this);
-#else
+#elif FRONTIER_ENGINE_COCOA
     m_engine = new CocoaEngine(this);
+#else
+#error No engine defined
 #endif
+
     res = m_engine->init();
     if (!res)
     {
