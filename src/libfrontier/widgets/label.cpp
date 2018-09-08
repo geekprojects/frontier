@@ -41,7 +41,7 @@ void Label::calculateSize()
     m_minSize.set(0, 0);
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
-    int pos = 0;
+    unsigned int pos = 0;
     int lines = 0;
     wstring line = L"";
     for (pos = 0; pos < m_text.length(); pos++)
@@ -80,9 +80,8 @@ bool Label::draw(Surface* surface)
 
     int y = 5;
 
-    int pos = 0;
-
     int lines = 1;
+    unsigned int pos = 0;
     for (pos = 0; pos < m_text.length(); pos++)
     {
         if (m_text[pos] == '\n')

@@ -87,7 +87,7 @@ bool Tabs::draw(Surface* surface)
 
     vector<Tab>::iterator it;
     int x = 0;
-    int tab;
+    unsigned int tab;
     for (it = m_tabs.begin(), tab = 0; it != m_tabs.end(); it++, tab++)
     {
         uint32_t backgroundCol;
@@ -156,7 +156,7 @@ Widget* Tabs::handleMessage(Message* msg)
                 }
 
                 int titleWidth = getTabWidth();
-                int tab = x / titleWidth;
+                unsigned int tab = x / titleWidth;
                 printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
                 if (tab >= m_tabs.size())
                 {

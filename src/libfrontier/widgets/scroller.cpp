@@ -79,8 +79,8 @@ void Scroller::setWidth(int width)
 void Scroller::checkSurfaceSize(bool highDPI)
 {
     if (m_childSurface == NULL ||
-        m_child->getWidth() != m_childSurface->getWidth() ||
-        m_child->getHeight() != m_childSurface->getHeight())
+        m_child->getWidth() != (int)m_childSurface->getWidth() ||
+        m_child->getHeight() != (int)m_childSurface->getHeight())
     {
         if (m_childSurface != NULL)
         {

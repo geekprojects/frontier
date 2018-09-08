@@ -284,8 +284,6 @@ bool FontManager::write(
     }
     face = size->face;
 
-    int pos;
-    uint32_t prevGlyph = 0;
 
     bool useKerning = FT_HAS_KERNING(face);
 
@@ -306,6 +304,8 @@ bool FontManager::write(
         surface = rootSurface;
     }
 
+    unsigned int pos;
+    uint32_t prevGlyph = 0;
     for (pos = 0; pos < text.length(); pos++)
     {
         uint32_t glyphIndex;
@@ -435,7 +435,7 @@ bool FontManager::write(
             int sh = surface->getHeight();
             int sw = surface->getWidth();
 
-            int yp;
+            unsigned int yp;
             for (yp = 0; yp < bitmap.rows; yp++)
             {
                 int y1 = y + yp + yoff;
@@ -444,7 +444,7 @@ bool FontManager::write(
                     continue;
                 }
 
-                int xp;
+                unsigned int xp;
                 for (xp = 0; xp < bitmap.width; xp++)
                 {
                     int x1 = x + xp + left;

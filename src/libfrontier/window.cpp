@@ -74,7 +74,7 @@ void FrontierWindow::update()
 
     float scale = m_engineWindow->getScaleFactor();
 
-    if (m_surface == NULL || m_surface->getWidth() != m_size.width || m_surface->getHeight() != m_size.height)
+    if (m_surface == NULL || (int)m_surface->getWidth() != m_size.width || (int)m_surface->getHeight() != m_size.height)
     {
         if (m_surface != NULL)
         {

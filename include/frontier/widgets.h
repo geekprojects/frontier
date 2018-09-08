@@ -270,7 +270,7 @@ struct Tab
 class Tabs : public Widget
 {
  protected:
-    int m_activeTab;
+    unsigned int m_activeTab;
     std::vector<Tab> m_tabs;
 
     sigc::signal<void, Widget*> m_changeTabSignal;
