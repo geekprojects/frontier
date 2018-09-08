@@ -3,16 +3,19 @@
 
 #include <frontier/engine.h>
 
+#undef malloc
+#undef HAVE_MALLOC
+
 #include <SDL.h>
 #include <SDL_video.h>
 
-class FrontierEngineWindowSDL : public FrontierEngineWindow
+class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
 {
  private:
     SDL_Window* m_sdlWindow;
 
  public:
-    FrontierEngineWindowSDL(FrontierWindow* window);
+    FrontierEngineWindowSDL(Frontier::FrontierWindow* window);
     virtual ~FrontierEngineWindowSDL();
 
     virtual bool init();
@@ -20,17 +23,17 @@ class FrontierEngineWindowSDL : public FrontierEngineWindow
     virtual bool update();
 };
 
-class FrontierEngineSDL : public FrontierEngine
+class FrontierEngineSDL : public Frontier::FrontierEngine
 {
  private:
     
 
  public:
-    FrontierEngineSDL(FrontierApp* app);
+    FrontierEngineSDL(Frontier::FrontierApp* app);
     virtual ~FrontierEngineSDL();
 
     bool init();
-    bool initWindow(FrontierWindow* window);
+    bool initWindow(Frontier::FrontierWindow* window);
 
     virtual bool checkEvents();
 };
