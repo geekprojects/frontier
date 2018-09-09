@@ -1,0 +1,27 @@
+
+language: cpp
+dist: trusty
+
+addons:
+  apt:
+    packages:
+      - libxml2-dev
+      - libpng12-dev
+      - libjpeg-dev
+      - libjpeg-turbo8
+      - libsdl2-dev
+
+before_script:
+  - ./autogen.sh --verbose 
+  - ./configure
+
+script: make && make test
+
+compiler:
+  - clang
+  - gcc
+
+os:
+  - linux
+  - osx
+
