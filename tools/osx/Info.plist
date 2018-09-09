@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+	<key>CFBundleName</key>
+	<string>Demo</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.geekprojects.beyond.mazeworld</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>CFBundleSignature</key>
+	<string>MAZE</string>
+	<key>CFBundleExecutable</key>
+	<string>Demo</string>
+
+        <!-- Enable High DPI -->
+        <key>NSHighResolutionCapable</key>
+        <true/>
+        <key>NSHighResolutionMagnifyAllowed</key>
+        <false/>
+
+        <!-- Tell our code that we started from the launcher -->
+        <key>LSEnvironment</key>
+        <dict>
+            <key>MAZEWORLD_LAUNCHER</key>
+            <string>1</string>
+        </dict>
+    </dict>
+</plist>
