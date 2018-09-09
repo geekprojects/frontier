@@ -36,6 +36,7 @@ ltmain.sh
 missing
 autoscan.log
 configure.scan
+output/
 
 libfrontier.pc
 
