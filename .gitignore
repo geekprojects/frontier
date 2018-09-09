@@ -39,3 +39,5 @@ configure.scan
 
 libfrontier.pc
 
+src/demo/demo
+
