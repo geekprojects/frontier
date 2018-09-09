@@ -5,6 +5,7 @@ dist: trusty
 addons:
   apt:
     packages:
+      - clang-3.9
       - libxml2-dev
       - libpng12-dev
       - libjpeg-dev
