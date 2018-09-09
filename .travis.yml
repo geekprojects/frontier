@@ -10,9 +10,11 @@ addons:
       - libjpeg-dev
       - libjpeg-turbo8
       - libsdl2-dev
+      - libfreetype6-dev
 
 before_script:
-  - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make && make install; cd -
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install freetype; fi
+  - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make && sudo make install; cd -
   - ./autogen.sh --verbose 
   - ./configure
 
