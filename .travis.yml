@@ -11,9 +11,10 @@ addons:
       - libjpeg-turbo8
       - libsdl2-dev
       - libfreetype6-dev
+      - libsigc++-2.0-dev
 
 before_script:
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install freetype; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install freetype libsigc++; fi
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make && sudo make install; cd -
   - ./autogen.sh --verbose 
   - ./configure

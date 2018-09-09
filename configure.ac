@@ -59,7 +59,7 @@ PKG_CHECK_MODULES(libgeek, libgeek >= 1)
 CPPFLAGS="$CPPFLAGS $libgeek_CFLAGS"
 LIBS="$LIBS $libgeek_LIBS"
 
-PKG_CHECK_MODULES(Freetype, freetype2 >= 18)
+PKG_CHECK_MODULES(Freetype, freetype2 >= 17)
 CPPFLAGS="$CPPFLAGS $Freetype_CFLAGS"
 LIBS="$LIBS $Freetype_LIBS"
 
