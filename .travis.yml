@@ -12,6 +12,7 @@ addons:
       - libsdl2-dev
 
 before_script:
+  - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make && make install; cd -
   - ./autogen.sh --verbose 
   - ./configure
 
