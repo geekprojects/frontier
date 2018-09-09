@@ -117,6 +117,9 @@ uint32_t UITheme::getColour(ThemeColour colour)
             return 0xff888888;
         case COLOUR_LIST_ITEM_SELECTED:
             return 0xffffffff;
+        default:
+            printf("UITheme::getColour: Unknown colour: %d\n", colour);
+            return 0;
     }
 }
 
