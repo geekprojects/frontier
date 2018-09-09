@@ -122,7 +122,7 @@ bool Label::draw(Surface* surface)
                 line += m_text[pos];
             }
             int w = m_ui->getTheme()->getTextWidth(line);
-            int x;
+            int x = 0;
 
             switch (m_align)
             {
