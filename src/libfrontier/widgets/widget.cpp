@@ -126,6 +126,20 @@ Widget* Widget::handleMessage(Message* msg)
     return NULL;
 }
 
+void Widget::onMouseEnter()
+{
+    m_mouseOver = true;
+    m_mouseEnterSignal.emit(true);
+setDirty();
+}
+
+void Widget::onMouseLeave()
+{
+    m_mouseOver = false;
+    m_mouseEnterSignal.emit(false);
+setDirty();
+}
+
 void Widget::dump(int level)
 {
     string spaces = "";

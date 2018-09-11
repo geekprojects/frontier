@@ -300,7 +300,7 @@ void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, 
     fm->write(m_iconFont,
         surface,
         x,
-        y,
+        y + 2, // These extra pixels seem to be required for Font Awesome
         text,
         c,
         true,

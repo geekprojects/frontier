@@ -59,6 +59,10 @@ class Widget
     int m_margin;
     int m_padding;
 
+    bool m_mouseOver;
+
+    sigc::signal<void, bool> m_mouseEnterSignal;
+
  public:
     Widget(FrontierApp* ui);
     virtual ~Widget();
@@ -95,6 +99,10 @@ class Widget
     void clearDirty();
 
     virtual Widget* handleMessage(Frontier::Message* msg);
+    
+    virtual void onMouseEnter();
+    virtual void onMouseLeave();
+    virtual sigc::signal<void, bool> signalMouseEnter() { return m_mouseEnterSignal; }
 
     virtual void dump(int level);
 };

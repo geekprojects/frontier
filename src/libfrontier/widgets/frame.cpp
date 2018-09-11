@@ -178,7 +178,9 @@ void Frame::layout()
         major -= (m_children.size() - 1) * m_padding;
     }
 
+#if 0
     printf("Frame::layout: major=%d, minor=%d\n", major, minor);
+#endif
 
     int q = major / m_children.size();
     int slackable = 0;
@@ -391,6 +393,10 @@ Widget* Frame::handleMessage(Message* msg)
                 {
                     return child->handleMessage(msg);
                 }
+            }
+            if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
+            {
+                return this;
             }
         }
     }

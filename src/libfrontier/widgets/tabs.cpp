@@ -157,62 +157,73 @@ Widget* Tabs::handleMessage(Message* msg)
     if (msg->messageType == FRONTIER_MSG_INPUT)
     {
         InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
+        switch (imsg->inputMessageType)
         {
-            int x = imsg->event.button.x;
-            int y = imsg->event.button.y;
-
-            Vector2D thisPos = getAbsolutePosition();
-            x -= thisPos.x;
-            y -= thisPos.y;
-
-            if (y < 25)
+            case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+            case FRONTIER_MSG_INPUT_MOUSE_MOTION:
             {
-                if (m_tabs.empty())
+                int x = imsg->event.button.x;
+                int y = imsg->event.button.y;
+
+                Vector2D thisPos = getAbsolutePosition();
+                x -= thisPos.x;
+                y -= thisPos.y;
+
+                if (y < 25)
                 {
-                    return this;
-                }
+                    if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
+                    {
+                        return this;
+                    }
 
-                if (!imsg->event.button.direction)
-                {
-                    return NULL;
-                }
+                    if (m_tabs.empty())
+                    {
+                        return this;
+                    }
 
-                int titleWidth = getTabWidth();
-                unsigned int tab = x / titleWidth;
-                printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
-                if (tab >= m_tabs.size())
-                {
-                    return NULL;
-                }
-                m_activeTab = tab;
+                    if (!imsg->event.button.direction)
+                    {
+                        return NULL;
+                    }
 
-                setDirty();
+                    int titleWidth = getTabWidth();
+                    unsigned int tab = x / titleWidth;
+                    printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
+                    if (tab >= m_tabs.size())
+                    {
+                        return NULL;
+                    }
+                    m_activeTab = tab;
 
-                Widget* activeTab = getActiveTab();
-                printf("Tabs::handleMessage: activeTab=%p\n", activeTab);
+                    setDirty();
 
-                m_changeTabSignal.emit(activeTab);
-                if (activeTab != NULL)
-                {
-                    getActiveTab()->setDirty();
-                    return activeTab;
+                    Widget* activeTab = getActiveTab();
+                    printf("Tabs::handleMessage: activeTab=%p\n", activeTab);
+
+                    m_changeTabSignal.emit(activeTab);
+                    if (activeTab != NULL)
+                    {
+                        getActiveTab()->setDirty();
+                        return activeTab;
+                    }
+                    else
+                    {
+                        return this;
+                    }
                 }
                 else
                 {
-                    return this;
-                }
-            }
-            else
-            {
-                Widget* activeWidget = m_tabs.at(m_activeTab).content;
+                    Widget* activeWidget = m_tabs.at(m_activeTab).content;
 
-                if (activeWidget != NULL)
-                {
-                    return activeWidget->handleMessage(msg);
-                }
+                    if (activeWidget != NULL)
+                    {
+                        return activeWidget->handleMessage(msg);
+                    }
 
-            }
+                }
+            } break;
+            default:
+                break;
         }
     }
     return NULL;

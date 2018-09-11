@@ -41,6 +41,7 @@ enum UIBorderType
     BORDER_LIST_BACKGROUND,
     BORDER_LIST_ITEM_1,
     BORDER_LIST_ITEM_2,
+    BORDER_TAB
 };
 
 enum UIState
@@ -64,6 +65,8 @@ enum ThemeColour
     COLOUR_LIST_ITEM_1,
     COLOUR_LIST_ITEM_2,
     COLOUR_LIST_ITEM_SELECTED,
+
+    COLOUR_TAB_SELECTED_BACKGROUND
 };
 
 class UITheme

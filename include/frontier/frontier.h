@@ -74,6 +74,7 @@ class FrontierWindow
 
     Widget* m_widget;
     Widget* m_activeWidget;
+    Widget* m_mouseOverWidget;
 
     Geek::Gfx::Surface* m_surface;
 

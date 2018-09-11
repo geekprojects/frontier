@@ -59,12 +59,12 @@ bool IconButton::draw(Surface* surface)
     int x = (m_setSize.width / 2) - (w / 2);
     int y = (m_setSize.height / 2) - (h / 2);
 
-    if (m_state)
+    if (m_state || m_mouseOver)
     {
         m_ui->getTheme()->drawBorder(
             surface,
             BORDER_BUTTON,
-            m_state ? STATE_SELECTED : STATE_NONE,
+            m_state ? STATE_SELECTED : STATE_HOVER,
             0, 0,
             m_setSize.width, m_setSize.height);
     }

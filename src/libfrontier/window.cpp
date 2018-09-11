@@ -32,6 +32,8 @@ FrontierWindow::FrontierWindow(FrontierApp* app)
     m_app = app;
     m_engineWindow = NULL;
 
+    m_mouseOverWidget = NULL;
+
     m_surface = NULL;
 
     m_size.set(500, 50);
@@ -148,14 +150,35 @@ void FrontierWindow::postMessage(Message* message)
 bool FrontierWindow::handleMessage(Message* message)
 {
     Widget* destWidget = NULL;
+    bool updateActive = false;
+
     if (message->messageType == FRONTIER_MSG_INPUT)
     {
         InputMessage* imsg = (InputMessage*)message;
         switch (imsg->inputMessageType)
         {
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+                updateActive = true;
+                destWidget = m_widget->handleMessage(message);
+               break;
+
             case FRONTIER_MSG_INPUT_MOUSE_MOTION:
                 destWidget = m_widget->handleMessage(message);
+
+                if (m_mouseOverWidget != destWidget)
+                {
+                    if (m_mouseOverWidget != NULL)
+                    {
+                        m_mouseOverWidget->onMouseLeave();
+                    }
+
+                    if (destWidget != NULL)
+                    {
+                        destWidget->onMouseEnter();
+                    }
+
+                    m_mouseOverWidget = destWidget;
+                }
                 break;
 
             case FRONTIER_MSG_INPUT_KEY:
@@ -169,7 +192,10 @@ bool FrontierWindow::handleMessage(Message* message)
 
     if (destWidget != NULL)
     {
-        m_activeWidget = destWidget;
+        if (updateActive)
+        {
+            m_activeWidget = destWidget;
+        }
 
         if (m_widget->isDirty())
         {

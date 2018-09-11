@@ -55,10 +55,24 @@ bool Button::draw(Surface* surface)
 
     int y = (m_setSize.height / 2) - (m_ui->getTheme()->getTextHeight() / 2);
 
+    UIState state;
+    if (m_state)
+    {
+        state = STATE_SELECTED;
+    }
+    else if (m_mouseOver)
+    {
+        state = STATE_HOVER;
+    }
+    else
+    {
+        state = STATE_NONE;
+    }
+
     m_ui->getTheme()->drawBorder(
         surface,
         BORDER_BUTTON,
-        m_state ? STATE_SELECTED : STATE_NONE,
+        state,
         0, 0,
         m_setSize.width, m_setSize.height);
     m_ui->getTheme()->drawText(surface, x, y, m_text);
@@ -71,26 +85,31 @@ Widget* Button::handleMessage(Message* msg)
     if (msg->messageType == FRONTIER_MSG_INPUT)
     {
         InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
+        switch (imsg->inputMessageType)
         {
-            printf("Button::handleMessage: Message! text=%ls\n", m_text.c_str());
-            if (m_state != imsg->event.button.direction)
-            {
-                setDirty();
-                m_state = imsg->event.button.direction;
-                if (!m_state)
+            case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+                printf("Button::handleMessage: Message! text=%ls\n", m_text.c_str());
+                if (m_state != imsg->event.button.direction)
                 {
-                    UIMessage* buttonMessage = new UIMessage();
-                    buttonMessage->messageType = FRONTIER_MSG_UI;
-                    buttonMessage->uiMessageType = FRONTIER_MSG_UI_BUTTON_PRESSED;
-                    buttonMessage->widget = this;
-                    buttonMessage->source = msg;
-                    buttonMessage->button.state = m_state;
-                    m_ui->postMessage(buttonMessage);
+                    setDirty();
+                    m_state = imsg->event.button.direction;
+                    if (!m_state)
+                    {
+                        UIMessage* buttonMessage = new UIMessage();
+                        buttonMessage->messageType = FRONTIER_MSG_UI;
+                        buttonMessage->uiMessageType = FRONTIER_MSG_UI_BUTTON_PRESSED;
+                        buttonMessage->widget = this;
+                        buttonMessage->source = msg;
+                        buttonMessage->button.state = m_state;
+                        m_ui->postMessage(buttonMessage);
 
-                    m_clickSignal.emit();
+                        m_clickSignal.emit();
+                    }
                 }
-            }
+                break;
+
+            default:
+                break;
         }
     }
     return this;
