@@ -88,7 +88,7 @@ Widget* Button::handleMessage(Message* msg)
                     buttonMessage->button.state = m_state;
                     m_ui->postMessage(buttonMessage);
 
-m_clickSignal.emit();
+                    m_clickSignal.emit();
                 }
             }
         }

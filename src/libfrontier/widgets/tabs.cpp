@@ -112,19 +112,22 @@ bool Tabs::draw(Surface* surface)
     {
         uint32_t backgroundCol;
         bool isActive = (tab == m_activeTab);
+        UIState state = STATE_NONE;
         if (isActive)
         {
             backgroundCol = 0xff808080;
+            state = STATE_SELECTED;
         }
         else
         {
             backgroundCol = m_ui->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
         }
-        surface->drawRectFilled(x, 0, titleWidth - 1, 24, backgroundCol);
+        //surface->drawRectFilled(x, 0, titleWidth - 1, 24, backgroundCol);
+
         m_ui->getTheme()->drawBorder(
             surface,
-            BORDER_WIDGET,
-            STATE_NONE,
+            BORDER_TAB,
+            state,
             x, 0,
             titleWidth, 24);
 
@@ -132,7 +135,7 @@ bool Tabs::draw(Surface* surface)
 
         m_ui->getTheme()->drawText(
             surface,
-            x,
+            x + 5,
             labelY,
            it->title.c_str()); 
 

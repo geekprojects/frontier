@@ -117,6 +117,8 @@ uint32_t UITheme::getColour(ThemeColour colour)
             return 0xff888888;
         case COLOUR_LIST_ITEM_SELECTED:
             return 0xffffffff;
+        case COLOUR_TAB_SELECTED_BACKGROUND:
+            return 0xff808080;
         default:
             printf("UITheme::getColour: Unknown colour: %d\n", colour);
             return 0;
@@ -133,12 +135,13 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
     bool background = false;
     bool gradient = false;
     bool border = false;
+    bool rounded = false;
 
     uint32_t b1 = getColour(COLOUR_BUTTON_1);
     uint32_t b2 = getColour(COLOUR_BUTTON_2);
 
-    uint32_t g1 = getColour(COLOUR_WIDGET_GRADIENT_1);
-    uint32_t g2 = getColour(COLOUR_WIDGET_GRADIENT_2);
+    //uint32_t g1 = getColour(COLOUR_WIDGET_GRADIENT_1);
+    //uint32_t g2 = getColour(COLOUR_WIDGET_GRADIENT_2);
 
     uint32_t backgroundColour = getColour(COLOUR_WINDOW_BACKGROUND);
 
@@ -151,8 +154,8 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
 
         case BORDER_BUTTON:
         {
+            //gradient = true;
             border = true;
-            gradient = true;
             if (state == STATE_SELECTED)
             {
                 uint32_t tmp;
@@ -161,6 +164,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
                 b1 = b2;
                 b2 = tmp;
             }
+            rounded = true;
         } break;
 
         case BORDER_SCROLLBAR:
@@ -173,48 +177,80 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         {
             background = true;
             backgroundColour = getColour(COLOUR_SCROLLBAR_CONTROL);
+            rounded = true;
         } break;
 
         case BORDER_LIST_ITEM_1:
         case BORDER_LIST_ITEM_2:
         {
-background = true;
-if (state == STATE_SELECTED)
-{
-backgroundColour = getColour(COLOUR_LIST_ITEM_SELECTED);
-}
-else if (type == BORDER_LIST_ITEM_1)
-{
-backgroundColour = getColour(COLOUR_LIST_ITEM_1);
-}
-else if (type == BORDER_LIST_ITEM_2)
-{
-backgroundColour = getColour(COLOUR_LIST_ITEM_1);
-}
+            background = true;
+            if (state == STATE_SELECTED)
+            {
+                backgroundColour = getColour(COLOUR_LIST_ITEM_SELECTED);
+            }
+            else if (type == BORDER_LIST_ITEM_1)
+            {
+                backgroundColour = getColour(COLOUR_LIST_ITEM_1);
+            }
+            else if (type == BORDER_LIST_ITEM_2)
+            {
+                backgroundColour = getColour(COLOUR_LIST_ITEM_1);
+            }
         } break;
+
+        case BORDER_TAB:
+        {
+            border = true;
+            background = true;
+            if (state == STATE_SELECTED)
+            {
+                backgroundColour = getColour(COLOUR_TAB_SELECTED_BACKGROUND);
+                b1 = b2;
+            }
+            else
+            {
+                backgroundColour = getColour(COLOUR_WINDOW_BACKGROUND);
+            }
+        } break;;
 
         default:
             break;
     }
 
+int r = 5;
     if (gradient)
     {
-        surface->drawGrad(x, y, width, height, g1, g2);
+        //surface->drawGrad(x, y, width, height, g1, g2);
+        surface->drawRectFilledRounded(x, y, width, height, r, backgroundColour);
     }
 
-if (background)
-{
-surface->drawRectFilled(x, y, width, height, backgroundColour);
-}
+    if (background)
+    {
+        if (rounded)
+        {
+            surface->drawRectFilledRounded(x, y, width, height, r, backgroundColour);
+        }
+        else
+        {
+            surface->drawRectFilled(x, y, width, height, backgroundColour);
+    }
+    }
 
-if (border)
-{
-    surface->drawLine(x, y, x + width, y, b1);
-    surface->drawLine(x, y, x, y + height, b1);
+    if (border)
+    {
+        if (rounded)
+        {
+            surface->drawRectRounded(x, y, width, height, 5, b1);
+        }
+        else
+        {
+            surface->drawLine(x, y, x + width, y, b1);
+            surface->drawLine(x, y, x, y + height, b1);
 
-    surface->drawLine(x + width, y, x + width, y + height, b2);
-    surface->drawLine(x, y + height, x + width, y + height, b2);
-}
+            surface->drawLine(x + width, y, x + width, y + height, b2);
+            surface->drawLine(x, y + height, x + width, y + height, b2);
+        }
+    }
 }
 
 void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, bool inverted)
@@ -225,7 +261,7 @@ void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring t
         c = 0xff000000;
     }
 
-FontHandle* font = m_font;
+    FontHandle* font = m_font;
 
     FontManager* fm = m_app->getFontManager();
     fm->write(font,
