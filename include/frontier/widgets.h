@@ -109,7 +109,7 @@ class Widget
 
 class Frame : public Widget
 {
- private:
+ protected:
     bool m_horizontal;
     bool m_border;
 
@@ -122,9 +122,30 @@ class Frame : public Widget
 
     void setBorder(bool border) { m_border = border; }
 
-    void add(Widget* widget);
+    virtual void add(Widget* widget);
 
     virtual bool draw(Geek::Gfx::Surface* surface);
+
+    virtual Widget* handleMessage(Frontier::Message* msg);
+};
+
+class ResizeableFrame : public Frame
+{
+ protected:
+    std::vector<float> m_sizes;
+
+    // Dragging resize state
+    bool m_dragging;
+    int m_dragWidget;
+    int m_dragPos;
+
+    virtual void layout();
+
+ public:
+    ResizeableFrame(FrontierApp* ui, bool horizontal);
+    virtual ~ResizeableFrame();
+
+    virtual void add(Widget* widget);
 
     virtual Widget* handleMessage(Frontier::Message* msg);
 };
