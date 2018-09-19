@@ -28,6 +28,7 @@ using namespace Geek;
 using namespace Geek::Gfx;
 
 #define MAX_TAB_SIZE 250
+#define TAB_HEIGHT 20
 
 Tabs::Tabs(FrontierApp* ui) : Widget(ui)
 {
@@ -42,7 +43,7 @@ void Tabs::calculateSize()
 {
     if (m_tabs.empty())
     {
-        m_minSize.set(0, 25);
+        m_minSize.set(0, TAB_HEIGHT);
         m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
         return;
     }
@@ -58,15 +59,13 @@ void Tabs::calculateSize()
     Size activeMinSize = activeWidget->getMinSize();
     Size activeMaxSize = activeWidget->getMaxSize();
 
-    activeMinSize.height += 25;
+    activeMinSize.height += TAB_HEIGHT;
 
     activeMaxSize.width = WIDGET_SIZE_UNLIMITED;
-    activeMaxSize.height += 25;
+    activeMaxSize.height += TAB_HEIGHT;
 
     m_minSize = activeMinSize;
     m_maxSize = activeMaxSize;
-
-    m_dirty = false;
 }
 
 void Tabs::layout()
@@ -77,9 +76,9 @@ void Tabs::layout()
     }
     Widget* activeWidget = getActiveTab();
 
-    Size tabSize = Size(m_setSize.width, m_setSize.height - 25);
+    Size tabSize = Size(m_setSize.width, m_setSize.height - TAB_HEIGHT);
     activeWidget->setSize(tabSize);
-    activeWidget->setPosition(0, 25);
+    activeWidget->setPosition(0, TAB_HEIGHT);
     activeWidget->layout();
 }
 
@@ -92,14 +91,14 @@ bool Tabs::draw(Surface* surface)
     }
 
     int labelHeight = m_ui->getTheme()->getTextHeight();
-    int labelY = (25 / 2) - (labelHeight / 2);
+    int labelY = (TAB_HEIGHT / 2) - (labelHeight / 2);
 
     m_ui->getTheme()->drawBorder(
         surface,
         BORDER_WIDGET,
         STATE_NONE,
-        0, 25,
-        m_setSize.width, m_setSize.height - 25);
+        0, TAB_HEIGHT,
+        m_setSize.width, m_setSize.height - TAB_HEIGHT);
 
     int titleWidth = getTabWidth();
 
@@ -110,17 +109,17 @@ bool Tabs::draw(Surface* surface)
     unsigned int tab;
     for (it = m_tabs.begin(), tab = 0; it != m_tabs.end(); it++, tab++)
     {
-        uint32_t backgroundCol;
+        //uint32_t backgroundCol;
         bool isActive = (tab == m_activeTab);
         UIState state = STATE_NONE;
         if (isActive)
         {
-            backgroundCol = 0xff808080;
+            //backgroundCol = 0xff808080;
             state = STATE_SELECTED;
         }
         else
         {
-            backgroundCol = m_ui->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
+            //backgroundCol = m_ui->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
         }
         //surface->drawRectFilled(x, 0, titleWidth - 1, 24, backgroundCol);
 
@@ -129,7 +128,7 @@ bool Tabs::draw(Surface* surface)
             BORDER_TAB,
             state,
             x, 0,
-            titleWidth, 24);
+            titleWidth, TAB_HEIGHT - 1);
 
         printf("Tabs::draw:  -> %ls: active=%d x=%d\n", it->title.c_str(), isActive, x);
 
@@ -169,7 +168,7 @@ Widget* Tabs::handleMessage(Message* msg)
                 x -= thisPos.x;
                 y -= thisPos.y;
 
-                if (y < 25)
+                if (y < TAB_HEIGHT)
                 {
                     if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
                     {
