@@ -146,7 +146,6 @@ void Frame::calculateSize()
     m_maxSize.width += 2 * m_margin;
     m_maxSize.height += 2 * m_margin;
 
-    m_dirty = false;
 #ifdef DEBUG_UI_FRAME
     printf("Frame::calculateSize: %p: Done: min=%s, max=%s\n", this, m_minSize.toString().c_str(), m_maxSize.toString().c_str());
 #endif

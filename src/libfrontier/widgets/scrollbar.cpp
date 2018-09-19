@@ -44,7 +44,6 @@ void ScrollBar::calculateSize()
 {
     m_minSize.set(10, 20);
     m_maxSize.set(10, WIDGET_SIZE_UNLIMITED);
-    m_dirty = false;
 }
 
 bool ScrollBar::draw(Surface* surface)
@@ -107,7 +106,7 @@ Widget* ScrollBar::handleMessage(Message* msg)
             }
 
 /*
-                setDirty();
+                setDirty(DIRTY_CONTENT);
 
                 m_state = imsg->event.button.direction;
                 UIMessage* buttonMessage = new UIMessage();
@@ -142,7 +141,7 @@ Widget* ScrollBar::handleMessage(Message* msg)
                 }
                 //printf("ScrollBar::handleMessage: m_pos(2)=%d\n", m_pos);
 
-                setDirty();
+                setDirty(DIRTY_CONTENT);
 
             }
         }
@@ -166,7 +165,7 @@ void ScrollBar::set(int min, int max, int size)
     {
         m_pos = m_max - m_size;
     }
-    setDirty();
+    setDirty(DIRTY_CONTENT);
 }
 
 void ScrollBar::setPos(int pos)
@@ -176,7 +175,7 @@ void ScrollBar::setPos(int pos)
     {
         m_pos = m_max - m_size;
     }
-    setDirty();
+    setDirty(DIRTY_CONTENT);
 }
 
 int ScrollBar::getPos()

@@ -64,12 +64,15 @@ void FrontierWindow::show()
 
     m_engineWindow->show();
 
+    m_widget->setDirty();
     update();
 }
 
 void FrontierWindow::setSize(Size size)
 {
     m_size = size;
+    m_widget->setDirty(DIRTY_SIZE, true);
+
     update();
 }
 
@@ -77,19 +80,27 @@ void FrontierWindow::update()
 {
     init();
 
-    m_widget->calculateSize();
+    if (m_widget->isDirty(DIRTY_SIZE))
+    {
+        m_widget->calculateSize();
 
-    Size min = m_widget->getMinSize();
-    Size max = m_widget->getMaxSize();
+        Size min = m_widget->getMinSize();
+        Size max = m_widget->getMaxSize();
 
-    m_size.setMax(min);
-    m_size.setMin(max);
+        m_size.setMax(min);
+        m_size.setMin(max);
 
-    m_size = m_widget->setSize(m_size);
+        m_size = m_widget->setSize(m_size);
 
-    printf("FrontierWindow::update: Updating window size: %s\n", m_size.toString().c_str());
+        printf("FrontierWindow::update: min=%s, max=%s\n", min.toString().c_str(), max.toString().c_str());
+        printf("FrontierWindow::update: Updating window size: %s\n", m_size.toString().c_str());
 
-    m_widget->layout();
+        m_widget->layout();
+
+        // Make sure we redraw
+        m_widget->setDirty(DIRTY_CONTENT);
+    }
+
 #if 0
     m_widget->dump(1);
 #endif
@@ -111,15 +122,20 @@ void FrontierWindow::update()
         {
             m_surface = new Surface(m_size.width, m_size.height, 4);
         }
+
+        m_widget->setDirty(DIRTY_CONTENT);
     }
     printf("FrontierWindow::update: Window surface=%p\n", m_surface);
 
+    if (m_widget->isDirty())
+    {
+        m_app->getTheme()->drawBackground(m_surface);
 
-    m_app->getTheme()->drawBackground(m_surface);
+        m_widget->draw(m_surface);
 
-    m_widget->draw(m_surface);
+        m_engineWindow->update();
 
-    m_engineWindow->update();
+    }
     m_widget->clearDirty();
 }
 

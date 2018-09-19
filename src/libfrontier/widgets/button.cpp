@@ -44,8 +44,6 @@ void Button::calculateSize()
     m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     m_maxSize.height = m_minSize.height;
     //m_maxSize.height = WIDGET_SIZE_UNLIMITED;
-
-    m_dirty = false;
 }
 
 bool Button::draw(Surface* surface)
@@ -91,7 +89,8 @@ Widget* Button::handleMessage(Message* msg)
                 printf("Button::handleMessage: Message! text=%ls\n", m_text.c_str());
                 if (m_state != imsg->event.button.direction)
                 {
-                    setDirty();
+                    setDirty(DIRTY_CONTENT);
+
                     m_state = imsg->event.button.direction;
                     if (!m_state)
                     {

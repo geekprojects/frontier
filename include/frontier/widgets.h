@@ -38,6 +38,12 @@ enum TextAlign
     ALIGN_RIGHT
 };
 
+enum DirtyFlag
+{
+    DIRTY_SIZE = 0x1,   // The size of the widget or its children have changed
+    DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
+};
+
 class Widget
 {
  protected:
@@ -54,7 +60,7 @@ class Widget
     Frontier::Size m_maxSize;
     Frontier::Size m_setSize;
 
-    bool m_dirty;
+    int m_dirty;
 
     int m_margin;
     int m_padding;
@@ -95,7 +101,9 @@ class Widget
     bool intersects(int x, int y);
 
     void setDirty();
-    bool isDirty() { return m_dirty; }
+    void setDirty(int flags, bool children = false);
+    bool isDirty() { return !!(m_dirty); }
+    bool isDirty(DirtyFlag flag) { return !!(m_dirty & flag); }
     void clearDirty();
 
     virtual Widget* handleMessage(Frontier::Message* msg);

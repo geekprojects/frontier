@@ -52,7 +52,6 @@ Scroller::~Scroller()
 
 void Scroller::calculateSize()
 {
-
     m_scrollBar->calculateSize();
 
     if (m_child != NULL)
@@ -66,8 +65,6 @@ void Scroller::calculateSize()
     m_minSize.width = 20 + m_scrollBar->getMinSize().width;
     m_minSize.height = 50;
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
-
-    m_dirty = false;
 }
 
 void Scroller::layout()

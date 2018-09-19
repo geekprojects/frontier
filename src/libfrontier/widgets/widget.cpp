@@ -32,7 +32,7 @@ Widget::Widget(FrontierApp* ui)
     m_ui = ui;
     m_parent = NULL;
 
-    m_dirty = true;
+    m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
 
     m_minSize = Size(0, 0);
     m_maxSize = Size(0, 0);
@@ -103,10 +103,31 @@ bool Widget::intersects(int x, int y)
 
 void Widget::setDirty()
 {
-    m_dirty = true;
+    m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
     if (m_parent != NULL)
     {
         m_parent->setDirty();
+    }
+}
+
+void Widget::setDirty(int dirty, bool children)
+{
+    m_dirty |= dirty;
+
+    if (children)
+    {
+        vector<Widget*>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); it++)
+        {
+            (*it)->setDirty(dirty, true);
+        }
+    }
+    else
+    {
+        if (m_parent != NULL)
+        {
+            m_parent->setDirty(dirty);
+        }
     }
 }
 
