@@ -71,6 +71,7 @@ if test "$enable_cocoa" != "no"
 then
     AC_MSG_NOTICE([Using Cocoa Engine])
     AC_DEFINE(FRONTIER_ENGINE_COCOA, 1, [Cocoa Engine])
+    LIBS="$LIBS -framework AppKit"
 fi
 
 if test "$enable_sdl" != "no"
