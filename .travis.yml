@@ -2,6 +2,11 @@
 language: cpp
 dist: trusty
 
+matrix:
+  exclude:
+  - os: linux
+    compiler: clang
+
 addons:
   apt:
     packages:
