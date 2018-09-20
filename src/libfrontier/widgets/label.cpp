@@ -90,8 +90,6 @@ void Label::calculateSize()
     m_minSize.height = (m_lineHeight * lines) + (5 * 2);
 
     m_maxSize.height = m_minSize.height;
-
-    m_dirty = false;
 }
 
 bool Label::draw(Surface* surface)

@@ -58,8 +58,6 @@ void List::calculateSize()
 
     m_minSize.width += 2 * 2;
     m_minSize.height += 2 * 2;
-
-    m_dirty = false;
 }
 
 bool List::draw(Surface* surface)
@@ -128,7 +126,7 @@ Widget* List::handleMessage(Message* msg)
             {
                 printf("List::handleMessage: Selected item %d, doubleClick=%d\n", m_selected, imsg->event.button.doubleClick);
 
-                setDirty();
+                setDirty(DIRTY_CONTENT);
 
                 m_selected = selected;
 

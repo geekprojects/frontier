@@ -48,8 +48,6 @@ void IconButton::calculateSize()
 
     //    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
     m_maxSize = m_minSize;
-
-    m_dirty = false;
 }
 
 bool IconButton::draw(Surface* surface)
