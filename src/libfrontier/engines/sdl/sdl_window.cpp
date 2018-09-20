@@ -79,7 +79,7 @@ printf("FrontierEngineWindowSDL::update: Setting window size: %s\n", winSize.toS
     int res;
     res = SDL_ConvertPixels(
         winSize.width, winSize.height,
-        SDL_PIXELFORMAT_ABGR8888, m_window->getSurface()->getData(), winSize.width * 4,
+        SDL_PIXELFORMAT_ARGB8888, m_window->getSurface()->getData(), winSize.width * 4,
         sdlSurface->format->format, sdlSurface->pixels, sdlSurface->pitch);
     if (res < 0)
     {

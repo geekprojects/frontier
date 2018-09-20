@@ -378,7 +378,7 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
         32,
         width * 4,
         colorspace,
-        kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+        kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host,
         provider,
         NULL,
         true,
