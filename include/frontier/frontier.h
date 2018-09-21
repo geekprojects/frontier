@@ -75,6 +75,7 @@ class FrontierWindow
     Widget* m_widget;
     Widget* m_activeWidget;
     Widget* m_mouseOverWidget;
+    Widget* m_dragWidget;
 
     Geek::Gfx::Surface* m_surface;
 
@@ -86,6 +87,7 @@ class FrontierWindow
 
     void setContent(Widget* widget);
     void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
+    void setDragWidget(Widget* widget) { m_dragWidget = widget; }
 
     void show();
     void update();

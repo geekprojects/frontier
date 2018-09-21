@@ -171,6 +171,8 @@ bool FrontierWindow::handleMessage(Message* message)
     if (message->messageType == FRONTIER_MSG_INPUT)
     {
         InputMessage* imsg = (InputMessage*)message;
+        imsg->window = this;
+
         switch (imsg->inputMessageType)
         {
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
@@ -204,6 +206,12 @@ bool FrontierWindow::handleMessage(Message* message)
                 }
                 break;
         }
+
+        if (m_dragWidget != NULL)
+        {
+            destWidget = m_dragWidget->handleMessage(message);
+        }
+
     }
 
     if (destWidget != NULL)

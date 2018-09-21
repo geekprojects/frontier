@@ -98,11 +98,19 @@ Widget* ScrollBar::handleMessage(Message* msg)
                 {
 //printf("ScrollBar::handleMessage: Control!!\n");
                     m_dragging = true;
+                    if (imsg->window != NULL)
+                    {
+                        imsg->window->setDragWidget(this);
+                    }
                 }
             }
             else
             {
                 m_dragging = false;
+                if (imsg->window != NULL)
+                {
+                    imsg->window->setDragWidget(NULL);
+                }
             }
 
 /*

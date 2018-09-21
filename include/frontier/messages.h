@@ -27,6 +27,8 @@
 
 namespace Frontier {
 
+class FrontierWindow;
+
 enum MessageType
 {
     FRONTIER_MSG_INPUT = 1,
@@ -53,6 +55,7 @@ enum InputMessageType
 struct InputMessage : public Message
 {
     InputMessageType inputMessageType;
+    FrontierWindow* window;
 
     union
     {
