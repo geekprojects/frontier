@@ -151,14 +151,14 @@ void Widget::onMouseEnter()
 {
     m_mouseOver = true;
     m_mouseEnterSignal.emit(true);
-setDirty();
+    setDirty(DIRTY_CONTENT);
 }
 
 void Widget::onMouseLeave()
 {
     m_mouseOver = false;
     m_mouseEnterSignal.emit(false);
-setDirty();
+    setDirty(DIRTY_CONTENT);
 }
 
 void Widget::dump(int level)
