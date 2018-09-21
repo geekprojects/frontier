@@ -275,6 +275,8 @@ class ScrollBar : public Widget
     int getControlSize();
     int range() { return m_max - (m_min + m_size); }
 
+    sigc::signal<void, int> m_changedPositionSignal;
+
  public:
     ScrollBar(FrontierApp* ui);
     ~ScrollBar();
@@ -287,6 +289,8 @@ class ScrollBar : public Widget
     void set(int min, int max, int size);
     void setPos(int pos);
     int getPos();
+
+    virtual sigc::signal<void, int> changedPositionSignal() { return m_changedPositionSignal; }
 };
 
 class Scroller : public Widget

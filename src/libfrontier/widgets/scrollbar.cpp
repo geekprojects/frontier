@@ -128,6 +128,8 @@ Widget* ScrollBar::handleMessage(Message* msg)
 
                 int y = imsg->event.motion.y - thisPos.y;
 
+                int oldPos = m_pos;
+
                 float r = (float)(y - SCROLLBAR_BORDER) / (float)(m_setSize.height - (SCROLLBAR_BORDER * 2));
                 m_pos = (int)((float)range * r) + m_min;
 
@@ -141,8 +143,11 @@ Widget* ScrollBar::handleMessage(Message* msg)
                 }
                 //printf("ScrollBar::handleMessage: m_pos(2)=%d\n", m_pos);
 
-                setDirty(DIRTY_CONTENT);
-
+                if (oldPos != m_pos)
+                {
+                    setDirty(DIRTY_CONTENT);
+                    m_changedPositionSignal.emit(m_pos);
+                }
             }
         }
     }
