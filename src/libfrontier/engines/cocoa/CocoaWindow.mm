@@ -66,6 +66,7 @@ using namespace Frontier;
 - (void)mouseUp:(NSEvent *)theEvent;
 - (void)mouseMoved:(NSEvent *)theEvent;
 - (void)mouseDragged:(NSEvent *)theEvent;
+- (void)scrollWheel:(NSEvent *)theEvent;
 - (void)keyUp:(NSEvent *)theEvent;
 - (void)keyDown:(NSEvent *)theEvent;
 
@@ -214,6 +215,30 @@ int height = [self frame].size.height;
     cwindow->getWindow()->handleMessage(msg);
 }
 
+- (void)scrollWheel:(NSEvent *)theEvent
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
+    NSPoint pos = [theEvent locationInWindow];
+    NSLog(@"scrollWheel: location: %0.2f, %0.2f\n", pos.x, pos.y);
+    bool hasPreciseScrollingDeltas = [theEvent hasPreciseScrollingDeltas];
+    CGFloat scrollX = [theEvent scrollingDeltaX];
+    CGFloat scrollY = [theEvent scrollingDeltaY];
+    NSLog(@"scrollWheel: scroll: %0.2f, %0.2f  hasPreciseScrollingDeltas=%d\n", scrollX, scrollY, hasPreciseScrollingDeltas);
+
+    Frontier::InputMessage* msg = new Frontier::InputMessage();
+    msg->messageType = FRONTIER_MSG_INPUT;
+    msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_WHEEL;
+
+    int height = [self frame].size.height;
+    msg->event.wheel.x = (int)pos.x;
+    msg->event.wheel.y = height - (int)pos.y;
+    msg->event.wheel.scrollX = (int)scrollX;
+    msg->event.wheel.scrollY = (int)scrollY;
+
+    CocoaWindow* cwindow = [window getEngineWindow];
+    cwindow->getWindow()->handleMessage(msg);
+}
+
 - (void)keyUp:(NSEvent *)theEvent
 {
     Frontier::InputMessage* msg = [self createKeyMessage: theEvent];
@@ -308,6 +333,7 @@ bool CocoaWindow::createCocoaWindow()
     window = [[CocoaNSWindow alloc]
         initWithContentRect: NSMakeRect(0, 0, 200, 200)
         styleMask: NSWindowStyleMaskTitled | NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable
+        //styleMask: NSBorderlessWindowMask
         backing: NSBackingStoreBuffered
         defer: NO];
 

@@ -49,7 +49,8 @@ enum InputMessageType
 {
     FRONTIER_MSG_INPUT_KEY = 1,
     FRONTIER_MSG_INPUT_MOUSE_BUTTON = 2,
-    FRONTIER_MSG_INPUT_MOUSE_MOTION = 3
+    FRONTIER_MSG_INPUT_MOUSE_MOTION = 3,
+    FRONTIER_MSG_INPUT_MOUSE_WHEEL  = 4
 };
 
 struct InputMessage : public Message
@@ -80,6 +81,13 @@ struct InputMessage : public Message
             uint8_t button;
             bool doubleClick;
         } button;
+        struct
+        {
+            uint32_t x;
+            uint32_t y;
+            int32_t scrollX;
+            int32_t scrollY;
+        } wheel;
     } event;
 };
 

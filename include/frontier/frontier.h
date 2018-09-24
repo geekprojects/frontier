@@ -30,6 +30,8 @@
 #include <frontier/messages.h>
 #include <frontier/theme.h>
 
+#include <sigc++/sigc++.h>
+
 namespace Frontier
 {
 class FrontierEngine;
@@ -38,6 +40,12 @@ class Widget;
 class UITheme;
 
 class FrontierEngineWindow;
+
+enum MessageBoxType
+{
+    MESSAGE_INFO,
+    MESSAGE_ALERT,
+};
 
 class FrontierApp
 {
@@ -61,14 +69,18 @@ class FrontierApp
     void postMessage(Frontier::Message* message);
     virtual void handleMessage(Frontier::Message* message);
 
-    std::string chooseFile();
+    virtual void message(std::string title, std::string message);
+    virtual bool confirmBox(std::string title, std::string message);
+    virtual std::string chooseFile();
 };
 
 class FrontierWindow
 {
  private:
-    FrontierApp* m_app;
     FrontierEngineWindow* m_engineWindow;
+    bool m_initialised;
+
+    FrontierApp* m_app;
 
     Frontier::Size m_size;
 
@@ -79,7 +91,12 @@ class FrontierWindow
 
     Geek::Gfx::Surface* m_surface;
 
-    bool init();
+    sigc::signal<bool> m_closeSignal;
+
+    bool initInternal();
+
+ protected:
+    virtual bool init();
 
  public:
     FrontierWindow(FrontierApp* app);
@@ -94,6 +111,7 @@ class FrontierWindow
 
     void setEngineWindow(FrontierEngineWindow* few) { m_engineWindow = few; }
     FrontierEngineWindow* getEngineWindow() { return m_engineWindow; }
+    FrontierApp* getApp() { return m_app; }
 
     void setSize(Frontier::Size size);
     Frontier::Size getSize() { return m_size; }
@@ -101,6 +119,7 @@ class FrontierWindow
 
     void postMessage(Frontier::Message* message);
     virtual bool handleMessage(Frontier::Message* message);
+    sigc::signal<bool> closeSignal() { return m_closeSignal; }
 };
 
 };

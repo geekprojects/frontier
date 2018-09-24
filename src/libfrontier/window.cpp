@@ -31,6 +31,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app)
 {
     m_app = app;
     m_engineWindow = NULL;
+    m_initialised = false;
 
     m_mouseOverWidget = NULL;
 
@@ -43,12 +44,26 @@ FrontierWindow::~FrontierWindow()
 {
 }
 
+bool FrontierWindow::initInternal()
+{
+    if (!m_initialised)
+    {
+        bool res;
+        res = m_app->getEngine()->initWindow(this);
+        if (!res)
+        {
+            return false;
+        }
+
+        res = init();
+        m_initialised = true;
+        return res;
+    }
+    return true;
+}
+
 bool FrontierWindow::init()
 {
-    if (m_engineWindow == NULL)
-    {
-        return m_app->getEngine()->initWindow(this);
-    }
     return true;
 }
 
@@ -60,7 +75,7 @@ void FrontierWindow::setContent(Widget* content)
 
 void FrontierWindow::show()
 {
-    init();
+    initInternal();
 
     m_engineWindow->show();
 
@@ -78,7 +93,7 @@ void FrontierWindow::setSize(Size size)
 
 void FrontierWindow::update()
 {
-    init();
+    initInternal();
 
     if (m_widget->isDirty(DIRTY_SIZE))
     {
@@ -176,6 +191,7 @@ bool FrontierWindow::handleMessage(Message* message)
         switch (imsg->inputMessageType)
         {
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+            case FRONTIER_MSG_INPUT_MOUSE_WHEEL:
                 updateActive = true;
                 destWidget = m_widget->handleMessage(message);
                break;

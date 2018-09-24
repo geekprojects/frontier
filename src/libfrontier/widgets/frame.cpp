@@ -379,7 +379,8 @@ Widget* Frame::handleMessage(Message* msg)
     {
         InputMessage* imsg = (InputMessage*)msg;
         if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
+            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION ||
+            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
         {
             int x = imsg->event.button.x;
             int y = imsg->event.button.y;

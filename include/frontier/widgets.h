@@ -71,6 +71,7 @@ class Widget
 
  public:
     Widget(FrontierApp* ui);
+    Widget(FrontierWindow* window);
     virtual ~Widget();
 
     virtual void calculateSize();
@@ -126,6 +127,7 @@ class Frame : public Widget
 
  public:
     Frame(FrontierApp* ui, bool horizontal);
+    Frame(FrontierWindow* ui, bool horizontal);
     virtual ~Frame();
 
     void setBorder(bool border) { m_border = border; }
@@ -151,6 +153,7 @@ class ResizeableFrame : public Frame
 
  public:
     ResizeableFrame(FrontierApp* ui, bool horizontal);
+    ResizeableFrame(FrontierWindow* ui, bool horizontal);
     virtual ~ResizeableFrame();
 
     virtual void add(Widget* widget);
@@ -164,6 +167,7 @@ class Grid : Widget
 
  public:
     Grid(FrontierApp* ui);
+    Grid(FrontierWindow* ui);
     virtual ~Grid();
 
     virtual bool draw(Geek::Gfx::Surface* surface);
@@ -181,6 +185,7 @@ class Button : public Widget
 
  public:
     Button(FrontierApp* ui, std::wstring text);
+    Button(FrontierWindow* ui, std::wstring text);
     ~Button();
 
     virtual void calculateSize();
@@ -198,6 +203,7 @@ class IconButton : public Button
 
  public:
     IconButton(FrontierApp* ui, wchar_t icon);
+    IconButton(FrontierWindow* ui, wchar_t icon);
     ~IconButton();
 
     virtual void calculateSize();

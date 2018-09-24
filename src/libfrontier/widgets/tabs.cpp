@@ -160,6 +160,7 @@ Widget* Tabs::handleMessage(Message* msg)
         {
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
             case FRONTIER_MSG_INPUT_MOUSE_MOTION:
+            case FRONTIER_MSG_INPUT_MOUSE_WHEEL:
             {
                 int x = imsg->event.button.x;
                 int y = imsg->event.button.y;
@@ -170,7 +171,7 @@ Widget* Tabs::handleMessage(Message* msg)
 
                 if (y < TAB_HEIGHT)
                 {
-                    if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
+                    if (imsg->inputMessageType != FRONTIER_MSG_INPUT_MOUSE_BUTTON)
                     {
                         return this;
                     }
