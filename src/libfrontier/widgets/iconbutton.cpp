@@ -32,6 +32,12 @@ IconButton::IconButton(FrontierApp* ui, wchar_t icon) : Button(ui, L"")
     m_state = false;
 }
 
+IconButton::IconButton(FrontierWindow* window, wchar_t icon) : Button(window, L"")
+{
+    m_icon = icon;
+    m_state = false;
+}
+
 IconButton::~IconButton()
 {
 }

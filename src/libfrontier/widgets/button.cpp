@@ -32,6 +32,12 @@ Button::Button(FrontierApp* ui, wstring text) : Widget(ui)
     m_state = false;
 }
 
+Button::Button(FrontierWindow* window, wstring text) : Widget(window)
+{
+    m_text = text;
+    m_state = false;
+}
+
 Button::~Button()
 {
 }

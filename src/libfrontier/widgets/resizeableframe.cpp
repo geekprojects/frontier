@@ -13,6 +13,10 @@ ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, h
 {
 }
 
+ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Frame(window, horizontal)
+{
+}
+
 ResizeableFrame::~ResizeableFrame()
 {
 }

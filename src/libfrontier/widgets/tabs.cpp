@@ -35,6 +35,11 @@ Tabs::Tabs(FrontierApp* ui) : Widget(ui)
     m_activeTab = 0;
 }
 
+Tabs::Tabs(FrontierWindow* window) : Widget(window)
+{
+    m_activeTab = 0;
+}
+
 Tabs::~Tabs()
 {
 }

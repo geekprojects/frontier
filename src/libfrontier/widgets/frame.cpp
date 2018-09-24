@@ -37,6 +37,12 @@ Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui)
     m_border = false;
 }
 
+Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window)
+{
+    m_horizontal = horizontal;
+    m_border = false;
+}
+
 Frame::~Frame()
 {
 }

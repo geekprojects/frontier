@@ -38,6 +38,19 @@ Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui)
     m_align = align;
 }
 
+Label::Label(FrontierWindow* window, wstring text) : Widget(window)
+{
+    m_text = text;
+    m_align = ALIGN_CENTER;
+}
+
+Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window)
+{
+    m_text = text;
+    m_align = align;
+}
+
+
 Label::~Label()
 {
 }

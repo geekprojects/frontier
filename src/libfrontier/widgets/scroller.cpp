@@ -29,26 +29,42 @@ using namespace Geek::Gfx;
 
 Scroller::Scroller(FrontierApp* ui) : Widget(ui)
 {
-    m_child = NULL;
-    m_childSurface = NULL;
-
-    m_scrollBar = new ScrollBar(ui);
-    m_scrollBar->setParent(this);
+    init(NULL);
 }
 
 Scroller::Scroller(FrontierApp* ui, Widget* child) : Widget(ui)
 {
-    m_childSurface = NULL;
+    init(child);
+}
 
-    m_scrollBar = new ScrollBar(ui);
+Scroller::Scroller(FrontierWindow* window) : Widget(window)
+{
+    init(NULL);
+}
 
-    setChild(child);
-    m_scrollBar->setParent(this);
+Scroller::Scroller(FrontierWindow* window, Widget* child) : Widget(window)
+{
+    init(child);
 }
 
 Scroller::~Scroller()
 {
 }
+
+void Scroller::init(Widget* child)
+{
+    m_childSurface = NULL;
+
+    m_scrollBar = new ScrollBar(m_ui);
+    m_scrollBar->setParent(this);
+
+    m_child = child;
+    if (child != NULL)
+    {
+        setChild(child);
+    }
+}
+
 
 void Scroller::calculateSize()
 {

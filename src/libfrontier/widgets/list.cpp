@@ -32,6 +32,11 @@ List::List(FrontierApp* ui) : Widget(ui)
     m_selected = -1;
 }
 
+List::List(FrontierWindow* window) : Widget(window)
+{
+    m_selected = -1;
+}
+
 List::~List()
 {
 }

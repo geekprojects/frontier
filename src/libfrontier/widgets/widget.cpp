@@ -29,7 +29,21 @@ using namespace Geek::Gfx;
 
 Widget::Widget(FrontierApp* ui)
 {
-    m_ui = ui;
+    init(ui);
+}
+
+Widget::Widget(FrontierWindow* window)
+{
+    init(window->getApp());
+}
+
+Widget::~Widget()
+{
+}
+
+void Widget::init(FrontierApp* app)
+{
+    m_ui = app;
     m_parent = NULL;
 
     m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
@@ -40,10 +54,6 @@ Widget::Widget(FrontierApp* ui)
 
     m_margin = 5;
     m_padding = 5;
-}
-
-Widget::~Widget()
-{
 }
 
 void Widget::calculateSize()

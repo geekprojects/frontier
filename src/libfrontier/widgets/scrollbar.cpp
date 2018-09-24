@@ -36,6 +36,13 @@ ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui)
     m_dragging = false;
 }
 
+ScrollBar::ScrollBar(FrontierWindow* window) : Widget(window)
+{
+    m_pos = 0;
+    m_size = 10;
+    m_dragging = false;
+}
+
 ScrollBar::~ScrollBar()
 {
 }

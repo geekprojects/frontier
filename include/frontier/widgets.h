@@ -69,6 +69,8 @@ class Widget
 
     sigc::signal<void, bool> m_mouseEnterSignal;
 
+    void init(FrontierApp* app);
+
  public:
     Widget(FrontierApp* ui);
     Widget(FrontierWindow* window);
@@ -221,6 +223,8 @@ class Label : public Widget
  public:
     Label(FrontierApp* ui, std::wstring text);
     Label(FrontierApp* ui, std::wstring text, TextAlign align);
+    Label(FrontierWindow* ui, std::wstring text);
+    Label(FrontierWindow* ui, std::wstring text, TextAlign align);
     ~Label();
 
     void setText(std::wstring wtext);
@@ -255,6 +259,7 @@ class List : public Widget
 
  public:
     List(FrontierApp* ui);
+    List(FrontierWindow* window);
     ~List();
 
     virtual void calculateSize();
@@ -285,6 +290,7 @@ class ScrollBar : public Widget
 
  public:
     ScrollBar(FrontierApp* ui);
+    ScrollBar(FrontierWindow* window);
     ~ScrollBar();
 
     virtual void calculateSize();
@@ -310,9 +316,13 @@ class Scroller : public Widget
     void checkSurfaceSize(bool highDPI);
     int getWidthOverhead() { return (m_scrollBar->getWidth() - 2); }
 
+    void init(Widget* child);
+
  public:
     Scroller(FrontierApp* ui);
     Scroller(FrontierApp* ui, Widget* child);
+    Scroller(FrontierWindow* ui);
+    Scroller(FrontierWindow* ui, Widget* child);
     ~Scroller();
 
     virtual void calculateSize();
@@ -346,6 +356,7 @@ class Tabs : public Widget
 
  public:
     Tabs(FrontierApp* app);
+    Tabs(FrontierWindow* app);
     virtual ~Tabs();
 
     virtual void calculateSize();
