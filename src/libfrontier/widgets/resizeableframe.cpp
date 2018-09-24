@@ -61,97 +61,103 @@ void ResizeableFrame::layout()
     int shrinkable = 0;
     float shrinkpc = 0;
 
-    vector<Widget*>::iterator it;
-    int i;
-    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    // HACK HACK HACK - Do it twice
+    int round;
+    for (round = 0; round < 2; round++)
     {
-        Widget* child = *it;
-        Size childMinSize = child->getMinSize();
-        Size childMaxSize = child->getMaxSize();
 
-        int childMajorMin = childMinSize.get(m_horizontal);
-        int childMajorMax = childMaxSize.get(m_horizontal);
-
-        float pc = m_sizes.at(i);
-        int childMajor = (int)((float)major * (pc / 100.0));
-
-printf("ResizeableFrame::layout: pc=%0.2f, childMajor=%d, minSize=%d, maxSize=%d\n", pc, childMajor, childMajorMin, childMajorMax);
-        if (childMajor < childMajorMin)
+        vector<Widget*>::iterator it;
+        int i;
+        for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
         {
-            int under = childMajorMin - childMajor;
-            childMajor = childMajorMin;
-            float extrapc = (((float)under / (float)major) * 100.0);
-m_sizes[i] += extrapc;
-shrinkpc += extrapc;
-        }
-        else if (childMajor > childMajorMax)
-        {
-            int over = childMajorMax - childMajor;
-            childMajor = childMajorMax;
-            float extrapc = (((float)over / (float)major) * 100.0);
-            m_sizes[i] -= extrapc;
-            shrinkpc -= extrapc;
-        }
-        else
-        {
-            shrinkable++;
-        }
+            Widget* child = *it;
+            Size childMinSize = child->getMinSize();
+            Size childMaxSize = child->getMaxSize();
 
-    }
-   printf("ResizeableFrame::layout: shrinkable=%d, shrinkpc=%0.2f\n", shrinkable, shrinkpc);
+            int childMajorMin = childMinSize.get(m_horizontal);
+            int childMajorMax = childMaxSize.get(m_horizontal);
 
-    int majorPos = m_margin;
-    int minorPos = m_margin;
+            float pc = m_sizes.at(i);
+            int childMajor = (int)((float)major * (pc / 100.0));
 
-    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
-    {
-        Widget* child = *it;
-        //Size childMinSize = child->getMinSize();
-        Size childMaxSize = child->getMaxSize();
-
-        //int childMajorMin = childMinSize.get(m_horizontal);
-        int childMajorMax = childMaxSize.get(m_horizontal);
-        float pc = m_sizes.at(i);
-        int childMajor = (int)((float)major * (pc / 100.0));
-
-        int childMinor = minor;
-
-      printf("ResizeableFrame::layout:  -> pc=%0.2f, shrinkable=%d, shrinkpc=%0.2f\n", pc, shrinkable, shrinkpc);
-        if ((childMajor < childMajorMax) && shrinkpc > 0 && shrinkable > 0)
-        {
-            float s = shrinkpc / shrinkable;
-            shrinkpc -= s;
-            shrinkable--;
-
-            childMajor -= s;
-            if (childMajor > childMajorMax)
+        printf("ResizeableFrame::layout: pc=%0.2f, childMajor=%d, minSize=%d, maxSize=%d\n", pc, childMajor, childMajorMin, childMajorMax);
+            if (childMajor < childMajorMin)
             {
-                int over = childMajor - childMajorMax;
-                int extrapc = (int)(((float)over / (float)major) * 100.0);
-                s -= over;
-                childMajor -= over;
+                int under = childMajorMin - childMajor;
+                childMajor = childMajorMin;
+                float extrapc = (((float)under / (float)major) * 100.0);
+                m_sizes[i] += extrapc;
                 shrinkpc += extrapc;
             }
-            m_sizes[i] -= s;
-            printf("ResizeableFrame::layout:    -> Shrunk by %0.2f%%\n", s);
-        }
+            else if (childMajor > childMajorMax)
+            {
+                int over = childMajorMax - childMajor;
+                childMajor = childMajorMax;
+                float extrapc = (((float)over / (float)major) * 100.0);
+                m_sizes[i] -= extrapc;
+                shrinkpc -= extrapc;
+            }
+            else
+            {
+                shrinkable++;
+            }
 
-        Size size;
-        if (m_horizontal)
+        }
+        printf("ResizeableFrame::layout: shrinkable=%d, shrinkpc=%0.2f\n", shrinkable, shrinkpc);
+
+        int majorPos = m_margin;
+        int minorPos = m_margin;
+
+        for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
         {
-            size = Size(childMajor, childMinor);
-            child->setPosition(majorPos, minorPos);
-        }
-        else
-        {
-            size = Size(childMinor, childMajor);
-            child->setPosition(minorPos, majorPos);
-        }
-        child->setSize(size);
+            Widget* child = *it;
+            //Size childMinSize = child->getMinSize();
+            Size childMaxSize = child->getMaxSize();
 
-        majorPos += childMajor + m_padding;
+            //int childMajorMin = childMinSize.get(m_horizontal);
+            int childMajorMax = childMaxSize.get(m_horizontal);
+            float pc = m_sizes.at(i);
+            int childMajor = (int)((float)major * (pc / 100.0));
 
-        child->layout();
+            int childMinor = minor;
+
+              printf("ResizeableFrame::layout:  -> pc=%0.2f, shrinkable=%d, shrinkpc=%0.2f\n", pc, shrinkable, shrinkpc);
+            if ((childMajor < childMajorMax) && shrinkpc > 0 && shrinkable > 0)
+            {
+                float s = shrinkpc / shrinkable;
+                shrinkpc -= s;
+                shrinkable--;
+
+                childMajor -= s;
+                if (childMajor > childMajorMax)
+                {
+                    int over = childMajor - childMajorMax;
+                    int extrapc = (int)(((float)over / (float)major) * 100.0);
+                    s -= over;
+                    childMajor -= over;
+                    shrinkpc += extrapc;
+                }
+                m_sizes[i] -= s;
+                printf("ResizeableFrame::layout:    -> Shrunk by %0.2f%%\n", s);
+            }
+
+            Size size;
+            if (m_horizontal)
+            {
+                size = Size(childMajor, childMinor);
+                child->setPosition(majorPos, minorPos);
+            }
+            else
+            {
+                size = Size(childMinor, childMajor);
+                child->setPosition(minorPos, majorPos);
+            }
+            child->setSize(size);
+
+            majorPos += childMajor + m_padding;
+
+            child->layout();
+        }
     }
 }
 
@@ -195,6 +201,11 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
                             Vector2D thisPos = getAbsolutePosition();
                             m_dragPos = x - thisPos.x;
 
+                            if (imsg->window != NULL)
+                            {
+                                imsg->window->setDragWidget(this);
+                            }
+
                             return this;
                         }
                     }
@@ -210,8 +221,13 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
                 if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON &&
                     !imsg->event.button.direction)
                 {
-                    m_dragging = false;
                     printf("ResizeableFrame::handleMessage: Stopping resize!\n");
+
+                    m_dragging = false;
+                    if (imsg->window != NULL)
+                    {
+                        imsg->window->setDragWidget(NULL);
+                    }
                 }
                 else
                 {
@@ -220,7 +236,9 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
                     int diff = m_dragPos - x;
 
                     float pc = (((float)diff / (float)getWidth()) * 100.0);
+#if 0
                     printf("ResizeableFrame::handleMessage: diff=%d, pc=%0.2f\n", diff, pc);
+#endif
                     m_sizes[m_dragWidget] -= pc;
                     m_sizes[m_dragWidget + 1] += pc;
                     setDirty();
