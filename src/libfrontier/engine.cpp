@@ -50,6 +50,15 @@ bool FrontierEngine::checkEvents()
     return false;
 }
 
+void FrontierEngine::message(string title, string message)
+{
+}
+
+bool FrontierEngine::confirmBox(string title, string message)
+{
+    return false;
+}
+
 string FrontierEngine::chooseFile()
 {
     log(WARN, "chooseFile not implemented");

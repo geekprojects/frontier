@@ -25,6 +25,8 @@
 
 #include <geek/core-logger.h>
 
+#include <string>
+
 namespace Frontier {
 
 class FrontierEngine : public Geek::Logger
@@ -42,6 +44,9 @@ class FrontierEngine : public Geek::Logger
 
     virtual bool checkEvents();
 
+    // Dialogs
+    virtual void message(std::string title, std::string message);
+    virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile();
 };
 

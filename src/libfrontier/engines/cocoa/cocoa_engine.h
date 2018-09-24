@@ -42,6 +42,8 @@ class CocoaEngine : public FrontierEngine
 
     virtual bool checkEvents();
 
+    virtual void message(std::string title, std::string message);
+    virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile();
 };
 

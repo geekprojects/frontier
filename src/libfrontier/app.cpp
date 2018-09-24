@@ -104,6 +104,16 @@ void FrontierApp::handleMessage(Message* message)
 {
 }
 
+void FrontierApp::message(string title, string message)
+{
+    m_engine->message(title, message);
+}
+
+bool FrontierApp::confirmBox(string title, string message)
+{
+    return m_engine->confirmBox(title, message);
+}
+
 string FrontierApp::chooseFile()
 {
     return m_engine->chooseFile();

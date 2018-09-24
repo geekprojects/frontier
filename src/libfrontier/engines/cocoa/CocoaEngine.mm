@@ -4,6 +4,7 @@
 #include <Cocoa/Cocoa.h>
 #include <Foundation/Foundation.h>
 
+using namespace std;
 using namespace Frontier;
 
 bool CocoaEngine::createApplication()
@@ -60,6 +61,35 @@ bool CocoaEngine::run()
     [app run];
 
     return false;
+}
+
+void CocoaEngine::message(string title, string message)
+{
+}
+
+bool CocoaEngine::confirmBox(string title, string message)
+{
+#if 0
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:@"Delete this project?"];
+    [alert setInformativeText:@"Deleted projects cannot be restored"];
+    [alert addButtonWithTitle:@"OK"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+
+    [alert beginSheetModalForWindow:nil completionHandler:^(NSModalResponse returnCode)
+    {
+        if (returnCode == NSAlertSecondButtonReturn)
+        {
+            NSLog(@"Delete was cancelled!");
+            return false;
+        }
+    
+        NSLog(@"This project was deleted!");
+        return true;
+    }];
+#endif
+return false;
 }
 
 std::string CocoaEngine::chooseFile()
