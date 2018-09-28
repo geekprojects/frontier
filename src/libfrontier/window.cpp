@@ -34,6 +34,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app)
     m_initialised = false;
 
     m_mouseOverWidget = NULL;
+    m_dragWidget = NULL;
 
     m_surface = NULL;
 

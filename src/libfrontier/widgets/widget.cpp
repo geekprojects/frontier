@@ -54,6 +54,8 @@ void Widget::init(FrontierApp* app)
 
     m_margin = 5;
     m_padding = 5;
+
+    m_mouseOver = false;
 }
 
 void Widget::calculateSize()
