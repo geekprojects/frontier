@@ -98,10 +98,11 @@ uint32_t UITheme::getColour(ThemeColour colour)
     switch (colour)
     {
         case COLOUR_WINDOW_BACKGROUND:
-            return 0x003e3e3e;
-        case COLOUR_BUTTON_1:
-            return 0xff818181;
-        case COLOUR_BUTTON_2:
+            return 0xff3c3f41;
+        case COLOUR_WIDGET_BORDER_1:
+            //return 0xff818181;
+            return 0xff4b4b4b;
+        case COLOUR_WIDGET_BORDER_2:
             return 0xff0F0F0F;
         case COLOUR_WIDGET_GRADIENT_1:
             return 0xff616161;
@@ -112,13 +113,13 @@ uint32_t UITheme::getColour(ThemeColour colour)
         case COLOUR_SCROLLBAR_CONTROL:
             return 0xff818181;
         case COLOUR_LIST_ITEM_1:
-            return 0xffcccccc;
+            return 0xff3c3f41;
         case COLOUR_LIST_ITEM_2:
-            return 0xff888888;
+            return 0xff2b2b2b;
         case COLOUR_LIST_ITEM_SELECTED:
             return 0xffffffff;
         case COLOUR_TAB_SELECTED_BACKGROUND:
-            return 0xff808080;
+            return 0xff585651;
         default:
             printf("UITheme::getColour: Unknown colour: %d\n", colour);
             return 0;
@@ -130,6 +131,13 @@ void UITheme::drawBackground(Geek::Gfx::Surface* surface)
     surface->clear(getColour(COLOUR_WINDOW_BACKGROUND));
 }
 
+void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state)
+{
+int w = surface->getWidth();
+int h = surface->getHeight();
+drawBorder(surface, type, state, 0, 0, w, h);
+}
+
 void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height)
 {
     bool background = false;
@@ -137,11 +145,11 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
     bool border = false;
     bool rounded = false;
 
-    uint32_t b1 = getColour(COLOUR_BUTTON_1);
-    uint32_t b2 = getColour(COLOUR_BUTTON_2);
+    uint32_t b1 = getColour(COLOUR_WIDGET_BORDER_1);
+    uint32_t b2 = getColour(COLOUR_WIDGET_BORDER_2);
 
-    //uint32_t g1 = getColour(COLOUR_WIDGET_GRADIENT_1);
-    //uint32_t g2 = getColour(COLOUR_WIDGET_GRADIENT_2);
+    uint32_t g1 = getColour(COLOUR_WIDGET_GRADIENT_1);
+    uint32_t g2 = getColour(COLOUR_WIDGET_GRADIENT_2);
 
     uint32_t backgroundColour = getColour(COLOUR_WINDOW_BACKGROUND);
 
@@ -154,7 +162,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
 
         case BORDER_BUTTON:
         {
-            //gradient = true;
+            gradient = true;
             border = true;
             if (state == STATE_SELECTED)
             {
@@ -202,10 +210,12 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         {
             border = true;
             background = true;
+b1 = 0xff4b4b4b;
+b2 = 0xff4b4b4b;
             if (state == STATE_SELECTED)
             {
                 backgroundColour = getColour(COLOUR_TAB_SELECTED_BACKGROUND);
-                b1 = b2;
+                //b1 = b2;
             }
             else
             {
@@ -220,8 +230,8 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
 int r = 5;
     if (gradient)
     {
-        //surface->drawGrad(x, y, width, height, g1, g2);
-        surface->drawRectFilledRounded(x, y, width, height, r, backgroundColour);
+        surface->drawGradRounded(x, y, width, height, r, g1, g2);
+        //surface->drawRectFilledRounded(x, y, width, height, r, backgroundColour);
     }
 
     if (background)
@@ -258,7 +268,7 @@ void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring t
     uint32_t c = 0xffffffff;
     if (inverted)
     {
-        c = 0xff000000;
+        c = getColour(COLOUR_WINDOW_BACKGROUND);
     }
 
     FontHandle* font = m_font;
@@ -290,7 +300,7 @@ void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, 
     uint32_t c = 0xffffffff;
     if (inverted)
     {
-        c = 0xff000000;
+        c = getColour(COLOUR_WINDOW_BACKGROUND);;
     }
 
     wstring text = L"";

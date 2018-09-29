@@ -54,8 +54,8 @@ enum UIState
 enum ThemeColour
 {
     COLOUR_WINDOW_BACKGROUND,
-    COLOUR_BUTTON_1,
-    COLOUR_BUTTON_2,
+    COLOUR_WIDGET_BORDER_1,
+    COLOUR_WIDGET_BORDER_2,
     COLOUR_WIDGET_GRADIENT_1,
     COLOUR_WIDGET_GRADIENT_2,
 
@@ -88,6 +88,7 @@ class UITheme
     virtual uint32_t getColour(ThemeColour colour);
 
     virtual void drawBackground(Geek::Gfx::Surface* surface);
+    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state);
     virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state, int x, int y, int w, int h);
 
     virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, bool inverted = false);
@@ -105,6 +106,13 @@ class UITheme
 #define FRONTIER_ICON_CLOSE 0xf00d
 #define FRONTIER_ICON_SAVE 0xf0c7
 #define FRONTIER_ICON_SYNC 0xf021
+#define FRONTIER_ICON_CARET_DOWN 0xf0d7
+#define FRONTIER_ICON_CARET_UP 0xf0d8
+#define FRONTIER_ICON_CARET_LEFT 0xf0d9
+#define FRONTIER_ICON_CARET_RIGHT 0xf0da
+#define FRONTIER_ICON_TREE 0xf1bb
+#define FRONTIER_ICON_FILE 0xf15b
+#define FRONTIER_ICON_FOLDER 0xf07b
 
 };
 
