@@ -49,6 +49,8 @@ class Widget
  protected:
     FrontierApp* m_ui;
     Widget* m_parent;
+    bool m_initialised;
+    void* m_privateData;
 
     std::vector<Widget*> m_children;
 
@@ -69,12 +71,19 @@ class Widget
 
     sigc::signal<void, bool> m_mouseEnterSignal;
 
-    void init(FrontierApp* app);
+    void initWidget(FrontierApp* app);
+    void callInit();
+
+ protected:
+    virtual void init();
 
  public:
     Widget(FrontierApp* ui);
     Widget(FrontierWindow* window);
     virtual ~Widget();
+
+    void setPrivateData(void* data) { m_privateData = data; }
+    void* getPrivateData() { return m_privateData; }
 
     virtual void calculateSize();
     virtual void layout();
@@ -87,6 +96,7 @@ class Widget
     void setPacked(bool packed) { m_packed = packed; }
     bool getPacked() { return m_packed; }
     Frontier::Size setSize(Frontier::Size size);
+    Frontier::Size getSize() { return m_setSize; }
     Frontier::Size getMinSize() { return m_minSize; }
     Frontier::Size getMaxSize() { return m_maxSize; }
     virtual int getWidth() { return m_setSize.width; }
@@ -97,10 +107,10 @@ class Widget
     virtual void setPadding(int padding) { m_padding = padding; }
     virtual int getPadding() { return m_padding; }
 
-    void setParent(Widget* w) { m_parent = w; }
+    void setParent(Widget* w);
     Widget* getParent() { return m_parent; }
 
-    Geek::Vector2D getAbsolutePosition();
+    virtual Geek::Vector2D getAbsolutePosition();
     bool intersects(int x, int y);
 
     void setDirty();
@@ -188,7 +198,7 @@ class Button : public Widget
  public:
     Button(FrontierApp* ui, std::wstring text);
     Button(FrontierWindow* ui, std::wstring text);
-    ~Button();
+    virtual ~Button();
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
@@ -206,7 +216,7 @@ class IconButton : public Button
  public:
     IconButton(FrontierApp* ui, wchar_t icon);
     IconButton(FrontierWindow* ui, wchar_t icon);
-    ~IconButton();
+    virtual ~IconButton();
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
@@ -225,7 +235,7 @@ class Label : public Widget
     Label(FrontierApp* ui, std::wstring text, TextAlign align);
     Label(FrontierWindow* ui, std::wstring text);
     Label(FrontierWindow* ui, std::wstring text, TextAlign align);
-    ~Label();
+    virtual ~Label();
 
     void setText(std::wstring wtext);
     void setAlign(TextAlign align);
@@ -236,40 +246,90 @@ class Label : public Widget
     virtual Widget* handleMessage(Frontier::Message* msg);
 };
 
-struct ListItem
+class List;
+
+class ListItem : public Widget
 {
-    virtual std::wstring getText() { return L""; }
+ protected:
+    List* m_list;
+    bool m_selected;
+
+ public:
+    ListItem(FrontierApp* ui);
+    ListItem(FrontierWindow* ui);
+    virtual ~ListItem();
+
+    virtual void setList(List* list);
+    virtual void clearSelected();
+    virtual void setSelected();
 };
 
-struct TextListItem : public ListItem
+class TextListItem : public ListItem
 {
+ private:
+    uint32_t m_icon;
     std::wstring m_text;
-    std::wstring getText() { return m_text; }
 
-    TextListItem() {}
-    TextListItem(std::wstring text) { m_text = text; }
+ public:
+    TextListItem(FrontierApp* ui, std::wstring text);
+    TextListItem(FrontierApp* ui, uint32_t icon, std::wstring text);
+    TextListItem(FrontierWindow* ui, std::wstring text);
+    TextListItem(FrontierWindow* ui, uint32_t icon, std::wstring text);
+    virtual ~TextListItem();
+
+    void setText(std::wstring wtext);
+
+    virtual void calculateSize();
+    virtual bool draw(Geek::Gfx::Surface* surface);
+
+    virtual Widget* handleMessage(Frontier::Message* msg);
+};
+
+class TreeListItem : public TextListItem
+{
+ private:
+    std::vector<ListItem*> m_items;
+    int m_titleHeight;
+    bool m_open;
+
+ public:
+    TreeListItem(FrontierApp* ui, std::wstring text);
+    TreeListItem(FrontierApp* ui, uint32_t icon, std::wstring text);
+    TreeListItem(FrontierWindow* ui, std::wstring text);
+    TreeListItem(FrontierWindow* ui, uint32_t icon, std::wstring text);
+    virtual ~TreeListItem();
+
+    void addItem(ListItem* item);
+
+    virtual void calculateSize();
+    virtual void layout();
+    virtual bool draw(Geek::Gfx::Surface* surface);
+
+    virtual Widget* handleMessage(Frontier::Message* msg);
 };
 
 class List : public Widget
 {
  private:
     std::vector<ListItem*> m_list;
-    int m_selected;
-    int m_itemHeight;
+    ListItem* m_selected;
 
  public:
     List(FrontierApp* ui);
     List(FrontierWindow* window);
-    ~List();
+    virtual ~List();
 
     virtual void calculateSize();
+    virtual void layout();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleMessage(Frontier::Message* msg);
 
     void clearItems();
     void addItem(ListItem* item);
-    int getSelected() { return m_selected; }
+    void setSelected(ListItem* item);
+    void clearSelected(ListItem* item);
+    ListItem* getSelected() { return m_selected; }
     ListItem* getItem(int i) { return m_list.at(i); }
 };
 
@@ -291,7 +351,7 @@ class ScrollBar : public Widget
  public:
     ScrollBar(FrontierApp* ui);
     ScrollBar(FrontierWindow* window);
-    ~ScrollBar();
+    virtual ~ScrollBar();
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
@@ -316,14 +376,14 @@ class Scroller : public Widget
     void checkSurfaceSize(bool highDPI);
     int getWidthOverhead() { return (m_scrollBar->getWidth() - 2); }
 
-    void init(Widget* child);
+    void initScroller(Widget* child);
 
  public:
     Scroller(FrontierApp* ui);
     Scroller(FrontierApp* ui, Widget* child);
     Scroller(FrontierWindow* ui);
     Scroller(FrontierWindow* ui, Widget* child);
-    ~Scroller();
+    virtual ~Scroller();
 
     virtual void calculateSize();
     virtual void layout();

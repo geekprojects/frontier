@@ -129,12 +129,24 @@ tabs->addTab(L"Icon Buttons", iconButtonTab);
     listFrame->add(new Label(this, L"List:"));
 
     List* list = new List(this);
-    list->addItem(new TextListItem(L"This is"));
-    list->addItem(new TextListItem(L"a list"));
-    list->addItem(new TextListItem(L"with lots"));
-    list->addItem(new TextListItem(L"of very"));
-    list->addItem(new TextListItem(L"boring"));
-    list->addItem(new TextListItem(L"items"));
+    list->addItem(new TextListItem(this, FRONTIER_ICON_FOLDER_OPEN, L"This is"));
+    list->addItem(new TextListItem(this, FRONTIER_ICON_CARET_RIGHT, L"a list"));
+    list->addItem(new TextListItem(this, L"with lots"));
+    list->addItem(new TextListItem(this, L"of very"));
+    list->addItem(new TextListItem(this, L"boring"));
+    list->addItem(new TextListItem(this, L"items"));
+
+    TreeListItem* tree1;
+    list->addItem(tree1 = new TreeListItem(this, FRONTIER_ICON_TREE, L"It's a tree!"));
+    tree1->addItem(new TextListItem(this, L"This tree"));
+    tree1->addItem(new TextListItem(this, L"has lots"));
+    tree1->addItem(new TextListItem(this, L"of very"));
+    tree1->addItem(new TextListItem(this, L"exciting items!"));
+
+    TreeListItem* tree2;
+    tree1->addItem(tree2 = new TreeListItem(this, FRONTIER_ICON_TREE, L"It's a tree IN A TREE!"));
+    tree2->addItem(new TextListItem(this, L"Wow!"));
+
     Scroller* scroller = new Scroller(this);
     scroller->setChild(list);
     listFrame->add(scroller);
@@ -168,5 +180,4 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
 
