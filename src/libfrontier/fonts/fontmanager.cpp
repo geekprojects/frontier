@@ -190,11 +190,13 @@ bool FontManager::addFontFile(string path)
         return false;
     }
 
+#if 0
     log(
         DEBUG,
         "addFontFile: Family: %s, style: 0x%x",
         face->family_name,
         (int)face->style_flags);
+#endif
 
     string familyName(face->family_name);
     FontFamily* family = getFontFamily(familyName);
