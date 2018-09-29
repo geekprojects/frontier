@@ -55,6 +55,8 @@ void Widget::initWidget(FrontierApp* app)
     m_margin = 5;
     m_padding = 5;
 
+    m_mouseOver = false;
+
     m_initialised = false;
 }
 

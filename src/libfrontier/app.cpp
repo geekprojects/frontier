@@ -66,8 +66,14 @@ return false;
         return false;
     }
 
+#if defined(__APPLE__) && defined(__MACH__)
     m_fontManager->scan("/System/Library/Fonts");
-    m_fontManager->scan("/Users/ian/Library/Fonts");
+    const char* homechar = getenv("HOME");
+    m_fontManager->scan(string(homechar) + "/Library/Fonts");
+#else
+    m_fontManager->scan("/usr/share/fonts");
+#endif
+
     m_fontManager->scan("fonts");
 
     m_theme = new UITheme(this);

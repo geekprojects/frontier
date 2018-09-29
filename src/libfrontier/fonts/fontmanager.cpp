@@ -190,6 +190,11 @@ bool FontManager::addFontFile(string path)
         return false;
     }
 
+    if (face->family_name == NULL)
+    {
+        return false;
+    }
+
 #if 0
     log(
         DEBUG,

@@ -46,9 +46,13 @@ bool FrontierEngineWindowSDL::init()
         640, 480,
         flags);
 
-printf("FrontierEngineWindowSDL::init: m_sdlWindow=%p\n", m_sdlWindow);
+    printf("FrontierEngineWindowSDL::init: m_sdlWindow=%p\n", m_sdlWindow);
+    if (m_sdlWindow == NULL)
+    {
+        return false;
+    }
 
-SDL_SetWindowData(m_sdlWindow, "FrontierWindow", this);
+    SDL_SetWindowData(m_sdlWindow, "FrontierWindow", this);
 
     return true;
 }
@@ -60,19 +64,28 @@ bool FrontierEngineWindowSDL::show()
 
 bool FrontierEngineWindowSDL::update()
 {
+    if (m_window->getSurface() == NULL || m_window->getSurface()->getData() == NULL)
+    {
+        return true;
+    }
+
     Size winSize = m_window->getSize();
 
-int w;
-int h;
-SDL_GetWindowSize(m_sdlWindow, &w, &h);
+    int w = 0;
+    int h = 0;
+    SDL_GetWindowSize(m_sdlWindow, &w, &h);
 
-if (w != winSize.width || h != winSize.height)
-{
-    SDL_SetWindowSize(m_sdlWindow, winSize.width, winSize.height);
-printf("FrontierEngineWindowSDL::update: Setting window size: %s\n", winSize.toString().c_str());
-}
+    if (w != winSize.width || h != winSize.height)
+    {
+        SDL_SetWindowSize(m_sdlWindow, winSize.width, winSize.height);
+        printf("FrontierEngineWindowSDL::update: Setting window size: %s\n", winSize.toString().c_str());
+    }
 
     SDL_Surface* sdlSurface = SDL_GetWindowSurface(m_sdlWindow);
+    if (sdlSurface == NULL)
+    {
+        return false;
+    }
 
     m_window->getSurface()->drawRectFilled(0, 0, 20, 20, 0xff);
 
