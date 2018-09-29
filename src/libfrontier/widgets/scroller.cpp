@@ -29,29 +29,29 @@ using namespace Geek::Gfx;
 
 Scroller::Scroller(FrontierApp* ui) : Widget(ui)
 {
-    init(NULL);
+    initScroller(NULL);
 }
 
 Scroller::Scroller(FrontierApp* ui, Widget* child) : Widget(ui)
 {
-    init(child);
+    initScroller(child);
 }
 
 Scroller::Scroller(FrontierWindow* window) : Widget(window)
 {
-    init(NULL);
+    initScroller(NULL);
 }
 
 Scroller::Scroller(FrontierWindow* window, Widget* child) : Widget(window)
 {
-    init(child);
+    initScroller(child);
 }
 
 Scroller::~Scroller()
 {
 }
 
-void Scroller::init(Widget* child)
+void Scroller::initScroller(Widget* child)
 {
     m_childSurface = NULL;
 
@@ -73,20 +73,31 @@ void Scroller::calculateSize()
     if (m_child != NULL)
     {
         m_child->calculateSize();
-
-        //m_width = m_child->getWidth() + m_scrollBar->getWidth() + 2;
-
     }
 
-    m_minSize.width = 20 + m_scrollBar->getMinSize().width;
+    //Size childMin = m_child->getMinSize();
+    Size childMax = m_child->getMaxSize();
+    //m_minSize.width = childMin.width + m_scrollBar->getMinSize().width;
+    //m_minSize.height = childMin.height + 2;
+    m_minSize.width = 50;
     m_minSize.height = 50;
+    m_minSize.setMin(childMax);
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 }
 
 void Scroller::layout()
 {
     m_child->setPosition(0, 0);
-    m_child->setSize(m_child->getMinSize());
+
+    Size childMin = m_child->getMinSize();
+    Size childMax = m_child->getMaxSize();
+
+    Size childSize;
+    childSize.width = m_setSize.width - m_scrollBar->getMinSize().width;
+    childSize.height = m_setSize.height;
+    childSize.setMin(childMax);
+    childSize.setMax(childMin);
+    m_child->setSize(childSize);
     m_child->layout();
 
     m_scrollBar->setPosition(m_setSize.width - m_scrollBar->getMinSize().width, 0);
@@ -142,6 +153,7 @@ bool Scroller::draw(Surface* surface)
 
     if (m_child != NULL)
     {
+/*
         int cw = m_setSize.width - (m_scrollBar->getWidth() + 2);
         int ch = m_setSize.height - 2;
         if (cw > m_child->getWidth())
@@ -152,7 +164,9 @@ bool Scroller::draw(Surface* surface)
         {
             ch = m_child->getHeight();
         }
+*/
 
+Size childSize = m_child->getSize();
 #ifdef DEBUG_UI_SCROLLER
         printf("Scroller::draw: scroller width=%d, height=%d\n", m_width, m_height);
         printf("Scroller::draw: child width=%d, height=%d\n", m_child->getWidth(), m_child->getHeight());
@@ -162,19 +176,17 @@ bool Scroller::draw(Surface* surface)
         checkSurfaceSize(surface->isHighDPI());
 
         if (surface->isHighDPI())
-{
-cw *= 2;
-ch *= 2;
-}
+        {
+            childSize.width *= 2;
+            childSize.height *= 2;
+        }
 
         m_childSurface->clear(0);
         m_child->draw(m_childSurface);
-        surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), cw, ch);
+        surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), childSize.width, childSize.height);
     }
 
-    //m_scrollBar->setPosition(m_setSize.width - m_scrollBar->getWidth(), 0);
-//m_scrollBar.setSize(Size(
-    //m_scrollBar->setHeight(m_setSize.height);
+    // TODO: Make this only show if necessary
     SurfaceViewPort scrollbarVP(surface, m_scrollBar->getX(), m_scrollBar->getY(), m_scrollBar->getWidth(), m_scrollBar->getHeight());
     m_scrollBar->draw(&scrollbarVP);
 
@@ -189,15 +201,20 @@ Widget* Scroller::handleMessage(Message* msg)
         if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON ||
             imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
         {
+
+            Vector2D thisPos = Widget::getAbsolutePosition();
+printf("Scroller::handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d\n", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
+
             int x = imsg->event.button.x;
             int y = imsg->event.button.y;
+
             if (m_scrollBar->intersects(x, y))
             {
                 return m_scrollBar->handleMessage(msg);
             }
             else
             {
-                imsg->event.button.y += m_scrollBar->getPos();
+                //imsg->event.button.y -= m_scrollBar->getPos();
                 return m_child->handleMessage(imsg);
             }
         }
