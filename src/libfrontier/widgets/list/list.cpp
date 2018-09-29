@@ -239,6 +239,7 @@ void List::clearSelected(ListItem* item)
 
 ListItem::ListItem(FrontierApp* ui) : Widget(ui)
 {
+    m_selected = false;
 }
 
 ListItem::ListItem(FrontierWindow* win) : Widget(win)
