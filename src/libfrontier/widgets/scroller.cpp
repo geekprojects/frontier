@@ -166,7 +166,7 @@ bool Scroller::draw(Surface* surface)
         }
 */
 
-Size childSize = m_child->getSize();
+        Size childSize = m_child->getSize();
 #ifdef DEBUG_UI_SCROLLER
         printf("Scroller::draw: scroller width=%d, height=%d\n", m_width, m_height);
         printf("Scroller::draw: child width=%d, height=%d\n", m_child->getWidth(), m_child->getHeight());
@@ -183,7 +183,13 @@ Size childSize = m_child->getSize();
 
         m_childSurface->clear(0);
         m_child->draw(m_childSurface);
-        surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), childSize.width, childSize.height);
+        Size size = m_setSize;
+        size.width -= 2;
+        size.height -= 2;
+
+        Size childMax = m_child->getMaxSize();
+        size.setMin(childMax);
+        surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), size.width, m_setSize.height);
     }
 
     // TODO: Make this only show if necessary
@@ -203,7 +209,9 @@ Widget* Scroller::handleMessage(Message* msg)
         {
 
             Vector2D thisPos = Widget::getAbsolutePosition();
-printf("Scroller::handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d\n", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
+#if 0
+            printf("Scroller::handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d\n", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
+#endif
 
             int x = imsg->event.button.x;
             int y = imsg->event.button.y;
