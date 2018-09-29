@@ -29,19 +29,19 @@ using namespace Geek::Gfx;
 
 Widget::Widget(FrontierApp* ui)
 {
-    init(ui);
+    initWidget(ui);
 }
 
 Widget::Widget(FrontierWindow* window)
 {
-    init(window->getApp());
+    initWidget(window->getApp());
 }
 
 Widget::~Widget()
 {
 }
 
-void Widget::init(FrontierApp* app)
+void Widget::initWidget(FrontierApp* app)
 {
     m_ui = app;
     m_parent = NULL;
@@ -54,11 +54,16 @@ void Widget::init(FrontierApp* app)
 
     m_margin = 5;
     m_padding = 5;
+
+    m_initialised = false;
+}
+
+void Widget::init()
+{
 }
 
 void Widget::calculateSize()
 {
-printf("Widget::calculateSize: Not set!\n");
 }
 
 void Widget::layout()
@@ -83,6 +88,22 @@ bool Widget::draw(Geek::Gfx::Surface* surface)
     return true;
 }
 
+void Widget::callInit()
+{
+    if (!m_initialised)
+    {
+        m_initialised = true;
+        init();
+    }
+}
+
+void Widget::setParent(Widget* widget)
+{
+    m_parent = widget;
+
+    callInit();
+}
+
 Geek::Vector2D Widget::getAbsolutePosition()
 {
     Vector2D pos;
@@ -92,10 +113,6 @@ Geek::Vector2D Widget::getAbsolutePosition()
     if (m_parent != NULL)
     {
         pos += m_parent->getAbsolutePosition();
-    }
-    else
-    {
-        //pos += m_ui->getPosition();
     }
 
     return pos;
@@ -113,6 +130,7 @@ bool Widget::intersects(int x, int y)
 
 void Widget::setDirty()
 {
+    callInit();
     m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
     if (m_parent != NULL)
     {
@@ -122,6 +140,7 @@ void Widget::setDirty()
 
 void Widget::setDirty(int dirty, bool children)
 {
+    callInit();
     m_dirty |= dirty;
 
     if (children)

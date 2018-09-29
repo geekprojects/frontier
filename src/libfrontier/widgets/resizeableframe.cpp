@@ -67,7 +67,7 @@ void ResizeableFrame::layout()
 
     // HACK HACK HACK - Do it twice
     int round;
-    for (round = 0; round < 2; round++)
+    for (round = 0; round < 3; round++)
     {
 
         vector<Widget*>::iterator it;
