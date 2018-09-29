@@ -189,7 +189,13 @@ bool Scroller::draw(Surface* surface)
 
         Size childMax = m_child->getMaxSize();
         size.setMin(childMax);
-        surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), size.width, m_setSize.height);
+        if (surface->isHighDPI())
+        {
+            size.width *= 2;
+            size.height *= 2;
+        }
+
+        surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), size.width, size.height);
     }
 
     // TODO: Make this only show if necessary
@@ -208,8 +214,8 @@ Widget* Scroller::handleMessage(Message* msg)
             imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
         {
 
-            Vector2D thisPos = Widget::getAbsolutePosition();
 #if 0
+            Vector2D thisPos = Widget::getAbsolutePosition();
             printf("Scroller::handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d\n", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
 #endif
 
