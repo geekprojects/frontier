@@ -99,8 +99,8 @@ void Label::calculateSize()
         }
     }
 
-    m_minSize.width += (5 * 2);
-    m_minSize.height = (m_lineHeight * lines) + (5 * 2);
+    m_minSize.width += (m_margin * 2);
+    m_minSize.height = (m_lineHeight * lines) + (m_margin * 2);
 
     m_maxSize.height = m_minSize.height;
 }
@@ -109,7 +109,7 @@ bool Label::draw(Surface* surface)
 {
     Widget::draw(surface);
 
-    int y = 5;
+    int y = m_margin;
 
     int lines = 1;
     unsigned int pos = 0;
@@ -138,7 +138,7 @@ bool Label::draw(Surface* surface)
             switch (m_align)
             {
                 case ALIGN_LEFT:
-                    x = 0;
+                    x = m_margin;
                     break;
                 case ALIGN_CENTER:
                     x = (m_setSize.width / 2) - (w / 2);

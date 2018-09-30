@@ -77,14 +77,18 @@ void List::layout()
         Size itemMax = item->getMaxSize();
 
         Size itemSize = Size(m_setSize.width, itemMin.height);
-printf("List::layout: itemSize(1): %d,%d, min=%d,%d, max=%d,%d\n", itemSize.width, itemSize.height, itemMin.width, itemMin.height, itemMax.width, itemMax.height);
+#if 0
+        printf("List::layout: itemSize(1): %d,%d, min=%d,%d, max=%d,%d\n", itemSize.width, itemSize.height, itemMin.width, itemMin.height, itemMax.width, itemMax.height);
+#endif
         itemSize.setMin(itemMax);
         itemSize.setMax(itemMin);
+#if 0
 printf("List::layout: itemSize(2): %d,%d\n", itemSize.width, itemSize.height);
+#endif
         item->setSize(itemSize);
         item->setPosition(x, y);
 
-item->layout();
+        item->layout();
 
         y += itemSize.height;
     }
@@ -100,32 +104,11 @@ bool List::draw(Surface* surface)
     for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
     {
         ListItem* item = *it;
-printf("List::draw: itemSize: %d,%d\n", item->getWidth(), item->getHeight());
+#if 0
+        printf("List::draw: itemSize: %d,%d\n", item->getWidth(), item->getHeight());
+#endif
         SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
         item->draw(&viewport);
-/*
-        ListItem* item = *it;
-        bool isSelected = m_selected == idx;
-        UIState state = STATE_NONE;
-        if (isSelected)
-        {
-            state = STATE_SELECTED;
-        }
-        UIBorderType border;
-        if ((idx % 2) == 0)
-        {
-            border = BORDER_LIST_ITEM_1;
-        }
-        else
-        {
-            border = BORDER_LIST_ITEM_2;
-        }
-        m_ui->getTheme()->drawBorder(surface, border, state, 0, y, m_setSize.width, m_itemHeight);
-
-        m_ui->getTheme()->drawText(surface, x, y, item->getText(), m_selected == idx);
-
-        y += m_itemHeight;
-*/
     }
     return true;
 }

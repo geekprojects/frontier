@@ -105,28 +105,34 @@ if (m_open)
 
 bool TreeListItem::draw(Geek::Gfx::Surface* surface)
 {
+#if 0
     printf("TreeListItem::draw: Drawing label...\n");
+#endif
+
+    // Draw text & icon
     SurfaceViewPort viewport(surface, TREELISTITEM_INDENT, 0, m_setSize.width - TREELISTITEM_INDENT, m_titleHeight);
     TextListItem::draw(&viewport);
 
-uint32_t icon = FRONTIER_ICON_CARET_RIGHT;
-if (m_open)
-{
-icon = FRONTIER_ICON_CARET_DOWN;
-}
+    uint32_t icon = FRONTIER_ICON_CARET_RIGHT;
+    if (m_open)
+    {
+        icon = FRONTIER_ICON_CARET_DOWN;
+    }
     m_ui->getTheme()->drawIcon(surface, 1, 2, icon, false);
 
-if (m_open)
-{
-    vector<ListItem*>::iterator it;
-    for (it = m_items.begin(); it != m_items.end(); it++)
+    if (m_open)
     {
-        ListItem* item = *it;
-        printf("TreeListItem::draw: item: %d, %d size=%d,%d\n", item->getX(), item->getY(), item->getWidth(), item->getHeight());
-        SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
-        item->draw(&viewport);
+        vector<ListItem*>::iterator it;
+        for (it = m_items.begin(); it != m_items.end(); it++)
+        {
+            ListItem* item = *it;
+#if 0
+            printf("TreeListItem::draw: item: %d, %d size=%d,%d\n", item->getX(), item->getY(), item->getWidth(), item->getHeight());
+#endif
+            SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
+            item->draw(&viewport);
+        }
     }
-}
 
     return true;
 }

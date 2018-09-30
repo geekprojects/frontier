@@ -390,7 +390,9 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
     int width = surface->getWidth();
     int height = surface->getHeight();
 
+#if 0
     printf("CocoaWindow::drawSurface: width=%d, height=%d, highDPI=%d\n", width, height, surface->isHighDPI());
+#endif
 
     int len = width * height * 4;
 

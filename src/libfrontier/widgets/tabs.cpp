@@ -107,7 +107,9 @@ bool Tabs::draw(Surface* surface)
 
     int titleWidth = getTabWidth();
 
+#if 0
     printf("Tabs::draw: tabs=%lu, titleWidth=%d\n", m_tabs.size(), titleWidth);
+#endif
 
     vector<Tab>::iterator it;
     int x = 0;
@@ -135,7 +137,9 @@ bool Tabs::draw(Surface* surface)
             x, 0,
             titleWidth, TAB_HEIGHT - 1);
 
+#if 0
         printf("Tabs::draw:  -> %ls: active=%d x=%d\n", it->title.c_str(), isActive, x);
+#endif
 
         m_ui->getTheme()->drawText(
             surface,
@@ -193,7 +197,9 @@ Widget* Tabs::handleMessage(Message* msg)
 
                     int titleWidth = getTabWidth();
                     unsigned int tab = x / titleWidth;
+#if 0
                     printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
+#endif
                     if (tab >= m_tabs.size())
                     {
                         return NULL;
@@ -203,7 +209,9 @@ Widget* Tabs::handleMessage(Message* msg)
                     setDirty();
 
                     Widget* activeTab = getActiveTab();
+#if 0
                     printf("Tabs::handleMessage: activeTab=%p\n", activeTab);
+#endif
 
                     m_changeTabSignal.emit(activeTab);
                     if (activeTab != NULL)

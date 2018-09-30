@@ -142,7 +142,9 @@ void FrontierWindow::update()
 
         m_widget->setDirty(DIRTY_CONTENT);
     }
+#if 0
     printf("FrontierWindow::update: Window surface=%p\n", m_surface);
+#endif
 
     if (m_widget->isDirty())
     {
