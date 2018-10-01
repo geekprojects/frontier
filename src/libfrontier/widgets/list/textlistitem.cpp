@@ -108,29 +108,3 @@ bool TextListItem::draw(Geek::Gfx::Surface* surface)
     return true;
 }
 
-Widget* TextListItem::handleMessage(Frontier::Message* msg)
-{
-    if (msg->messageType == FRONTIER_MSG_INPUT)
-    {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
-        {
-            //if (imsg->event.button.direction)
-            {
-                if (m_selected)
-                {
-                    //clearSelected();
-                }
-                else
-                {
-                    setSelected();
-                }
-                return this;
-            }
-        }
-    }
-    return NULL;
-}
-
-
-

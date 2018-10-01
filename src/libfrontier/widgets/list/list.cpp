@@ -261,3 +261,28 @@ void ListItem::clearSelected(bool updateList)
     }
 }
 
+Widget* ListItem::handleMessage(Frontier::Message* msg)
+{
+    if (msg->messageType == FRONTIER_MSG_INPUT)
+    {
+        InputMessage* imsg = (InputMessage*)msg;
+        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
+        {
+            //if (imsg->event.button.direction)
+            {
+                if (m_selected)
+                {
+                    // Ignore
+                }
+                else
+                {
+                    setSelected();
+                    m_clickSignal.emit(this);
+                    return this;
+                }
+            }
+        }
+    }
+    return NULL;
+}
+

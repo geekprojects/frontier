@@ -253,6 +253,8 @@ class ListItem : public Widget
  protected:
     List* m_list;
     bool m_selected;
+    sigc::signal<void, ListItem*> m_clickSignal;
+    sigc::signal<void, ListItem*> m_doubleClickSignal;
 
  public:
     ListItem(FrontierApp* ui);
@@ -262,6 +264,11 @@ class ListItem : public Widget
     virtual void setList(List* list);
     virtual void clearSelected(bool updateList = true);
     virtual void setSelected(bool updateList = true);
+
+    virtual Widget* handleMessage(Frontier::Message* msg);
+
+    virtual sigc::signal<void, ListItem*> clickSignal() { return m_clickSignal; }
+    virtual sigc::signal<void, ListItem*> doubleClickSignal() { return m_doubleClickSignal; }
 };
 
 class TextListItem : public ListItem
@@ -281,8 +288,6 @@ class TextListItem : public ListItem
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
-
-    virtual Widget* handleMessage(Frontier::Message* msg);
 };
 
 class TreeListItem : public TextListItem
@@ -440,6 +445,7 @@ class Tabs : public Widget
         }
         return m_tabs.at(m_activeTab).content;
     }
+    void setActiveTab(Widget* tabContent);
 
     virtual void dump(int level);
 
