@@ -232,7 +232,7 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
                                 imsg->window->setDragWidget(this);
                             }
 
-                            return this;
+                            return NULL;
                         }
                     }
                 }
@@ -271,7 +271,7 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
 
                     m_dragPos = x;
                 }
-                return this;
+                return NULL;
             }
         }
     }
