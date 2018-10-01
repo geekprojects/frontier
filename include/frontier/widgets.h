@@ -260,8 +260,8 @@ class ListItem : public Widget
     virtual ~ListItem();
 
     virtual void setList(List* list);
-    virtual void clearSelected();
-    virtual void setSelected();
+    virtual void clearSelected(bool updateList = true);
+    virtual void setSelected(bool updateList = true);
 };
 
 class TextListItem : public ListItem

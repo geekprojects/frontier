@@ -209,7 +209,7 @@ void List::setSelected(ListItem* item)
 {
     if (m_selected != NULL)
     {
-        m_selected->clearSelected();
+        m_selected->clearSelected(false);
     }
     m_selected = item;
     setDirty(DIRTY_CONTENT);
@@ -227,6 +227,7 @@ ListItem::ListItem(FrontierApp* ui) : Widget(ui)
 
 ListItem::ListItem(FrontierWindow* win) : Widget(win)
 {
+    m_selected = false;
 }
 
 ListItem::~ListItem()
@@ -238,23 +239,25 @@ void ListItem::setList(List* list)
     m_list = list;
 }
 
-void ListItem::setSelected()
+void ListItem::setSelected(bool updateList)
 {
     m_selected = true;
-    if (m_list != NULL)
+
+    if (updateList && m_list != NULL)
     {
         m_list->setSelected(this);
+        setDirty(DIRTY_CONTENT);
     }
-setDirty(DIRTY_CONTENT);
 }
 
-void ListItem::clearSelected()
+void ListItem::clearSelected(bool updateList)
 {
     m_selected = false;
-    if (m_list != NULL)
+
+    if (updateList && m_list != NULL)
     {
         m_list->clearSelected(this);
+        setDirty(DIRTY_CONTENT);
     }
-setDirty(DIRTY_CONTENT);
 }
 

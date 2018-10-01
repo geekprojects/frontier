@@ -11,10 +11,14 @@ using namespace Geek::Gfx;
 
 ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, horizontal)
 {
+    m_dragging = false;
+    m_dragWidget = 0;
 }
 
 ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Frame(window, horizontal)
 {
+    m_dragging = false;
+    m_dragWidget = 0;
 }
 
 ResizeableFrame::~ResizeableFrame()
