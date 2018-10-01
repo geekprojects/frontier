@@ -184,6 +184,7 @@ void FrontierWindow::postMessage(Message* message)
 
 bool FrontierWindow::handleMessage(Message* message)
 {
+    Widget* prevActiveWidget = m_activeWidget;
     Widget* destWidget = NULL;
     bool updateActive = false;
 
@@ -231,17 +232,18 @@ bool FrontierWindow::handleMessage(Message* message)
         {
             destWidget = m_dragWidget->handleMessage(message);
         }
-
     }
 
     if (destWidget != NULL)
     {
-        if (updateActive)
+        bool updateRequired = m_widget->isDirty();
+        if (updateActive && prevActiveWidget == m_activeWidget)
         {
             m_activeWidget = destWidget;
+            updateRequired = true;
         }
 
-        if (m_widget->isDirty())
+        if (updateRequired)
         {
             update();
         }
