@@ -90,10 +90,6 @@ void Tabs::layout()
 bool Tabs::draw(Surface* surface)
 {
     Widget::draw(surface);
-    if (m_tabs.empty())
-    {
-        return true;
-    }
 
     int labelHeight = m_ui->getTheme()->getTextHeight();
     int labelY = (TAB_HEIGHT / 2) - (labelHeight / 2);
@@ -104,6 +100,11 @@ bool Tabs::draw(Surface* surface)
         STATE_NONE,
         0, TAB_HEIGHT,
         m_setSize.width, m_setSize.height - TAB_HEIGHT);
+
+    if (m_tabs.empty())
+    {
+        return true;
+    }
 
     int titleWidth = getTabWidth();
 
@@ -224,7 +225,7 @@ Widget* Tabs::handleMessage(Message* msg)
                         return this;
                     }
                 }
-                else
+                else if (!m_tabs.empty())
                 {
                     Widget* activeWidget = m_tabs.at(m_activeTab).content;
 
@@ -252,6 +253,23 @@ void Tabs::addTab(std::wstring title, Widget* content)
     content->setParent(this);
 
     setDirty();
+}
+
+void Tabs::setActiveTab(Widget* tabContent)
+{
+    int i = 0;
+    for (Tab tab : m_tabs)
+    {
+        if (tab.content == tabContent)
+        {
+            m_activeTab = i;
+            setDirty();
+            return;
+        }
+        i++;
+    }
+
+    return;
 }
 
 void Tabs::dump(int level)
