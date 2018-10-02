@@ -195,7 +195,11 @@ void ScrollBar::set(int min, int max, int size)
 void ScrollBar::setPos(int pos)
 {
     m_pos = pos;
-    if (m_pos > (m_max - m_size))
+    if (m_pos < m_min)
+    {
+        m_pos = m_min;
+    }
+    else if (m_pos > (m_max - m_size))
     {
         m_pos = m_max - m_size;
     }
