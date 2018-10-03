@@ -27,19 +27,31 @@ ResizeableFrame::~ResizeableFrame()
 
 void ResizeableFrame::add(Widget* widget)
 {
+    addWithSize(widget, 0);
+}
+
+void ResizeableFrame::addWithSize(Widget* widget, int setPc)
+{
     m_children.push_back(widget);
 
     widget->setParent(this);
     widget->setDirty();
 
-    m_sizes.clear();
-
-    float pc = 100.0 / (float)m_children.size();
-
-    vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
+    if (setPc == 0)
     {
-        m_sizes.push_back(pc);
+        m_sizes.clear();
+
+        float pc = 100.0 / (float)m_children.size();
+
+        vector<Widget*>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); it++)
+        {
+            m_sizes.push_back(pc);
+        }
+    }
+    else
+    {
+        m_sizes.push_back(setPc);
     }
 }
 

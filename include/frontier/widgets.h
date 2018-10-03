@@ -169,6 +169,7 @@ class ResizeableFrame : public Frame
     virtual ~ResizeableFrame();
 
     virtual void add(Widget* widget);
+    virtual void addWithSize(Widget* widget, int setPc);
 
     virtual Widget* handleMessage(Frontier::Message* msg);
 };
