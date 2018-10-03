@@ -75,6 +75,12 @@ void FrontierWindow::setContent(Widget* content)
     m_widget->setPosition(0, 0);
 }
 
+void FrontierWindow::setDragWidget(Widget* widget)
+{
+    m_dragWidget = widget;
+    m_dragTime = m_app->getTimestamp();
+}
+
 void FrontierWindow::show()
 {
     initInternal();
@@ -230,13 +236,19 @@ bool FrontierWindow::handleMessage(Message* message)
 
         if (m_dragWidget != NULL)
         {
-            destWidget = m_dragWidget->handleMessage(message);
+            uint64_t now = m_app->getTimestamp();
+            uint64_t diff = now - m_dragTime;
+            if (diff >= 100)
+            {
+                destWidget = m_dragWidget->handleMessage(message);
+                m_dragTime = m_app->getTimestamp();
+            }
         }
     }
 
-    if (destWidget != NULL)
+    bool updateRequired = m_widget->isDirty();
+    if (destWidget != NULL || updateRequired)
     {
-        bool updateRequired = m_widget->isDirty();
         if (updateActive && prevActiveWidget == m_activeWidget)
         {
             m_activeWidget = destWidget;

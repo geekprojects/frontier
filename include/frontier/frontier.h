@@ -72,6 +72,8 @@ class FrontierApp
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile();
+
+    uint64_t getTimestamp();
 };
 
 class FrontierWindow
@@ -88,6 +90,7 @@ class FrontierWindow
     Widget* m_activeWidget;
     Widget* m_mouseOverWidget;
     Widget* m_dragWidget;
+    uint64_t m_dragTime;
 
     Geek::Gfx::Surface* m_surface;
 
@@ -104,7 +107,7 @@ class FrontierWindow
 
     void setContent(Widget* widget);
     void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
-    void setDragWidget(Widget* widget) { m_dragWidget = widget; }
+    void setDragWidget(Widget* widget);
 
     void show();
     void update();
@@ -120,6 +123,7 @@ class FrontierWindow
     void postMessage(Frontier::Message* message);
     virtual bool handleMessage(Frontier::Message* message);
     sigc::signal<bool> closeSignal() { return m_closeSignal; }
+
 };
 
 };

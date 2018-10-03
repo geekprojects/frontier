@@ -21,6 +21,7 @@
 
 #include <frontier/frontier.h>
 #include <frontier/config.h>
+#include <sys/time.h>
 
 #ifdef FRONTIER_ENGINE_SDL
 #   include "engines/sdl/sdl_engine.h"
@@ -123,5 +124,16 @@ bool FrontierApp::confirmBox(string title, string message)
 string FrontierApp::chooseFile()
 {
     return m_engine->chooseFile();
+}
+
+uint64_t FrontierApp::getTimestamp()
+{
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    uint64_t millis;
+    millis = tv.tv_sec * 1000l;
+    millis += tv.tv_usec / 1000l;
+
+    return millis;
 }
 
