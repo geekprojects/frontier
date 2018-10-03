@@ -20,7 +20,7 @@
 
 
 #include <frontier/frontier.h>
-#include <frontier/widgets.h>
+#include <frontier/widgets/scroller.h>
 
 using namespace std;
 using namespace Frontier;

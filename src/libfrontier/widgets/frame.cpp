@@ -20,7 +20,7 @@
 
 
 #include <frontier/frontier.h>
-#include <frontier/widgets.h>
+#include <frontier/widgets/frame.h>
 
 #include <stdio.h>
 

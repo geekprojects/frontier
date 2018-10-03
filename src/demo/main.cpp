@@ -20,7 +20,16 @@
 
 
 #include <frontier/frontier.h>
-#include <frontier/widgets.h>
+
+#include <frontier/widgets/button.h>
+#include <frontier/widgets/frame.h>
+#include <frontier/widgets/iconbutton.h>
+#include <frontier/widgets/label.h>
+#include <frontier/widgets/list.h>
+#include <frontier/widgets/resizeableframe.h>
+#include <frontier/widgets/scrollbar.h>
+#include <frontier/widgets/scroller.h>
+#include <frontier/widgets/tabs.h>
 
 using namespace Frontier;
 

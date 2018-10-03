@@ -1,6 +1,6 @@
 
 #include <frontier/frontier.h>
-#include <frontier/widgets.h>
+#include <frontier/widgets/resizeableframe.h>
 
 #include <stdio.h>
 

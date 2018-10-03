@@ -116,6 +116,7 @@ AC_CONFIG_FILES([Makefile
                  src/demo/Makefile
                  include/Makefile
                  include/frontier/Makefile
+                 include/frontier/widgets/Makefile
                  libfrontier.pc
 ])
 
