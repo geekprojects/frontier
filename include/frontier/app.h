@@ -18,8 +18,8 @@
  * along with Frontier.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __FRONTIER_FRONTIER_H_
-#define __FRONTIER_FRONTIER_H_
+#ifndef __FRONTIER_APP_H_
+#define __FRONTIER_APP_H_
 
 #include <vector>
 
@@ -30,7 +30,52 @@
 #include <frontier/messages.h>
 #include <frontier/theme.h>
 
-#include <frontier/app.h>
-#include <frontier/window.h>
+#include <sigc++/sigc++.h>
+
+namespace Frontier
+{
+class FrontierEngine;
+class FrontierApp;
+class Widget;
+class UITheme;
+
+class FrontierEngineWindow;
+
+enum MessageBoxType
+{
+    MESSAGE_INFO,
+    MESSAGE_ALERT,
+};
+
+class FrontierApp
+{
+ private:
+    FrontierEngine* m_engine;
+
+    FontManager* m_fontManager;
+    UITheme* m_theme;
+
+ public:
+    FrontierApp();
+    virtual ~FrontierApp();
+
+    FrontierEngine* getEngine() { return m_engine; }
+    FontManager* getFontManager() { return m_fontManager; }
+    UITheme* getTheme() { return m_theme; }
+
+    virtual bool init();
+    virtual bool main();
+
+    void postMessage(Frontier::Message* message);
+    virtual void handleMessage(Frontier::Message* message);
+
+    virtual void message(std::string title, std::string message);
+    virtual bool confirmBox(std::string title, std::string message);
+    virtual std::string chooseFile();
+
+    uint64_t getTimestamp();
+};
+
+};
 
 #endif
