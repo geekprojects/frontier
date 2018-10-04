@@ -2,6 +2,7 @@
 #define __FRONTIER_WIDGETS_ICON_BUTTON_H_
 
 #include <frontier/widgets/button.h>
+#include <frontier/fontawesome.h>
 
 namespace Frontier
 {

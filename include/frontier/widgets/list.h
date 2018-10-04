@@ -2,6 +2,7 @@
 #define __FRONTIER_WIDGETS_LIST_H_
 
 #include <frontier/widgets.h>
+#include <frontier/fontawesome.h>
 
 namespace Frontier
 {

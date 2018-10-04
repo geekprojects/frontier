@@ -102,18 +102,6 @@ class UITheme
     FrontierApp* getApp() { return m_app; }
 };
 
-#define FRONTIER_ICON_FOLDER_OPEN 0xf07c
-#define FRONTIER_ICON_CLOSE 0xf00d
-#define FRONTIER_ICON_SAVE 0xf0c7
-#define FRONTIER_ICON_SYNC 0xf021
-#define FRONTIER_ICON_CARET_DOWN 0xf0d7
-#define FRONTIER_ICON_CARET_UP 0xf0d8
-#define FRONTIER_ICON_CARET_LEFT 0xf0d9
-#define FRONTIER_ICON_CARET_RIGHT 0xf0da
-#define FRONTIER_ICON_TREE 0xf1bb
-#define FRONTIER_ICON_FILE 0xf15b
-#define FRONTIER_ICON_FOLDER 0xf07b
-
 };
 
 #endif
