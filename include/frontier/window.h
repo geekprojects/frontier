@@ -40,6 +40,15 @@ class Widget;
 
 class FrontierEngineWindow;
 
+enum WindowFlags
+{
+    WINDOW_BORDER = 1,
+    WINDOW_RESIZEABLE = 2,
+
+    WINDOW_NORMAL = WINDOW_BORDER | WINDOW_RESIZEABLE,
+    WINDOW_POPUP = 0
+};
+
 class FrontierWindow
 {
  private:
@@ -48,6 +57,9 @@ class FrontierWindow
 
     FrontierApp* m_app;
 
+    std::wstring m_title;
+    int m_flags;
+    //bool m_isMain;
     Frontier::Size m_size;
 
     Widget* m_widget;
@@ -66,8 +78,13 @@ class FrontierWindow
     virtual bool init();
 
  public:
-    FrontierWindow(FrontierApp* app);
+    FrontierWindow(FrontierApp* app, std::wstring title, int flags);
     ~FrontierWindow();
+
+    std::wstring getTitle() { return m_title; }
+    bool hasBorder() { return !!(m_flags & WINDOW_BORDER); }
+    bool isResizeable() { return !!(m_flags & WINDOW_RESIZEABLE); }
+
 
     void setContent(Widget* widget);
     void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
@@ -89,7 +106,6 @@ class FrontierWindow
     sigc::signal<bool> closeSignal() { return m_closeSignal; }
 
 };
-
 
 };
 

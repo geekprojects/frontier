@@ -1,8 +1,10 @@
 
 #include "cocoa_engine.h"
+#include "utils.h"
 
 #include <Cocoa/Cocoa.h>
 
+using namespace std;
 using namespace Frontier;
 
 #include "keycode_map.h"
@@ -330,12 +332,26 @@ int height = [self frame].size.height;
 bool CocoaWindow::createCocoaWindow()
 {
     CocoaNSWindow* window;
+
+    int styleMask = 0;
+    if (m_window->hasBorder())
+    {
+        styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable;
+    }
+    else
+    {
+        styleMask = NSWindowStyleMaskBorderless;
+    }
+    if (m_window->isResizeable())
+    {
+        styleMask |= NSWindowStyleMaskResizable;
+    }
+
     window = [[CocoaNSWindow alloc]
         initWithContentRect: NSMakeRect(0, 0, 200, 200)
-        styleMask: NSWindowStyleMaskTitled | NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable
-        //styleMask: NSBorderlessWindowMask
+        styleMask: styleMask
         backing: NSBackingStoreBuffered
-        defer: NO];
+        defer: YES];
 
     [window setAcceptsMouseMovedEvents:YES];
 
@@ -345,7 +361,9 @@ bool CocoaWindow::createCocoaWindow()
     [nc addObserver:window selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:window];
 
     m_cocoaWindow = window;
-    [window setTitle: @"Test window"];
+
+    NSString* titleStr = [CocoaUtils wstringToNSString:m_window->getTitle()];
+    [window setTitle: titleStr];
 
     NSRect rect = [window contentRectForFrameRect:[window frame]];
     rect.origin.x = 0;

@@ -27,11 +27,14 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek::Gfx;
 
-FrontierWindow::FrontierWindow(FrontierApp* app)
+FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags)
 {
     m_app = app;
     m_engineWindow = NULL;
     m_initialised = false;
+
+    m_title = title;
+    m_flags = flags;
 
     m_dragWidget = NULL;
     m_mouseOverWidget = NULL;
