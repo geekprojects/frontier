@@ -21,30 +21,45 @@
 #ifndef __FRONTIER_MENU_H_
 #define __FRONTIER_MENU_H_
 
+#include <string>
+#include <vector>
+
+#include <sigc++/sigc++.h>
+
 namespace Frontier
 {
+
+enum MenuType
+{
+    MENU_TYPE_ABOUT,
+    MENU_TYPE_WINDOW,
+    MENU_TYPE_HELP,
+};
 
 class MenuItem
 {
  private:
+    std::wstring m_title;
+    std::vector<MenuItem*> m_children;
+
+    void* m_enginePrivate;
 
     sigc::signal<void> m_clickSignal;
 
  public:
-    MenuItem(std::string title);
+    MenuItem(std::wstring title);
     virtual ~MenuItem();
 
+    void setTitle(std::wstring title) { m_title = title; }
+    std::wstring getTitle() { return m_title; }
+
+    void add(MenuItem* child) { m_children.push_back(child); }
+    std::vector<MenuItem*>& getChildren() { return m_children; }
+
     virtual sigc::signal<void> clickSignal() { return m_clickSignal; }
-};
 
-class Menu
-{
- private:
-
-
- public:
-    Menu(std::string title);
-    virtual ~Menu();
+    void setEnginePrivate(void* priv) { m_enginePrivate = priv; }
+    void* getEnginePrivate() { return m_enginePrivate; }
 };
 
 };

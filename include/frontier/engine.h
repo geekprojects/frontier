@@ -31,7 +31,7 @@ namespace Frontier {
 
 class FrontierEngine : public Geek::Logger
 {
- private:
+ protected:
     FrontierApp* m_app;
 
  public:

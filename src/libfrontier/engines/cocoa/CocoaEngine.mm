@@ -1,11 +1,35 @@
 
 #include "cocoa_engine.h"
+#include "utils.h"
 
 #include <Cocoa/Cocoa.h>
 #include <Foundation/Foundation.h>
 
 using namespace std;
 using namespace Frontier;
+
+@interface MenuTarget : NSObject
+{
+    CocoaEngine* m_engine;
+}
+
+- (void)setCocoaEngine:(CocoaEngine*) engine;
+- (void)onMenuItem;
+
+@end
+
+@implementation MenuTarget
+- (void)setCocoaEngine:(CocoaEngine*) engine
+{
+    m_engine = engine;
+}
+
+- (void)onMenuItem
+{
+    printf("MenuTarget.menuItemAction: Here!\n");
+}
+
+@end
 
 bool CocoaEngine::createApplication()
 {
@@ -20,6 +44,8 @@ bool CocoaEngine::createApplication()
 
     [mainMenu release];  /* we're done with it, let NSApp own it. */
     mainMenu = nil;
+
+
 
     NSMenu* appleMenu = [[NSMenu alloc] initWithTitle:@""];
 
@@ -37,6 +63,28 @@ bool CocoaEngine::createApplication()
     [[NSApp mainMenu] addItem:menuItem];
     [menuItem release];
 
+MenuTarget* target = [MenuTarget alloc];
+
+    vector<MenuItem*>* appMenu = m_app->getAppMenu();
+    for (MenuItem* menu : *appMenu)
+    {
+        printf("CocoaEngine::createApplication: Menu: %ls\n", menu->getTitle().c_str());
+        NSString* titleStr = [CocoaUtils wstringToNSString:menu->getTitle()];
+
+        NSMenu* nsmenu = [[NSMenu alloc] initWithTitle:titleStr];
+
+        for (MenuItem* child : menu->getChildren())
+        {
+            NSString* childTitleStr = [CocoaUtils wstringToNSString:child->getTitle()];
+            NSMenuItem* childItem = [nsmenu addItemWithTitle:childTitleStr action:@selector(target:onMenuItem:) keyEquivalent:@""];
+childItem.target = target;
+
+        }
+
+        menuItem = [[NSMenuItem alloc] initWithTitle:titleStr action:nil keyEquivalent:@""];
+        [menuItem setSubmenu:nsmenu];
+        [[NSApp mainMenu] addItem:menuItem];
+    }
 
     /* Create the window menu */
     NSMenu* windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
@@ -111,5 +159,11 @@ std::string CocoaEngine::chooseFile()
     }
 
     return "";
+}
+
+bool CocoaEngine::onMenuItem(MenuItem* item)
+{
+printf("CocoaEngine::onMenuItem: item=%p\n", item);
+return true;
 }
 

@@ -32,6 +32,8 @@ class CocoaEngine : public FrontierEngine
     bool createApplication();
     bool run();
 
+bool onMenuItem(MenuItem* item);
+
  public:
     CocoaEngine(FrontierApp* app);
     virtual ~CocoaEngine();

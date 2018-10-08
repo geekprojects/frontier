@@ -29,6 +29,7 @@
 #include <frontier/fonts.h>
 #include <frontier/messages.h>
 #include <frontier/theme.h>
+#include <frontier/menu.h>
 
 #include <sigc++/sigc++.h>
 
@@ -55,6 +56,8 @@ class FrontierApp
     FontManager* m_fontManager;
     UITheme* m_theme;
 
+    std::vector<MenuItem*> m_appMenu;
+
  public:
     FrontierApp();
     virtual ~FrontierApp();
@@ -62,6 +65,8 @@ class FrontierApp
     FrontierEngine* getEngine() { return m_engine; }
     FontManager* getFontManager() { return m_fontManager; }
     UITheme* getTheme() { return m_theme; }
+
+    std::vector<MenuItem*>* getAppMenu() { return &m_appMenu; }
 
     virtual bool init();
     virtual bool main();
