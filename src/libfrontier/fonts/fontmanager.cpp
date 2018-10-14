@@ -341,12 +341,19 @@ bool FontManager::write(
         glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font, -1, currentChar);
         if (glyphIndex == 0)
         {
+#if 0
             log(
                 ERROR,
                 "write: Unable to find glyph for: %c (0x%x)",
                 currentChar,
                 currentChar);
-            continue;
+#endif
+
+            glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font, -1, 0xFFFD);
+            if (glyphIndex == 0)
+            {
+                continue;
+            }
         }
 
         if (useKerning && prevGlyph && glyphIndex)
