@@ -57,9 +57,14 @@ bool FrontierEngineWindowSDL::init()
     return true;
 }
 
-bool FrontierEngineWindowSDL::show()
+void FrontierEngineWindowSDL::show()
 {
-    return true;
+    SDL_ShowWindow(m_sdlWindow);
+}
+
+void FrontierEngineWindowSDL::hide()
+{
+    SDL_HideWindow(m_sdlWindow);
 }
 
 bool FrontierEngineWindowSDL::update()

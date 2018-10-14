@@ -38,7 +38,8 @@ class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
     virtual ~FrontierEngineWindowSDL();
 
     virtual bool init();
-    virtual bool show();
+    virtual void show();
+    virtual void hide();
     virtual bool update();
 };
 
