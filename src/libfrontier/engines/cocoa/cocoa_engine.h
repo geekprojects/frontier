@@ -64,14 +64,18 @@ class CocoaWindow : public FrontierEngineWindow
 
  public:
     CocoaWindow(FrontierWindow* window);
-    ~CocoaWindow();
+    virtual ~CocoaWindow();
 
     virtual bool init();
-    virtual bool show();
+    virtual void show();
+    virtual void hide();
 
     virtual bool update();
 
     virtual float getScaleFactor();
+
+    virtual void setPosition(unsigned int x, unsigned int y);
+    virtual Geek::Vector2D getPosition();
 };
 
 };

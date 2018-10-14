@@ -79,14 +79,26 @@ bool FrontierEngineWindow::init()
     return true;
 }
 
-bool FrontierEngineWindow::show()
+void FrontierEngineWindow::show()
 {
-    return true;
+}
+
+void FrontierEngineWindow::hide()
+{
 }
 
 bool FrontierEngineWindow::update()
 {
     return true;
+}
+
+void FrontierEngineWindow::setPosition(unsigned int x, unsigned int y)
+{
+}
+
+Geek::Vector2D FrontierEngineWindow::getPosition()
+{
+    return Geek::Vector2D(0, 0);
 }
 
 float FrontierEngineWindow::getScaleFactor()

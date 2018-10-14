@@ -25,6 +25,7 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 using namespace Geek::Gfx;
 
 FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags)
@@ -72,6 +73,11 @@ bool FrontierWindow::init()
     return true;
 }
 
+void FrontierWindow::setPosition(Geek::Vector2D position)
+{
+    m_engineWindow->setPosition(position.x, position.y);
+}
+
 void FrontierWindow::setContent(Widget* content)
 {
     m_widget = content;
@@ -92,6 +98,14 @@ void FrontierWindow::show()
 
     m_widget->setDirty();
     update();
+}
+
+void FrontierWindow::hide()
+{
+    if (m_engineWindow != NULL)
+    {
+        m_engineWindow->hide();
+    }
 }
 
 void FrontierWindow::setSize(Size size)
@@ -268,4 +282,21 @@ bool FrontierWindow::handleMessage(Message* message)
 
     return true;
 }
+
+Vector2D FrontierWindow::getScreenPosition(Vector2D pos)
+{
+    Vector2D screenPos(0, 0);
+    if (m_engineWindow == NULL)
+    {
+        return screenPos;
+    }
+
+    Vector2D windowPos = m_engineWindow->getPosition();
+
+    screenPos = windowPos;
+    screenPos += pos;
+
+    return screenPos;
+}
+
 

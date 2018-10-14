@@ -85,12 +85,14 @@ class FrontierWindow
     bool hasBorder() { return !!(m_flags & WINDOW_BORDER); }
     bool isResizeable() { return !!(m_flags & WINDOW_RESIZEABLE); }
 
+    void setPosition(Geek::Vector2D position);
 
     void setContent(Widget* widget);
     void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
     void setDragWidget(Widget* widget);
 
     void show();
+    void hide();
     void update();
 
     void setEngineWindow(FrontierEngineWindow* few) { m_engineWindow = few; }
@@ -104,6 +106,8 @@ class FrontierWindow
     void postMessage(Frontier::Message* message);
     virtual bool handleMessage(Frontier::Message* message);
     sigc::signal<bool> closeSignal() { return m_closeSignal; }
+
+    Geek::Vector2D getScreenPosition(Geek::Vector2D windowPos);
 
 };
 

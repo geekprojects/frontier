@@ -38,11 +38,6 @@ bool CocoaWindow::init()
     return createCocoaWindow();
 }
 
-bool CocoaWindow::show()
-{
-    return true;
-}
-
 bool CocoaWindow::update()
 {
     Size winSize = m_window->getSize();

@@ -31,14 +31,23 @@
 #include <frontier/widgets/scroller.h>
 #include <frontier/widgets/tabs.h>
 
+using namespace std;
 using namespace Frontier;
+using namespace Geek;
+
+class TooltipWindow;
 
 class DemoApp : public FrontierApp
 {
  private:
     FrontierWindow* m_mainWindow;
+    Button* m_textButton1;
+    Button* m_textButton2;
 
-    void onTextButton();
+    TooltipWindow* m_tooltipWindow;
+
+    void onTextButton1();
+    void onTextButton2();
     void onIconButton();
 
  public:
@@ -50,6 +59,31 @@ class DemoApp : public FrontierApp
 
 using namespace Frontier;
 
+class TooltipWindow : public FrontierWindow
+{
+ private:
+
+ public:
+    TooltipWindow(FrontierApp* app);
+    virtual ~TooltipWindow();
+
+    virtual bool init();
+};
+
+TooltipWindow::TooltipWindow(FrontierApp* app) : FrontierWindow(app, L"", WINDOW_POPUP)
+{
+}
+
+TooltipWindow::~TooltipWindow()
+{
+}
+
+bool TooltipWindow::init()
+{
+    setContent(new Label(this, L"Tool tip!"));
+    return true;
+}
+
 DemoApp::DemoApp()
 {
 }
@@ -60,6 +94,18 @@ DemoApp::~DemoApp()
 
 bool DemoApp::init()
 {
+    vector<MenuItem*>* appMenu = getAppMenu();
+
+    MenuItem* fileMenu = new MenuItem(L"File");
+    fileMenu->add(new MenuItem(L"New..."));
+    appMenu->push_back(fileMenu);
+
+    MenuItem* projectMenu = new MenuItem(L"Project");
+    projectMenu->add(new MenuItem(L"New..."));
+    projectMenu->add(new MenuItem(L"Open..."));
+    projectMenu->add(new MenuItem(L"Save"));
+    appMenu->push_back(projectMenu);
+
     bool res;
     res = FrontierApp::init();
     if (!res)
@@ -117,9 +163,9 @@ bool DemoApp::init()
 
     Frame* buttonTab = new Frame(this, false);
     Frame* buttonFrame1 = new Frame(this, true);
-    Button* textButton;
     buttonFrame1->add(new Label(this, L"Button:"));
-    buttonFrame1->add(textButton = new Button(this, L"Click me!"));
+    buttonFrame1->add(m_textButton1 = new Button(this, L"Click me!"));
+    buttonFrame1->add(m_textButton2 = new Button(this, L"But not me!"));
     buttonTab->add(buttonFrame1);
     tabs->addTab(L"Buttons", buttonTab);
 
@@ -129,10 +175,20 @@ bool DemoApp::init()
     iconButtonFrame1->add(new Label(this, L"Icon Button:"));
     iconButtonFrame1->add(iconButton = new IconButton(this, 0xf0ae));
     iconButtonTab->add(iconButtonFrame1);
-tabs->addTab(L"Icon Buttons", iconButtonTab);
+    tabs->addTab(L"Icon Buttons", iconButtonTab);
 
-    textButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton));
+    m_textButton1->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton1));
+    m_textButton2->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton2));
     iconButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onIconButton));
+
+    Frame* menuButtonTab = new Frame(this, false);
+    List* menuList = new List(this);
+    menuList->addItem(new TextListItem(this, FRONTIER_ICON_FILE, L"New..."));
+    menuList->addItem(new TextListItem(this, L"Open..."));
+    menuList->addItem(new TextListItem(this, FRONTIER_ICON_SAVE, L"Save"));
+    menuList->addItem(new TextListItem(this, L"Save As..."));
+    menuButtonTab->add(menuList);
+    tabs->addTab(L"Menu Test", menuButtonTab);
 
     Frame* listFrame = new Frame(this, true);
     listFrame->add(new Label(this, L"List:"));
@@ -161,11 +217,12 @@ tabs->addTab(L"Icon Buttons", iconButtonTab);
     listFrame->add(scroller);
     rootFrame->add(listFrame);
 
-    m_mainWindow = new FrontierWindow(this);
+    m_mainWindow = new FrontierWindow(this, L"Frontier Demo", WINDOW_NORMAL);
     m_mainWindow->setContent(rootFrame);
 
     m_mainWindow->show();
 
+    m_tooltipWindow = new TooltipWindow(this);
     return true;
 }
 
@@ -174,9 +231,22 @@ void DemoApp::onIconButton()
     printf("DemoApp::onIconButton: Here!\n");
 }
 
-void DemoApp::onTextButton()
+void DemoApp::onTextButton1()
 {
     printf("DemoApp::onTextButton: Here!\n");
+
+    Vector2D widgetPos = m_textButton1->getAbsolutePosition();
+    widgetPos.y += m_textButton1->getHeight();
+
+    Vector2D screenPos = m_mainWindow->getScreenPosition(widgetPos);
+
+    m_tooltipWindow->show();
+    m_tooltipWindow->setPosition(screenPos);
+}
+
+void DemoApp::onTextButton2()
+{
+    m_tooltipWindow->hide();
 }
 
 int main(int argc, char** argv)

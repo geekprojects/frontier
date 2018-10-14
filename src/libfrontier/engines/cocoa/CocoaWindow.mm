@@ -17,6 +17,8 @@ using namespace Frontier;
 - (void)setEngineWindow:(CocoaWindow*)cocoaWindow;
 - (CocoaWindow*)getEngineWindow;
 
+//- (void)setPosition: (unsigned int) x y:(unsigned int) y;
+
 - (void)windowDidResize: (NSNotification *)notification; 
 
 @end
@@ -31,6 +33,10 @@ using namespace Frontier;
 - (CocoaWindow*)getEngineWindow;
 {
     return m_engineWindow;
+}
+
+- (void)setPosition: (unsigned int) x y:(unsigned int) y
+{
 }
 
 - (void)windowDidResize: (NSNotification *)notification 
@@ -373,19 +379,36 @@ bool CocoaWindow::createCocoaWindow()
     [[window contentView] addSubview: view];
     [window makeFirstResponder: view];
 
-    [window makeKeyAndOrderFront:nil];
+    //[window makeKeyAndOrderFront:nil];
 
     return true;
 }
 
+void CocoaWindow::show()
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+    if (![window isMiniaturized])
+    {
+        [window makeKeyAndOrderFront:nil];
+    }
+}
+
+void CocoaWindow::hide()
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+    [window orderOut:nil];
+}
+
 Frontier::Size CocoaWindow::getSize()
 {
-/*
-    NSRect rect = [m_cocoaWindow contentRectForFrameRect:[m_cocoaWindow frame]];
-
+#if 0
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+    NSRect rect = [window contentRectForFrameRect:[window frame]];
+    printf("CocoaWindow::getSize: %d, %d\n", (int)rect.size.width, (int)rect.size.height);
     return Frontier::Size(rect.size.width, rect.size.height);
-*/
+#else
     return Frontier::Size(0, 0);
+#endif
 }
 
 void CocoaWindow::setSize(Frontier::Size size)
@@ -446,5 +469,36 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
 float CocoaWindow::getScaleFactor()
 {
     return [[(NSWindow*)m_cocoaWindow screen] backingScaleFactor];
+}
+
+void CocoaWindow::setPosition(unsigned int x, unsigned int y)
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+    NSRect rect = [window frame];
+
+    NSScreen* screen = [window screen];
+    NSRect screenFrame = [screen frame];
+
+    NSPoint point;
+    point.x = x;
+    point.y = (screenFrame.size.height - y) - rect.size.height;
+    [window setFrameTopLeftPoint: point];
+}
+
+Geek::Vector2D CocoaWindow::getPosition()
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+
+    NSScreen* screen = [window screen];
+    NSRect screenFrame = [screen frame];
+    printf("CocoaWindow.getPosition: screen size: %d, %d\n", (int)screenFrame.size.width, (int)screenFrame.size.height);
+
+    NSRect rect = [window frame];
+    printf("CocoaWindow.getPosition: window origin: %d, %d\n", (int)rect.origin.x, (int)rect.origin.y);
+    Geek::Vector2D pos;
+    pos.x = rect.origin.x;
+    pos.y = (int)(screenFrame.size.height - (rect.origin.y + rect.size.height));
+    printf("CocoaWindow.getPosition: %u, %u\n", pos.x, pos.y);
+    return pos;
 }
 

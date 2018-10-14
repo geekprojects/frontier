@@ -60,11 +60,15 @@ class FrontierEngineWindow
     virtual ~FrontierEngineWindow();
 
     virtual bool init();
-    virtual bool show();
+    virtual void show();
+    virtual void hide();
 
     virtual bool update();
 
     FrontierWindow* getWindow() { return m_window; }
+
+    virtual void setPosition(unsigned int x, unsigned int y);
+    virtual Geek::Vector2D getPosition();
 
     virtual float getScaleFactor();
 };
