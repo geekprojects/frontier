@@ -21,6 +21,8 @@
 #ifndef __FRONTIER_UTILS_H_
 #define __FRONTIER_UTILS_H_
 
+#include <string>
+
 namespace Frontier {
 
 struct Size
@@ -108,6 +110,12 @@ struct Size
             return height;
         }
     }
+};
+
+class Utils
+{
+ public:
+    static std::wstring string2wstring(std::string str);
 };
 
 };
