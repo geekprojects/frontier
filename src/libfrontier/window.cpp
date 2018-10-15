@@ -82,6 +82,7 @@ void FrontierWindow::setContent(Widget* content)
 {
     m_widget = content;
     m_widget->setPosition(0, 0);
+    m_widget->setDirty();
 }
 
 void FrontierWindow::setDragWidget(Widget* widget)
