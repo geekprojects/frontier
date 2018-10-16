@@ -83,9 +83,8 @@ void ResizeableFrame::layout()
     int round;
     for (round = 0; round < 2; round++)
     {
-
-    int shrinkable = 0;
-    float shrinkpc = 0;
+        int shrinkable = 0;
+        float shrinkpc = 0;
 
         vector<Widget*>::iterator it;
         int i;
@@ -107,15 +106,17 @@ void ResizeableFrame::layout()
         {
             Widget* child = *it;
             Size childMinSize = child->getMinSize();
-            Size childMaxSize = child->getMaxSize();
 
             int childMajorMin = childMinSize.get(m_horizontal);
-            int childMajorMax = childMaxSize.get(m_horizontal);
 
             float pc = m_sizes.at(i);
             int childMajor = (int)((float)major * (pc / 100.0));
 
+#if 0
+            Size childMaxSize = child->getMaxSize();
+            int childMajorMax = childMaxSize.get(m_horizontal);
             printf("ResizeableFrame::layout: pc=%0.2f, childMajor=%d, minSize=%d, maxSize=%d\n", pc, childMajor, childMajorMin, childMajorMax);
+#endif
             if (childMajor < childMajorMin)
             {
                 int under = childMajorMin - childMajor;
@@ -124,23 +125,15 @@ void ResizeableFrame::layout()
                 m_sizes[i] += extrapc;
                 shrinkpc += extrapc;
             }
-/*
-            else if (childMajor > childMajorMax)
-            {
-                int over = childMajorMax - childMajor;
-                childMajor = childMajorMax;
-                float extrapc = (((float)over / (float)major) * 100.0);
-                m_sizes[i] -= extrapc;
-                shrinkpc -= extrapc;
-            }
-*/
             else
             {
                 shrinkable++;
             }
 
         }
+#if 0
         printf("ResizeableFrame::layout: shrinkable=%d, shrinkpc=%0.2f\n", shrinkable, shrinkpc);
+#endif
 
         int majorPos = m_margin;
         int minorPos = m_margin;
@@ -158,7 +151,9 @@ void ResizeableFrame::layout()
 
             int childMinor = minor;
 
+#if 0
             printf("ResizeableFrame::layout:  -> pc=%0.2f, shrinkable=%d, shrinkpc=%0.2f\n", pc, shrinkable, shrinkpc);
+#endif
             if ((childMajor < childMajorMax) && (childMajor > childMajorMin) && shrinkpc > 0 && shrinkable > 0)
             {
                 float s = shrinkpc / shrinkable;
@@ -175,7 +170,9 @@ void ResizeableFrame::layout()
                     shrinkpc += extrapc;
                 }
                 m_sizes[i] -= s;
+#if 0
                 printf("ResizeableFrame::layout:    -> Shrunk by %0.2f%%\n", s);
+#endif
             }
 
             Size size;

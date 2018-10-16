@@ -133,8 +133,10 @@ void FrontierWindow::update()
 
         m_size = m_widget->setSize(m_size);
 
+#if 0
         printf("FrontierWindow::update: min=%s, max=%s\n", min.toString().c_str(), max.toString().c_str());
         printf("FrontierWindow::update: Updating window size: %s\n", m_size.toString().c_str());
+#endif
 
         m_widget->layout();
 

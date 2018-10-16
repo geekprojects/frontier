@@ -17,8 +17,6 @@ using namespace Frontier;
 - (void)setEngineWindow:(CocoaWindow*)cocoaWindow;
 - (CocoaWindow*)getEngineWindow;
 
-//- (void)setPosition: (unsigned int) x y:(unsigned int) y;
-
 - (void)windowDidResize: (NSNotification *)notification; 
 
 @end
@@ -42,15 +40,12 @@ using namespace Frontier;
 - (void)windowDidResize: (NSNotification *)notification 
 {
     NSRect rect = [self contentRectForFrameRect:[self frame]];
-    NSLog(@"CocoaNSWindow.windowDidResize: w=%0.2f, h=%0.2f", rect.size.width, rect.size.height);
 
     int w = rect.size.width;
     int h = rect.size.height;
 
     m_engineWindow->getWindow()->setSize(Frontier::Size(w, h));
     m_engineWindow->getWindow()->update();
-
-    NSLog(@"CocoaNSWindow.windowDidResize: (screen) backingScaleFactor=%0.2f", [[self screen] backingScaleFactor]);
 }
 
 @end
@@ -227,11 +222,14 @@ int height = [self frame].size.height;
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
     NSPoint pos = [theEvent locationInWindow];
-    NSLog(@"scrollWheel: location: %0.2f, %0.2f\n", pos.x, pos.y);
-    bool hasPreciseScrollingDeltas = [theEvent hasPreciseScrollingDeltas];
+
     CGFloat scrollX = [theEvent scrollingDeltaX];
     CGFloat scrollY = [theEvent scrollingDeltaY];
+
+#if 0
+    bool hasPreciseScrollingDeltas = [theEvent hasPreciseScrollingDeltas];
     NSLog(@"scrollWheel: scroll: %0.2f, %0.2f  hasPreciseScrollingDeltas=%d\n", scrollX, scrollY, hasPreciseScrollingDeltas);
+#endif
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
@@ -491,14 +489,12 @@ Geek::Vector2D CocoaWindow::getPosition()
 
     NSScreen* screen = [window screen];
     NSRect screenFrame = [screen frame];
-    printf("CocoaWindow.getPosition: screen size: %d, %d\n", (int)screenFrame.size.width, (int)screenFrame.size.height);
-
     NSRect rect = [window frame];
-    printf("CocoaWindow.getPosition: window origin: %d, %d\n", (int)rect.origin.x, (int)rect.origin.y);
+
     Geek::Vector2D pos;
     pos.x = rect.origin.x;
     pos.y = (int)(screenFrame.size.height - (rect.origin.y + rect.size.height));
-    printf("CocoaWindow.getPosition: %u, %u\n", pos.x, pos.y);
+
     return pos;
 }
 
