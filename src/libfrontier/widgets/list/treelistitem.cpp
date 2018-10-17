@@ -66,41 +66,41 @@ void TreeListItem::calculateSize()
     m_titleHeight = m_minSize.height;
 
     m_minSize.width += TREELISTITEM_INDENT;
-if (m_open)
-{
-    vector<ListItem*>::iterator it;
-    for (it = m_items.begin(); it != m_items.end(); it++)
+    if (m_open)
     {
-        ListItem* item = *it;
-        item->calculateSize();
+        vector<ListItem*>::iterator it;
+        for (it = m_items.begin(); it != m_items.end(); it++)
+        {
+            ListItem* item = *it;
+            item->calculateSize();
 
-        Size itemMin = item->getMinSize();
-        //Size itemMax = item->getMaxSize();
-        m_minSize.height += itemMin.height;
+            Size itemMin = item->getMinSize();
+            //Size itemMax = item->getMaxSize();
+            m_minSize.height += itemMin.height;
+        }
     }
-}
 }
 
 void TreeListItem::layout()
 {
     int y = m_titleHeight;
-if (m_open)
-{
-    vector<ListItem*>::iterator it;
-    for (it = m_items.begin(); it != m_items.end(); it++)
+    if (m_open)
     {
-        ListItem* item = *it;
-        Size itemMin = item->getMinSize();
-        Size itemMax = item->getMaxSize();
-        Size itemSize = Size(m_setSize.width - (TREELISTITEM_INDENT * 2), itemMin.height);
-        itemSize.setMax(itemMin);
-        itemSize.setMin(itemMax);
-        item->setSize(itemSize);
-        item->setPosition((TREELISTITEM_INDENT * 2), y);
-        item->layout();
-        y += itemSize.height;
+        vector<ListItem*>::iterator it;
+        for (it = m_items.begin(); it != m_items.end(); it++)
+        {
+            ListItem* item = *it;
+            Size itemMin = item->getMinSize();
+            Size itemMax = item->getMaxSize();
+            Size itemSize = Size(m_setSize.width - (TREELISTITEM_INDENT * 2), itemMin.height);
+            itemSize.setMax(itemMin);
+            itemSize.setMin(itemMax);
+            item->setSize(itemSize);
+            item->setPosition((TREELISTITEM_INDENT * 2), y);
+            item->layout();
+            y += itemSize.height;
+        }
     }
-}
 }
 
 bool TreeListItem::draw(Geek::Gfx::Surface* surface)
@@ -113,12 +113,15 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
     SurfaceViewPort viewport(surface, TREELISTITEM_INDENT, 0, m_setSize.width - TREELISTITEM_INDENT, m_titleHeight);
     TextListItem::draw(&viewport);
 
-    uint32_t icon = FRONTIER_ICON_CARET_RIGHT;
-    if (m_open)
+    if (!m_items.empty())
     {
-        icon = FRONTIER_ICON_CARET_DOWN;
+        uint32_t icon = FRONTIER_ICON_CARET_RIGHT;
+        if (m_open)
+        {
+            icon = FRONTIER_ICON_CARET_DOWN;
+        }
+        m_ui->getTheme()->drawIcon(surface, 1, 2, icon, false);
     }
-    m_ui->getTheme()->drawIcon(surface, 1, 2, icon, false);
 
     if (m_open)
     {
