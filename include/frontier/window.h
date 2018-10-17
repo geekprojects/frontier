@@ -88,6 +88,7 @@ class FrontierWindow
     void setPosition(Geek::Vector2D position);
 
     void setContent(Widget* widget);
+    Widget* getContent() { return m_widget; }
     void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
     void setDragWidget(Widget* widget);
 
