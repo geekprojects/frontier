@@ -263,6 +263,8 @@ void Tabs::setActiveTab(Widget* tabContent)
         if (tab.content == tabContent)
         {
             m_activeTab = i;
+
+            layout();
             setDirty();
             return;
         }
