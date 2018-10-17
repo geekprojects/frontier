@@ -192,7 +192,14 @@ Widget* List::handleMessage(Message* msg)
 
 void List::clearItems()
 {
+    for (ListItem* item : m_list)
+    {
+        delete item;
+    }
+
     m_list.clear();
+    m_selected = NULL;
+
     setDirty();
 }
 

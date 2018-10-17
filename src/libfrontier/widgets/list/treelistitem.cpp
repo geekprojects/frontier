@@ -51,6 +51,10 @@ TreeListItem::TreeListItem(FrontierWindow* win, uint32_t icon, std::wstring text
 
 TreeListItem::~TreeListItem()
 {
+    for (ListItem* item : m_items)
+    {
+        delete item;
+    }
 }
 
 void TreeListItem::addItem(ListItem* item)
@@ -58,6 +62,12 @@ void TreeListItem::addItem(ListItem* item)
     m_items.push_back(item);
     item->setParent(this);
     item->setList(m_list);
+}
+
+void TreeListItem::setOpen(bool open)
+{
+    m_open = open;
+    setDirty();
 }
 
 void TreeListItem::calculateSize()

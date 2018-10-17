@@ -67,6 +67,8 @@ class TreeListItem : public TextListItem
 
     void addItem(ListItem* item);
 
+    void setOpen(bool open);
+
     virtual void calculateSize();
     virtual void layout();
     virtual bool draw(Geek::Gfx::Surface* surface);
