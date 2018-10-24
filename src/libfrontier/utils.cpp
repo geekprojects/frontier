@@ -15,3 +15,14 @@ wstring Utils::string2wstring(string str)
     return out;
 }
 
+string Utils::wstring2string(wstring str)
+{
+    string out;
+    unsigned int i;
+    for (i = 0; i < str.length(); i++)
+    {
+        out += str[i];
+    }
+    return out;
+}
+
