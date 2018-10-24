@@ -32,15 +32,15 @@ enum KeyCode
      * tables in client code).
      */
 
-    KC_BACKSPACE                     = 0xff08,  /* Back space, back char */
-    KC_TAB                           = 0xff09,
+    KC_BACKSPACE                     = 0x0008,  /* Back space, back char */
+    KC_TAB                           = 0x0009,
     KC_LINEFEED                      = 0xff0a,  /* Linefeed, LF */
     KC_CLEAR                         = 0xff0b,
-    KC_RETURN                        = 0xff0d,  /* Return, enter */
+    KC_RETURN                        = 0x000d,  /* Return, enter */
     KC_PAUSE                         = 0xff13,  /* Pause, hold */
     KC_SCROLL_LOCK                   = 0xff14,
     KC_SYS_REQ                       = 0xff15,
-    KC_ESCAPE                        = 0xff1b,
+    KC_ESCAPE                        = 0x001b,
     KC_DELETE                        = 0xffff,  /* Delete, rubout */
 
     /* Cursor control & motion */
@@ -304,6 +304,7 @@ enum KeyModifier
     KMOD_CAPS_LOCK = 0x2000,
     KMOD_COMMAND = 0x4000,
     KMOD_RESERVED = 0x8000,
+    KMOD_ANY = 0xffffffff,
 
     KMOD_CONTROL = (KMOD_CONTROL_L|KMOD_CONTROL_R),
     KMOD_SHIFT =   (KMOD_SHIFT_L|KMOD_SHIFT_R),

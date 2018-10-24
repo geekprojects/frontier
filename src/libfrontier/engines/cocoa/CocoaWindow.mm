@@ -273,31 +273,32 @@ int height = [self frame].size.height;
 
     std::string wchars = std::string([chars UTF8String], [chars lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 
-    char c = 0;
-    if (wchars.length() > 0)
-    {
-        c = wchars.at(0);
-    }
-
-    if (c && isprint(c))
-    {
-        NSLog(@"createKeyMessage: keyCode=0x%x, chars=%c", keyCode, c);
-    }
-    else
-    {
-        NSLog(@"createKeyMessage: keyCode=0x%x", keyCode);
-    }
-
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
     msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
 
     if (wchars.length() > 0)
     {
-        msg->event.key.chr = wchars.at(0);
+        msg->event.key.key = wchars.at(0);
     }
 
-    if (keyCode < 128)
+    msg->event.key.chr = 0;
+    unsigned int c = wchars.at(0);
+    if (wchars.length() > 0 && c != 0xffffffef && !iscntrl(c))
+    {
+        if (isprint(c))
+        {
+            NSLog(@"createKeyMessage: keyCode=0x%x, chars=%c", keyCode, c);
+        }
+        else
+        {
+            NSLog(@"createKeyMessage: keyCode=0x%x, chars=0x%x", keyCode, c);
+        }
+
+        msg->event.key.chr = c;
+        msg->event.key.key = toupper(c);
+    }
+    else if (keyCode < 128)
     {
         msg->event.key.key = g_darwinKeyCodeMap[keyCode];
     }
