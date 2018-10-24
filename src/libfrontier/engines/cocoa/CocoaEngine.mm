@@ -167,3 +167,13 @@ printf("CocoaEngine::onMenuItem: item=%p\n", item);
 return true;
 }
 
+string CocoaEngine::getConfigDir()
+{
+    NSError *error;
+    NSURL *appSupportDir = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:&error];
+
+    NSString* path = [appSupportDir path];
+
+    return std::string([path UTF8String], [path lengthOfBytesUsingEncoding:NSUTF8StringEncoding]) + "/" + Utils::wstring2string(m_app->getName());
+}
+

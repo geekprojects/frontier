@@ -84,7 +84,7 @@ bool TooltipWindow::init()
     return true;
 }
 
-DemoApp::DemoApp()
+DemoApp::DemoApp() : FrontierApp(L"Demo")
 {
 }
 
@@ -112,6 +112,8 @@ bool DemoApp::init()
     {
         return false;
     }
+
+printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
 
     Frame* rootFrame = new Frame(this, false);
     Tabs* tabs = new Tabs(this);

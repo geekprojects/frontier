@@ -34,8 +34,9 @@
 using namespace std;
 using namespace Frontier;
 
-FrontierApp::FrontierApp()
+FrontierApp::FrontierApp(wstring name)
 {
+    m_name = name;
 }
 
 FrontierApp::~FrontierApp()
@@ -85,6 +86,11 @@ return false;
     }
 
     return true;
+}
+
+string FrontierApp::getConfigDir()
+{
+    return m_engine->getConfigDir();
 }
 
 bool FrontierApp::main()

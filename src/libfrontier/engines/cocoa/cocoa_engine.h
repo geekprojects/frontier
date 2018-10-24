@@ -44,6 +44,8 @@ bool onMenuItem(MenuItem* item);
 
     virtual bool checkEvents();
 
+    virtual std::string getConfigDir();
+
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile();

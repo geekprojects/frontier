@@ -50,6 +50,25 @@ bool FrontierEngine::checkEvents()
     return false;
 }
 
+string FrontierEngine::getConfigDir()
+{
+    wstring name = m_app->getName();
+
+    string dirname = "";
+    size_t i;
+    for (i = 0; i < name.length(); i++)
+    {
+        char c = name.at(i);
+        if (isalnum(c))
+        {
+            dirname += tolower(c);
+        }
+    }
+
+    string home = string(getenv("HOME"));
+    return home + "/." + dirname;
+}
+
 void FrontierEngine::message(string title, string message)
 {
 }

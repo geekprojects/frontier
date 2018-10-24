@@ -51,6 +51,7 @@ enum MessageBoxType
 class FrontierApp
 {
  private:
+    std::wstring m_name;
     FrontierEngine* m_engine;
 
     FontManager* m_fontManager;
@@ -59,12 +60,16 @@ class FrontierApp
     std::vector<MenuItem*> m_appMenu;
 
  public:
-    FrontierApp();
+    FrontierApp(std::wstring name);
     virtual ~FrontierApp();
+
+    std::wstring getName() { return m_name; }
 
     FrontierEngine* getEngine() { return m_engine; }
     FontManager* getFontManager() { return m_fontManager; }
     UITheme* getTheme() { return m_theme; }
+
+    std::string getConfigDir();
 
     std::vector<MenuItem*>* getAppMenu() { return &m_appMenu; }
 
