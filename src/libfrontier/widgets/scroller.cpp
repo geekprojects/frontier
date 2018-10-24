@@ -18,7 +18,6 @@
  * along with Frontier.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <frontier/frontier.h>
 #include <frontier/widgets/scroller.h>
 
@@ -130,14 +129,14 @@ void Scroller::checkSurfaceSize(bool highDPI)
         {
             delete m_childSurface;
         }
-if (highDPI)
-{
-        m_childSurface = new HighDPISurface(m_child->getWidth(), m_child->getHeight(), 4);
-}
-else
-{
-        m_childSurface = new Surface(m_child->getWidth(), m_child->getHeight(), 4);
-}
+        if (highDPI)
+        {
+            m_childSurface = new HighDPISurface(m_child->getWidth(), m_child->getHeight(), 4);
+        }
+        else
+        {
+            m_childSurface = new Surface(m_child->getWidth(), m_child->getHeight(), 4);
+        }
     }
 }
 
@@ -168,9 +167,9 @@ bool Scroller::draw(Surface* surface)
 
         Size childSize = m_child->getSize();
 #ifdef DEBUG_UI_SCROLLER
-        printf("Scroller::draw: scroller width=%d, height=%d\n", m_width, m_height);
+        printf("Scroller::draw: scroller width=%d, height=%d\n", m_setSize.width, m_setSize.height);
         printf("Scroller::draw: child width=%d, height=%d\n", m_child->getWidth(), m_child->getHeight());
-        printf("Scroller::draw: cw=%d, ch=%d\n", cw, ch);
+        //printf("Scroller::draw: cw=%d, ch=%d\n", cw, ch);
 #endif
 
         checkSurfaceSize(surface->isHighDPI());
@@ -240,5 +239,17 @@ void Scroller::setChild(Widget* child)
 {
     m_child = child;
     m_child->setParent(this);
+}
+
+void Scroller::dump(int level)
+{
+    Widget::dump(level);
+
+    if (m_child != NULL)
+    {
+        m_child->dump(level + 1);
+    }
+
+    m_scrollBar->dump(level + 1);
 }
 

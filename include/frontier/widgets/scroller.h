@@ -38,6 +38,8 @@ class Scroller : public Widget
     virtual Widget* handleMessage(Frontier::Message* msg);
 
     void setChild(Widget* child);
+
+    virtual void dump(int level);
 };
 
 };
