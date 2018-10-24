@@ -133,9 +133,9 @@ void UITheme::drawBackground(Geek::Gfx::Surface* surface)
 
 void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state)
 {
-int w = surface->getWidth();
-int h = surface->getHeight();
-drawBorder(surface, type, state, 0, 0, w, h);
+    int w = surface->getWidth();
+    int h = surface->getHeight();
+    drawBorder(surface, type, state, 0, 0, w, h);
 }
 
 void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height)
@@ -227,11 +227,23 @@ b2 = 0xff4b4b4b;
             break;
     }
 
-int r = 5;
+    int r = 5;
+
+    if (rounded && (width < r * 2 || height < r * 2))
+    {
+        rounded = false;
+    }
+
     if (gradient)
     {
-        surface->drawGradRounded(x, y, width, height, r, g1, g2);
-        //surface->drawRectFilledRounded(x, y, width, height, r, backgroundColour);
+        if (rounded)
+        {
+            surface->drawGradRounded(x, y, width, height, r, g1, g2);
+        }
+        else
+        {
+            surface->drawRectFilledRounded(x, y, width, height, r, backgroundColour);
+        }
     }
 
     if (background)
