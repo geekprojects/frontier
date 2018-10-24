@@ -40,6 +40,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags)
     m_dragWidget = NULL;
     m_mouseOverWidget = NULL;
     m_dragWidget = NULL;
+    m_activeWidget = NULL;
 
     m_surface = NULL;
 
