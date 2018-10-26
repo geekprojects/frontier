@@ -144,7 +144,7 @@ bool Label::draw(Surface* surface)
                     x = (m_setSize.width / 2) - (w / 2);
                     break;
                 case ALIGN_RIGHT:
-                    x = m_setSize.width - w;
+                    x = (m_setSize.width - m_margin) - w;
                     break;
             }
 
