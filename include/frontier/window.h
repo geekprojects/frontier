@@ -90,6 +90,7 @@ class FrontierWindow
     void setContent(Widget* widget);
     Widget* getContent() { return m_widget; }
     void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
+    Widget* getActiveWidget() { return m_activeWidget; }
     void setDragWidget(Widget* widget);
 
     void show();

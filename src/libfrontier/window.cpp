@@ -82,6 +82,7 @@ void FrontierWindow::setPosition(Geek::Vector2D position)
 void FrontierWindow::setContent(Widget* content)
 {
     m_widget = content;
+    m_widget->setWindow(this);
     m_widget->setPosition(0, 0);
     m_widget->setDirty();
 }

@@ -35,6 +35,7 @@ Widget::Widget(FrontierApp* ui)
 Widget::Widget(FrontierWindow* window)
 {
     initWidget(window->getApp());
+    m_window = window;
 }
 
 Widget::~Widget()
@@ -44,6 +45,7 @@ Widget::~Widget()
 void Widget::initWidget(FrontierApp* app)
 {
     m_ui = app;
+    m_window = NULL;
     m_parent = NULL;
 
     m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
@@ -104,6 +106,22 @@ void Widget::setParent(Widget* widget)
     m_parent = widget;
 
     callInit();
+}
+
+FrontierWindow* Widget::getWindow()
+{
+    if (m_window != NULL)
+    {
+        return m_window;
+    }
+
+    if (m_parent != NULL)
+    {
+        m_window = m_parent->getWindow();
+        return m_window;
+    }
+
+    return NULL;
 }
 
 Geek::Vector2D Widget::getAbsolutePosition()
@@ -171,6 +189,16 @@ void Widget::clearDirty()
     {
         (*it)->clearDirty();
     }
+}
+
+bool Widget::isActive()
+{
+    FrontierWindow* window = getWindow();
+    if (window != NULL)
+    {
+        return (window->getActiveWidget() == this);
+    }
+    return false;
 }
 
 Widget* Widget::handleMessage(Message* msg)

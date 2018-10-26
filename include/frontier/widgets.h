@@ -48,6 +48,7 @@ class Widget
 {
  protected:
     FrontierApp* m_ui;
+    FrontierWindow* m_window;
     Widget* m_parent;
     bool m_initialised;
     void* m_privateData;
@@ -110,6 +111,9 @@ class Widget
     void setParent(Widget* w);
     Widget* getParent() { return m_parent; }
 
+    void setWindow(FrontierWindow* window) { m_window = window; }
+    FrontierWindow* getWindow();
+
     virtual Geek::Vector2D getAbsolutePosition();
     bool intersects(int x, int y);
 
@@ -118,6 +122,8 @@ class Widget
     bool isDirty() { return !!(m_dirty); }
     bool isDirty(DirtyFlag flag) { return !!(m_dirty & flag); }
     void clearDirty();
+
+    bool isActive();
 
     virtual Widget* handleMessage(Frontier::Message* msg);
     
