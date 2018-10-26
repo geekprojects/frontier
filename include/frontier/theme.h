@@ -41,7 +41,8 @@ enum UIBorderType
     BORDER_LIST_BACKGROUND,
     BORDER_LIST_ITEM_1,
     BORDER_LIST_ITEM_2,
-    BORDER_TAB
+    BORDER_TAB,
+    BORDER_INPUT,
 };
 
 enum UIState
@@ -66,7 +67,9 @@ enum ThemeColour
     COLOUR_LIST_ITEM_2,
     COLOUR_LIST_ITEM_SELECTED,
 
-    COLOUR_TAB_SELECTED_BACKGROUND
+    COLOUR_TAB_SELECTED_BACKGROUND,
+
+    COLOUR_INPUT_BACKGROUND
 };
 
 class UITheme
@@ -98,6 +101,7 @@ class UITheme
     virtual void drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted = false);
     virtual int getIconWidth(wchar_t icon);
     virtual int getIconHeight();
+    virtual FontHandle* getFont(bool highDPI);
 
     FrontierApp* getApp() { return m_app; }
 };

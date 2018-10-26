@@ -76,7 +76,9 @@ bool ScrollBar::draw(Surface* surface)
 #endif
 
     int sizePix = getControlSize();
-    //printf("ScrollBar::draw: sizePix=%d\n", sizePix);
+#if 0
+    printf("ScrollBar::draw: sizePix=%d\n", sizePix);
+#endif
 
     m_ui->getTheme()->drawBorder(
         surface,

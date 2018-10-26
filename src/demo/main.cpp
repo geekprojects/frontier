@@ -30,6 +30,7 @@
 #include <frontier/widgets/scrollbar.h>
 #include <frontier/widgets/scroller.h>
 #include <frontier/widgets/tabs.h>
+#include <frontier/widgets/textinput.h>
 
 using namespace std;
 using namespace Frontier;
@@ -182,6 +183,20 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     m_textButton1->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton1));
     m_textButton2->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton2));
     iconButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onIconButton));
+
+    Frame* inputTab = new Frame(this, false);
+    Frame* inputFrame1 = new Frame(this, true);
+    TextInput* input1;
+    inputFrame1->add(new Label(this, L"Default Text:"));
+    inputFrame1->add(input1 = new TextInput(this, L"Default text"));
+    inputTab->add(inputFrame1);
+    Frame* inputFrame2 = new Frame(this, true);
+    TextInput* input2;
+    inputFrame2->add(new Label(this, L"Empty Text:"));
+    inputFrame2->add(input2 = new TextInput(this));
+    inputTab->add(inputFrame2);
+    tabs->addTab(L"Inputs", inputTab);
+
 
     Frame* menuButtonTab = new Frame(this, false);
     List* menuList = new List(this);

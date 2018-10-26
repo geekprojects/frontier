@@ -120,6 +120,8 @@ uint32_t UITheme::getColour(ThemeColour colour)
             return 0xffffffff;
         case COLOUR_TAB_SELECTED_BACKGROUND:
             return 0xff585651;
+        case COLOUR_INPUT_BACKGROUND:
+            return 0xff45494a;
         default:
             printf("UITheme::getColour: Unknown colour: %d\n", colour);
             return 0;
@@ -210,8 +212,8 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         {
             border = true;
             background = true;
-b1 = 0xff4b4b4b;
-b2 = 0xff4b4b4b;
+            b1 = 0xff4b4b4b;
+            b2 = 0xff4b4b4b;
             if (state == STATE_SELECTED)
             {
                 backgroundColour = getColour(COLOUR_TAB_SELECTED_BACKGROUND);
@@ -222,6 +224,23 @@ b2 = 0xff4b4b4b;
                 backgroundColour = getColour(COLOUR_WINDOW_BACKGROUND);
             }
         } break;;
+
+        case BORDER_INPUT:
+        {
+            background = true;
+            backgroundColour = getColour(COLOUR_INPUT_BACKGROUND);
+            border = true;
+            if (state == STATE_SELECTED)
+            {
+                b1 = 0xff0000ff;
+                b2 = 0xff0000ff;
+            }
+            else
+            {
+                b1 = 0xff646464;
+                b2 = 0xff646464;
+            }
+        } break;
 
         default:
             break;
@@ -343,4 +362,8 @@ int UITheme::getIconHeight()
     return m_iconFont->getPixelHeight(72);
 }
 
+FontHandle* UITheme::getFont(bool highDPI)
+{
+    return m_font;
+}
 
