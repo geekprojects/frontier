@@ -53,6 +53,12 @@ enum InputMessageType
     FRONTIER_MSG_INPUT_MOUSE_WHEEL  = 4
 };
 
+enum MouseButton
+{
+    BUTTON_LEFT  = 1,
+    BUTTON_RIGHT = 2
+};
+
 struct InputMessage : public Message
 {
     InputMessageType inputMessageType;
@@ -78,7 +84,7 @@ struct InputMessage : public Message
             uint32_t y;
 
             bool direction;
-            uint8_t button;
+            int buttons;
             bool doubleClick;
         } button;
         struct

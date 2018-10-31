@@ -61,19 +61,20 @@ using namespace Frontier;
 - (void)setImage:(CGImageRef)image;
 - (void)setEngineWindow:(CocoaWindow*)cocoaWindow;
 
-- (void)updateTrackingAreas;
-
 - (void)drawRect:(NSRect)dirtyRect;
 
 - (void)mouseDown:(NSEvent *)theEvent;
 - (void)mouseUp:(NSEvent *)theEvent;
+- (void)touchesBeganWithEvent:(NSEvent *)theEvent;
 - (void)mouseMoved:(NSEvent *)theEvent;
 - (void)mouseDragged:(NSEvent *)theEvent;
+
 - (void)scrollWheel:(NSEvent *)theEvent;
 - (void)keyUp:(NSEvent *)theEvent;
 - (void)keyDown:(NSEvent *)theEvent;
 
 - (Frontier::InputMessage*)createKeyMessage:(NSEvent*)event;
+- (Frontier::InputMessage*)createMouseButtonMessage:(NSEvent*)event;
 
 @end
 
@@ -111,40 +112,12 @@ using namespace Frontier;
 
 }
 
-- (void)updateTrackingAreas
-{
-#if 0
-    if (trackingArea != NULL)
-    {
-        [self removeTrackingArea: trackingArea];
-    }
-    NSTrackingAreaOptions options =(NSTrackingActiveAlways | NSTrackingInVisibleRect |  NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
-    trackingArea = [[NSTrackingArea alloc]
-        initWithRect: [self bounds]
-        options: options
-        owner: self
-         userInfo: nil];
-    [self addTrackingArea: trackingArea];
-#endif
-}
-
 - (void)mouseDown:(NSEvent *)theEvent
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
 
-    NSPoint pos = [theEvent locationInWindow];
-    //NSLog(@"Mouse was clicked: location: %0.2f, %0.2f\n", pos.x, pos.y);
-
-    Frontier::InputMessage* msg = new Frontier::InputMessage();
-    msg->messageType = FRONTIER_MSG_INPUT;
-    msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_BUTTON;
-    msg->event.button.direction = true;//(event.button.type == SDL_MOUSEBUTTONDOWN);
-    msg->event.button.button = 0;//event.button.button;
-    msg->event.button.doubleClick = false;//(event.button.clicks == 2);
-
-    int height = [self frame].size.height;
-    msg->event.button.x = (int)pos.x;
-    msg->event.button.y = height - (int)pos.y;
+    Frontier::InputMessage* msg = [self createMouseButtonMessage: theEvent];
+    msg->event.button.direction = true;
 
     CocoaWindow* cwindow = [window getEngineWindow];
     cwindow->getWindow()->handleMessage(msg);
@@ -155,23 +128,66 @@ using namespace Frontier;
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
 
+    Frontier::InputMessage* msg = [self createMouseButtonMessage: theEvent];
+    msg->event.button.direction = false;
+
+    CocoaWindow* cwindow = [window getEngineWindow];
+    cwindow->getWindow()->handleMessage(msg);
+}
+
+- (void)touchesBeganWithEvent:(NSEvent *)theEvent
+{
+    NSSet *touches = [theEvent touchesMatchingPhase:NSTouchPhaseTouching inView:self];
+    int count = [touches count];
+    if (count == 2)
+    {
+        printf("touchesBeganWithEvent: TWO FINGERS\n");
+        Frontier::InputMessage* msg = [self createMouseButtonMessage: theEvent];
+        msg->event.button.direction = false;
+
+        CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
+        CocoaWindow* cwindow = [window getEngineWindow];
+        cwindow->getWindow()->handleMessage(msg);
+    }
+}
+
+- (Frontier::InputMessage*)createMouseButtonMessage:(NSEvent*)theEvent
+{
     NSPoint pos = [theEvent locationInWindow];
-    //NSLog(@"Mouse was clicked: location: %0.2f, %0.2f\n", pos.x, pos.y);
+
+    int button;
+    int type = [theEvent type];
+    int clickCount = 1;
+    if (type == NSEventTypeGesture)
+    {
+        button = BUTTON_RIGHT;
+    }
+    else
+    {
+        clickCount = [theEvent clickCount];
+        printf("createMouseButtonMessage: clickCount=%d\n", clickCount);
+
+        if (([theEvent modifierFlags] & NSEventModifierFlagControl))
+        {
+            button = BUTTON_RIGHT;
+        }
+        else
+        {
+            button = BUTTON_LEFT;
+        }
+    }
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
     msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_BUTTON;
-    msg->event.button.direction = false;//(event.button.type == SDL_MOUSEBUTTONDOWN);
-    msg->event.button.button = 0;//event.button.button;
-    msg->event.button.doubleClick = false;//(event.button.clicks == 2);
+    msg->event.button.buttons = button;
+    msg->event.button.doubleClick = clickCount == 2;
 
-int height = [self frame].size.height;
+    int height = [self frame].size.height;
     msg->event.button.x = (int)pos.x;
     msg->event.button.y = height - (int)pos.y;
 
-    CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
-
+    return msg;
 }
 
 - (void)mouseMoved:(NSEvent *)theEvent
@@ -184,9 +200,6 @@ int height = [self frame].size.height;
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
     msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_MOTION;
-    //msg->event.button.direction = false;//(event.button.type == SDL_MOUSEBUTTONDOWN);
-    //msg->event.button.button = 0;//event.button.button;
-    //msg->event.button.doubleClick = false;//(event.button.clicks == 2);
 
     int height = [self frame].size.height;
     msg->event.button.x = (int)pos.x;
@@ -201,14 +214,10 @@ int height = [self frame].size.height;
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
 
     NSPoint pos = [theEvent locationInWindow];
-    //NSLog(@"Mouse was dragged: location: %0.2f, %0.2f\n", pos.x, pos.y);
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
     msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_MOTION;
-    //msg->event.button.direction = false;//(event.button.type == SDL_MOUSEBUTTONDOWN);
-    //msg->event.button.button = 0;//event.button.button;
-    //msg->event.button.doubleClick = false;//(event.button.clicks == 2);
 
     int height = [self frame].size.height;
     msg->event.button.x = (int)pos.x;
@@ -373,7 +382,9 @@ bool CocoaWindow::createCocoaWindow()
     NSRect rect = [window contentRectForFrameRect:[window frame]];
     rect.origin.x = 0;
     rect.origin.y = 0;
+
     FrontierView* view = [[FrontierView alloc] initWithFrame:rect];
+    [view setAcceptsTouchEvents:YES];
     m_cocoaView = view;
     [[window contentView] addSubview: view];
     [window makeFirstResponder: view];
