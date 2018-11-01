@@ -42,7 +42,7 @@ void FontFamily::addFace(FontFace* face)
     m_faces.push_back(face);
 }
 
-FontFace* FontFamily::getFace(int style)
+FontFace* FontFamily::getFace(string style)
 {
     vector<FontFace*>::iterator it;
     for (it = m_faces.begin(); it != m_faces.end(); it++)

@@ -26,7 +26,7 @@ using namespace std;
 FontFace::FontFace(
     FontManager* manager,
     string path,
-    int style,
+    string style,
     int height,
     int unitsPerEM)
 {

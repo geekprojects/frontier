@@ -155,12 +155,12 @@ bool FontManager::scan()
     return scan(m_path);
 }
 
-FontHandle* FontManager::openFont(std::string familyName, int style, int size)
+FontHandle* FontManager::openFont(string familyName, string style, int size)
 {
     log(DEBUG,
-        "openFont: Family: %s, style=0x%x, size=%d",
+        "openFont: Family: %s, style=%s, size=%d",
         familyName.c_str(),
-        style,
+        style.c_str(),
         size);
     FontFamily* family = getFontFamily(familyName);
     if (family == NULL)
@@ -198,9 +198,11 @@ bool FontManager::addFontFile(string path)
 #if 0
     log(
         DEBUG,
-        "addFontFile: Family: %s, style: 0x%x",
+        "addFontFile: %s: Family: %s, style: 0x%x (%s)",
+        path.c_str(),
         face->family_name,
-        (int)face->style_flags);
+        (int)face->style_flags,
+        face->style_name);
 #endif
 
     string familyName(face->family_name);
@@ -212,21 +214,10 @@ bool FontManager::addFontFile(string path)
         m_fontFamilies.insert(make_pair(familyName, family));
     }
 
-    int style = FontStyle_Normal;
-
-    if (face->style_flags & FT_STYLE_FLAG_ITALIC)
-    {
-        style |= FontStyle_Italic;
-    }
-    if (face->style_flags & FT_STYLE_FLAG_BOLD)
-    {
-        style |= FontStyle_Bold;
-    }
-
     FontFace* fontFace = new FontFace(
         this,
         path,
-        style,
+        face->style_name,
         face->height,
         face->units_per_EM);
 
@@ -256,14 +247,15 @@ bool FontManager::write(
     wstring text,
     uint32_t col,
     bool draw,
-    int* width)
+    int* widthReturn,
+    int maxWidth)
 {
     FT_Error error;
     FT_Face face;
 
-    if (width != NULL)
+    if (widthReturn != NULL)
     {
-        *width = 0;
+        *widthReturn = 0;
     }
 
     if (font == NULL)
@@ -300,6 +292,10 @@ bool FontManager::write(
     if (highDPI)
     {
         scaler.height *= 2;
+        if (maxWidth > 0)
+        {
+            maxWidth *= 2;
+        }
     }
 
     FT_Size size;
@@ -332,6 +328,7 @@ bool FontManager::write(
     }
 
     unsigned int pos;
+    unsigned int width = 0;
     uint32_t prevGlyph = 0;
     for (pos = 0; pos < text.length(); pos++)
     {
@@ -513,14 +510,21 @@ bool FontManager::write(
 
         x += xAdvance;
         y += yAdvance;
-        if (width != NULL)
-        {
-            *width += xAdvance;
-        }
+        width += xAdvance;
 
         FTC_Node_Unref(glyphNode, m_cacheManager);
 
+        if (maxWidth > 0 && width >= (unsigned int)maxWidth)
+        {
+            break;
+        }
     }
+
+    if (widthReturn != NULL)
+    {
+        *widthReturn = width;
+    }
+
     return true;
 }
 

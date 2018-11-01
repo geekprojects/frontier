@@ -33,13 +33,6 @@
 #include <geek/core-logger.h>
 #include <geek/gfx-surface.h>
 
-enum FontStyle
-{
-    FontStyle_Normal = 0x0,
-    FontStyle_Italic = 0x1,
-    FontStyle_Bold   = 0x2,
-};
-
 class FontFamily;
 class FontFace;
 class FontHandle;
@@ -67,7 +60,7 @@ class FontManager : public Geek::Logger
     bool scan();
     bool scan(std::string dir);
 
-    FontHandle* openFont(std::string name, int style, int size);
+    FontHandle* openFont(std::string name, std::string style, int size);
 
     FontFamily* getFontFamily(std::string familyName);
 
@@ -80,7 +73,8 @@ class FontManager : public Geek::Logger
         std::wstring text,
         uint32_t c,
         bool draw,
-        int* width);
+        int* width,
+        int maxWidth = -1);
 
     int width(
         FontHandle* font,
@@ -98,7 +92,7 @@ class FontFamily
 
     void addFace(FontFace* face);
 
-    FontFace* getFace(int style);
+    FontFace* getFace(std::string style);
 };
 
 class FontFace
@@ -107,7 +101,7 @@ class FontFace
     FontManager* m_manager;
 
     std::string m_path;
-    int m_style;
+    std::string m_style;
 
     // Size
     int m_height;
@@ -118,11 +112,11 @@ class FontFace
 
  public:
 
-    FontFace(FontManager* manager,std::string path, int style, int height, int unitsPerEM);
+    FontFace(FontManager* manager, std::string path, std::string style, int height, int unitsPerEM);
     ~FontFace();
 
     std::string getPath() { return m_path; }
-    int getStyle() { return m_style; }
+    std::string getStyle() { return m_style; }
     int getPixelHeight(int dpi, int points);
 
     FontHandle* open(int pointSize);
