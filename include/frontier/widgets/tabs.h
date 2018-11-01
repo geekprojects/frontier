@@ -10,6 +10,7 @@ struct Tab
 {
     std::wstring title;
     Widget* content;
+    bool closeable;
 };
 
 class Tabs : public Widget
@@ -19,6 +20,7 @@ class Tabs : public Widget
     std::vector<Tab> m_tabs;
 
     sigc::signal<void, Widget*> m_changeTabSignal;
+    sigc::signal<void, Widget*> m_closeTabSignal;
 
     int getTabWidth();
 
@@ -34,7 +36,8 @@ class Tabs : public Widget
 
     virtual Widget* handleMessage(Frontier::Message* msg);
 
-    void addTab(std::wstring title, Widget* content);
+    void addTab(std::wstring title, Widget* content, bool closeable = false);
+    void closeTab(Widget* tab);
 
     Widget* getActiveTab()
     {
@@ -53,6 +56,7 @@ class Tabs : public Widget
     virtual void dump(int level);
 
     virtual sigc::signal<void, Widget*> changeTabSignal() { return m_changeTabSignal; }
+    virtual sigc::signal<void, Widget*> closeTabSignal() { return m_closeTabSignal; }
 };
 
 };

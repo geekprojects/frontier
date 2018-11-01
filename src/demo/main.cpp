@@ -42,6 +42,7 @@ class DemoApp : public FrontierApp
 {
  private:
     FrontierWindow* m_mainWindow;
+    Tabs* m_tabs;
     Button* m_textButton1;
     Button* m_textButton2;
 
@@ -50,6 +51,8 @@ class DemoApp : public FrontierApp
     void onTextButton1();
     void onTextButton2();
     void onIconButton();
+
+    void onCloseTab(Widget* tab);
 
  public:
     DemoApp();
@@ -117,8 +120,9 @@ bool DemoApp::init()
 printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
 
     Frame* rootFrame = new Frame(this, false);
-    Tabs* tabs = new Tabs(this);
-    rootFrame->add(tabs);
+    m_tabs = new Tabs(this);
+    rootFrame->add(m_tabs);
+    m_tabs->closeTabSignal().connect(sigc::mem_fun(*this, &DemoApp::onCloseTab));
 
     Frame* toolbarTab = new Frame(this, false);
 
@@ -127,13 +131,13 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     toolbar1->add(new IconButton(this, FRONTIER_ICON_SAVE));
     toolbar1->add(new IconButton(this, FRONTIER_ICON_SYNC));
     toolbarTab->add(toolbar1);
-    tabs->addTab(L"Tool Bars", toolbarTab);
+    m_tabs->addTab(L"Tool Bars", toolbarTab);
 
     /*
      * Labels
      */
     Frame* labelTab = new Frame(this, false);
-    tabs->addTab(L"Labels", labelTab);
+    m_tabs->addTab(L"Labels", labelTab);
 
     Frame* labelFrame1 = new Frame(this, true);
     labelFrame1->add(new Label(this, L"Label:"));
@@ -170,7 +174,7 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     buttonFrame1->add(m_textButton1 = new Button(this, L"Click me!"));
     buttonFrame1->add(m_textButton2 = new Button(this, L"But not me!"));
     buttonTab->add(buttonFrame1);
-    tabs->addTab(L"Buttons", buttonTab);
+    m_tabs->addTab(L"Buttons", buttonTab);
 
     Frame* iconButtonTab = new Frame(this, false);
     Frame* iconButtonFrame1 = new Frame(this, true);
@@ -178,7 +182,7 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     iconButtonFrame1->add(new Label(this, L"Icon Button:"));
     iconButtonFrame1->add(iconButton = new IconButton(this, 0xf0ae));
     iconButtonTab->add(iconButtonFrame1);
-    tabs->addTab(L"Icon Buttons", iconButtonTab);
+    m_tabs->addTab(L"Icon Buttons", iconButtonTab);
 
     m_textButton1->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton1));
     m_textButton2->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onTextButton2));
@@ -195,7 +199,14 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     inputFrame2->add(new Label(this, L"Empty Text:"));
     inputFrame2->add(input2 = new TextInput(this));
     inputTab->add(inputFrame2);
-    tabs->addTab(L"Inputs", inputTab);
+    m_tabs->addTab(L"Inputs", inputTab);
+
+    Frame* closeableTab = new Frame(this, false);
+    m_tabs->addTab(L"Closeable", closeableTab, true);
+
+    Frame* closeableFrame1 = new Frame(this, true);
+    closeableFrame1->add(new Label(this, L"This tab is closeable!"));
+    closeableTab->add(closeableFrame1);
 
 
     Frame* menuButtonTab = new Frame(this, false);
@@ -205,7 +216,7 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     menuList->addItem(new TextListItem(this, FRONTIER_ICON_SAVE, L"Save"));
     menuList->addItem(new TextListItem(this, L"Save As..."));
     menuButtonTab->add(menuList);
-    tabs->addTab(L"Menu Test", menuButtonTab);
+    m_tabs->addTab(L"Menu Test", menuButtonTab, true);
 
     Frame* listFrame = new Frame(this, true);
     listFrame->add(new Label(this, L"List:"));
@@ -264,6 +275,12 @@ void DemoApp::onTextButton1()
 void DemoApp::onTextButton2()
 {
     m_tooltipWindow->hide();
+}
+
+void DemoApp::onCloseTab(Widget* tab)
+{
+    printf("DemoApp::onCloseTab: Closing tab: %p\n", tab);
+    m_tabs->closeTab(tab);
 }
 
 int main(int argc, char** argv)

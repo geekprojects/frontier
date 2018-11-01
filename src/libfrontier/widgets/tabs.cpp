@@ -21,6 +21,7 @@
 
 #include <frontier/frontier.h>
 #include <frontier/widgets/tabs.h>
+#include <frontier/fontawesome.h>
 
 using namespace std;
 using namespace Frontier;
@@ -28,7 +29,7 @@ using namespace Geek;
 using namespace Geek::Gfx;
 
 #define MAX_TAB_SIZE 250
-#define TAB_HEIGHT 20
+#define TAB_HEIGHT 22
 
 Tabs::Tabs(FrontierApp* ui) : Widget(ui)
 {
@@ -106,11 +107,13 @@ bool Tabs::draw(Surface* surface)
         return true;
     }
 
-    int titleWidth = getTabWidth();
+    int tabWidth = getTabWidth();
 
 #if 0
     printf("Tabs::draw: tabs=%lu, titleWidth=%d\n", m_tabs.size(), titleWidth);
 #endif
+
+    int closeWidth = m_ui->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
 
     vector<Tab>::iterator it;
     int x = 0;
@@ -136,23 +139,40 @@ bool Tabs::draw(Surface* surface)
             BORDER_TAB,
             state,
             x, 0,
-            titleWidth, TAB_HEIGHT - 1);
+            tabWidth, TAB_HEIGHT);
+
+        int titleWidth = tabWidth - 10;
+        if (it->closeable)
+        {
+            titleWidth -= closeWidth + 5;
+        }
 
 #if 0
-        printf("Tabs::draw:  -> %ls: active=%d x=%d\n", it->title.c_str(), isActive, x);
+        printf("Tabs::draw:  -> %ls: active=%d x=%d, tabWidth=%d, titleWidth=%d, closeable=%d\n", it->title.c_str(), isActive, x, tabWidth, titleWidth, it->closeable);
 #endif
 
         m_ui->getTheme()->drawText(
             surface,
             x + 5,
             labelY,
-           it->title.c_str()); 
+           it->title.c_str(),
+            titleWidth); 
+
+        if (it->closeable)
+        {
+            m_ui->getTheme()->drawIcon(
+                surface,
+                x + tabWidth - (closeWidth + 5),
+                labelY,
+                FRONTIER_ICON_WINDOW_CLOSE,
+                false);
+        }
 
         if (tab < m_tabs.size() - 1)
         {
-            //surface->drawLine(x + titleWidth - 1, 0, x + titleWidth - 1, 24, 0xffffffff);
+            //surface->drawLine(x + tabWidth - 1, 0, x + tabWidth - 1, 24, 0xffffffff);
         }
-        x += titleWidth;
+        x += tabWidth;
     }
 
     Widget* activeWidget = m_tabs.at(m_activeTab).content;
@@ -191,13 +211,9 @@ Widget* Tabs::handleMessage(Message* msg)
                         return this;
                     }
 
-                    if (!imsg->event.button.direction)
-                    {
-                        return NULL;
-                    }
 
-                    int titleWidth = getTabWidth();
-                    unsigned int tab = x / titleWidth;
+                    int tabWidth = getTabWidth();
+                    unsigned int tab = x / tabWidth;
 #if 0
                     printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
 #endif
@@ -205,11 +221,32 @@ Widget* Tabs::handleMessage(Message* msg)
                     {
                         return NULL;
                     }
+
+                    Widget* activeTab = getActiveTab();
+
+                    if (m_tabs.at(tab).closeable)
+                    {
+                        int closeWidth = m_ui->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
+                        if (x > (int)((tab * tabWidth) + (tabWidth - (closeWidth + 5))))
+                        {
+                            if (!imsg->event.button.direction)
+                            {
+                                m_closeTabSignal.emit(m_tabs.at(tab).content);
+                            }
+
+                            return this;
+                        }
+                    }
+
+                    if (!imsg->event.button.direction)
+                    {
+                        return this;
+                    }
+
                     m_activeTab = tab;
 
                     setDirty();
 
-                    Widget* activeTab = getActiveTab();
 #if 0
                     printf("Tabs::handleMessage: activeTab=%p\n", activeTab);
 #endif
@@ -243,16 +280,40 @@ Widget* Tabs::handleMessage(Message* msg)
     return NULL;
 }
 
-void Tabs::addTab(std::wstring title, Widget* content)
+void Tabs::addTab(std::wstring title, Widget* content, bool closeable)
 {
     Tab tab;
     tab.title = title;
     tab.content = content;
+    tab.closeable = closeable;
+
     m_tabs.push_back(tab);
 
     content->setParent(this);
 
     setDirty();
+}
+
+void Tabs::closeTab(Widget* widget)
+{
+    vector<Tab>::iterator it;
+
+    for (it = m_tabs.begin(); it != m_tabs.end(); it++)
+    {
+        if (it->content == widget)
+        {
+            m_tabs.erase(it);
+
+            if (m_activeTab >= m_tabs.size())
+            {
+                m_activeTab = m_tabs.size() - 1;
+            }
+
+            layout();
+            setDirty();
+            return;
+        }
+    }
 }
 
 void Tabs::setActiveTab(Widget* tabContent)
