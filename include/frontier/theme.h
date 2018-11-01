@@ -77,9 +77,7 @@ class UITheme
  protected:
     bool m_initialised;
     FontHandle* m_font;
-    FontHandle* m_fontHighDPI;
     FontHandle* m_iconFont;
-    FontHandle* m_iconFontHighDPI;
     FrontierApp* m_app;
 
  public:
@@ -94,7 +92,7 @@ class UITheme
     virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state);
     virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state, int x, int y, int w, int h);
 
-    virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, bool inverted = false);
+    virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false);
     virtual int getTextWidth(std::wstring text);
     virtual int getTextHeight();
 

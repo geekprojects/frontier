@@ -39,52 +39,27 @@ bool UITheme::init()
 {
     if (!m_initialised)
     {
+        m_initialised = true;
+
         m_font = m_app->getFontManager()->openFont(
             "Helvetica Neue",
-            FontStyle_Normal,
+            "Regular",
             12);
-            m_initialised = true;
-
         if (m_font == NULL)
         {
-printf("UITheme::init: Failed to find font: Lato\n");
-            return false;
-        }
-        m_fontHighDPI = m_app->getFontManager()->openFont(
-            "Helvetica Neue",
-            FontStyle_Normal,
-            24);
-            m_initialised = true;
-
-        if (m_font == NULL)
-        {
-printf("UITheme::init: Failed to find font: Lato\n");
+            printf("UITheme::init: Failed to find font: Lato\n");
             return false;
         }
 
         m_iconFont = m_app->getFontManager()->openFont(
-            "FontAwesome",
-            FontStyle_Normal,
+            "Font Awesome 5 Free",
+            "Solid",
             12);
-            m_initialised = true;
         if (m_font == NULL)
         {
-printf("UITheme::init: Failed to find font: FontAwesome\n");
+            printf("UITheme::init: Failed to find font: FontAwesome\n");
             return false;
         }
-
-        m_iconFontHighDPI = m_app->getFontManager()->openFont(
-            "FontAwesome",
-            FontStyle_Normal,
-            24);
-            m_initialised = true;
-        if (m_font == NULL)
-        {
-printf("UITheme::init: Failed to find font: FontAwesome\n");
-            return false;
-        }
-
-        m_initialised = true;
     }
     return true;
 }
@@ -119,7 +94,7 @@ uint32_t UITheme::getColour(ThemeColour colour)
         case COLOUR_LIST_ITEM_SELECTED:
             return 0xffffffff;
         case COLOUR_TAB_SELECTED_BACKGROUND:
-            return 0xff585651;
+            return 0xff515658;
         case COLOUR_INPUT_BACKGROUND:
             return 0xff45494a;
         default:
@@ -221,7 +196,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
             }
             else
             {
-                backgroundColour = getColour(COLOUR_WINDOW_BACKGROUND);
+                backgroundColour = 0xff3b3d3e;//getColour(COLOUR_WINDOW_BACKGROUND);
             }
         } break;;
 
@@ -232,8 +207,8 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
             border = true;
             if (state == STATE_SELECTED)
             {
-                b1 = 0xff0000ff;
-                b2 = 0xff0000ff;
+                b1 = 0xff4c708c;
+                b2 = 0xff4c708c;
             }
             else
             {
@@ -274,7 +249,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         else
         {
             surface->drawRectFilled(x, y, width, height, backgroundColour);
-    }
+        }
     }
 
     if (border)
@@ -292,9 +267,14 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
             surface->drawLine(x, y + height, x + width, y + height, b2);
         }
     }
+
+    if (type == BORDER_TAB && state == STATE_SELECTED)
+    {
+        surface->drawRectFilled(x + 1, y + height - 2, width - 2, 2, 0xff4a7987);
+    }
 }
 
-void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, bool inverted)
+void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted)
 {
     uint32_t c = 0xffffffff;
     if (inverted)
@@ -312,7 +292,8 @@ void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring t
         text.c_str(),
         c,
         true,
-        NULL);
+        NULL,
+        maxWidth);
 }
 
 int UITheme::getTextWidth(std::wstring text)
