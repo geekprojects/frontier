@@ -21,6 +21,7 @@
 
 #include <frontier/frontier.h>
 #include <frontier/widgets.h>
+#include <frontier/contextmenu.h>
 
 using namespace std;
 using namespace Frontier;
@@ -47,6 +48,7 @@ void Widget::initWidget(FrontierApp* app)
     m_ui = app;
     m_window = NULL;
     m_parent = NULL;
+    m_contextMenu = NULL;
 
     m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
 
@@ -199,6 +201,28 @@ bool Widget::isActive()
         return (window->getActiveWidget() == this);
     }
     return false;
+}
+
+void Widget::openContextMenu()
+{
+    openContextMenu(getAbsolutePosition());
+}
+
+void Widget::openContextMenu(Geek::Vector2D pos)
+{
+    if (m_contextMenu == NULL)
+    {
+        return;
+    }
+
+    ContextMenu* cm = m_ui->getContextMenuWindow();
+    cm->setMenu(m_contextMenu);
+
+    cm->setSize(Size(0, 0));
+    cm->show();
+
+    Vector2D screenPos = getWindow()->getScreenPosition(pos);
+    cm->setPosition(screenPos);
 }
 
 Widget* Widget::handleMessage(Message* msg)

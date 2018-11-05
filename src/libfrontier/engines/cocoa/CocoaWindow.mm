@@ -18,6 +18,8 @@ using namespace Frontier;
 - (CocoaWindow*)getEngineWindow;
 
 - (void)windowDidResize: (NSNotification *)notification; 
+- (void)windowDidBecomeKey: (NSNotification *)notification; 
+- (void)windowDidResignKey: (NSNotification *)notification; 
 
 @end
 
@@ -33,10 +35,6 @@ using namespace Frontier;
     return m_engineWindow;
 }
 
-- (void)setPosition: (unsigned int) x y:(unsigned int) y
-{
-}
-
 - (void)windowDidResize: (NSNotification *)notification 
 {
     NSRect rect = [self contentRectForFrameRect:[self frame]];
@@ -46,6 +44,16 @@ using namespace Frontier;
 
     m_engineWindow->getWindow()->setSize(Frontier::Size(w, h));
     m_engineWindow->getWindow()->update();
+}
+
+- (void)windowDidBecomeKey: (NSNotification *)notification
+{
+printf("CocoaNSWindow::windowDidBecomeKey: Here!\n");
+}
+
+- (void)windowDidResignKey: (NSNotification *)notification
+{
+printf("CocoaNSWindow::windowDidResignKey: Here!\n");
 }
 
 @end
@@ -68,6 +76,9 @@ using namespace Frontier;
 - (void)touchesBeganWithEvent:(NSEvent *)theEvent;
 - (void)mouseMoved:(NSEvent *)theEvent;
 - (void)mouseDragged:(NSEvent *)theEvent;
+
+- (void)mouseEntered:(NSEvent *)theEvent;
+- (void)mouseExited:(NSEvent *)theEvent;
 
 - (void)scrollWheel:(NSEvent *)theEvent;
 - (void)keyUp:(NSEvent *)theEvent;
@@ -227,6 +238,17 @@ using namespace Frontier;
     cwindow->getWindow()->handleMessage(msg);
 }
 
+- (void)mouseEntered:(NSEvent *)theEvent
+{
+printf("mouseEntered: Here!\n");
+}
+
+- (void)mouseExited:(NSEvent *)theEvent
+{
+printf("mouseExited: Here!\n");
+}
+
+
 - (void)scrollWheel:(NSEvent *)theEvent
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
@@ -356,6 +378,7 @@ bool CocoaWindow::createCocoaWindow()
     {
         styleMask = NSWindowStyleMaskBorderless;
     }
+
     if (m_window->isResizeable())
     {
         styleMask |= NSWindowStyleMaskResizable;
@@ -373,6 +396,8 @@ bool CocoaWindow::createCocoaWindow()
 
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:window selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:window];
+    [nc addObserver:window selector:@selector(windowDidBecomeKey:) name:NSWindowDidBecomeKeyNotification object:window];
+    [nc addObserver:window selector:@selector(windowDidResignKey:) name:NSWindowDidResignKeyNotification object:window];
 
     m_cocoaWindow = window;
 
@@ -491,7 +516,12 @@ void CocoaWindow::setPosition(unsigned int x, unsigned int y)
 
     NSPoint point;
     point.x = x;
-    point.y = (screenFrame.size.height - y) - rect.size.height;
+    point.y = screenFrame.size.height - (y + (rect.size.height / 2));
+
+#if 0
+    printf("CocoaWindow::setPosition: y=%d, screen height=%d, window height=%d -> %d\n", (int)y, (int)screenFrame.size.height, (int)rect.size.height, (int)point.y);
+#endif
+
     [window setFrameTopLeftPoint: point];
 }
 

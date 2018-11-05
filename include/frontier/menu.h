@@ -62,6 +62,19 @@ class MenuItem
     void* getEnginePrivate() { return m_enginePrivate; }
 };
 
+class Menu
+{
+ private:
+    std::vector<MenuItem*> m_menuItems;
+
+ public:
+    Menu();
+    ~Menu();
+
+    void add(MenuItem* child) { m_menuItems.push_back(child); }
+    std::vector<MenuItem*>& getMenuItems() { return m_menuItems; }
+};
+
 };
 
 #endif

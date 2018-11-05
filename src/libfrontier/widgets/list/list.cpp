@@ -285,6 +285,10 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
                 {
                     setSelected();
                     m_clickSignal.emit(this);
+                    if (m_list != NULL)
+                    {
+                        m_list->selectSignal().emit(this);
+                    }
                     return this;
                 }
             }
@@ -292,4 +296,7 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
     }
     return NULL;
 }
+
+
+
 

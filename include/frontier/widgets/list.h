@@ -8,6 +8,7 @@ namespace Frontier
 {
 
 class List;
+class Menu;
 
 class ListItem : public Widget
 {
@@ -82,6 +83,8 @@ class List : public Widget
     std::vector<ListItem*> m_list;
     ListItem* m_selected;
 
+    sigc::signal<void, ListItem*> m_selectSignal;
+
  public:
     List(FrontierApp* ui);
     List(FrontierWindow* window);
@@ -99,8 +102,26 @@ class List : public Widget
     void clearSelected(ListItem* item);
     ListItem* getSelected() { return m_selected; }
     ListItem* getItem(int i) { return m_list.at(i); }
+
+    virtual sigc::signal<void, ListItem*> selectSignal() { return m_selectSignal; }
 };
 
+class MenuList : public List
+{
+ private:
+    std::vector<MenuItem*> m_menuItems;
+
+ public:
+    MenuList(FrontierApp* ui, Menu* menu);
+    MenuList(FrontierWindow* window, Menu* menu);
+    MenuList(FrontierApp* ui, std::vector<MenuItem*> menu);
+    MenuList(FrontierWindow* window, std::vector<MenuItem*> menu);
+    virtual ~MenuList();
+
+    virtual void init();
+
+    void setMenu(std::vector<MenuItem*> menuItems);
+};
 
 };
 

@@ -37,6 +37,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags)
     m_title = title;
     m_flags = flags;
 
+    m_widget = NULL;
     m_dragWidget = NULL;
     m_mouseOverWidget = NULL;
     m_dragWidget = NULL;
@@ -44,7 +45,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags)
 
     m_surface = NULL;
 
-    m_size.set(500, 50);
+    m_size.set(640, 480);
 }
 
 FrontierWindow::~FrontierWindow()
@@ -98,6 +99,10 @@ void FrontierWindow::show()
     initInternal();
 
     m_engineWindow->show();
+    if (!(m_flags & WINDOW_TOOL_TIP))
+    {
+        m_app->setActiveWindow(this);
+    }
 
     m_widget->setDirty();
     update();
@@ -114,9 +119,12 @@ void FrontierWindow::hide()
 void FrontierWindow::setSize(Size size)
 {
     m_size = size;
-    m_widget->setDirty(DIRTY_SIZE, true);
+    if (m_widget != NULL)
+    {
+        m_widget->setDirty(DIRTY_SIZE, true);
 
-    update();
+        update();
+    }
 }
 
 void FrontierWindow::update()
@@ -224,6 +232,8 @@ bool FrontierWindow::handleMessage(Message* message)
         switch (imsg->inputMessageType)
         {
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+                m_app->setActiveWindow(this);
+                // Fall through
             case FRONTIER_MSG_INPUT_MOUSE_WHEEL:
                 updateActive = true;
                 destWidget = m_widget->handleMessage(message);
@@ -288,6 +298,16 @@ bool FrontierWindow::handleMessage(Message* message)
     return true;
 }
 
+void FrontierWindow::gainedFocus()
+{
+    printf("FrontierWindow::gainedFocus: Here! this=%p\n", this);
+}
+
+void FrontierWindow::lostFocus()
+{
+    printf("FrontierWindow::lostFocus: Here! this=%p\n", this);
+}
+
 Vector2D FrontierWindow::getScreenPosition(Vector2D pos)
 {
     Vector2D screenPos(0, 0);
@@ -303,5 +323,4 @@ Vector2D FrontierWindow::getScreenPosition(Vector2D pos)
 
     return screenPos;
 }
-
 

@@ -39,6 +39,7 @@ class FrontierEngine;
 class FrontierApp;
 class Widget;
 class UITheme;
+class ContextMenu;
 
 class FrontierEngineWindow;
 
@@ -57,7 +58,11 @@ class FrontierApp
     FontManager* m_fontManager;
     UITheme* m_theme;
 
+    ContextMenu* m_contextMenuWindow;
+
     std::vector<MenuItem*> m_appMenu;
+
+    FrontierWindow* m_activeWindow;
 
  public:
     FrontierApp(std::wstring name);
@@ -69,9 +74,14 @@ class FrontierApp
     FontManager* getFontManager() { return m_fontManager; }
     UITheme* getTheme() { return m_theme; }
 
+    ContextMenu* getContextMenuWindow();
+
     std::string getConfigDir();
 
     std::vector<MenuItem*>* getAppMenu() { return &m_appMenu; }
+
+    void setActiveWindow(FrontierWindow* activeWindow);
+    FrontierWindow* getActiveWindow();
 
     virtual bool init();
     virtual bool main();

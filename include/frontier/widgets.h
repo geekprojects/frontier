@@ -31,6 +31,8 @@
 
 namespace Frontier {
 
+class Menu;
+
 enum TextAlign
 {
     ALIGN_LEFT,
@@ -54,6 +56,7 @@ class Widget
     void* m_privateData;
 
     std::vector<Widget*> m_children;
+    Menu* m_contextMenu;
 
     int m_x;
     int m_y;
@@ -124,6 +127,11 @@ class Widget
     void clearDirty();
 
     bool isActive();
+
+    void setContextMenu(Menu* menu) { m_contextMenu = menu; }
+    Menu* getContextMenu() { return m_contextMenu; }
+    void openContextMenu();
+    void openContextMenu(Geek::Vector2D pos);
 
     virtual Widget* handleMessage(Frontier::Message* msg);
     

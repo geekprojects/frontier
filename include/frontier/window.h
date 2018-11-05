@@ -44,9 +44,9 @@ enum WindowFlags
 {
     WINDOW_BORDER = 1,
     WINDOW_RESIZEABLE = 2,
+    WINDOW_TOOL_TIP = 4,
 
     WINDOW_NORMAL = WINDOW_BORDER | WINDOW_RESIZEABLE,
-    WINDOW_POPUP = 0
 };
 
 class FrontierWindow
@@ -71,6 +71,8 @@ class FrontierWindow
     Geek::Gfx::Surface* m_surface;
 
     sigc::signal<bool> m_closeSignal;
+    sigc::signal<bool> m_gainedFocusSignal;
+    sigc::signal<bool> m_lostFocusSignal;
 
     bool initInternal();
 
@@ -109,8 +111,10 @@ class FrontierWindow
     virtual bool handleMessage(Frontier::Message* message);
     sigc::signal<bool> closeSignal() { return m_closeSignal; }
 
-    Geek::Vector2D getScreenPosition(Geek::Vector2D windowPos);
+    virtual void gainedFocus();
+    virtual void lostFocus();
 
+    Geek::Vector2D getScreenPosition(Geek::Vector2D windowPos);
 };
 
 };

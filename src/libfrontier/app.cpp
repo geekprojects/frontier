@@ -21,6 +21,7 @@
 
 #include <frontier/frontier.h>
 #include <frontier/config.h>
+#include <frontier/contextmenu.h>
 #include <sys/time.h>
 
 #ifdef FRONTIER_ENGINE_SDL
@@ -36,6 +37,8 @@ using namespace Frontier;
 
 FrontierApp::FrontierApp(wstring name)
 {
+    m_activeWindow = NULL;
+    m_contextMenuWindow = NULL;
     m_name = name;
 }
 
@@ -88,9 +91,42 @@ return false;
     return true;
 }
 
+ContextMenu* FrontierApp::getContextMenuWindow()
+{
+    if (m_contextMenuWindow == NULL)
+    {
+        m_contextMenuWindow = new ContextMenu(this);
+    }
+    return m_contextMenuWindow;
+}
+
 string FrontierApp::getConfigDir()
 {
     return m_engine->getConfigDir();
+}
+
+void FrontierApp::setActiveWindow(FrontierWindow* window)
+{
+    if (window == m_activeWindow)
+    {
+        return;
+    }
+
+    if (m_activeWindow != NULL)
+    {
+        m_activeWindow->lostFocus();
+    }
+
+    m_activeWindow = window;
+    if (m_activeWindow != NULL)
+    {
+        m_activeWindow->gainedFocus();
+    }
+}
+
+FrontierWindow* FrontierApp::getActiveWindow()
+{
+    return m_activeWindow;
 }
 
 bool FrontierApp::main()
