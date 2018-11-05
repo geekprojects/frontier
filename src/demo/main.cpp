@@ -74,8 +74,9 @@ class TooltipWindow : public FrontierWindow
     virtual bool init();
 };
 
-TooltipWindow::TooltipWindow(FrontierApp* app) : FrontierWindow(app, L"", WINDOW_POPUP)
+TooltipWindow::TooltipWindow(FrontierApp* app) : FrontierWindow(app, L"", WINDOW_TOOL_TIP)
 {
+    setSize(Size(20, 20));
 }
 
 TooltipWindow::~TooltipWindow()
