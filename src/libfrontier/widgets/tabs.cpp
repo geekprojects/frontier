@@ -45,6 +45,25 @@ Tabs::~Tabs()
 {
 }
 
+void Tabs::init()
+{
+    Menu* menu = new Menu();
+
+    MenuItem* closeItem = new MenuItem(L"Close");
+    closeItem->clickSignal().connect(sigc::mem_fun(*this, &Tabs::closeActiveTab));
+    menu->add(closeItem);
+
+    MenuItem* closeAllItem = new MenuItem(L"Close All");
+    closeAllItem->clickSignal().connect(sigc::mem_fun(*this, &Tabs::closeAllTabs));
+    menu->add(closeAllItem);
+
+    MenuItem* closeOthersItem = new MenuItem(L"Close Others");
+    closeOthersItem->clickSignal().connect(sigc::mem_fun(*this, &Tabs::closeAllButActiveTab));
+    menu->add(closeOthersItem);
+
+    setContextMenu(menu);
+}
+
 void Tabs::calculateSize()
 {
     if (m_tabs.empty())
@@ -238,7 +257,12 @@ Widget* Tabs::handleMessage(Message* msg)
                         }
                     }
 
-                    if (!imsg->event.button.direction)
+                    if (imsg->event.button.buttons == BUTTON_RIGHT)
+                    {
+                        printf("Tabs::handleMessage: CONTEXT MENU!!!\n");
+                        openContextMenu(Geek::Vector2D(imsg->event.button.x, imsg->event.button.y));
+                    }
+                    else if (!imsg->event.button.direction)
                     {
                         return this;
                     }
@@ -315,6 +339,42 @@ void Tabs::closeTab(Widget* widget)
         }
     }
 }
+
+void Tabs::closeActiveTab()
+{
+    Widget* activeWidget = getActiveTab();
+    if (activeWidget != NULL)
+    {
+        closeTab(activeWidget);
+    }
+}
+
+void Tabs::closeAllTabs()
+{
+    vector<Tab> tabs  = m_tabs; // Make a copy as the original will be modified
+    for (Tab tab : tabs)
+    {
+        if (tab.closeable)
+        {
+            closeTab(tab.content);
+        }
+    }
+}
+
+void Tabs::closeAllButActiveTab()
+{
+    Widget* activeWidget = getActiveTab();
+
+    vector<Tab> tabs  = m_tabs; // Make a copy as the original will be modified
+    for (Tab tab : tabs)
+    {
+        if (tab.closeable && tab.content != activeWidget)
+        {
+            closeTab(tab.content);
+        }
+    }
+}
+
 
 void Tabs::setActiveTab(Widget* tabContent)
 {

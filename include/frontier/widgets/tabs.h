@@ -29,6 +29,8 @@ class Tabs : public Widget
     Tabs(FrontierWindow* app);
     virtual ~Tabs();
 
+    virtual void init();
+
     virtual void calculateSize();
     virtual void layout();
 
@@ -38,6 +40,10 @@ class Tabs : public Widget
 
     void addTab(std::wstring title, Widget* content, bool closeable = false);
     void closeTab(Widget* tab);
+
+    void closeActiveTab();
+    void closeAllTabs();
+    void closeAllButActiveTab();
 
     Widget* getActiveTab()
     {
