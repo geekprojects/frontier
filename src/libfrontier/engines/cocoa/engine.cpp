@@ -63,8 +63,6 @@ bool CocoaEngine::initWindow(FrontierWindow* window)
 
 bool CocoaEngine::checkEvents()
 {
-    run();
-
-    return true;
+    return run();
 }
 

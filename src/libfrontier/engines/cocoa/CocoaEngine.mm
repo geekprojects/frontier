@@ -31,9 +31,38 @@ using namespace Frontier;
 
 @end
 
+@interface FrontierAppDelegate : NSObject <NSApplicationDelegate>
+
+- (id)init;
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
+
+@end
+
+@implementation FrontierAppDelegate : NSObject
+- (id)init
+{
+    self = [super init];
+
+    return self;
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+    [NSApp stop:self];
+    printf("FrontierAppDelegate::applicationShouldTerminate: Here!\n");
+    return NSTerminateCancel;
+}
+@end
+
 bool CocoaEngine::createApplication()
 {
     m_application = [NSApplication sharedApplication];
+
+    FrontierAppDelegate* appDelegate = [[FrontierAppDelegate alloc] init];
+    m_appDelegate = appDelegate;
+
+    [NSApp setDelegate:appDelegate];
 
     [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 
@@ -44,8 +73,6 @@ bool CocoaEngine::createApplication()
 
     [mainMenu release];  /* we're done with it, let NSApp own it. */
     mainMenu = nil;
-
-
 
     NSMenu* appleMenu = [[NSMenu alloc] initWithTitle:@""];
 
@@ -105,8 +132,11 @@ childItem.target = target;
 
 bool CocoaEngine::run()
 {
+    printf("CocoaEngine::run: Starting run\n");
     NSApplication* app = (NSApplication*)m_application;
     [app run];
+
+    printf("CocoaEngine::run: run has exited\n");
 
     return false;
 }

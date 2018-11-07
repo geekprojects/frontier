@@ -17,6 +17,7 @@ using namespace Frontier;
 - (void)setEngineWindow:(CocoaWindow*)cocoaWindow;
 - (CocoaWindow*)getEngineWindow;
 
+-(BOOL) windowShouldClose:(id) sender;
 - (void)windowDidResize: (NSNotification *)notification; 
 - (void)windowDidBecomeKey: (NSNotification *)notification; 
 - (void)windowDidResignKey: (NSNotification *)notification; 
@@ -33,6 +34,12 @@ using namespace Frontier;
 - (CocoaWindow*)getEngineWindow;
 {
     return m_engineWindow;
+}
+
+-(BOOL) windowShouldClose:(id) sender
+{
+    printf("CocoaNSWindow::windowShouldClose: Here!\n");
+    return NO;
 }
 
 - (void)windowDidResize: (NSNotification *)notification 

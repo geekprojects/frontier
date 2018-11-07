@@ -28,6 +28,7 @@ class CocoaEngine : public FrontierEngine
 {
  private:
     void* m_application;
+    void* m_appDelegate;
 
     bool createApplication();
     bool run();
