@@ -53,7 +53,7 @@ class MenuItem
     void setTitle(std::wstring title) { m_title = title; }
     std::wstring getTitle() { return m_title; }
 
-    void add(MenuItem* child) { m_children.push_back(child); }
+    void add(MenuItem* child);
     std::vector<MenuItem*>& getChildren() { return m_children; }
 
     virtual sigc::signal<void> clickSignal() { return m_clickSignal; }

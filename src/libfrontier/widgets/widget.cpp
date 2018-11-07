@@ -41,6 +41,11 @@ Widget::Widget(FrontierWindow* window)
 
 Widget::~Widget()
 {
+    for (Widget* child : m_children)
+    {
+        child->decRefCount();
+    }
+    m_children.clear();
 }
 
 void Widget::initWidget(FrontierApp* app)
@@ -62,6 +67,11 @@ void Widget::initWidget(FrontierApp* app)
     m_mouseOver = false;
 
     m_initialised = false;
+
+    if (m_ui != NULL)
+    {
+        m_ui->registerObject(this);
+    }
 }
 
 void Widget::init()

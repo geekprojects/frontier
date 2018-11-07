@@ -96,7 +96,7 @@ class List : public Widget
 
     virtual Widget* handleMessage(Frontier::Message* msg);
 
-    void clearItems();
+    void clearItems(bool setDirty = true);
     void addItem(ListItem* item);
     void setSelected(ListItem* item);
     void clearSelected(ListItem* item);

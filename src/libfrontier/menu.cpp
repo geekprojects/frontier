@@ -19,6 +19,17 @@ MenuItem::MenuItem(std::wstring title)
 
 MenuItem::~MenuItem()
 {
+    for (MenuItem* child : m_children)
+    {
+        delete child;
+    }
+
+    m_children.clear();
+}
+
+void MenuItem::add(MenuItem* child)
+{
+    m_children.push_back(child);
 }
 
 

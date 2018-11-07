@@ -44,6 +44,13 @@ FrontierApp::FrontierApp(wstring name)
 
 FrontierApp::~FrontierApp()
 {
+    for (FrontierWindow* window : m_windows)
+    {
+        delete window;
+    }
+    m_windows.clear();
+
+    gc();
 }
 
 bool FrontierApp::init()
@@ -91,6 +98,40 @@ return false;
     return true;
 }
 
+void FrontierApp::registerObject(FrontierObject* obj)
+{
+    m_objects.insert(obj);
+}
+
+void FrontierApp::gc()
+{
+    int freed = 0;
+    do
+    {
+        printf("FrontierApp::gc: %lu objects\n", m_objects.size());
+        set<FrontierObject*> objects = m_objects; // Make a copy!
+        freed = 0;
+        for (FrontierObject* obj : objects)
+        {
+            //printf("FrontierApp::gc: %p: references=%d\n", obj, obj->getRefCount());
+            int count = obj->getRefCount();
+            if (count <= 0)
+            {
+                printf("FrontierApp::gc: %p: references=%d\n", obj, obj->getRefCount());
+                if (count < 0)
+                {
+                    printf("FrontierApp::gc: %p: Reference Count is less than zero??\n", obj);
+                }
+                delete obj;
+                m_objects.erase(obj);
+                freed++;
+            }
+        }
+        printf("FrontierApp::gc: Freed %d objects\n", freed);
+    }
+    while (freed > 0);
+}
+
 ContextMenu* FrontierApp::getContextMenuWindow()
 {
     if (m_contextMenuWindow == NULL)
@@ -103,6 +144,11 @@ ContextMenu* FrontierApp::getContextMenuWindow()
 string FrontierApp::getConfigDir()
 {
     return m_engine->getConfigDir();
+}
+
+void FrontierApp::addWindow(FrontierWindow* window)
+{
+    m_windows.push_back(window);
 }
 
 void FrontierApp::setActiveWindow(FrontierWindow* window)

@@ -22,9 +22,11 @@
 #define __FRONTIER_APP_H_
 
 #include <vector>
+#include <set>
 
 #include <geek/gfx-surface.h>
 
+#include <frontier/object.h>
 #include <frontier/utils.h>
 #include <frontier/fonts.h>
 #include <frontier/messages.h>
@@ -55,6 +57,8 @@ class FrontierApp
     std::wstring m_name;
     FrontierEngine* m_engine;
 
+    std::set<FrontierObject*> m_objects;
+
     FontManager* m_fontManager;
     UITheme* m_theme;
 
@@ -62,6 +66,7 @@ class FrontierApp
 
     std::vector<MenuItem*> m_appMenu;
 
+    std::vector<FrontierWindow*> m_windows;
     FrontierWindow* m_activeWindow;
 
  public:
@@ -69,6 +74,9 @@ class FrontierApp
     virtual ~FrontierApp();
 
     std::wstring getName() { return m_name; }
+
+    void registerObject(FrontierObject* object);
+    void gc();
 
     FrontierEngine* getEngine() { return m_engine; }
     FontManager* getFontManager() { return m_fontManager; }
@@ -80,6 +88,7 @@ class FrontierApp
 
     std::vector<MenuItem*>* getAppMenu() { return &m_appMenu; }
 
+    void addWindow(FrontierWindow* window);
     void setActiveWindow(FrontierWindow* activeWindow);
     FrontierWindow* getActiveWindow();
 

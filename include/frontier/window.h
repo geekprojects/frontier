@@ -81,7 +81,7 @@ class FrontierWindow
 
  public:
     FrontierWindow(FrontierApp* app, std::wstring title, int flags);
-    ~FrontierWindow();
+    virtual ~FrontierWindow();
 
     std::wstring getTitle() { return m_title; }
     bool hasBorder() { return !!(m_flags & WINDOW_BORDER); }

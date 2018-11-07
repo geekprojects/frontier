@@ -43,6 +43,11 @@ Tabs::Tabs(FrontierWindow* window) : Widget(window)
 
 Tabs::~Tabs()
 {
+    for (Tab tab : m_tabs)
+    {
+        tab.content->decRefCount();
+    }
+    m_tabs.clear();
 }
 
 void Tabs::init()
@@ -313,6 +318,7 @@ void Tabs::addTab(std::wstring title, Widget* content, bool closeable)
 
     m_tabs.push_back(tab);
 
+    content->incRefCount();
     content->setParent(this);
 
     setDirty();
@@ -326,6 +332,7 @@ void Tabs::closeTab(Widget* widget)
     {
         if (it->content == widget)
         {
+            it->content->decRefCount();
             m_tabs.erase(it);
 
             if (m_activeTab >= m_tabs.size())

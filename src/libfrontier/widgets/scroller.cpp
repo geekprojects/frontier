@@ -48,6 +48,14 @@ Scroller::Scroller(FrontierWindow* window, Widget* child) : Widget(window)
 
 Scroller::~Scroller()
 {
+    if (m_scrollBar != NULL)
+    {
+        m_scrollBar->decRefCount();
+    }
+    if (m_child != NULL)
+    {
+        m_child->decRefCount();
+    }
 }
 
 void Scroller::initScroller(Widget* child)
@@ -55,6 +63,7 @@ void Scroller::initScroller(Widget* child)
     m_childSurface = NULL;
 
     m_scrollBar = new ScrollBar(m_ui);
+    m_scrollBar->incRefCount();
     m_scrollBar->setParent(this);
 
     m_child = child;
@@ -238,6 +247,7 @@ Widget* Scroller::handleMessage(Message* msg)
 void Scroller::setChild(Widget* child)
 {
     m_child = child;
+    m_child->incRefCount();
     m_child->setParent(this);
 }
 

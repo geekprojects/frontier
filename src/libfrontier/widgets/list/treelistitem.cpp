@@ -53,13 +53,14 @@ TreeListItem::~TreeListItem()
 {
     for (ListItem* item : m_items)
     {
-        delete item;
+        item->decRefCount();
     }
 }
 
 void TreeListItem::addItem(ListItem* item)
 {
     m_items.push_back(item);
+    item->incRefCount();
     item->setParent(this);
     item->setList(m_list);
 }

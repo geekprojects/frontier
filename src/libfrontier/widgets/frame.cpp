@@ -50,6 +50,7 @@ Frame::~Frame()
 void Frame::add(Widget* widget)
 {
     m_children.push_back(widget);
+    widget->incRefCount();
     widget->setParent(this);
     widget->setDirty();
 }

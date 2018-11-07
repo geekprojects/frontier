@@ -39,6 +39,7 @@ List::List(FrontierWindow* window) : Widget(window)
 
 List::~List()
 {
+    clearItems(false);
 }
 
 void List::calculateSize()
@@ -190,22 +191,26 @@ Widget* List::handleMessage(Message* msg)
     return this;
 }
 
-void List::clearItems()
+void List::clearItems(bool setDirty)
 {
     for (ListItem* item : m_list)
     {
-        delete item;
+        item->decRefCount();
     }
 
     m_list.clear();
     m_selected = NULL;
 
-    setDirty();
+    if (setDirty)
+    {
+        this->setDirty();
+    }
 }
 
 void List::addItem(ListItem* item)
 {
     m_list.push_back(item);
+    item->incRefCount();
     item->setParent(this);
     item->setList(this);
 

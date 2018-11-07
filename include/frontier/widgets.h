@@ -46,7 +46,7 @@ enum DirtyFlag
     DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
 };
 
-class Widget
+class Widget : public FrontierObject
 {
  protected:
     FrontierApp* m_ui;

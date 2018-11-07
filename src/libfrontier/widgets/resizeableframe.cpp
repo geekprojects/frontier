@@ -34,6 +34,7 @@ void ResizeableFrame::addWithSize(Widget* widget, int setPc)
 {
     m_children.push_back(widget);
 
+    widget->incRefCount();
     widget->setParent(this);
     widget->setDirty();
 

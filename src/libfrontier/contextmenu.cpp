@@ -19,7 +19,7 @@ ContextMenu::~ContextMenu()
 bool ContextMenu::init()
 {
     m_menuList = new MenuList(this, m_menu);
-m_menuList->selectSignal().connect(sigc::mem_fun(*this, &ContextMenu::itemSelected));
+    m_menuList->selectSignal().connect(sigc::mem_fun(*this, &ContextMenu::itemSelected));
     setContent(m_menuList);
     return true;
 }

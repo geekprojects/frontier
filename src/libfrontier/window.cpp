@@ -46,10 +46,16 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags)
     m_surface = NULL;
 
     m_size.set(640, 480);
+
+    m_app->addWindow(this);
 }
 
 FrontierWindow::~FrontierWindow()
 {
+    if (m_widget != NULL)
+    {
+        m_widget->decRefCount();
+    }
 }
 
 bool FrontierWindow::initInternal()
@@ -82,7 +88,13 @@ void FrontierWindow::setPosition(Geek::Vector2D position)
 
 void FrontierWindow::setContent(Widget* content)
 {
+    if (m_widget != NULL)
+    {
+        m_widget->decRefCount();
+    }
+
     m_widget = content;
+    m_widget->incRefCount();
     m_widget->setWindow(this);
     m_widget->setPosition(0, 0);
     m_widget->setDirty();
@@ -294,6 +306,8 @@ bool FrontierWindow::handleMessage(Message* message)
     }
 
     delete message;
+
+    m_app->gc();
 
     return true;
 }
