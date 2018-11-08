@@ -56,6 +56,10 @@ Scroller::~Scroller()
     {
         m_child->decRefCount();
     }
+    if (m_childSurface != NULL)
+    {
+        delete m_childSurface;
+    }
 }
 
 void Scroller::initScroller(Widget* child)

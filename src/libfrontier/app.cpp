@@ -40,6 +40,10 @@ FrontierApp::FrontierApp(wstring name)
     m_activeWindow = NULL;
     m_contextMenuWindow = NULL;
     m_name = name;
+
+    m_engine = NULL;
+    m_theme = NULL;
+    m_fontManager = NULL;
 }
 
 FrontierApp::~FrontierApp()
@@ -51,6 +55,21 @@ FrontierApp::~FrontierApp()
     m_windows.clear();
 
     gc();
+
+    if (m_theme != NULL)
+    {
+        delete m_theme;
+    }
+
+    if (m_fontManager != NULL)
+    {
+        delete m_fontManager;
+    }
+
+    if (m_engine != NULL)
+    {
+        delete m_engine;
+    }
 }
 
 bool FrontierApp::init()

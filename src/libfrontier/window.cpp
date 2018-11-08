@@ -56,6 +56,11 @@ FrontierWindow::~FrontierWindow()
     {
         m_widget->decRefCount();
     }
+
+    if (m_surface != NULL)
+    {
+        delete m_surface;
+    }
 }
 
 bool FrontierWindow::initInternal()
