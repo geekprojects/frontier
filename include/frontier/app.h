@@ -95,6 +95,8 @@ class FrontierApp
     virtual bool init();
     virtual bool main();
 
+    void update();
+
     void postMessage(Frontier::Message* message);
     virtual void handleMessage(Frontier::Message* message);
 

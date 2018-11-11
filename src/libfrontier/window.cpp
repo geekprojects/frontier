@@ -312,7 +312,7 @@ bool FrontierWindow::handleMessage(Message* message)
 
     delete message;
 
-    m_app->gc();
+    m_app->update();
 
     return true;
 }

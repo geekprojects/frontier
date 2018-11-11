@@ -214,6 +214,19 @@ bool FrontierApp::main()
     return true;
 }
 
+void FrontierApp::update()
+{
+    for (FrontierWindow* window : m_windows)
+    {
+        if (window->getContent() != NULL && window->getContent()->isDirty())
+        {
+            window->update();
+        }
+    }
+
+    gc();
+}
+
 void FrontierApp::postMessage(Message* message)
 {
     handleMessage(message);
