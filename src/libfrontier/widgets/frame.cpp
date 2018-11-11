@@ -59,8 +59,7 @@ bool Frame::draw(Surface* surface)
 {
     if (m_border)
     {
-        //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
-        //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xff0000);
+        surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xff888888);
     }
 
     vector<Widget*>::iterator it;
