@@ -1,6 +1,7 @@
 
 #include <frontier/contextmenu.h>
 #include <frontier/widgets/list.h>
+#include <frontier/widgets/frame.h>
 
 using namespace std;
 using namespace Frontier;
@@ -18,9 +19,15 @@ ContextMenu::~ContextMenu()
 
 bool ContextMenu::init()
 {
+    Frame* frame = new Frame(this, false);
+    frame->setBorder(true);
+
     m_menuList = new MenuList(this, m_menu);
     m_menuList->selectSignal().connect(sigc::mem_fun(*this, &ContextMenu::itemSelected));
-    setContent(m_menuList);
+    frame->add(m_menuList);
+
+    setContent(frame);
+
     return true;
 }
 
