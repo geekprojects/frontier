@@ -124,10 +124,10 @@ void FrontierApp::registerObject(FrontierObject* obj)
 
 void FrontierApp::gc()
 {
-    int freed = 0;
+    unsigned int totalFreed = 0;
+    unsigned int freed = 0;
     do
     {
-        printf("FrontierApp::gc: %lu objects\n", m_objects.size());
         set<FrontierObject*> objects = m_objects; // Make a copy!
         freed = 0;
         for (FrontierObject* obj : objects)
@@ -136,7 +136,7 @@ void FrontierApp::gc()
             int count = obj->getRefCount();
             if (count <= 0)
             {
-                printf("FrontierApp::gc: %p: references=%d\n", obj, obj->getRefCount());
+                //printf("FrontierApp::gc: %p: references=%d\n", obj, obj->getRefCount());
                 if (count < 0)
                 {
                     printf("FrontierApp::gc: %p: Reference Count is less than zero??\n", obj);
@@ -146,9 +146,14 @@ void FrontierApp::gc()
                 freed++;
             }
         }
-        printf("FrontierApp::gc: Freed %d objects\n", freed);
+        totalFreed += freed;
     }
     while (freed > 0);
+
+    if (totalFreed > 0)
+    {
+        printf("FrontierApp::gc: totalFreed=%u, currentCount=%lu\n", totalFreed, m_objects.size());
+    }
 }
 
 ContextMenu* FrontierApp::getContextMenuWindow()
