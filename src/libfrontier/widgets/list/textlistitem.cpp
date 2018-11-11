@@ -86,6 +86,11 @@ bool TextListItem::draw(Geek::Gfx::Surface* surface)
     {
         state = STATE_SELECTED;
     }
+    else if (m_mouseOver)
+    {
+        state = STATE_HOVER;
+    }
+
     m_ui->getTheme()->drawBorder(surface, BORDER_LIST_ITEM_1, state, 0, 0, surface->getWidth() - 2, surface->getHeight() - 2);
 
     int lineHeight = m_ui->getTheme()->getTextHeight();
@@ -103,6 +108,7 @@ bool TextListItem::draw(Geek::Gfx::Surface* surface)
         x,
         y,
         m_text.c_str(),
+        -1,
         m_selected);
 
     return true;

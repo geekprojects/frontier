@@ -130,6 +130,9 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
 
     uint32_t backgroundColour = getColour(COLOUR_WINDOW_BACKGROUND);
 
+    unsigned int x2 = x + width - 1;
+    unsigned int y2 = y + height - 1;
+
     switch (type)
     {
         case BORDER_WIDGET:
@@ -172,6 +175,10 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
             if (state == STATE_SELECTED)
             {
                 backgroundColour = getColour(COLOUR_LIST_ITEM_SELECTED);
+            }
+            else if (state == STATE_HOVER)
+            {
+                backgroundColour = 0xffbbbbbb;//getColour(COLOUR_LIST_ITEM_SELECTED);
             }
             else if (type == BORDER_LIST_ITEM_1)
             {
@@ -260,23 +267,24 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         }
         else
         {
-            surface->drawLine(x, y, x + width, y, b1);
-            surface->drawLine(x, y, x, y + height, b1);
+            surface->drawLine(x, y, x2, y, b1);
+            surface->drawLine(x, y, x, y2, b1);
 
-            surface->drawLine(x + width, y, x + width, y + height, b2);
-            surface->drawLine(x, y + height, x + width, y + height, b2);
+            surface->drawLine(x2, y, x2, y2, b2);
+            surface->drawLine(x, y2, x2, y2, b2);
         }
     }
 
     if (type == BORDER_TAB && state == STATE_SELECTED)
     {
-        surface->drawRectFilled(x + 1, y + height - 2, width - 2, 2, 0xff4a7987);
+        surface->drawRectFilled(x + 1, y2 - 1, width - 2, 2, 0xff4a7987);
     }
 }
 
 void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted)
 {
     uint32_t c = 0xffffffff;
+
     if (inverted)
     {
         c = getColour(COLOUR_WINDOW_BACKGROUND);

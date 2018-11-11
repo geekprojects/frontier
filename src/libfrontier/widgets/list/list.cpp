@@ -142,52 +142,6 @@ Widget* List::handleMessage(Message* msg)
         }
     }
 
-#if 0
-    if (msg->messageType == FRONTIER_MSG_INPUT)
-    {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
-        {
-            Vector2D pos = getAbsolutePosition();
-            int ey = imsg->event.button.y - pos.y;
-            int selected = -1;
-            bool hasSelected = false;
-            int y = 2;
-
-            int idx;
-            vector<ListItem*>::iterator it;
-            for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
-            {
-                if (ey >= y && ey < y + m_itemHeight)
-                {
-                    selected = idx;
-                    hasSelected = true;
-                    break;
-                }
-                y += m_itemHeight;
-            }
-
-            if (hasSelected && (m_selected != selected || imsg->event.button.doubleClick || imsg->event.button.button == 3))
-            {
-                printf("List::handleMessage: Selected item %d, doubleClick=%d\n", m_selected, imsg->event.button.doubleClick);
-
-                setDirty(DIRTY_CONTENT);
-
-                m_selected = selected;
-
-                UIMessage* buttonMessage = new UIMessage();
-                buttonMessage->messageType = FRONTIER_MSG_UI;
-                buttonMessage->uiMessageType = FRONTIER_MSG_UI_LIST_SELECTED;
-                buttonMessage->widget = this;
-                buttonMessage->source = msg;
-                buttonMessage->list.selected = m_selected;
-                buttonMessage->list.itemY = y;
-                m_ui->postMessage(buttonMessage);
-            }
-        }
-    }
-#endif
-
     return this;
 }
 
@@ -299,7 +253,7 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
             }
         }
     }
-    return NULL;
+    return this;
 }
 
 
