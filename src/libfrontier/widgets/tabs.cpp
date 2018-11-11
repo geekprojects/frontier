@@ -96,6 +96,22 @@ void Tabs::calculateSize()
 
     m_minSize = activeMinSize;
     m_maxSize = activeMaxSize;
+
+    int closeWidth = m_ui->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
+    int tabsWidth = 0;
+    for (Tab tab : m_tabs)
+    {
+        tabsWidth += 20;
+        if (tab.closeable)
+        {
+            tabsWidth += closeWidth;
+        }
+    }
+
+    if (m_minSize.width < tabsWidth)
+    {
+        m_minSize.width = tabsWidth;
+    }
 }
 
 void Tabs::layout()
