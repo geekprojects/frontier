@@ -285,10 +285,11 @@ Widget* Tabs::handleMessage(Message* msg)
                     }
                     else if (!imsg->event.button.direction)
                     {
-                        return this;
+                        return NULL;
                     }
 
                     m_activeTab = tab;
+                    activeTab = getActiveTab();
 
                     setDirty();
 
@@ -299,7 +300,7 @@ Widget* Tabs::handleMessage(Message* msg)
                     m_changeTabSignal.emit(activeTab);
                     if (activeTab != NULL)
                     {
-                        getActiveTab()->setDirty();
+                        activeTab->setDirty();
                         return activeTab;
                     }
                     else
