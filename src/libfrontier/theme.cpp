@@ -68,7 +68,7 @@ UITheme::~UITheme()
 {
 }
 
-uint32_t UITheme::getColour(ThemeColour colour)
+uint32_t UITheme::getColour(ThemeColour colour) const
 {
     switch (colour)
     {
@@ -103,19 +103,19 @@ uint32_t UITheme::getColour(ThemeColour colour)
     }
 }
 
-void UITheme::drawBackground(Geek::Gfx::Surface* surface)
+void UITheme::drawBackground(Geek::Gfx::Surface* surface) const
 {
     surface->clear(getColour(COLOUR_WINDOW_BACKGROUND));
 }
 
-void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state)
+void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state) const
 {
     int w = surface->getWidth();
     int h = surface->getHeight();
     drawBorder(surface, type, state, 0, 0, w, h);
 }
 
-void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height)
+void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height) const
 {
     bool background = false;
     bool gradient = false;
@@ -281,7 +281,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
     }
 }
 
-void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted)
+void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted) const
 {
     uint32_t c = 0xffffffff;
 
@@ -304,18 +304,18 @@ void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring t
         maxWidth);
 }
 
-int UITheme::getTextWidth(std::wstring text)
+int UITheme::getTextWidth(std::wstring text) const
 {
     FontManager* fm = m_app->getFontManager();
     return fm->width(m_font, text.c_str());
 }
 
-int UITheme::getTextHeight()
+int UITheme::getTextHeight() const
 {
     return m_font->getPixelHeight(72);
 }
 
-void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted)
+void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted) const
 {
     uint32_t c = 0xffffffff;
     if (inverted)
@@ -337,7 +337,7 @@ void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, 
         NULL);
 }
 
-int UITheme::getIconWidth(wchar_t icon)
+int UITheme::getIconWidth(wchar_t icon) const
 {
     wstring text = L"";
     text += icon;
@@ -346,12 +346,12 @@ int UITheme::getIconWidth(wchar_t icon)
     return fm->width(m_iconFont, text);
 }
 
-int UITheme::getIconHeight()
+int UITheme::getIconHeight() const
 {
     return m_iconFont->getPixelHeight(72);
 }
 
-FontHandle* UITheme::getFont(bool highDPI)
+FontHandle* UITheme::getFont(bool highDPI) const
 {
     return m_font;
 }

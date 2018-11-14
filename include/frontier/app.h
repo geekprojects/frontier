@@ -79,8 +79,8 @@ class FrontierApp
     void gc();
 
     FrontierEngine* getEngine() { return m_engine; }
-    FontManager* getFontManager() { return m_fontManager; }
-    UITheme* getTheme() { return m_theme; }
+    FontManager* getFontManager() const { return m_fontManager; }
+    UITheme* getTheme() const { return m_theme; }
 
     ContextMenu* getContextMenuWindow();
 
@@ -104,7 +104,7 @@ class FrontierApp
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile();
 
-    uint64_t getTimestamp();
+    uint64_t getTimestamp() const;
 };
 
 };

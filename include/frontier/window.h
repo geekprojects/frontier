@@ -93,16 +93,16 @@ class FrontierWindow
     FrontierWindow(FrontierApp* app, std::wstring title, int flags);
     virtual ~FrontierWindow();
 
-    std::wstring getTitle() { return m_title; }
-    bool hasBorder() { return !!(m_flags & WINDOW_BORDER); }
-    bool isResizeable() { return !!(m_flags & WINDOW_RESIZEABLE); }
+    std::wstring getTitle() const { return m_title; }
+    bool hasBorder() const { return !!(m_flags & WINDOW_BORDER); }
+    bool isResizeable() const { return !!(m_flags & WINDOW_RESIZEABLE); }
 
     void setPosition(Geek::Vector2D position);
 
     void setContent(Widget* widget);
-    Widget* getContent() { return m_widget; }
+    Widget* getContent() const { return m_widget; }
     void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
-    Widget* getActiveWidget() { return m_activeWidget; }
+    Widget* getActiveWidget() const { return m_activeWidget; }
     void setDragWidget(Widget* widget);
 
     void show();
@@ -111,11 +111,11 @@ class FrontierWindow
 
     void setEngineWindow(FrontierEngineWindow* few) { m_engineWindow = few; }
     FrontierEngineWindow* getEngineWindow() { return m_engineWindow; }
-    FrontierApp* getApp() { return m_app; }
+    FrontierApp* getApp() const { return m_app; }
 
     void setSize(Frontier::Size size);
-    Frontier::Size getSize() { return m_size; }
-    Geek::Gfx::Surface* getSurface() { return m_surface; }
+    Frontier::Size getSize() const { return m_size; }
+    Geek::Gfx::Surface* getSurface() const { return m_surface; }
 
     void postMessage(Frontier::Message* message);
     virtual bool handleMessage(Frontier::Message* message);

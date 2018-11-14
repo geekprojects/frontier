@@ -136,7 +136,7 @@ FrontierWindow* Widget::getWindow()
     return NULL;
 }
 
-Geek::Vector2D Widget::getAbsolutePosition()
+Geek::Vector2D Widget::getAbsolutePosition() const
 {
     Vector2D pos;
     pos.x = m_x;
@@ -150,7 +150,7 @@ Geek::Vector2D Widget::getAbsolutePosition()
     return pos;
 }
 
-bool Widget::intersects(int x, int y)
+bool Widget::intersects(int x, int y) const
 {
     Vector2D thisPos = getAbsolutePosition();
     int x1 = thisPos.x;

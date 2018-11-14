@@ -87,49 +87,49 @@ class Widget : public FrontierObject
     virtual ~Widget();
 
     void setPrivateData(void* data) { m_privateData = data; }
-    void* getPrivateData() { return m_privateData; }
+    void* getPrivateData() const { return m_privateData; }
 
     virtual void calculateSize();
     virtual void layout();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    int getX() { return m_x; }
-    int getY() { return m_y; }
+    int getX() const { return m_x; }
+    int getY() const { return m_y; }
     void setPosition(int x, int y) { m_x = x; m_y = y; }
 
     void setPacked(bool packed) { m_packed = packed; }
-    bool getPacked() { return m_packed; }
+    bool getPacked() const { return m_packed; }
     Frontier::Size setSize(Frontier::Size size);
-    Frontier::Size getSize() { return m_setSize; }
+    Frontier::Size getSize() const { return m_setSize; }
     Frontier::Size getMinSize() { return m_minSize; }
-    Frontier::Size getMaxSize() { return m_maxSize; }
-    virtual int getWidth() { return m_setSize.width; }
-    virtual int getHeight() { return m_setSize.height; }
+    Frontier::Size getMaxSize() const { return m_maxSize; }
+    virtual int getWidth() const { return m_setSize.width; }
+    virtual int getHeight() const { return m_setSize.height; }
 
     virtual void setMargin(int margin) { m_margin = margin; }
-    virtual int getMargin() { return m_margin; }
+    virtual int getMargin() const { return m_margin; }
     virtual void setPadding(int padding) { m_padding = padding; }
-    virtual int getPadding() { return m_padding; }
+    virtual int getPadding() const { return m_padding; }
 
     void setParent(Widget* w);
-    Widget* getParent() { return m_parent; }
+    Widget* getParent() const { return m_parent; }
 
     void setWindow(FrontierWindow* window) { m_window = window; }
     FrontierWindow* getWindow();
 
-    virtual Geek::Vector2D getAbsolutePosition();
-    bool intersects(int x, int y);
+    virtual Geek::Vector2D getAbsolutePosition() const;
+    bool intersects(int x, int y) const;
 
     void setDirty();
     void setDirty(int flags, bool children = false);
-    bool isDirty() { return !!(m_dirty); }
-    bool isDirty(DirtyFlag flag) { return !!(m_dirty & flag); }
+    bool isDirty() const { return !!(m_dirty); }
+    bool isDirty(DirtyFlag flag) const { return !!(m_dirty & flag); }
     void clearDirty();
 
     bool isActive();
 
     void setContextMenu(Menu* menu) { m_contextMenu = menu; }
-    Menu* getContextMenu() { return m_contextMenu; }
+    Menu* getContextMenu() const { return m_contextMenu; }
     void openContextMenu();
     void openContextMenu(Geek::Vector2D pos);
 

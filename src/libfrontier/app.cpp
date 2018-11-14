@@ -251,7 +251,7 @@ string FrontierApp::chooseFile()
     return m_engine->chooseFile();
 }
 
-uint64_t FrontierApp::getTimestamp()
+uint64_t FrontierApp::getTimestamp() const
 {
     timeval tv;
     gettimeofday(&tv, NULL);
