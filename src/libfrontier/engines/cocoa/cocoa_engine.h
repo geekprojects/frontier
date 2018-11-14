@@ -79,6 +79,9 @@ class CocoaWindow : public FrontierEngineWindow
 
     virtual void setPosition(unsigned int x, unsigned int y);
     virtual Geek::Vector2D getPosition();
+
+    virtual void resetCursor();
+    virtual void updateCursor(WindowCursor cursor, int x, int y, int w, int h);
 };
 
 };

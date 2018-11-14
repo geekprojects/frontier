@@ -138,6 +138,7 @@ class Widget : public FrontierObject
     virtual void onMouseEnter();
     virtual void onMouseLeave();
     virtual sigc::signal<void, bool> signalMouseEnter() { return m_mouseEnterSignal; }
+    virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_POINTER; }
 
     virtual void dump(int level);
 };

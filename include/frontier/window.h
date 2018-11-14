@@ -49,6 +49,14 @@ enum WindowFlags
     WINDOW_NORMAL = WINDOW_BORDER | WINDOW_RESIZEABLE,
 };
 
+enum WindowCursor
+{
+    CURSOR_POINTER,
+    CURSOR_EDIT,
+    CURSOR_RESIZE_HORIZONTAL,
+    CURSOR_RESIZE_VERTICAL,
+};
+
 class FrontierWindow
 {
  private:
@@ -67,6 +75,7 @@ class FrontierWindow
     Widget* m_mouseOverWidget;
     Widget* m_dragWidget;
     uint64_t m_dragTime;
+    Frontier::WindowCursor m_currentCursor;
 
     Geek::Gfx::Surface* m_surface;
 
@@ -75,6 +84,7 @@ class FrontierWindow
     sigc::signal<bool> m_lostFocusSignal;
 
     bool initInternal();
+    void updateCursor();
 
  protected:
     virtual bool init();

@@ -69,8 +69,7 @@ printf("CocoaNSWindow::windowDidResignKey: Here!\n");
 {
     CocoaWindow* m_engineWindow;
     CGImageRef m_image;
-
-    NSTrackingArea* trackingArea;
+    NSCursor* m_cursor;
 }
 
 - (void)setImage:(CGImageRef)image;
@@ -93,6 +92,9 @@ printf("CocoaNSWindow::windowDidResignKey: Here!\n");
 
 - (Frontier::InputMessage*)createKeyMessage:(NSEvent*)event;
 - (Frontier::InputMessage*)createMouseButtonMessage:(NSEvent*)event;
+
+- (void)setCursor:(NSCursor*)cursor;
+- (void)resetCursorRects;
 
 @end
 
@@ -370,6 +372,19 @@ printf("mouseExited: Here!\n");
     return msg;
 }
 
+- (void)setCursor:(NSCursor*)cursor
+{
+    m_cursor = cursor;
+}
+
+- (void)resetCursorRects
+{
+    if (m_cursor != NULL)
+    {
+        [self addCursorRect:[self bounds] cursor:m_cursor];
+    }
+}
+
 @end
 
 bool CocoaWindow::createCocoaWindow()
@@ -545,5 +560,48 @@ Geek::Vector2D CocoaWindow::getPosition()
     pos.y = (int)(screenFrame.size.height - (rect.origin.y + rect.size.height));
 
     return pos;
+}
+
+void CocoaWindow::resetCursor()
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+    FrontierView* view = (FrontierView*)m_cocoaView;
+
+    [view setCursor:NSCursor.arrowCursor];
+    [window invalidateCursorRectsForView:view];
+}
+
+void CocoaWindow::updateCursor(WindowCursor cursor, int x, int y, int w, int h)
+{
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+    FrontierView* view = (FrontierView*)m_cocoaView;
+    
+    NSRect rect;
+    rect.origin.x = x;
+    rect.origin.y = y;
+    rect.size.width = w;
+    rect.size.height = h;
+
+    NSCursor* nscursor = NULL;;
+
+    switch (cursor)
+    {
+        case CURSOR_POINTER:
+            nscursor = NSCursor.arrowCursor;
+            break;
+        case CURSOR_EDIT:
+            nscursor = NSCursor.IBeamCursor;
+            break;
+        case CURSOR_RESIZE_HORIZONTAL:
+            nscursor = NSCursor.resizeLeftRightCursor;
+            break;
+        case CURSOR_RESIZE_VERTICAL:
+            nscursor = NSCursor.resizeUpDownCursor;
+            break;
+    }
+
+    [view setCursor:nscursor];
+
+    [window invalidateCursorRectsForView:view];
 }
 

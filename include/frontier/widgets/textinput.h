@@ -27,6 +27,8 @@ class TextInput : public Widget
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleMessage(Frontier::Message* msg);
+
+    virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_EDIT; }
 };
 
 };

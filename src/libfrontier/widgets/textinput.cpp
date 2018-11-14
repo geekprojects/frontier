@@ -227,7 +227,7 @@ Widget* TextInput::handleMessage(Message* msg)
             } break;
 
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
-            //case FRONTIER_MSG_INPUT_MOUSE_MOTION:
+            case FRONTIER_MSG_INPUT_MOUSE_MOTION:
                 return this;
 
             default:

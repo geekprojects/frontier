@@ -169,6 +169,10 @@ void FrontierWindow::update()
 
         // Make sure we redraw
         m_widget->setDirty(DIRTY_CONTENT);
+
+        // Likely to be different?
+        //m_mouseOverWidget = NULL;
+        //updateCursor();
     }
 
 #if 0
@@ -209,6 +213,37 @@ void FrontierWindow::update()
 
     }
     m_widget->clearDirty();
+
+}
+
+void FrontierWindow::updateCursor()
+{
+    if (m_engineWindow == NULL)
+    {
+        return;
+    }
+
+    WindowCursor cursor = CURSOR_POINTER;
+    if (m_mouseOverWidget != NULL)
+    {
+        cursor = m_mouseOverWidget->getCursor();
+    }
+
+    if (cursor != m_currentCursor)
+    {
+        m_engineWindow->resetCursor();
+
+        printf("FrontierWindow::updateCursor: Updating cursor: %u\n", cursor);
+        if (cursor != CURSOR_POINTER && m_mouseOverWidget != NULL)
+        {
+            Vector2D pos = m_mouseOverWidget->getAbsolutePosition();
+            Size size = m_mouseOverWidget->getSize();
+            printf("FrontierWindow::updateCursor: Rect: %d,%d, w=%d, h=%d\n", pos.x, pos.y, size.width, size.height);
+            m_engineWindow->updateCursor(cursor, pos.x, pos.y, size.width, size.height);
+        }
+
+        m_currentCursor = cursor;
+    }
 }
 
 /*
@@ -273,6 +308,8 @@ bool FrontierWindow::handleMessage(Message* message)
 
                     m_mouseOverWidget = destWidget;
                 }
+                updateCursor();
+
                 break;
 
             case FRONTIER_MSG_INPUT_KEY:

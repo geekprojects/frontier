@@ -125,3 +125,11 @@ float FrontierEngineWindow::getScaleFactor()
     return 1.0;
 }
 
+void FrontierEngineWindow::resetCursor()
+{
+}
+
+void FrontierEngineWindow::updateCursor(WindowCursor cursor, int x, int y, int w, int h)
+{
+}
+

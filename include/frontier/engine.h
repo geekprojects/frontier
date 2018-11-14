@@ -73,6 +73,9 @@ class FrontierEngineWindow
     virtual Geek::Vector2D getPosition();
 
     virtual float getScaleFactor();
+
+    virtual void resetCursor();
+    virtual void updateCursor(Frontier::WindowCursor cursor, int x, int y, int w, int h);
 };
 
 };
