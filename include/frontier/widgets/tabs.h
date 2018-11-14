@@ -60,6 +60,7 @@ class Tabs : public Widget
 
     void setActiveTab(Widget* tabContent);
     int findTab(Widget* tabContent);
+    const std::vector<Tab>& getTabs() { return m_tabs; }
 
     virtual void dump(int level);
 
