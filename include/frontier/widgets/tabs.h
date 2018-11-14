@@ -39,7 +39,7 @@ class Tabs : public Widget
     virtual Widget* handleMessage(Frontier::Message* msg);
 
     void addTab(std::wstring title, Widget* content, bool closeable = false);
-    void closeTab(Widget* tab);
+    void closeTab(Widget* tab, bool emitChangeSignal = true);
 
     void closeActiveTab();
     void closeAllTabs();
@@ -57,7 +57,9 @@ class Tabs : public Widget
         }
         return m_tabs.at(m_activeTab).content;
     }
+
     void setActiveTab(Widget* tabContent);
+    int findTab(Widget* tabContent);
 
     virtual void dump(int level);
 

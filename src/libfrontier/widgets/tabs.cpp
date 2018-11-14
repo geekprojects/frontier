@@ -341,20 +341,28 @@ void Tabs::addTab(std::wstring title, Widget* content, bool closeable)
     setDirty();
 }
 
-void Tabs::closeTab(Widget* widget)
+void Tabs::closeTab(Widget* widget, bool emitChangeSignal)
 {
     vector<Tab>::iterator it;
 
-    for (it = m_tabs.begin(); it != m_tabs.end(); it++)
+    unsigned int i;
+    for (i = 0, it = m_tabs.begin(); it != m_tabs.end(); it++, i++)
     {
         if (it->content == widget)
         {
+            bool isActive = (i == m_activeTab);
+
             it->content->decRefCount();
             m_tabs.erase(it);
 
             if (m_activeTab >= m_tabs.size())
             {
                 m_activeTab = m_tabs.size() - 1;
+            }
+
+            if (isActive && emitChangeSignal)
+            {
+                m_changeTabSignal.emit(getActiveTab());
             }
 
             layout();
@@ -380,7 +388,7 @@ void Tabs::closeAllTabs()
     {
         if (tab.closeable)
         {
-            closeTab(tab.content);
+            closeTab(tab.content, false);
         }
     }
 }
@@ -394,11 +402,10 @@ void Tabs::closeAllButActiveTab()
     {
         if (tab.closeable && tab.content != activeWidget)
         {
-            closeTab(tab.content);
+            closeTab(tab.content, false);
         }
     }
 }
-
 
 void Tabs::setActiveTab(Widget* tabContent)
 {
@@ -417,6 +424,22 @@ void Tabs::setActiveTab(Widget* tabContent)
     }
 
     return;
+}
+
+int Tabs::findTab(Widget* tabContent)
+{
+    int i = 0;
+    for (Tab tab : m_tabs)
+    {
+        if (tab.content == tabContent)
+        {
+            return i;
+        }
+        i++;
+    }
+
+    // Not found
+    return -1;
 }
 
 void Tabs::dump(int level)
