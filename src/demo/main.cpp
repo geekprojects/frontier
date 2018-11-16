@@ -31,6 +31,7 @@
 #include <frontier/widgets/scroller.h>
 #include <frontier/widgets/tabs.h>
 #include <frontier/widgets/textinput.h>
+#include <frontier/widgets/grid.h>
 
 using namespace std;
 using namespace Frontier;
@@ -202,6 +203,18 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     inputTab->add(inputFrame2);
     m_tabs->addTab(L"Inputs", inputTab);
 
+    Frame* gridTab = new Frame(this, false);
+    Grid* grid1 = new Grid(this);
+    gridTab->add(grid1);
+    grid1->put(0, 0, new Label(this, L"Small:"));
+    grid1->put(1, 0, new Button(this, L"S"));
+    grid1->put(0, 1, new Label(this, L"Very very large:"));
+    grid1->put(1, 1, new TextInput(this, L"Input box"));
+    grid1->put(0, 2, new Label(this, L"Very very very very very very large:"));
+    //grid1->put(1, 2, new Button(this, L"LARGE BUTTON!!!"));
+    grid1->put(2, 2, new Button(this, L"A LARGE BUTTON!!!"));
+    m_tabs->addTab(L"Grid", gridTab);
+
     Frame* closeableTab = new Frame(this, false);
     m_tabs->addTab(L"Closeable", closeableTab, true);
 
@@ -224,8 +237,8 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
 
     List* list = new List(this);
     list->addItem(new TextListItem(this, FRONTIER_ICON_FOLDER_OPEN, L"This is"));
-    list->addItem(new TextListItem(this, FRONTIER_ICON_CARET_RIGHT, L"a list"));
-    list->addItem(new TextListItem(this, L"with lots"));
+    list->addItem(new TextListItem(this, FRONTIER_ICON_THUMBS_UP, L"a list"));
+    list->addItem(new TextListItem(this, FRONTIER_ICON_TOGGLE_ON, L"with lots"));
     list->addItem(new TextListItem(this, L"of very"));
     list->addItem(new TextListItem(this, L"boring"));
     list->addItem(new TextListItem(this, L"items"));
