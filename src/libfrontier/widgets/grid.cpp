@@ -96,12 +96,14 @@ void Grid::calculateSize()
     freeSizes();
 
     Size gridSize = getGridSize();
+#if 0
     printf("Grid::calculateSize: gridSize=%d,%d\n", gridSize.width, gridSize.height);
+#endif
 
-m_colMinSizes = new int[gridSize.width];
-m_colMaxSizes = new int[gridSize.width];
-m_rowMinSizes = new int[gridSize.height];
-m_rowMaxSizes = new int[gridSize.height];
+    m_colMinSizes = new int[gridSize.width];
+    m_colMaxSizes = new int[gridSize.width];
+    m_rowMinSizes = new int[gridSize.height];
+    m_rowMaxSizes = new int[gridSize.height];
 
     memset(m_colMinSizes, 0, sizeof(int) * gridSize.width);
     memset(m_colMaxSizes, 0, sizeof(int) * gridSize.width);
@@ -114,8 +116,8 @@ m_rowMaxSizes = new int[gridSize.height];
     for (GridItem* item : m_grid)
     {
         item->widget->calculateSize();
-int col = item->x;
-int row = item->y;
+        int col = item->x;
+        int row = item->y;
         Size minSize = item->widget->getMinSize();
         Size maxSize = item->widget->getMaxSize();
 
@@ -141,14 +143,18 @@ int row = item->y;
     int col;
     for (col = 0; col < gridSize.width; col++)
     {
+#if 0
         printf("Grid::calculateSize: Column %d: min=%d, max=%d\n", col, m_colMinSizes[col], m_colMaxSizes[col]);
+#endif
         m_minSize.width += m_colMinSizes[col];
         m_maxSize.width += m_colMaxSizes[col];
     }
     int row;
     for (row = 0; row < gridSize.height; row++)
     {
+#if 0
         printf("Grid::calculateSize: Row %d: min=%d, max=%d\n", row, m_rowMinSizes[row], m_rowMaxSizes[row]);
+#endif
         m_minSize.height += m_rowMinSizes[row];
         m_maxSize.height += m_rowMinSizes[row];
     }
@@ -234,6 +240,7 @@ void Grid::layout()
                 colSizes[col] = m_colMaxSizes[col];
                 slackX += s;
             }
+        printf("Grid::layout: Col %d: Size=%d\n", col, colSizes[col]);
         }
     }
 
@@ -257,13 +264,14 @@ void Grid::layout()
             slackableY--;
 
             rowSizes[row] += s;
-            if (colSizes[row] > m_rowMaxSizes[row])
+            if (rowSizes[row] > m_rowMaxSizes[row])
             {
                 s = rowSizes[row] - m_rowMaxSizes[row];
                 rowSizes[row] = m_rowMaxSizes[row];
                 slackY += s;
             }
         }
+        printf("Grid::layout: Row %d: Size=%d\n", row, rowSizes[row]);
     }
 
     int y = m_margin;
@@ -278,7 +286,13 @@ void Grid::layout()
                 //Size minSize = item->widget->getMinSize();
                 item->widget->setPosition(x, y);
                 item->widget->setSize(Size(colSizes[col], rowSizes[row]));
+                item->widget->layout();
             }
+
+#if 0
+            printf("Grid::layout: Set Item: %d, %d, size=%d,%d (%p)\n", col, row, colSizes[col], rowSizes[row], item);
+#endif
+
             x += colSizes[col] + m_padding;
         }
         y += rowSizes[row] + m_padding;
