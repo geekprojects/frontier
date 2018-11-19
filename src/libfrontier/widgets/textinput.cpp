@@ -22,6 +22,8 @@
 #include <frontier/frontier.h>
 #include <frontier/widgets/textinput.h>
 
+#include <wctype.h>
+
 using namespace std;
 using namespace Frontier;
 using namespace Geek::Gfx;
