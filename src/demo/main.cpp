@@ -32,6 +32,7 @@
 #include <frontier/widgets/tabs.h>
 #include <frontier/widgets/textinput.h>
 #include <frontier/widgets/grid.h>
+#include <frontier/widgets/combobox.h>
 
 using namespace std;
 using namespace Frontier;
@@ -214,6 +215,23 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     //grid1->put(1, 2, new Button(this, L"LARGE BUTTON!!!"));
     grid1->put(2, 2, new Button(this, L"A LARGE BUTTON!!!"));
     m_tabs->addTab(L"Grid", gridTab);
+
+
+    vector<wstring> options;
+    options.push_back(L"Option 1");
+    options.push_back(L"Option 2");
+    options.push_back(L"Option 3");
+    options.push_back(L"Option 4");
+    options.push_back(L"Option 5");
+
+    Frame* comboBoxTab = new Frame(this, false);
+    Frame* comboBoxFrame1 = new Frame(this, true);
+    ComboBox* comboBox1;
+    comboBoxFrame1->add(new Label(this, L"Combo Box:"));
+    comboBoxFrame1->add(comboBox1 = new ComboBox(this, options));
+    comboBoxTab->add(comboBoxFrame1);
+    m_tabs->addTab(L"ComboBox", comboBoxTab);
+
 
     Frame* closeableTab = new Frame(this, false);
     m_tabs->addTab(L"Closeable", closeableTab, true);
