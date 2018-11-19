@@ -49,7 +49,7 @@ bool onMenuItem(MenuItem* item);
 
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
-    virtual std::string chooseFile();
+    virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 };
 
 class CocoaWindow : public FrontierEngineWindow

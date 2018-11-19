@@ -436,6 +436,8 @@ bool CocoaWindow::createCocoaWindow()
     [[window contentView] addSubview: view];
     [window makeFirstResponder: view];
 
+    [window center];
+
     //[window makeKeyAndOrderFront:nil];
 
     return true;

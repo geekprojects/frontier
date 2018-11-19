@@ -92,8 +92,6 @@ bool FrontierEngineWindowSDL::update()
         return false;
     }
 
-    m_window->getSurface()->drawRectFilled(0, 0, 20, 20, 0xff);
-
     int res;
     res = SDL_ConvertPixels(
         winSize.width, winSize.height,
@@ -102,6 +100,7 @@ bool FrontierEngineWindowSDL::update()
     if (res < 0)
     {
         printf("ScreenSDL::redraw: res=%d: %s\n", res, SDL_GetError());
+        return false;
     }
 
 /*
@@ -114,7 +113,11 @@ bool FrontierEngineWindowSDL::update()
     SDL_BlitSurface(m_surface, NULL, winSurface, &dstrect);
 */
 
-    SDL_UpdateWindowSurface(m_sdlWindow);
+    res = SDL_UpdateWindowSurface(m_sdlWindow);
+    if (res < 0)
+    {
+        printf("ScreenSDL::redraw: res=%d: %s\n", res, SDL_GetError());
+    }
 
     return true;
 }

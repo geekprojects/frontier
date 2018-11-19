@@ -51,6 +51,11 @@ enum MessageBoxType
     MESSAGE_ALERT,
 };
 
+enum ChooseFileFlags
+{
+    DIRECTORIES_ONLY = 0x1
+};
+
 class FrontierApp
 {
  private:
@@ -102,7 +107,7 @@ class FrontierApp
 
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
-    virtual std::string chooseFile();
+    virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 
     uint64_t getTimestamp() const;
 };

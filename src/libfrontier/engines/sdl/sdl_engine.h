@@ -46,7 +46,9 @@ class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
 class FrontierEngineSDL : public Frontier::FrontierEngine
 {
  private:
+    std::string m_lastText;
     
+    Frontier::InputMessage* m_keyDownMessage;
 
  public:
     FrontierEngineSDL(Frontier::FrontierApp* app);

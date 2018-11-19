@@ -170,12 +170,19 @@ bool CocoaEngine::confirmBox(string title, string message)
 return false;
 }
 
-std::string CocoaEngine::chooseFile()
+std::string CocoaEngine::chooseFile(int flags, string path, string pattern)
 {
     NSOpenPanel* openDlg = [NSOpenPanel openPanel];
 
     // Enable the selection of files in the dialog.
+if (!(flags & DIRECTORIES_ONLY))
+{
     [openDlg setCanChooseFiles:YES];
+}
+else
+{
+    [openDlg setCanChooseFiles:NO];
+}
 
     // Enable the selection of directories in the dialog.
     [openDlg setCanChooseDirectories:YES];
@@ -193,8 +200,8 @@ std::string CocoaEngine::chooseFile()
 
 bool CocoaEngine::onMenuItem(MenuItem* item)
 {
-printf("CocoaEngine::onMenuItem: item=%p\n", item);
-return true;
+    printf("CocoaEngine::onMenuItem: item=%p\n", item);
+    return true;
 }
 
 string CocoaEngine::getConfigDir()

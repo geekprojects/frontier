@@ -246,9 +246,9 @@ bool FrontierApp::confirmBox(string title, string message)
     return m_engine->confirmBox(title, message);
 }
 
-string FrontierApp::chooseFile()
+string FrontierApp::chooseFile(int flags, string path, string pattern)
 {
-    return m_engine->chooseFile();
+    return m_engine->chooseFile(flags, path, pattern);
 }
 
 uint64_t FrontierApp::getTimestamp() const

@@ -78,7 +78,7 @@ bool FrontierEngine::confirmBox(string title, string message)
     return false;
 }
 
-string FrontierEngine::chooseFile()
+string FrontierEngine::chooseFile(int flags, std::string path, std::string pattern)
 {
     log(WARN, "chooseFile not implemented");
     return "";
