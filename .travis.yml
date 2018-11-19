@@ -24,6 +24,7 @@ addons:
       - freetype
       - libsigc++
       - libtool
+    update: true
 
 before_script:
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [$TRAVIS_OS_NAME == osx]; then make install; else sudo make install; fi; cd -
