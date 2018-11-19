@@ -234,7 +234,7 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
         InputMessage* imsg = (InputMessage*)msg;
         if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
         {
-            //if (imsg->event.button.direction)
+            if (imsg->event.button.direction)
             {
                 if (m_selected)
                 {
@@ -250,6 +250,10 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
                     }
                     return this;
                 }
+            }
+            else
+            {
+                return NULL;
             }
         }
     }
