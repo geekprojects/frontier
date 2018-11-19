@@ -18,9 +18,14 @@ addons:
       - libsdl2-dev
       - libfreetype6-dev
       - libsigc++-2.0-dev
+  homebrew:
+    packages:
+      - llvm
+      - freetype
+      - libsigc++
+      - libtool
 
 before_script:
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install freetype libsigc++ libtool; fi
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [$TRAVIS_OS_NAME == osx]; then make install; else sudo make install; fi; cd -
   - ./autogen.sh --verbose 
   - ./configure
