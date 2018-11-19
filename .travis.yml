@@ -20,7 +20,7 @@ addons:
       - libsigc++-2.0-dev
 
 before_script:
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install freetype libsigc++; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install freetype libsigc++; brew reinstall libtool; fi
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [$TRAVIS_OS_NAME == osx]; then make install; else sudo make install; fi; cd -
   - ./autogen.sh --verbose 
   - ./configure
