@@ -22,6 +22,7 @@ class TextInput : public Widget
     virtual ~TextInput();
 
     void setText(std::wstring wtext);
+    std::wstring getText() { return m_text; }
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
