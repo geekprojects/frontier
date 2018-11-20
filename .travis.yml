@@ -1,16 +1,10 @@
 
 language: cpp
-dist: trusty
-
-matrix:
-  exclude:
-  - os: linux
-    compiler: clang
+dist: xenial
 
 addons:
   apt:
     packages:
-      - clang-3.9
       - libxml2-dev
       - libpng12-dev
       - libjpeg-dev
