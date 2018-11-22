@@ -74,6 +74,8 @@ class Widget : public FrontierObject
     bool m_mouseOver;
 
     sigc::signal<void, bool> m_mouseEnterSignal;
+    sigc::signal<void> m_activeSignal;
+    sigc::signal<void> m_inactiveSignal;
 
     void initWidget(FrontierApp* app);
     void callInit();
@@ -138,6 +140,9 @@ class Widget : public FrontierObject
     virtual void onMouseEnter();
     virtual void onMouseLeave();
     virtual sigc::signal<void, bool> signalMouseEnter() { return m_mouseEnterSignal; }
+    virtual sigc::signal<void> signalActive() { return m_activeSignal; }
+    virtual sigc::signal<void> signalInactive() { return m_inactiveSignal; }
+
     virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_POINTER; }
 
     virtual void dump(int level);

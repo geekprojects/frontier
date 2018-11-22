@@ -333,11 +333,21 @@ bool FrontierWindow::handleMessage(Message* message)
     }
 
     bool updateRequired = m_widget->isDirty();
-    if (destWidget != NULL || updateRequired)
+    if (destWidget != NULL || updateRequired || updateActive)
     {
-        if (updateActive && prevActiveWidget == m_activeWidget)
+        if (updateActive && prevActiveWidget != destWidget)
         {
+            if (prevActiveWidget != NULL)
+            {
+                prevActiveWidget->signalInactive().emit();
+            }
+
             m_activeWidget = destWidget;
+            if (m_activeWidget != NULL)
+            {
+                m_activeWidget->signalActive().emit();
+            }
+
             updateRequired = true;
         }
 

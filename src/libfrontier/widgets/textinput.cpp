@@ -229,6 +229,9 @@ Widget* TextInput::handleMessage(Message* msg)
             } break;
 
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+                setDirty(DIRTY_CONTENT);
+                return this;
+
             case FRONTIER_MSG_INPUT_MOUSE_MOTION:
                 return this;
 
