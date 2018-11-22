@@ -1,6 +1,12 @@
+---
 
 language: cpp
 dist: xenial
+
+matrix:
+  exclude:
+    - os: linux
+      compiler: clang
 
 addons:
   apt:
@@ -20,10 +26,12 @@ addons:
 
 before_script:
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [$TRAVIS_OS_NAME == osx]; then make install; else sudo make install; fi; cd -
-  - ./autogen.sh --verbose 
-  - ./configure
+  - ./autogen.sh --verbose
+  - ./configure --enable-tests
 
-script: make
+script:
+  - make
+  - make test
 
 compiler:
   - clang
@@ -32,4 +40,3 @@ compiler:
 os:
   - linux
   - osx
-

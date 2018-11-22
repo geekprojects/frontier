@@ -6,12 +6,15 @@ libgtest_la_SOURCES = googletest/googletest/src/gtest-all.cc googletest/googlemo
 libgtest_la_CPPFLAGS = -I$(top_srcdir)/tests/googletest/googletest/include -I$(top_srcdir)/tests/googletest/googletest -I$(top_srcdir)/tests/googletest/googlemock -I$(top_srcdir)/tests/googletest/googlemock/include
 libgtest_la_LDFLAGS = -pthread
 
-noinst_PROGRAMS=test
+noinst_PROGRAMS=frontier_test
 
-test_SOURCES=main.cpp testFrontierApp.cpp
-test_LDADD=../src/libfrontier/libfrontier.la libgtest.la
-test_LDFLAGS=-framework Cocoa -framework AppKit 
-test_CPPFLAGS=-I${top_srcdir}/include -I${top_srcdir}/src/libfrontier -I$(top_srcdir)/tests//googletest/googletest/include
+frontier_test_SOURCES=main.cpp testFrontierApp.cpp
+frontier_test_LDADD=../src/libfrontier/libfrontier.la libgtest.la
+frontier_test_LDFLAGS=-framework Cocoa -framework AppKit 
+frontier_test_CPPFLAGS=-I${top_srcdir}/include -I${top_srcdir}/src/libfrontier -I$(top_srcdir)/tests//googletest/googletest/include
+
+test: all
+	./frontier_test
 
 
 

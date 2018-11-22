@@ -17,6 +17,9 @@ endif
 pkgconfigdir=$(libdir)/pkgconfig
 pkgconfig_DATA=libfrontier.pc
 
+test:
+	cd tests; $(MAKE) test
+
 add-copyright:
 	copyright-header \
 	  --license $(COPYRIGHT_LICENSE)  \
