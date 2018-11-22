@@ -1,8 +1,7 @@
-
 AC_PREREQ(2.61)
 AC_INIT([libfrontier], [0.1], [ian@geekprojects.com])
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_CONFIG_SRCDIR([include/frontier/frontier.h])
 AC_CONFIG_HEADER([include/frontier/config.h])
 
@@ -104,6 +103,21 @@ AC_CHECK_FUNCS([memset strdup gettimeofday sqrt])
 AC_FUNC_MALLOC
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
 
+AC_ARG_ENABLE(tests,
+        [  --enable-tests            Enable Unit Tests ],
+        [enable_tests="yes"],
+        [enable_tests="no"])
+if test "x$enable_tests" != "xno"
+then
+    AC_DEFINE(BUILD_TESTS, true, [tests])
+    AM_CONDITIONAL([BUILD_TESTS], true, [tests])
+else
+    AC_DEFINE(BUILD_TESTS, false, [tests])
+    AM_CONDITIONAL([BUILD_TESTS], false, [tests])
+fi
+
+
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/libfrontier/Makefile
@@ -111,9 +125,11 @@ AC_CONFIG_FILES([Makefile
                  src/libfrontier/widgets/list/Makefile
                  src/libfrontier/fonts/Makefile
                  src/libfrontier/engines/Makefile
+                 src/libfrontier/engines/test/Makefile
                  src/libfrontier/engines/sdl/Makefile
                  src/libfrontier/engines/cocoa/Makefile
                  src/demo/Makefile
+                 tests/Makefile
                  include/Makefile
                  include/frontier/Makefile
                  include/frontier/widgets/Makefile
