@@ -11,7 +11,7 @@ noinst_PROGRAMS=test
 test_SOURCES=main.cpp testFrontierApp.cpp
 test_LDADD=../src/libfrontier/libfrontier.la libgtest.la
 test_LDFLAGS=-framework Cocoa -framework AppKit 
-test_CPPFLAGS=-I${top_srcdir}/include -I$(top_srcdir)/tests//googletest/googletest/include
+test_CPPFLAGS=-I${top_srcdir}/include -I${top_srcdir}/src/libfrontier -I$(top_srcdir)/tests//googletest/googletest/include
 
 
 
