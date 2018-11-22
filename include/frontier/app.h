@@ -74,6 +74,9 @@ class FrontierApp
     std::vector<FrontierWindow*> m_windows;
     FrontierWindow* m_activeWindow;
 
+ protected:
+    void setEngine(FrontierEngine* m_engine);
+
  public:
     FrontierApp(std::wstring name);
     virtual ~FrontierApp();
@@ -82,6 +85,7 @@ class FrontierApp
 
     void registerObject(FrontierObject* object);
     void gc();
+    unsigned int getObjectCount() { return m_objects.size(); }
 
     FrontierEngine* getEngine() { return m_engine; }
     FontManager* getFontManager() const { return m_fontManager; }

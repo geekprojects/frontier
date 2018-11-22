@@ -72,17 +72,30 @@ FrontierApp::~FrontierApp()
     }
 }
 
+void FrontierApp::setEngine(FrontierEngine* engine)
+{
+    if (m_engine != NULL)
+    {
+        printf("FrontierApp::setEngine: ERROR: Cannot change engine!\n");
+    }
+    m_engine = engine;
+}
+
 bool FrontierApp::init()
 {
     bool res;
 
+    // A custom app can set their own engine
+    if (m_engine == NULL)
+    {
 #ifdef FRONTIER_ENGINE_SDL
-    m_engine = new FrontierEngineSDL(this);
+        m_engine = new FrontierEngineSDL(this);
 #elif FRONTIER_ENGINE_COCOA
-    m_engine = new CocoaEngine(this);
+        m_engine = new CocoaEngine(this);
 #else
 #error No engine defined
 #endif
+    }
 
     res = m_engine->init();
     if (!res)
