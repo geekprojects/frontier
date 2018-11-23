@@ -47,8 +47,15 @@ bool UITheme::init()
             12);
         if (m_font == NULL)
         {
-            printf("UITheme::init: Failed to find font: Lato\n");
-            return false;
+            m_font = m_app->getFontManager()->openFont(
+                "Lato",
+                "Regular",
+                12);
+            if (m_font == NULL)
+            {
+                printf("UITheme::init: Failed to find UI font\n");
+                return false;
+            }
         }
 
         m_iconFont = m_app->getFontManager()->openFont(
@@ -57,7 +64,7 @@ bool UITheme::init()
             12);
         if (m_font == NULL)
         {
-            printf("UITheme::init: Failed to find font: FontAwesome\n");
+            printf("UITheme::init: Failed to find FontAwesome\n");
             return false;
         }
     }
