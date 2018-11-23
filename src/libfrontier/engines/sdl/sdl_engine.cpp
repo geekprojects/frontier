@@ -219,11 +219,26 @@ bool FrontierEngineSDL::checkEvents()
                     few->getWindow()->update();
                     printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT_RESIZED\n");
                     break;
+
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                     printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT_SIZE_CHANGED\n");
                     break;
+
+                case SDL_WINDOWEVENT_SHOWN:
+                case SDL_WINDOWEVENT_EXPOSED:
+                    printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT: Forcing update\n");
+                    few->getWindow()->update(true);
+                    break;
+
+                default:
+                    printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT: Unknown event: %d\n", event.window.event);
+                    break;
             }
         } break;
+
+        default:
+            printf("FrontierEngineSDL::checkEvents: Unhandled event: %d\n", event.type);
+            break;
     }
 
     return true;

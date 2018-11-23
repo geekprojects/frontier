@@ -36,8 +36,13 @@ bool FrontierEngineWindowSDL::init()
 {
     int flags =
         SDL_WINDOW_RESIZABLE |
-        SDL_WINDOW_SHOWN |
+        SDL_WINDOW_HIDDEN |
         SDL_WINDOW_ALLOW_HIGHDPI ;
+
+    if (!m_window->hasBorder())
+    {
+        flags |= SDL_WINDOW_BORDERLESS;
+    }
 
     m_sdlWindow = SDL_CreateWindow(
         "Frontier",
@@ -99,7 +104,7 @@ bool FrontierEngineWindowSDL::update()
         sdlSurface->format->format, sdlSurface->pixels, sdlSurface->pitch);
     if (res < 0)
     {
-        printf("ScreenSDL::redraw: res=%d: %s\n", res, SDL_GetError());
+        printf("FrontierEngineWindowSDL::redraw: res=%d: %s\n", res, SDL_GetError());
         return false;
     }
 
@@ -116,9 +121,16 @@ bool FrontierEngineWindowSDL::update()
     res = SDL_UpdateWindowSurface(m_sdlWindow);
     if (res < 0)
     {
-        printf("ScreenSDL::redraw: res=%d: %s\n", res, SDL_GetError());
+        printf("FrontierEngineWindowSDL::redraw: res=%d: %s\n", res, SDL_GetError());
+        return false;
     }
 
+    printf("FrontierEngineWindowSDL::redraw: Done!\n");
     return true;
+}
+
+void FrontierEngineWindowSDL::setPosition(unsigned int x, unsigned int y)
+{
+    SDL_SetWindowPosition(m_sdlWindow, x, y);
 }
 

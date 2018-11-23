@@ -41,6 +41,8 @@ class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
     virtual void show();
     virtual void hide();
     virtual bool update();
+
+    virtual void setPosition(unsigned int x, unsigned int y);
 };
 
 class FrontierEngineSDL : public Frontier::FrontierEngine
