@@ -144,7 +144,7 @@ void FrontierWindow::setSize(Size size)
     }
 }
 
-void FrontierWindow::update()
+void FrontierWindow::update(bool force)
 {
     initInternal();
 
@@ -203,7 +203,7 @@ void FrontierWindow::update()
     printf("FrontierWindow::update: Window surface=%p\n", m_surface);
 #endif
 
-    if (m_widget->isDirty())
+    if (m_widget->isDirty() || force)
     {
         m_app->getTheme()->drawBackground(m_surface);
 

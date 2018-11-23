@@ -107,7 +107,7 @@ class FrontierWindow
 
     void show();
     void hide();
-    void update();
+    void update(bool force = false);
 
     void setEngineWindow(FrontierEngineWindow* few) { m_engineWindow = few; }
     FrontierEngineWindow* getEngineWindow() { return m_engineWindow; }
