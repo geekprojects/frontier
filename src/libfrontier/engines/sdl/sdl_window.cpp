@@ -45,7 +45,7 @@ bool FrontierEngineWindowSDL::init()
     }
 
     m_sdlWindow = SDL_CreateWindow(
-        "Frontier",
+        Utils::wstring2string(m_window->getTitle()).c_str(),
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         640, 480,
