@@ -14,7 +14,7 @@ frontier_test_LDFLAGS=-framework Cocoa -framework AppKit
 frontier_test_CPPFLAGS=-I${top_srcdir}/include -I${top_srcdir}/src/libfrontier -I$(top_srcdir)/tests//googletest/googletest/include
 
 test: all
-	./frontier_test
+	cd ..; tests/frontier_test
 
 
 
