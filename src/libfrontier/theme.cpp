@@ -42,9 +42,9 @@ bool UITheme::init()
         m_initialised = true;
 
         m_font = m_app->getFontManager()->openFont(
-            "Helvetica Neue",
+            "System Font",
             "Regular",
-            12);
+            14);
         if (m_font == NULL)
         {
             m_font = m_app->getFontManager()->openFont(
