@@ -30,36 +30,51 @@ using namespace Geek::Gfx;
 
 TextInput::TextInput(FrontierApp* ui) : Widget(ui)
 {
-    m_text = L"";
-    m_column = 0;
+    m_textSurface = NULL;
+
+    setText(L"");
 }
 
 TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui)
 {
-    m_text = text;
-    m_column = text.length();
+    m_textSurface = NULL;
+
+    setText(text);
 }
 
 TextInput::TextInput(FrontierWindow* window) : Widget(window)
 {
-    m_text = L"";
-    m_column = 0;
+    m_textSurface = NULL;
+
+    setText(L"");
 }
 
 TextInput::TextInput(FrontierWindow* window, wstring text) : Widget(window)
 {
-    m_text = text;
-    m_column = text.length();
+    m_textSurface = NULL;
+
+    setText(text);
 }
 
 TextInput::~TextInput()
 {
+    if (m_textSurface != NULL)
+    {
+        delete m_textSurface;
+    }
 }
 
 void TextInput::setText(std::wstring text)
 {
     m_text = text;
     m_column = text.length();
+    m_offsetX = 0;
+
+    if (m_textSurface != NULL)
+    {
+        delete m_textSurface;
+    }
+
     setDirty();
 }
 
@@ -91,74 +106,109 @@ bool TextInput::draw(Surface* surface)
         0, 0,
         m_setSize.width, m_setSize.height);
 
-    int y = m_margin;
+    unsigned int textWidth = m_ui->getTheme()->getTextWidth(m_text) + 4;
+    unsigned int textHeight = lineHeight + 4;
+    printf("TextInput::draw: textWidth=%d\n", textWidth);
 
-    int lines = 1;
-    unsigned int pos = 0;
-    for (pos = 0; pos < m_text.length(); pos++)
+    if (m_textSurface != NULL)
     {
-        if (m_text[pos] == '\n')
+        unsigned int surfaceWidth = m_textSurface->getWidth();
+        if (m_textSurface->isHighDPI())
         {
-            lines++;
+            surfaceWidth /= 2;
+        }
+        printf("TextInput::draw: old surface width=%d\n", surfaceWidth);
+        if (surfaceWidth != textWidth)
+        {
+            printf("TextInput::draw: Deleting test surface\n");
+            delete m_textSurface;
+            m_textSurface = NULL;
         }
     }
 
-    y = (m_setSize.height / 2) - (lines * lineHeight) / 2;
- 
-    wstring line = L"";
-    for (pos = 0; pos < m_text.length(); pos++)
+    if (m_textSurface == NULL)
     {
-        if (m_text[pos] == '\n' || pos == m_text.length() - 1)
+        if (surface->isHighDPI())
         {
-            if (pos == m_text.length() - 1)
-            {
-                line += m_text[pos];
-            }
-            //int w = m_ui->getTheme()->getTextWidth(line);
-            int x = m_margin;
-
-            unsigned int i;
-            for (i = 0; i < line.length(); i++)
-            {
-                wstring cstr = wstring(L"") + line.at(i);
-
-
-                int width = m_ui->getTheme()->getTextWidth(cstr);
-                fm->write(font,
-                    surface,
-                    x,
-                    y,
-                    cstr,
-                    0xffffffff,
-                    true,
-                    NULL);
-
-                if (i == m_column)
-                {
-                    drawCursor(surface, x, y);
-                }
- 
-                x += width;
-            }
-
-            if (m_column == line.length())
-            {
-                drawCursor(surface, x, y);
-            }
-
-            y += lineHeight;
-            line = L"";
+            m_textSurface = new HighDPISurface(textWidth, textHeight, 4);
         }
         else
         {
-            line += m_text[pos];
+            m_textSurface = new Surface(textWidth, textHeight, 4);
         }
     }
 
-    if (m_text.length() == 0)
+    m_textSurface->clear(m_ui->getTheme()->getColour(COLOUR_INPUT_BACKGROUND));
+ 
+    int x = 2;//m_margin;
+    int y = 2;//(m_setSize.height / 2) - (lineHeight / 2);
+
+    unsigned int cursorX = 0;
+    unsigned int pos = 0;
+    wchar_t t[2];
+    t[1] = 0;
+    for (pos = 0; pos < m_text.length(); pos++)
     {
-        drawCursor(surface, m_margin, y);
+        t[0] = m_text.at(pos);
+        wstring cstr = wstring(t);
+
+        int width = m_ui->getTheme()->getTextWidth(cstr);
+        fm->write(font,
+            m_textSurface,
+            x,
+            y,
+            cstr,
+            0xffffffff,
+            true,
+            NULL);
+
+        if (pos == m_column)
+        {
+            cursorX = x;
+        }
+
+        x += width;
     }
+
+    if (m_column == m_text.length())
+    {
+        cursorX = x;
+    }
+
+    drawCursor(m_textSurface, cursorX, y);
+
+    unsigned int drawWidth = m_setSize.width - (m_margin * 2);
+    if (drawWidth > textWidth)
+    {
+        m_offsetX = 0;
+        drawWidth = textWidth;
+    }
+    else
+    {
+        unsigned int maxX = textWidth - drawWidth;
+        if (m_offsetX > maxX)
+        {
+            m_offsetX = maxX;
+        }
+
+        if (cursorX < m_offsetX)
+        {
+            m_offsetX = cursorX;
+        }
+        else if (cursorX >= m_offsetX + drawWidth)
+        {
+            m_offsetX = (cursorX - drawWidth) + 1;
+        }
+    }
+
+    unsigned int offsetX = m_offsetX;
+    if (m_textSurface->isHighDPI())
+    {
+        offsetX *= 2;
+        drawWidth *= 2;
+        textHeight *= 2;
+    }
+    surface->blit(m_margin, m_margin, m_textSurface, offsetX, 0, drawWidth, textHeight);
 
    return true;
 }
@@ -168,7 +218,7 @@ void TextInput::drawCursor(Surface* surface, int x, int y)
     if (isActive())
     {
         int lineHeight = m_ui->getTheme()->getTextHeight();
-        surface->drawLine(x, y - 1, x, y + lineHeight + 1, 0xffffffff);
+        surface->drawLine(x, y - 1, x, y + lineHeight, 0xffffffff);
     }
 }
 

@@ -11,8 +11,11 @@ class TextInput : public Widget
  private:
     std::wstring m_text;
     unsigned int m_column;
+    unsigned int m_offsetX;
 
     void drawCursor(Geek::Gfx::Surface* surface, int x, int y);
+
+    Geek::Gfx::Surface* m_textSurface;
 
  public:
     TextInput(FrontierApp* ui);
