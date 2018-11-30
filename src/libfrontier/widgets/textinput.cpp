@@ -73,6 +73,7 @@ void TextInput::setText(std::wstring text)
     if (m_textSurface != NULL)
     {
         delete m_textSurface;
+        m_textSurface = NULL;
     }
 
     setDirty();
@@ -108,7 +109,6 @@ bool TextInput::draw(Surface* surface)
 
     unsigned int textWidth = m_ui->getTheme()->getTextWidth(m_text) + 4;
     unsigned int textHeight = lineHeight + 4;
-    printf("TextInput::draw: textWidth=%d\n", textWidth);
 
     if (m_textSurface != NULL)
     {
@@ -117,10 +117,8 @@ bool TextInput::draw(Surface* surface)
         {
             surfaceWidth /= 2;
         }
-        printf("TextInput::draw: old surface width=%d\n", surfaceWidth);
         if (surfaceWidth != textWidth)
         {
-            printf("TextInput::draw: Deleting test surface\n");
             delete m_textSurface;
             m_textSurface = NULL;
         }
