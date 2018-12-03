@@ -13,7 +13,15 @@ class TextInput : public Widget
     unsigned int m_column;
     unsigned int m_offsetX;
 
+    std::vector<int> m_charX;
+
+    bool m_selecting;
+    int m_selectStart;
+    int m_selectEnd;
+
     void drawCursor(Geek::Gfx::Surface* surface, int x, int y);
+
+    int charAt(int x);
 
     Geek::Gfx::Surface* m_textSurface;
 
@@ -26,6 +34,13 @@ class TextInput : public Widget
 
     void setText(std::wstring wtext);
     std::wstring getText() { return m_text; }
+
+    bool hasSelection()
+    {
+        return (m_selectStart >= 0 && m_selectStart != m_selectEnd);
+    }
+    std::wstring getSelected();
+    std::wstring cutSelected();
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);

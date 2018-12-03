@@ -26,6 +26,7 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 using namespace Geek::Gfx;
 
 TextInput::TextInput(FrontierApp* ui) : Widget(ui)
@@ -70,6 +71,10 @@ void TextInput::setText(std::wstring text)
     m_column = text.length();
     m_offsetX = 0;
 
+    m_selecting = false;
+    m_selectStart = -1;
+    m_selectEnd = -1;
+
     if (m_textSurface != NULL)
     {
         delete m_textSurface;
@@ -110,6 +115,9 @@ bool TextInput::draw(Surface* surface)
     unsigned int textWidth = m_ui->getTheme()->getTextWidth(m_text) + 4;
     unsigned int textHeight = lineHeight + 4;
 
+    int selectStart = MIN(m_selectStart, m_selectEnd);
+    int selectEnd = MAX(m_selectStart, m_selectEnd);
+
     if (m_textSurface != NULL)
     {
         unsigned int surfaceWidth = m_textSurface->getWidth();
@@ -138,8 +146,10 @@ bool TextInput::draw(Surface* surface)
 
     m_textSurface->clear(m_ui->getTheme()->getColour(COLOUR_INPUT_BACKGROUND));
  
-    int x = 2;//m_margin;
-    int y = 2;//(m_setSize.height / 2) - (lineHeight / 2);
+    int x = 2;
+    int y = 2;
+
+    m_charX.clear();
 
     unsigned int cursorX = 0;
     unsigned int pos = 0;
@@ -151,6 +161,15 @@ bool TextInput::draw(Surface* surface)
         wstring cstr = wstring(t);
 
         int width = m_ui->getTheme()->getTextWidth(cstr);
+
+        if (hasSelection())
+        {
+            if ((int)pos >= selectStart && (int)pos < selectEnd)
+            {
+                m_textSurface->drawRectFilled(x, 0, width, textHeight, 0xffff0000);
+            }
+        }
+
         fm->write(font,
             m_textSurface,
             x,
@@ -160,12 +179,14 @@ bool TextInput::draw(Surface* surface)
             true,
             NULL);
 
+
         if (pos == m_column)
         {
             cursorX = x;
         }
 
         x += width;
+        m_charX.push_back(x);
     }
 
     if (m_column == m_text.length())
@@ -258,15 +279,24 @@ Widget* TextInput::handleMessage(Message* msg)
                             }
                             break;
                         case KC_BACKSPACE:
-                            if (m_column > 0)
+                            if (hasSelection())
+                            {
+                                cutSelected();
+                            }
+                            else if (m_column > 0)
                             {
                                 m_column--;
                                 m_text.erase(m_column, 1);
                             }
                             break;
+
                         default:
                             if (iswprint(c))
                             {
+                                if (hasSelection())
+                                {
+                                    cutSelected();
+                                }
                                 m_text.insert(m_column, 1, c);
                                 m_column++;
                             }
@@ -277,16 +307,114 @@ Widget* TextInput::handleMessage(Message* msg)
             } break;
 
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+            {
                 setDirty(DIRTY_CONTENT);
+
+                Vector2D pos = getAbsolutePosition();
+                int x = inputMessage->event.button.x - pos.x;
+                x -= m_offsetX;
+                printf("TextInput::handleMessage: FRONTIER_MSG_INPUT_MOUSE_BUTTON: x=%d\n", x);
+
+                int at = charAt(x);
+                if (inputMessage->event.button.direction)
+                {
+                    m_selecting = true;
+                    m_selectStart = at;
+                    m_selectEnd = at;
+                    m_column = at;
+                }
+                else
+                {
+                    m_selecting = false;
+                }
+
                 return this;
+            } break;
 
             case FRONTIER_MSG_INPUT_MOUSE_MOTION:
+            {
+                if (m_selecting)
+                {
+                    setDirty(DIRTY_CONTENT);
+                    Vector2D pos = getAbsolutePosition();
+                    int x = inputMessage->event.button.x - pos.x;
+                    x -= m_offsetX;
+                    printf("TextInput::handleMessage: FRONTIER_MSG_INPUT_MOUSE_MOTION: x=%d\n", x);
+
+                    int at = charAt(x);
+
+                    m_selectEnd = at;
+                    m_column = at;
+                }
+
                 return this;
+            } break;
 
             default:
                 break;
         }
     }
     return NULL;
+}
+
+int TextInput::charAt(int x)
+{
+    printf("TextInput::charAt: x=%d\n", x);
+    int selected = -1;
+    int i = 0;
+    for (int charX : m_charX)
+    {
+        printf("TextInput::charAt: -> charX=%d\n", charX);
+        if (x < charX)
+        {
+            printf("TextInput::charAt:   -> Gone beyond!\n");
+            selected = i;
+            break;
+        }
+        i++;
+    }
+
+    printf("TextInput::charAt: selected=%d\n", selected);
+
+    if (selected >= 0)
+    {
+        return selected;
+    }
+    else
+    {
+        return m_text.length();
+    }
+}
+
+wstring TextInput::getSelected()
+{
+    if (hasSelection())
+    {
+        int selectStart = MIN(m_selectStart, m_selectEnd);
+        int selectEnd = MAX(m_selectStart, m_selectEnd);
+        int selectLen = selectEnd - selectStart;
+
+        return m_text.substr(selectStart, selectLen);
+    }
+    return L"";
+}
+
+wstring TextInput::cutSelected()
+{
+    if (hasSelection())
+    {
+        int selectStart = MIN(m_selectStart, m_selectEnd);
+        int selectEnd = MAX(m_selectStart, m_selectEnd);
+        int selectLen = selectEnd - selectStart;
+
+        wstring selectText = m_text.substr(selectStart, selectLen);
+
+        m_text.erase(selectStart, selectLen);
+
+        m_column = selectStart;
+        m_selectStart = -1;
+        return selectText;
+    }
+    return L"";
 }
 
