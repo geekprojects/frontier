@@ -253,7 +253,13 @@ Widget* Tabs::handleMessage(Message* msg)
 
 
                     int tabWidth = getTabWidth();
-                    unsigned int tab = x / tabWidth;
+                    unsigned int tab = 0;
+
+                    if (tabWidth > 0)
+                    {
+                        tab = x / tabWidth;
+                    }
+
 #if 0
                     printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
 #endif
