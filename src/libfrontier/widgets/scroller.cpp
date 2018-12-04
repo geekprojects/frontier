@@ -82,19 +82,17 @@ void Scroller::calculateSize()
 {
     m_scrollBar->calculateSize();
 
+    m_minSize.width = 50;
+    m_minSize.height = 50;
+    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+
     if (m_child != NULL)
     {
         m_child->calculateSize();
-    }
 
-    //Size childMin = m_child->getMinSize();
-    Size childMax = m_child->getMaxSize();
-    //m_minSize.width = childMin.width + m_scrollBar->getMinSize().width;
-    //m_minSize.height = childMin.height + 2;
-    m_minSize.width = 50;
-    m_minSize.height = 50;
-    m_minSize.setMin(childMax);
-    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+        Size childMax = m_child->getMaxSize();
+        m_minSize.setMin(childMax);
+    }
 }
 
 void Scroller::layout()

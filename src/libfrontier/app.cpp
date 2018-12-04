@@ -223,8 +223,6 @@ bool FrontierApp::main()
             return false;
         }
     }
-
-    return true;
 }
 
 void FrontierApp::update()

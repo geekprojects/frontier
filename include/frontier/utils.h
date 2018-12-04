@@ -51,7 +51,7 @@ struct Size
     std::string toString()
     {
         char buffer[32];
-        sprintf(buffer, "%d,%d", width, height);
+        snprintf(buffer, 32, "%d,%d", width, height);
         return std::string(buffer);
     }
 

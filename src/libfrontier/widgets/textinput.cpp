@@ -304,7 +304,7 @@ Widget* TextInput::handleMessage(Message* msg)
                     setDirty();
                 }
                 return this;
-            } break;
+            }
 
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
             {
@@ -329,7 +329,7 @@ Widget* TextInput::handleMessage(Message* msg)
                 }
 
                 return this;
-            } break;
+            }
 
             case FRONTIER_MSG_INPUT_MOUSE_MOTION:
             {
@@ -348,7 +348,7 @@ Widget* TextInput::handleMessage(Message* msg)
                 }
 
                 return this;
-            } break;
+            }
 
             default:
                 break;

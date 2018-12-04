@@ -271,7 +271,7 @@ slackable++;
             childMajor = childMajorMin;
         }
 
-        if (childMajor < childMajorMax)
+        if (childMajor < childMajorMax && slackable > 0)
         {
             int s = slack / slackable;
             slack -= s;
