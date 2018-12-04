@@ -1,4 +1,5 @@
-Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch=develop)](https://travis-ci.org/geekprojects/frontier)
+Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch=develop)](https://travis-ci.org/geekprojects/frontier) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=geekprojects_frontier&metric=alert_status)](https://sonarcloud.io/dashboard?id=geekprojects_frontier)
+
 --------
 
 
