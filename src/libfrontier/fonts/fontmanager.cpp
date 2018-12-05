@@ -115,7 +115,6 @@ bool FontManager::init()
 bool FontManager::scan(string dir)
 {
     DIR* fd;
-    dirent* dirent;
 
     log(DEBUG, "scan: Scanning %s", dir.c_str());
 
@@ -125,15 +124,25 @@ bool FontManager::scan(string dir)
         return false;
     }
 
-    while ((dirent = readdir(fd)) != NULL)
+    dirent* direntEntry = NULL;
+    dirent* direntResult = direntEntry;
+
+    int len_entry = sizeof(struct dirent) + fpathconf(dirfd(fd), _PC_NAME_MAX) + 1;
+    direntEntry = (dirent*)malloc(len_entry);
+    while (true)
     {
-        if (dirent->d_name[0] == '.')
+        int res = readdir_r(fd, direntEntry, &direntResult);
+        if (res != 0 || direntResult == NULL)
+        {
+            break;
+        }
+        if (direntEntry->d_name[0] == '.')
         {
             continue;
         }
 
         struct stat stat;
-        string path = dir + "/" + dirent->d_name;
+        string path = dir + "/" + direntEntry->d_name;
         lstat(path.c_str(), &stat);
         if (S_ISDIR(stat.st_mode))
         {
@@ -144,6 +153,7 @@ bool FontManager::scan(string dir)
             addFontFile(path);
         }
     }
+    free(direntEntry);
 
     closedir(fd);
 
