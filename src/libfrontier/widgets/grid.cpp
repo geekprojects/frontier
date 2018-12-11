@@ -23,6 +23,11 @@ Grid::Grid(FrontierWindow* window) : Widget(window)
 
 Grid::~Grid()
 {
+    for (GridItem* item : m_grid)
+    {
+        item->widget->decRefCount();
+    }
+
     freeSizes();
 }
 
