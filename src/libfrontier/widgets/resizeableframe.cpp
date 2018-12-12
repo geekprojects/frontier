@@ -13,12 +13,16 @@ ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, h
 {
     m_dragging = false;
     m_dragWidget = 0;
+
+    m_padding = 3;
 }
 
 ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Frame(window, horizontal)
 {
     m_dragging = false;
     m_dragWidget = 0;
+
+    m_padding = 3;
 }
 
 ResizeableFrame::~ResizeableFrame()
