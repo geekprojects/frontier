@@ -23,6 +23,8 @@
 #include <frontier/widgets.h>
 #include <frontier/contextmenu.h>
 
+#include <typeinfo>
+
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
@@ -61,8 +63,8 @@ void Widget::initWidget(FrontierApp* app)
     m_maxSize = Size(0, 0);
     m_setSize = Size(0, 0);
 
-    m_margin = 5;
-    m_padding = 5;
+    m_margin = m_ui->getTheme()->getMargin();
+    m_padding = m_ui->getTheme()->getPadding();
 
     m_mouseOver = false;
 
@@ -262,7 +264,9 @@ void Widget::dump(int level)
     {
         spaces += "    ";
     }
-    printf("%s: %p: x=%d, y=%d, size=%s\n", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
+
+    const char* name = typeid(*this).name();
+    printf("%s%s(%p): x=%d, y=%d, size=%s\n", spaces.c_str(), name, this, m_x, m_y, m_setSize.toString().c_str());
 
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)

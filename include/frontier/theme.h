@@ -80,6 +80,9 @@ class UITheme
     FontHandle* m_iconFont;
     FrontierApp* m_app;
 
+    int m_margin;
+    int m_padding;
+
  public:
     UITheme(FrontierApp* video);
     virtual ~UITheme();
@@ -87,6 +90,11 @@ class UITheme
     virtual bool init();
 
     virtual uint32_t getColour(ThemeColour colour) const;
+    virtual int getMargin() const { return m_margin; }
+    virtual int getPadding() const { return m_padding; }
+
+    virtual void setMargin(int margin) { m_margin = margin; }
+    virtual void setPadding(int padding) { m_padding = padding; }
 
     virtual void drawBackground(Geek::Gfx::Surface* surface) const;
     virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state) const;

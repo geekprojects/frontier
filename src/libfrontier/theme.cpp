@@ -33,6 +33,9 @@ UITheme::UITheme(FrontierApp* app)
 
     m_font = NULL;
     m_iconFont = NULL;
+
+    m_margin = 5;
+    m_padding = 5;
 }
 
 bool UITheme::init()
@@ -44,7 +47,7 @@ bool UITheme::init()
         m_font = m_app->getFontManager()->openFont(
             "System Font",
             "Regular",
-            14);
+            12);
         if (m_font == NULL)
         {
             m_font = m_app->getFontManager()->openFont(
