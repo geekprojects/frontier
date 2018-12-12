@@ -24,6 +24,8 @@
 #include <frontier/contextmenu.h>
 #include <sys/time.h>
 
+#include <typeinfo>
+
 #ifdef FRONTIER_ENGINE_SDL
 #   include "engines/sdl/sdl_engine.h"
 #elif FRONTIER_ENGINE_COCOA
@@ -55,6 +57,11 @@ FrontierApp::~FrontierApp()
     m_windows.clear();
 
     gc();
+
+    for (FrontierObject* obj : m_objects)
+    {
+        printf("FrontierApp::~FrontierApp: Leaked object %p: type=%s references=%d\n", obj, typeid(*obj).name(), obj->getRefCount());
+    }
 
     if (m_theme != NULL)
     {
