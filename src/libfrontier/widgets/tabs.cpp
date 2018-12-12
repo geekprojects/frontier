@@ -456,13 +456,20 @@ void Tabs::dump(int level)
     {
         spaces += "    ";
     }
-    printf("%s: %p: x=%d, y=%d, size=%s\n", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
+    printf("%sTabs(%p): x=%d, y=%d, size=%s\n", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
 
+    for (Tab tab : m_tabs)
+    {
+        tab.content->dump(level + 1);
+    }
+
+/*
     Widget* activeWidget = getActiveTab();
     if (activeWidget != NULL)
     {
         activeWidget->dump(level + 1);
     }
+*/
 }
 
 int Tabs::getTabWidth()
