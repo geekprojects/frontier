@@ -116,20 +116,6 @@ void Scroller::layout()
     m_scrollBar->set(0, m_child->getHeight(), (m_setSize.height - 2));
 }
 
-/*
-void Scroller::setWidth(int width)
-{
-    m_width = width;
-    if (m_child != NULL)
-    {
-        if (m_child->getWidth()  < m_width - getWidthOverhead())
-        {
-            m_child->setWidth(m_width - getWidthOverhead());
-        }
-    }
-}
-*/
-
 void Scroller::checkSurfaceSize(bool highDPI)
 {
     if (m_childSurface == NULL ||
@@ -153,7 +139,6 @@ void Scroller::checkSurfaceSize(bool highDPI)
 
 bool Scroller::draw(Surface* surface)
 {
-    //surface->drawRect(0, 0, m_setSize.width - (m_scrollBar->getWidth() - 2), m_setSize.height, 0xffffffff);
     m_ui->getTheme()->drawBorder(
         surface,
         BORDER_WIDGET,
@@ -163,19 +148,6 @@ bool Scroller::draw(Surface* surface)
 
     if (m_child != NULL)
     {
-/*
-        int cw = m_setSize.width - (m_scrollBar->getWidth() + 2);
-        int ch = m_setSize.height - 2;
-        if (cw > m_child->getWidth())
-        {
-            cw = m_child->getWidth();
-        }
-        if (ch > m_child->getHeight())
-        {
-            ch = m_child->getHeight();
-        }
-*/
-
         Size childSize = m_child->getSize();
 #ifdef DEBUG_UI_SCROLLER
         printf("Scroller::draw: scroller width=%d, height=%d\n", m_setSize.width, m_setSize.height);
@@ -185,27 +157,22 @@ bool Scroller::draw(Surface* surface)
 
         checkSurfaceSize(surface->isHighDPI());
 
-        if (surface->isHighDPI())
-        {
-            childSize.width *= 2;
-            childSize.height *= 2;
-        }
-
         m_childSurface->clear(0);
         m_child->draw(m_childSurface);
         Size size = m_setSize;
         size.width -= 2;
         size.height -= 2;
 
-        Size childMax = m_child->getMaxSize();
-        size.setMin(childMax);
+        size.setMin(childSize);
+        int childY = m_scrollBar->getPos();
         if (surface->isHighDPI())
         {
+            childY *= 2;
             size.width *= 2;
             size.height *= 2;
         }
 
-        surface->blit(1, 1, m_childSurface, 0, m_scrollBar->getPos(), size.width, size.height);
+        surface->blit(1, 1, m_childSurface, 0, childY, size.width, size.height);
     }
 
     // TODO: Make this only show if necessary
@@ -238,9 +205,14 @@ Widget* Scroller::handleMessage(Message* msg)
             }
             else
             {
-                //imsg->event.button.y -= m_scrollBar->getPos();
-                return m_child->handleMessage(imsg);
+                InputMessage childMessage = *imsg;
+                childMessage.event.button.y += m_scrollBar->getPos();
+                return m_child->handleMessage(&childMessage);
             }
+        }
+        else if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
+        {
+            return m_scrollBar->handleMessage(msg);
         }
     }
     return this;
