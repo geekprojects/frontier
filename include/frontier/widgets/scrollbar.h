@@ -14,6 +14,7 @@ class ScrollBar : public Widget
     int m_pos;
     int m_size;
     bool m_dragging;
+    int m_dragOffset;
 
     int getControlPos();
     int getControlSize();

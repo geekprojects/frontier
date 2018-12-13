@@ -34,6 +34,7 @@ ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui)
     m_pos = 0;
     m_size = 10;
     m_dragging = false;
+    m_dragOffset = 0;
 }
 
 ScrollBar::ScrollBar(FrontierWindow* window) : Widget(window)
@@ -41,6 +42,7 @@ ScrollBar::ScrollBar(FrontierWindow* window) : Widget(window)
     m_pos = 0;
     m_size = 10;
     m_dragging = false;
+    m_dragOffset = 0;
 }
 
 ScrollBar::~ScrollBar()
@@ -97,6 +99,7 @@ Widget* ScrollBar::handleMessage(Message* msg)
         InputMessage* imsg = (InputMessage*)msg;
         if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
         {
+            FrontierWindow* window = getWindow();
             Vector2D thisPos = getAbsolutePosition();
 
             int pos = getControlPos();
@@ -109,35 +112,22 @@ Widget* ScrollBar::handleMessage(Message* msg)
             {
                 if (y >= pos && y < pos + sizePix)
                 {
-//printf("ScrollBar::handleMessage: Control!!\n");
                     m_dragging = true;
-                    if (imsg->window != NULL)
+                    m_dragOffset = y - pos;
+                    if (window != NULL)
                     {
-                        imsg->window->setDragWidget(this);
+                        window->setDragWidget(this);
                     }
                 }
             }
             else
             {
                 m_dragging = false;
-                if (imsg->window != NULL)
+                if (window != NULL)
                 {
-                    imsg->window->setDragWidget(NULL);
+                    window->setDragWidget(NULL);
                 }
             }
-
-/*
-                setDirty(DIRTY_CONTENT);
-
-                m_state = imsg->event.button.direction;
-                UIMessage* buttonMessage = new UIMessage();
-                buttonMessage->messageType = FRONTIER_MSG_UI;
-                buttonMessage->uiMessageType = FRONTIER_MSG_UI_BUTTON_PRESSED;
-                buttonMessage->widget = this;
-                buttonMessage->source = msg;
-                buttonMessage->button.state = m_state;
-                m_ui->postMessage(buttonMessage);
-*/
         }
         else if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
         {
@@ -148,10 +138,13 @@ Widget* ScrollBar::handleMessage(Message* msg)
                 int range = m_max - (m_min + m_size);
 
                 int y = imsg->event.motion.y - thisPos.y;
+                y -= m_dragOffset;
 
                 int oldPos = m_pos;
 
-                float r = (float)(y - SCROLLBAR_BORDER) / (float)(m_setSize.height - (SCROLLBAR_BORDER * 2));
+                int yMax = (m_setSize.height - (SCROLLBAR_BORDER * 2)) - getControlSize();
+
+                float r = (float)(y - SCROLLBAR_BORDER) / (float)(yMax);
                 m_pos = (int)((float)range * r) + m_min;
 
                 if (m_pos < m_min)
@@ -162,7 +155,6 @@ Widget* ScrollBar::handleMessage(Message* msg)
                 {
                     m_pos = m_max - m_size;
                 }
-                //printf("ScrollBar::handleMessage: m_pos(2)=%d\n", m_pos);
 
                 if (oldPos != m_pos)
                 {
@@ -170,6 +162,12 @@ Widget* ScrollBar::handleMessage(Message* msg)
                     m_changedPositionSignal.emit(m_pos);
                 }
             }
+        }
+        else if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
+        {
+            int scrollPos = getPos();
+            scrollPos -= imsg->event.wheel.scrollY;
+            setPos(scrollPos);
         }
     }
 
