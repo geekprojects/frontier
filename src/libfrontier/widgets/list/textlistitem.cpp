@@ -27,6 +27,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+#define ICON_WIDTH 20
+
 TextListItem::TextListItem(FrontierApp* ui, std::wstring text) : ListItem(ui)
 {
     m_icon = 0;
@@ -72,10 +74,10 @@ void TextListItem::calculateSize()
     if (m_icon != 0)
     {
         //m_minSize.width += m_ui->getTheme()->getIconWidth(m_icon);
-        m_minSize.width += 20;
+        m_minSize.width += ICON_WIDTH;
     }
 
-    m_minSize.width += (5 * 2);
+    m_minSize.width += (m_margin * 2);
     m_minSize.height = lineHeight + (1 * 2);
 }
 
@@ -99,8 +101,10 @@ bool TextListItem::draw(Geek::Gfx::Surface* surface)
 
     if (m_icon != 0)
     {
-        m_ui->getTheme()->drawIcon(surface, x, y, m_icon, m_selected);
-        x += 20;
+        int iconWidth = m_ui->getTheme()->getIconWidth(m_icon);
+        int iconX = (ICON_WIDTH / 2) - (iconWidth / 2);
+        m_ui->getTheme()->drawIcon(surface, x + iconX, y, m_icon, m_selected);
+        x += ICON_WIDTH;
     }
 
     m_ui->getTheme()->drawText(
