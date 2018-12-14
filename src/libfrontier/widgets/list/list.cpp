@@ -95,9 +95,8 @@ printf("List::layout: itemSize(2): %d,%d\n", itemSize.width, itemSize.height);
     }
 }
 
-bool List::draw(Surface* surface)
+bool List::draw(Surface* surface, Rect visible)
 {
-    //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffffff);
     m_ui->getTheme()->drawBackground(surface);
 
     int idx;
@@ -106,10 +105,18 @@ bool List::draw(Surface* surface)
     {
         ListItem* item = *it;
 #if 0
-        printf("List::draw: itemSize: %d,%d\n", item->getWidth(), item->getHeight());
+        printf("List::draw: %d,%d, itemSize: %d,%d\n", item->getX(), item->getY(), item->getWidth(), item->getHeight());
 #endif
-        SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
-        item->draw(&viewport);
+
+        if (item->getX() >= visible.x - item->getWidth() && item->getY() >= visible.y - item->getHeight())
+        {
+            if (item->getY() > visible.y + visible.height)
+            {
+                break;
+            }
+            SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
+            item->draw(&viewport);
+        }
     }
     return true;
 }

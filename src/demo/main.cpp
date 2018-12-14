@@ -272,6 +272,12 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     tree1->addItem(tree2 = new TreeListItem(this, FRONTIER_ICON_TREE, L"It's a tree IN A TREE!"));
     tree2->addItem(new TextListItem(this, L"Wow!"));
 
+    int i;
+    for (i = 0; i < 100; i++)
+    {
+        list->addItem(new TextListItem(this, FRONTIER_ICON_FOLDER_OPEN, L"Another item!"));
+    }
+
     Scroller* scroller = new Scroller(this);
     scroller->setChild(list);
     listFrame->add(scroller);
