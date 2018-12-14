@@ -67,7 +67,7 @@ bool Frame::draw(Surface* surface)
     {
         Widget* child = *it;
         SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
-        child->draw(&viewport);
+        child->draw(&viewport, Rect(0, 0, child->getWidth(), child->getHeight()));
 
 #if 0
         viewport.drawRect(0, 0, child->getWidth(), child->getHeight(), 0x00ff00);

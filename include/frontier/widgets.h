@@ -94,6 +94,7 @@ class Widget : public FrontierObject
     virtual void calculateSize();
     virtual void layout();
     virtual bool draw(Geek::Gfx::Surface* surface);
+    virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
 
     int getX() const { return m_x; }
     int getY() const { return m_y; }

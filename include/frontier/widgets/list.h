@@ -93,7 +93,7 @@ class List : public Widget
 
     virtual void calculateSize();
     virtual void layout();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
 
     virtual Widget* handleMessage(Frontier::Message* msg);
 

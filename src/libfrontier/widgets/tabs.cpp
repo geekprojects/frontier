@@ -130,8 +130,6 @@ void Tabs::layout()
 
 bool Tabs::draw(Surface* surface)
 {
-    Widget::draw(surface);
-
     int labelHeight = m_ui->getTheme()->getTextHeight();
     int labelY = (TAB_HEIGHT / 2) - (labelHeight / 2);
 
@@ -218,7 +216,7 @@ bool Tabs::draw(Surface* surface)
     Widget* activeWidget = m_tabs.at(m_activeTab).content;
 
     SurfaceViewPort viewport(surface, activeWidget->getX(), activeWidget->getY(), activeWidget->getWidth(), activeWidget->getHeight());
-    return activeWidget->draw(&viewport);
+    return activeWidget->draw(&viewport, Rect(0, 0, activeWidget->getWidth(), activeWidget->getHeight()));
 }
 
 Widget* Tabs::handleMessage(Message* msg)

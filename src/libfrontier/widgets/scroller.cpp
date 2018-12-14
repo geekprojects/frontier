@@ -156,15 +156,17 @@ bool Scroller::draw(Surface* surface)
 #endif
 
         checkSurfaceSize(surface->isHighDPI());
+        int childY = m_scrollBar->getPos();
 
-        m_childSurface->clear(0);
-        m_child->draw(m_childSurface);
+
         Size size = m_setSize;
         size.width -= 2;
         size.height -= 2;
 
+        m_childSurface->clear(0);
+        m_child->draw(m_childSurface, Rect(0, childY, m_child->getWidth(), size.height));
+
         size.setMin(childSize);
-        int childY = m_scrollBar->getPos();
         if (surface->isHighDPI())
         {
             childY *= 2;
@@ -177,7 +179,7 @@ bool Scroller::draw(Surface* surface)
 
     // TODO: Make this only show if necessary
     SurfaceViewPort scrollbarVP(surface, m_scrollBar->getX(), m_scrollBar->getY(), m_scrollBar->getWidth(), m_scrollBar->getHeight());
-    m_scrollBar->draw(&scrollbarVP);
+    ((Widget*)m_scrollBar)->draw(&scrollbarVP, Rect(0, 0, m_scrollBar->getWidth(), m_scrollBar->getHeight()));
 
     return true;
 }

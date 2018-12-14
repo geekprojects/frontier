@@ -101,6 +101,11 @@ Size Widget::setSize(Size size)
     return size;
 }
 
+bool Widget::draw(Geek::Gfx::Surface* surface, Rect visible)
+{
+    return draw(surface);
+}
+
 bool Widget::draw(Geek::Gfx::Surface* surface)
 {
     return true;
