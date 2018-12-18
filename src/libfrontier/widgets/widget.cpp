@@ -232,14 +232,7 @@ void Widget::openContextMenu(Geek::Vector2D pos)
         return;
     }
 
-    ContextMenu* cm = m_ui->getContextMenuWindow();
-    cm->setMenu(m_contextMenu);
-
-    cm->setSize(Size(0, 0));
-    cm->show();
-
-    Vector2D screenPos = getWindow()->getScreenPosition(pos);
-    cm->setPosition(screenPos);
+    getWindow()->openContextMenu(pos, m_contextMenu);
 }
 
 Widget* Widget::handleMessage(Message* msg)

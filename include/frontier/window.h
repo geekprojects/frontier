@@ -37,6 +37,7 @@ namespace Frontier
 class FrontierEngine;
 class FrontierApp;
 class Widget;
+class Menu;
 
 class FrontierEngineWindow;
 
@@ -116,6 +117,8 @@ class FrontierWindow
     void setSize(Frontier::Size size);
     Frontier::Size getSize() const { return m_size; }
     Geek::Gfx::Surface* getSurface() const { return m_surface; }
+
+    void openContextMenu(Geek::Vector2D pos, Menu* menu);
 
     void postMessage(Frontier::Message* message);
     virtual bool handleMessage(Frontier::Message* message);

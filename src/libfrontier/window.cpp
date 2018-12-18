@@ -22,6 +22,7 @@
 #include <frontier/frontier.h>
 #include <frontier/engine.h>
 #include <frontier/widgets.h>
+#include <frontier/contextmenu.h>
 
 using namespace std;
 using namespace Frontier;
@@ -55,6 +56,21 @@ FrontierWindow::~FrontierWindow()
     if (m_widget != NULL)
     {
         m_widget->decRefCount();
+    }
+
+    if (m_activeWidget != NULL)
+    {
+        m_activeWidget->decRefCount();
+    }
+
+    if (m_mouseOverWidget != NULL)
+    {
+        m_mouseOverWidget->decRefCount();
+    }
+
+    if (m_dragWidget != NULL)
+    {
+        m_dragWidget->decRefCount();
     }
 
     if (m_surface != NULL)
@@ -107,7 +123,18 @@ void FrontierWindow::setContent(Widget* content)
 
 void FrontierWindow::setDragWidget(Widget* widget)
 {
-    m_dragWidget = widget;
+    if (m_dragWidget != widget)
+    {
+        if (m_dragWidget != NULL)
+        {
+            m_dragWidget->decRefCount();
+        }
+        m_dragWidget = widget;
+        if (m_dragWidget != NULL)
+        {
+            m_dragWidget->incRefCount();
+        }
+    }
     m_dragTime = m_app->getTimestamp();
 }
 
@@ -266,6 +293,18 @@ int FrontierWindow::getHeight()
 }
 */
 
+void FrontierWindow::openContextMenu(Geek::Vector2D pos, Menu* menu)
+{
+    ContextMenu* cm = m_app->getContextMenuWindow();
+    cm->setMenu(menu);
+
+    cm->setSize(Size(0, 0));
+    cm->show();
+
+    Vector2D screenPos = getScreenPosition(pos);
+    cm->setPosition(screenPos);
+}
+
 void FrontierWindow::postMessage(Message* message)
 {
 }
@@ -299,14 +338,17 @@ bool FrontierWindow::handleMessage(Message* message)
                     if (m_mouseOverWidget != NULL)
                     {
                         m_mouseOverWidget->onMouseLeave();
-                    }
-
-                    if (destWidget != NULL)
-                    {
-                        destWidget->onMouseEnter();
+                        m_mouseOverWidget->decRefCount();
                     }
 
                     m_mouseOverWidget = destWidget;
+
+                    if (m_mouseOverWidget != NULL)
+                    {
+                        m_mouseOverWidget->incRefCount();
+                        m_mouseOverWidget->onMouseEnter();
+                    }
+
                 }
                 updateCursor();
 
@@ -340,11 +382,13 @@ bool FrontierWindow::handleMessage(Message* message)
             if (prevActiveWidget != NULL)
             {
                 prevActiveWidget->signalInactive().emit();
+                m_activeWidget->decRefCount();
             }
 
             m_activeWidget = destWidget;
             if (m_activeWidget != NULL)
             {
+                m_activeWidget->incRefCount();
                 m_activeWidget->signalActive().emit();
             }
 
