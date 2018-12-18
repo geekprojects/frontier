@@ -85,6 +85,7 @@ class List : public Widget
     ListItem* m_selected;
 
     sigc::signal<void, ListItem*> m_selectSignal;
+    sigc::signal<void, ListItem*, Geek::Vector2D> m_contextMenuSignal;
 
  public:
     List(FrontierApp* ui);
@@ -105,6 +106,7 @@ class List : public Widget
     ListItem* getItem(int i) { return m_list.at(i); }
 
     virtual sigc::signal<void, ListItem*> selectSignal() { return m_selectSignal; }
+    virtual sigc::signal<void, ListItem*, Geek::Vector2D> contextMenuSignal() { return m_contextMenuSignal; }
 };
 
 class MenuList : public List

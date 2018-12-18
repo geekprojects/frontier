@@ -47,16 +47,28 @@ void List::calculateSize()
     vector<ListItem*>::iterator it;
 
     m_minSize.set(0, 0);
-    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+    m_maxSize.set(0, 0);
+    //m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
-    m_minSize.height = 0;
     for (it = m_list.begin(); it != m_list.end(); it++)
     {
         ListItem* item = *it;
         item->calculateSize();
+
         Size itemMin = item->getMinSize();
-        m_minSize.setMax(itemMin);
+        m_minSize.setMaxWidth(itemMin);
         m_minSize.height += itemMin.height;
+
+        Size itemMax = item->getMaxSize();
+        m_maxSize.setMaxWidth(itemMax);
+        if (itemMax.height == WIDGET_SIZE_UNLIMITED)
+        {
+            m_maxSize.height = WIDGET_SIZE_UNLIMITED;
+        }
+        else if (m_maxSize.height < WIDGET_SIZE_UNLIMITED)
+        {
+            m_maxSize.height += itemMin.height;
+        }
     }
 
     m_minSize.width += 2 * 2;
@@ -241,6 +253,7 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
         InputMessage* imsg = (InputMessage*)msg;
         if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
         {
+printf("ListItem::handleMessage: direction=%d, buttons=%d\n", imsg->event.button.direction, imsg->event.button.buttons);
             if (imsg->event.button.direction)
             {
                 if (m_selected)
@@ -250,6 +263,7 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
                 else
                 {
                     setSelected();
+
                     m_clickSignal.emit(this);
                     if (m_list != NULL)
                     {
@@ -260,6 +274,11 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
             }
             else
             {
+                if (imsg->event.button.buttons == BUTTON_RIGHT)
+                {
+                    m_list->contextMenuSignal().emit(this, Vector2D(imsg->event.button.x, imsg->event.button.y));
+                    return this;
+                }
                 return NULL;
             }
         }

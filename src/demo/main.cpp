@@ -55,6 +55,7 @@ class DemoApp : public FrontierApp
     void onIconButton();
 
     void onCloseTab(Widget* tab);
+    void onContextMenu(ListItem* item, Geek::Vector2D pos);
 
  public:
     DemoApp();
@@ -254,6 +255,7 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
     listFrame->add(new Label(this, L"List:"));
 
     List* list = new List(this);
+    list->contextMenuSignal().connect(sigc::mem_fun(*this, &DemoApp::onContextMenu));
     list->addItem(new TextListItem(this, FRONTIER_ICON_FOLDER_OPEN, L"This is"));
     list->addItem(new TextListItem(this, FRONTIER_ICON_THUMBS_UP, L"a list"));
     list->addItem(new TextListItem(this, FRONTIER_ICON_TOGGLE_ON, L"with lots"));
@@ -319,6 +321,17 @@ void DemoApp::onCloseTab(Widget* tab)
 {
     printf("DemoApp::onCloseTab: Closing tab: %p\n", tab);
     m_tabs->closeTab(tab);
+}
+
+void DemoApp::onContextMenu(ListItem* item, Geek::Vector2D pos)
+{
+    printf("DemoApp::onContextMenu: item=%p, pos=%d,%d\n", item, pos.x, pos.y);
+
+    Menu* menu = new Menu();
+    MenuItem* item1 = new MenuItem(L"Hello!");
+    //closeItem->clickSignal().connect(sigc::mem_fun(*this, &Tabs::closeActiveTab));
+    menu->add(item1);
+    m_mainWindow->openContextMenu(pos, menu);
 }
 
 int main(int argc, char** argv)
