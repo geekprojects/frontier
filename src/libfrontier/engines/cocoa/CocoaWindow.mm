@@ -55,12 +55,10 @@ using namespace Frontier;
 
 - (void)windowDidBecomeKey: (NSNotification *)notification
 {
-printf("CocoaNSWindow::windowDidBecomeKey: Here!\n");
 }
 
 - (void)windowDidResignKey: (NSNotification *)notification
 {
-printf("CocoaNSWindow::windowDidResignKey: Here!\n");
 }
 
 @end
@@ -215,7 +213,6 @@ printf("CocoaNSWindow::windowDidResignKey: Here!\n");
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
 
     NSPoint pos = [theEvent locationInWindow];
-    //NSLog(@"Mouse was moved: location: %0.2f, %0.2f\n", pos.x, pos.y);
 
     Frontier::InputMessage* msg = new Frontier::InputMessage();
     msg->messageType = FRONTIER_MSG_INPUT;
@@ -436,9 +433,14 @@ bool CocoaWindow::createCocoaWindow()
     [[window contentView] addSubview: view];
     [window makeFirstResponder: view];
 
-    [window center];
+    NSTrackingArea* trackingArea = [[NSTrackingArea alloc]
+        initWithRect:[view bounds]
+        options: (NSTrackingMouseMoved | NSTrackingActiveAlways)
+        owner:window
+        userInfo:nil];
+    [view addTrackingArea:trackingArea];
 
-    //[window makeKeyAndOrderFront:nil];
+    [window center];
 
     return true;
 }
@@ -560,6 +562,15 @@ Geek::Vector2D CocoaWindow::getPosition()
     Geek::Vector2D pos;
     pos.x = rect.origin.x;
     pos.y = (int)(screenFrame.size.height - (rect.origin.y + rect.size.height));
+
+#if 0
+    printf(
+        "CocoaWindow::getPosition: screenFrame.size.height=%d, rect.origin.y=%d, rect.size.height=%d, pos.y=%d\n",
+        (int)screenFrame.size.height,
+        (int)rect.origin.y,
+        (int)rect.size.height,
+        pos.y);
+#endif
 
     return pos;
 }
