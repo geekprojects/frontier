@@ -82,22 +82,25 @@ void Frame::calculateSize()
     printf("Frame::calculateSize: %p: Calculating...\n", this);
 #endif
 
-    if (m_parent == NULL)
+    if (!m_border)
     {
-        m_margin = 0;
-    }
-    else
-    {
-        // Parent is a frame
-        Frame* parentFrame = dynamic_cast<Frame*>(m_parent);
-        if (parentFrame != NULL)
+        if (m_parent == NULL)
         {
-#ifdef DEBUG_UI_FRAME
-            printf("Frame::calculateSize: %p: Parent is Frame, margin=%d\n", this, parentFrame->getMargin());
-            //if (parentFrame->getMargin() > 0)
-#endif
+            m_margin = 0;
+        }
+        else
+        {
+            // Parent is a frame
+            Frame* parentFrame = dynamic_cast<Frame*>(m_parent);
+            if (parentFrame != NULL)
             {
-                m_margin = 0;
+#ifdef DEBUG_UI_FRAME
+                printf("Frame::calculateSize: %p: Parent is Frame, margin=%d\n", this, parentFrame->getMargin());
+                //if (parentFrame->getMargin() > 0)
+#endif
+                {
+                    m_margin = 0;
+                }
             }
         }
     }
