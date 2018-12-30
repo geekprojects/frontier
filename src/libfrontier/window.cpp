@@ -121,6 +121,28 @@ void FrontierWindow::setContent(Widget* content)
     m_widget->setDirty();
 }
 
+void FrontierWindow::setActiveWidget(Widget* widget)
+{
+    if (m_activeWidget == widget)
+    {
+        return;
+    }
+
+    if (m_activeWidget != NULL)
+    {
+        m_activeWidget->signalInactive().emit();
+        m_activeWidget->decRefCount();
+    }
+
+    m_activeWidget = widget;
+
+    if (m_activeWidget != NULL)
+    {
+        m_activeWidget->incRefCount();
+        m_activeWidget->signalActive().emit();
+    }
+}
+
 void FrontierWindow::setDragWidget(Widget* widget)
 {
     if (m_dragWidget != widget)
@@ -379,19 +401,7 @@ bool FrontierWindow::handleMessage(Message* message)
     {
         if (updateActive && prevActiveWidget != destWidget)
         {
-            if (prevActiveWidget != NULL)
-            {
-                prevActiveWidget->signalInactive().emit();
-                m_activeWidget->decRefCount();
-            }
-
-            m_activeWidget = destWidget;
-            if (m_activeWidget != NULL)
-            {
-                m_activeWidget->incRefCount();
-                m_activeWidget->signalActive().emit();
-            }
-
+            setActiveWidget(destWidget);
             updateRequired = true;
         }
 

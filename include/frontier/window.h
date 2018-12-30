@@ -102,7 +102,7 @@ class FrontierWindow
 
     void setContent(Widget* widget);
     Widget* getContent() const { return m_widget; }
-    void setActiveWidget(Widget* widget) { m_activeWidget = widget; }
+    void setActiveWidget(Widget* widget);
     Widget* getActiveWidget() const { return m_activeWidget; }
     void setDragWidget(Widget* widget);
 
