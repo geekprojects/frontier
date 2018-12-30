@@ -1,21 +1,23 @@
 #ifndef __FRONTIER_OBJECT_H_
 #define __FRONTIER_OBJECT_H_
 
+#include <atomic>
+
 namespace Frontier
 {
 
 class FrontierObject
 {
  private:
-    int m_referenceCount;
+    std::atomic<int> m_referenceCount;
 
  public:
     FrontierObject();
     virtual ~FrontierObject();
 
-    virtual void incRefCount() { m_referenceCount++; }
-    virtual void decRefCount() { m_referenceCount--; }
-    int getRefCount() { return m_referenceCount; }
+    void incRefCount() { m_referenceCount++; }
+    void decRefCount() { m_referenceCount--; }
+    int getRefCount() { return m_referenceCount.load(); }
 };
 
 };

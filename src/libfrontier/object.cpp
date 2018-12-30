@@ -15,7 +15,7 @@ FrontierObject::~FrontierObject()
 {
     if (m_referenceCount > 0)
     {
-        printf("FrontierObject::~FrontierObject: WARN: m_referenceCount=%d\n", m_referenceCount);
+        printf("FrontierObject::~FrontierObject: WARN: m_referenceCount=%d\n", getRefCount());
     }
 }
 
