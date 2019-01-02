@@ -120,6 +120,7 @@ void Tabs::layout()
     {
         return;
     }
+
     Widget* activeWidget = getActiveTab();
 
     Size tabSize = Size(m_setSize.width, m_setSize.height - TAB_HEIGHT);
@@ -143,6 +144,12 @@ bool Tabs::draw(Surface* surface)
     if (m_tabs.empty())
     {
         return true;
+    }
+
+    if (m_activeTab >= m_tabs.size())
+    {
+        printf("Tabs::draw: Invalid active tab: %d\n", m_activeTab);
+        m_activeTab = m_tabs.size() - 1;
     }
 
     int tabWidth = getTabWidth();
@@ -205,18 +212,22 @@ bool Tabs::draw(Surface* surface)
                 FRONTIER_ICON_WINDOW_CLOSE,
                 false);
         }
-
-        if (tab < m_tabs.size() - 1)
-        {
-            //surface->drawLine(x + tabWidth - 1, 0, x + tabWidth - 1, 24, 0xffffffff);
-        }
         x += tabWidth;
     }
 
     Widget* activeWidget = m_tabs.at(m_activeTab).content;
+    if (activeWidget != NULL)
+    {
+        SurfaceViewPort viewport(
+            surface,
+            activeWidget->getX(),
+            activeWidget->getY(),
+            activeWidget->getWidth(),
+            activeWidget->getHeight());
+        return activeWidget->draw(&viewport, Rect(0, 0, activeWidget->getWidth(), activeWidget->getHeight()));
+    }
 
-    SurfaceViewPort viewport(surface, activeWidget->getX(), activeWidget->getY(), activeWidget->getWidth(), activeWidget->getHeight());
-    return activeWidget->draw(&viewport, Rect(0, 0, activeWidget->getWidth(), activeWidget->getHeight()));
+    return true;
 }
 
 Widget* Tabs::handleMessage(Message* msg)
