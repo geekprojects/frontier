@@ -138,8 +138,13 @@ void FrontierWindow::setActiveWidget(Widget* widget)
 
     if (m_activeWidget != NULL)
     {
+        printf("FrontierWindow::setActiveWidget: Active: %s (%p)\n", typeid(*widget).name(), widget);
         m_activeWidget->incRefCount();
         m_activeWidget->signalActive().emit();
+    }
+    else
+    {
+        printf("FrontierWindow::setActiveWidget: Active: %p\n", widget);
     }
 }
 
@@ -396,10 +401,15 @@ bool FrontierWindow::handleMessage(Message* message)
         }
     }
 
+
+
     bool updateRequired = m_widget->isDirty();
     if (destWidget != NULL || updateRequired || updateActive)
     {
-        if (updateActive && prevActiveWidget != destWidget)
+        if (updateActive &&
+            destWidget != NULL &&
+            prevActiveWidget == m_activeWidget && // Make sure it hasn't been explicitly set
+            prevActiveWidget != destWidget)
         {
             setActiveWidget(destWidget);
             updateRequired = true;
