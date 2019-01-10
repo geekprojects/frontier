@@ -100,14 +100,6 @@ Widget* Button::handleMessage(Message* msg)
                     m_state = imsg->event.button.direction;
                     if (!m_state)
                     {
-                        UIMessage* buttonMessage = new UIMessage();
-                        buttonMessage->messageType = FRONTIER_MSG_UI;
-                        buttonMessage->uiMessageType = FRONTIER_MSG_UI_BUTTON_PRESSED;
-                        buttonMessage->widget = this;
-                        buttonMessage->source = msg;
-                        buttonMessage->button.state = m_state;
-                        m_ui->postMessage(buttonMessage);
-
                         m_clickSignal.emit();
                     }
                 }

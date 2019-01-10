@@ -32,8 +32,6 @@ class FrontierWindow;
 enum MessageType
 {
     FRONTIER_MSG_INPUT = 1,
-    FRONTIER_MSG_UI = 2,
-    FRONTIER_MSG_APP = 1000
 };
 
 struct Message
@@ -96,44 +94,6 @@ struct InputMessage : public Message
         } wheel;
     } event;
 };
-
-
-/*
- * UI/Widget generated events
- */
-class Widget;
-
-struct UIMessage : public Frontier::Message
-{
-    int uiMessageType;
-    Widget* widget;
-    Frontier::Message* source;
-    struct
-    {
-        bool state;
-    } button;
-    struct
-    {
-        int selected;
-        int itemY;
-    } list;
-};
-
-#define FRONTIER_MSG_UI_BUTTON_PRESSED 0x1000
-#define FRONTIER_MSG_UI_LIST_SELECTED 0x2000
-
-
-/*
- * Application Specific Messages
- */
-
-#define FRONTIER_MSG_APP_QUIT 1
-
-struct AppMessage : public Message
-{
-    uint32_t appMessageType;
-};
-
 
 };
 
