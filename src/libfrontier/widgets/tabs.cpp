@@ -31,12 +31,12 @@ using namespace Geek::Gfx;
 #define MAX_TAB_SIZE 250
 #define TAB_HEIGHT 22
 
-Tabs::Tabs(FrontierApp* ui) : Widget(ui)
+Tabs::Tabs(FrontierApp* ui) : Widget(ui, L"Tabs")
 {
     m_activeTab = 0;
 }
 
-Tabs::Tabs(FrontierWindow* window) : Widget(window)
+Tabs::Tabs(FrontierWindow* window) : Widget(window, L"Tabs")
 {
     m_activeTab = 0;
 }
@@ -97,7 +97,7 @@ void Tabs::calculateSize()
     m_minSize = activeMinSize;
     m_maxSize = activeMaxSize;
 
-    int closeWidth = m_ui->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
+    int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
     int tabsWidth = 0;
     for (Tab tab : m_tabs)
     {
@@ -131,10 +131,10 @@ void Tabs::layout()
 
 bool Tabs::draw(Surface* surface)
 {
-    int labelHeight = m_ui->getTheme()->getTextHeight();
+    int labelHeight = m_app->getTheme()->getTextHeight();
     int labelY = (TAB_HEIGHT / 2) - (labelHeight / 2);
 
-    m_ui->getTheme()->drawBorder(
+    m_app->getTheme()->drawBorder(
         surface,
         BORDER_WIDGET,
         STATE_NONE,
@@ -148,17 +148,17 @@ bool Tabs::draw(Surface* surface)
 
     if (m_activeTab >= m_tabs.size())
     {
-        printf("Tabs::draw: Invalid active tab: %d\n", m_activeTab);
+        log(ERROR, "draw: Invalid active tab: %d", m_activeTab);
         m_activeTab = m_tabs.size() - 1;
     }
 
     int tabWidth = getTabWidth();
 
 #if 0
-    printf("Tabs::draw: tabs=%lu, titleWidth=%d\n", m_tabs.size(), titleWidth);
+    log(DEBUG, "draw: tabs=%lu, titleWidth=%d", m_tabs.size(), titleWidth);
 #endif
 
-    int closeWidth = m_ui->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
+    int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
 
     vector<Tab>::iterator it;
     int x = 0;
@@ -175,11 +175,11 @@ bool Tabs::draw(Surface* surface)
         }
         else
         {
-            //backgroundCol = m_ui->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
+            //backgroundCol = m_app->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
         }
         //surface->drawRectFilled(x, 0, titleWidth - 1, 24, backgroundCol);
 
-        m_ui->getTheme()->drawBorder(
+        m_app->getTheme()->drawBorder(
             surface,
             BORDER_TAB,
             state,
@@ -193,10 +193,10 @@ bool Tabs::draw(Surface* surface)
         }
 
 #if 0
-        printf("Tabs::draw:  -> %ls: active=%d x=%d, tabWidth=%d, titleWidth=%d, closeable=%d\n", it->title.c_str(), isActive, x, tabWidth, titleWidth, it->closeable);
+        log(DEUG, "draw:  -> %ls: active=%d x=%d, tabWidth=%d, titleWidth=%d, closeable=%d", it->title.c_str(), isActive, x, tabWidth, titleWidth, it->closeable);
 #endif
 
-        m_ui->getTheme()->drawText(
+        m_app->getTheme()->drawText(
             surface,
             x + 5,
             labelY,
@@ -205,7 +205,7 @@ bool Tabs::draw(Surface* surface)
 
         if (it->closeable)
         {
-            m_ui->getTheme()->drawIcon(
+            m_app->getTheme()->drawIcon(
                 surface,
                 x + tabWidth - (closeWidth + 5),
                 labelY,
@@ -270,7 +270,7 @@ Widget* Tabs::handleMessage(Message* msg)
                     }
 
 #if 0
-                    printf("Tabs::handleMessage: x=%d, titleWidth=%d, m_activeTab=%d\n", x, titleWidth, m_activeTab);
+                    log(DEBUG, "handleMessage: x=%d, titleWidth=%d, m_activeTab=%d", x, titleWidth, m_activeTab);
 #endif
                     if (tab >= m_tabs.size())
                     {
@@ -281,7 +281,7 @@ Widget* Tabs::handleMessage(Message* msg)
 
                     if (m_tabs.at(tab).closeable)
                     {
-                        int closeWidth = m_ui->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
+                        int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
                         if (x > (int)((tab * tabWidth) + (tabWidth - (closeWidth + 5))))
                         {
                             if (!imsg->event.button.direction)
@@ -295,7 +295,7 @@ Widget* Tabs::handleMessage(Message* msg)
 
                     if (imsg->event.button.buttons == BUTTON_RIGHT)
                     {
-                        printf("Tabs::handleMessage: CONTEXT MENU!!!\n");
+                        log(DEBUG, "handleMessage: CONTEXT MENU!!!");
                         openContextMenu(Geek::Vector2D(imsg->event.button.x, imsg->event.button.y));
                     }
                     else if (!imsg->event.button.direction)
@@ -309,7 +309,7 @@ Widget* Tabs::handleMessage(Message* msg)
                     setDirty();
 
 #if 0
-                    printf("Tabs::handleMessage: activeTab=%p\n", activeTab);
+                    log(DEBUG, "handleMessage: activeTab=%p", activeTab);
 #endif
 
                     m_changeTabSignal.emit(activeTab);
@@ -465,7 +465,7 @@ void Tabs::dump(int level)
     {
         spaces += "    ";
     }
-    printf("%sTabs(%p): x=%d, y=%d, size=%s\n", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
+    log(DEBUG, "%sTabs(%p): x=%d, y=%d, size=%s", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
 
     for (Tab tab : m_tabs)
     {

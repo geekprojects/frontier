@@ -39,15 +39,15 @@ void ComboBox::initComboBox()
     setMargin(0);
     setPadding(0);
 
-    m_textInput = new TextInput(m_ui, L"");
-    m_button = new IconButton(m_ui, FRONTIER_ICON_ARROW_DOWN);
+    m_textInput = new TextInput(m_app, L"");
+    m_button = new IconButton(m_app, FRONTIER_ICON_ARROW_DOWN);
 
     m_button->clickSignal().connect(sigc::mem_fun(*this, &ComboBox::openDropDown));
 
     add(m_textInput);
     add(m_button);
 
-    m_comboBoxDropDown = new ComboBoxDropDown(m_ui);
+    m_comboBoxDropDown = new ComboBoxDropDown(m_app);
 
     m_comboBoxDropDown->getList()->selectSignal().connect(sigc::mem_fun(*this, &ComboBox::optionSelected));
 
@@ -67,7 +67,7 @@ void ComboBox::updateOptions()
 void ComboBox::openDropDown()
 {
     Vector2D widgetPos = getAbsolutePosition();
-    widgetPos.y += m_textInput->getHeight() / 2;
+    widgetPos.y += m_textInput->getHeight();
 
     Vector2D screenPos = getWindow()->getScreenPosition(widgetPos);
 
@@ -78,7 +78,7 @@ void ComboBox::openDropDown()
 
 void ComboBox::optionSelected(ListItem* option)
 {
-    printf("ComboBox::optionSelected: Here!\n");
+    log(DEBUG, "optionSelected: Here!");
     if (option != NULL)
     {
         wstring text = ((TextListItem*)option)->getText();
@@ -109,7 +109,7 @@ bool ComboBoxDropDown::init()
 
 void ComboBoxDropDown::lostFocus()
 {
-    printf("ComboBoxDropDown::lostFocus: Closing!\n");
+    log(DEBUG, "lostFocus: Closing!");
     hide();
 }
 

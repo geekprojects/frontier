@@ -52,7 +52,7 @@ class FrontierEngine : public Geek::Logger
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 };
 
-class FrontierEngineWindow
+class FrontierEngineWindow : public Geek::Logger
 {
  protected:
     FrontierWindow* m_window;

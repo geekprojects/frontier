@@ -120,7 +120,7 @@ void ResizeableFrame::layout()
 #if 0
             Size childMaxSize = child->getMaxSize();
             int childMajorMax = childMaxSize.get(m_horizontal);
-            printf("ResizeableFrame::layout: pc=%0.2f, childMajor=%d, minSize=%d, maxSize=%d\n", pc, childMajor, childMajorMin, childMajorMax);
+            log(Geek::DEBUG, "layout: pc=%0.2f, childMajor=%d, minSize=%d, maxSize=%d", pc, childMajor, childMajorMin, childMajorMax);
 #endif
             if (childMajor < childMajorMin)
             {
@@ -137,7 +137,7 @@ void ResizeableFrame::layout()
 
         }
 #if 0
-        printf("ResizeableFrame::layout: shrinkable=%d, shrinkpc=%0.2f\n", shrinkable, shrinkpc);
+        log(Geek::DEBUG, "layout: shrinkable=%d, shrinkpc=%0.2f", shrinkable, shrinkpc);
 #endif
 
         int majorPos = m_margin;
@@ -157,7 +157,7 @@ void ResizeableFrame::layout()
             int childMinor = minor;
 
 #if 0
-            printf("ResizeableFrame::layout:  -> pc=%0.2f, shrinkable=%d, shrinkpc=%0.2f\n", pc, shrinkable, shrinkpc);
+            log(DEBUG, "layout:  -> pc=%0.2f, shrinkable=%d, shrinkpc=%0.2f", pc, shrinkable, shrinkpc);
 #endif
             if ((childMajor < childMajorMax) && (childMajor > childMajorMin) && shrinkpc > 0 && shrinkable > 0)
             {
@@ -176,7 +176,7 @@ void ResizeableFrame::layout()
                 }
                 m_sizes[i] -= s;
 #if 0
-                printf("ResizeableFrame::layout:    -> Shrunk by %0.2f%%\n", s);
+                log(DEBUG, "layout:    -> Shrunk by %0.2f%%", s);
 #endif
             }
 
@@ -235,7 +235,7 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
                         int width = child->getWidth();
                         if (x > childPos.x + width && x < childPos.x + width + m_padding)
                         {
-                            printf("ResizeableFrame::handleMessage: Starting resize!\n");
+                            log(DEBUG, "handleMessage: Starting resize!");
                             m_dragging = true;
                             m_dragWidget = pos;
                             Vector2D thisPos = getAbsolutePosition();
@@ -261,7 +261,7 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
                 if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON &&
                     !imsg->event.button.direction)
                 {
-                    printf("ResizeableFrame::handleMessage: Stopping resize!\n");
+                    log(DEBUG, "handleMessage: Stopping resize!");
 
                     m_dragging = false;
                     if (imsg->window != NULL)
@@ -277,7 +277,7 @@ Widget* ResizeableFrame::handleMessage(Message* msg)
 
                     float pc = (((float)diff / (float)getWidth()) * 100.0);
 #if 0
-                    printf("ResizeableFrame::handleMessage: diff=%d, pc=%0.2f\n", diff, pc);
+                    log(DEBUG, "handleMessage: diff=%d, pc=%0.2f", diff, pc);
 #endif
                     m_sizes[m_dragWidget] -= pc;
                     m_sizes[m_dragWidget + 1] += pc;

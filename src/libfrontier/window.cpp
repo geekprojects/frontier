@@ -31,7 +31,7 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags)
+FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) : Logger(L"Window[" + title + L"]")
 {
     m_app = app;
     m_engineWindow = NULL;
@@ -140,13 +140,13 @@ void FrontierWindow::setActiveWidget(Widget* widget)
 
     if (m_activeWidget != NULL)
     {
-        printf("FrontierWindow::setActiveWidget: Active: %s (%p)\n", typeid(*widget).name(), widget);
+        log(DEBUG, "setActiveWidget: Active: %s (%p)", typeid(*widget).name(), widget);
         m_activeWidget->incRefCount();
         m_activeWidget->signalActive().emit();
     }
     else
     {
-        printf("FrontierWindow::setActiveWidget: Active: %p\n", widget);
+        log(DEBUG, "setActiveWidget: Active: %p", widget);
     }
 }
 
@@ -217,8 +217,8 @@ void FrontierWindow::update(bool force)
         m_size = m_widget->setSize(m_size);
 
 #if 0
-        printf("FrontierWindow::update: min=%s, max=%s\n", min.toString().c_str(), max.toString().c_str());
-        printf("FrontierWindow::update: Updating window size: %s\n", m_size.toString().c_str());
+        log(DEBUG, "update: min=%s, max=%s", min.toString().c_str(), max.toString().c_str());
+        log(DEBUG, "update: Updating window size: %s", m_size.toString().c_str());
 #endif
 
         m_widget->layout();
@@ -256,7 +256,7 @@ void FrontierWindow::update(bool force)
         m_widget->setDirty(DIRTY_CONTENT);
     }
 #if 0
-    printf("FrontierWindow::update: Window surface=%p\n", m_surface);
+    log(DEBUG, "update: Window surface=%p", m_surface);
 #endif
 
     if (m_widget->isDirty() || force)
@@ -289,12 +289,12 @@ void FrontierWindow::updateCursor()
     {
         m_engineWindow->resetCursor();
 
-        printf("FrontierWindow::updateCursor: Updating cursor: %u\n", cursor);
+        log(DEBUG, "updateCursor: Updating cursor: %u", cursor);
         if (cursor != CURSOR_POINTER && m_mouseOverWidget != NULL)
         {
             Vector2D pos = m_mouseOverWidget->getAbsolutePosition();
             Size size = m_mouseOverWidget->getSize();
-            printf("FrontierWindow::updateCursor: Rect: %d,%d, w=%d, h=%d\n", pos.x, pos.y, size.width, size.height);
+            log(DEBUG, "updateCursor: Rect: %d,%d, w=%d, h=%d", pos.x, pos.y, size.width, size.height);
             m_engineWindow->updateCursor(cursor, pos.x, pos.y, size.width, size.height);
         }
 
@@ -432,12 +432,12 @@ bool FrontierWindow::handleMessage(Message* message)
 
 void FrontierWindow::gainedFocus()
 {
-    printf("FrontierWindow::gainedFocus: Here! this=%p\n", this);
+    log(DEBUG, "gainedFocus: Here! this=%p", this);
 }
 
 void FrontierWindow::lostFocus()
 {
-    printf("FrontierWindow::lostFocus: Here! this=%p\n", this);
+    log(DEBUG, "lostFocus: Here! this=%p", this);
 }
 
 Vector2D FrontierWindow::getScreenPosition(Vector2D pos)

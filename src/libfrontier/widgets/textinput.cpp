@@ -29,28 +29,28 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-TextInput::TextInput(FrontierApp* ui) : Widget(ui)
+TextInput::TextInput(FrontierApp* ui) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
 
     setText(L"");
 }
 
-TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui)
+TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
 
     setText(text);
 }
 
-TextInput::TextInput(FrontierWindow* window) : Widget(window)
+TextInput::TextInput(FrontierWindow* window) : Widget(window, L"TextInput")
 {
     m_textSurface = NULL;
 
     setText(L"");
 }
 
-TextInput::TextInput(FrontierWindow* window, wstring text) : Widget(window)
+TextInput::TextInput(FrontierWindow* window, wstring text) : Widget(window, L"TextInput")
 {
     m_textSurface = NULL;
 
@@ -86,7 +86,7 @@ void TextInput::setText(std::wstring text)
 
 void TextInput::calculateSize()
 {
-    int lineHeight = m_ui->getTheme()->getTextHeight();
+    int lineHeight = m_app->getTheme()->getTextHeight();
 
     m_minSize.set(50, lineHeight + (m_margin * 2));
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, lineHeight + (m_margin * 2));
@@ -94,10 +94,10 @@ void TextInput::calculateSize()
 
 bool TextInput::draw(Surface* surface)
 {
-    int lineHeight = m_ui->getTheme()->getTextHeight();
+    int lineHeight = m_app->getTheme()->getTextHeight();
 
-    FontManager* fm = m_ui->getFontManager();
-    FontHandle* font = m_ui->getTheme()->getFont(surface->isHighDPI());
+    FontManager* fm = m_app->getFontManager();
+    FontHandle* font = m_app->getTheme()->getFont(surface->isHighDPI());
 
     UIState state = STATE_NONE;
     if (isActive())
@@ -105,14 +105,14 @@ bool TextInput::draw(Surface* surface)
         state = STATE_SELECTED;
     }
 
-    m_ui->getTheme()->drawBorder(
+    m_app->getTheme()->drawBorder(
         surface,
         BORDER_INPUT,
         state,
         0, 0,
         m_setSize.width, m_setSize.height);
 
-    unsigned int textWidth = m_ui->getTheme()->getTextWidth(m_text) + 4;
+    unsigned int textWidth = m_app->getTheme()->getTextWidth(m_text) + 4;
     unsigned int textHeight = lineHeight + 4;
 
     int selectStart = MIN(m_selectStart, m_selectEnd);
@@ -144,7 +144,7 @@ bool TextInput::draw(Surface* surface)
         }
     }
 
-    m_textSurface->clear(m_ui->getTheme()->getColour(COLOUR_INPUT_BACKGROUND));
+    m_textSurface->clear(m_app->getTheme()->getColour(COLOUR_INPUT_BACKGROUND));
  
     int x = 2;
     int y = 2;
@@ -160,7 +160,7 @@ bool TextInput::draw(Surface* surface)
         t[0] = m_text.at(pos);
         wstring cstr = wstring(t);
 
-        int width = m_ui->getTheme()->getTextWidth(cstr);
+        int width = m_app->getTheme()->getTextWidth(cstr);
 
         if (hasSelection())
         {
@@ -236,7 +236,7 @@ void TextInput::drawCursor(Surface* surface, int x, int y)
 {
     if (isActive())
     {
-        int lineHeight = m_ui->getTheme()->getTextHeight();
+        int lineHeight = m_app->getTheme()->getTextHeight();
         surface->drawLine(x, y - 1, x, y + lineHeight, 0xffffffff);
     }
 }

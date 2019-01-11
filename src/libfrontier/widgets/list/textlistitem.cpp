@@ -65,15 +65,15 @@ void TextListItem::setText(std::wstring text)
 
 void TextListItem::calculateSize()
 {
-    int lineHeight = m_ui->getTheme()->getTextHeight();
+    int lineHeight = m_app->getTheme()->getTextHeight();
 
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
-    m_minSize.width = 1 + m_ui->getTheme()->getTextWidth(m_text);
+    m_minSize.width = 1 + m_app->getTheme()->getTextWidth(m_text);
 
     if (m_icon != 0)
     {
-        //m_minSize.width += m_ui->getTheme()->getIconWidth(m_icon);
+        //m_minSize.width += m_app->getTheme()->getIconWidth(m_icon);
         m_minSize.width += ICON_WIDTH;
     }
 
@@ -93,21 +93,21 @@ bool TextListItem::draw(Geek::Gfx::Surface* surface)
         state = STATE_HOVER;
     }
 
-    m_ui->getTheme()->drawBorder(surface, BORDER_LIST_ITEM_1, state, 0, 0, surface->getWidth() - 2, surface->getHeight() - 2);
+    m_app->getTheme()->drawBorder(surface, BORDER_LIST_ITEM_1, state, 0, 0, surface->getWidth() - 2, surface->getHeight() - 2);
 
-    int lineHeight = m_ui->getTheme()->getTextHeight();
+    int lineHeight = m_app->getTheme()->getTextHeight();
     int x = 1;
     int y = (surface->getHeight() / 2) - (lineHeight) / 2;
 
     if (m_icon != 0)
     {
-        int iconWidth = m_ui->getTheme()->getIconWidth(m_icon);
+        int iconWidth = m_app->getTheme()->getIconWidth(m_icon);
         int iconX = (ICON_WIDTH / 2) - (iconWidth / 2);
-        m_ui->getTheme()->drawIcon(surface, x + iconX, y, m_icon, m_selected);
+        m_app->getTheme()->drawIcon(surface, x + iconX, y, m_icon, m_selected);
         x += ICON_WIDTH;
     }
 
-    m_ui->getTheme()->drawText(
+    m_app->getTheme()->drawText(
         surface,
         x,
         y,

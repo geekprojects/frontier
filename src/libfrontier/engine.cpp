@@ -84,7 +84,7 @@ string FrontierEngine::chooseFile(int flags, std::string path, std::string patte
     return "";
 }
 
-FrontierEngineWindow::FrontierEngineWindow(FrontierWindow* window)
+FrontierEngineWindow::FrontierEngineWindow(FrontierWindow* window) : Logger(L"FrontierEngineWindow")
 {
      m_window = window;
 }

@@ -23,21 +23,19 @@
 #include <frontier/widgets.h>
 #include <frontier/contextmenu.h>
 
-#include <typeinfo>
-
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-Widget::Widget(FrontierApp* ui)
+Widget::Widget(FrontierApp* ui, wstring widgetName) : Logger(L"Widget[" + widgetName + L"]")
 {
-    initWidget(ui);
+    initWidget(ui, widgetName);
 }
 
-Widget::Widget(FrontierWindow* window)
+Widget::Widget(FrontierWindow* window, wstring widgetName) : Logger(L"Widget[" + widgetName + L"]")
 {
-    initWidget(window->getApp());
+    initWidget(window->getApp(), widgetName);
     m_window = window;
 }
 
@@ -50,9 +48,11 @@ Widget::~Widget()
     m_children.clear();
 }
 
-void Widget::initWidget(FrontierApp* app)
+void Widget::initWidget(FrontierApp* app, wstring widgetName)
 {
-    m_ui = app;
+    m_app = app;
+    m_widgetName = widgetName;
+
     m_window = NULL;
     m_parent = NULL;
     m_contextMenu = NULL;
@@ -63,16 +63,16 @@ void Widget::initWidget(FrontierApp* app)
     m_maxSize = Size(0, 0);
     m_setSize = Size(0, 0);
 
-    m_margin = m_ui->getTheme()->getMargin();
-    m_padding = m_ui->getTheme()->getPadding();
+    m_margin = m_app->getTheme()->getMargin();
+    m_padding = m_app->getTheme()->getPadding();
 
     m_mouseOver = false;
 
     m_initialised = false;
 
-    if (m_ui != NULL)
+    if (m_app != NULL)
     {
-        m_ui->registerObject(this);
+        m_app->registerObject(this);
     }
 }
 
@@ -263,8 +263,7 @@ void Widget::dump(int level)
         spaces += "    ";
     }
 
-    const char* name = typeid(*this).name();
-    printf("%s%s(%p): x=%d, y=%d, size=%s\n", spaces.c_str(), name, this, m_x, m_y, m_setSize.toString().c_str());
+    log(Geek::DEBUG, "%s%s(%p): x=%d, y=%d, size=%s", spaces.c_str(), m_widgetName.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
 
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)

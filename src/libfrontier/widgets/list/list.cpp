@@ -27,12 +27,12 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-List::List(FrontierApp* ui) : Widget(ui)
+List::List(FrontierApp* ui) : Widget(ui, L"List")
 {
     m_selected = NULL;
 }
 
-List::List(FrontierWindow* window) : Widget(window)
+List::List(FrontierWindow* window) : Widget(window, L"List")
 {
     m_selected = NULL;
 }
@@ -109,7 +109,7 @@ printf("List::layout: itemSize(2): %d,%d\n", itemSize.width, itemSize.height);
 
 bool List::draw(Surface* surface, Rect visible)
 {
-    m_ui->getTheme()->drawBackground(surface);
+    m_app->getTheme()->drawBackground(surface);
 
     int idx;
     vector<ListItem*>::iterator it;
@@ -205,12 +205,12 @@ void List::clearSelected(ListItem* item)
     m_selected = NULL;
 }
 
-ListItem::ListItem(FrontierApp* ui) : Widget(ui)
+ListItem::ListItem(FrontierApp* ui) : Widget(ui, L"ListItem")
 {
     m_selected = false;
 }
 
-ListItem::ListItem(FrontierWindow* win) : Widget(win)
+ListItem::ListItem(FrontierWindow* win) : Widget(win, L"ListItem")
 {
     m_selected = false;
 }

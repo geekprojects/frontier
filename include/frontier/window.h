@@ -58,7 +58,7 @@ enum WindowCursor
     CURSOR_RESIZE_VERTICAL,
 };
 
-class FrontierWindow
+class FrontierWindow : public Geek::Logger
 {
  private:
     FrontierEngineWindow* m_engineWindow;

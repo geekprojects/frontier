@@ -131,7 +131,7 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
         {
             icon = FRONTIER_ICON_CARET_DOWN;
         }
-        m_ui->getTheme()->drawIcon(surface, 1, 2, icon, false);
+        m_app->getTheme()->drawIcon(surface, 1, 2, icon, false);
     }
 
     if (m_open)

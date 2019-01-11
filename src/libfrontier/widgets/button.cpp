@@ -24,15 +24,16 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 using namespace Geek::Gfx;
 
-Button::Button(FrontierApp* ui, wstring text) : Widget(ui)
+Button::Button(FrontierApp* ui, wstring text) : Widget(ui, L"Button")
 {
     m_text = text;
     m_state = false;
 }
 
-Button::Button(FrontierWindow* window, wstring text) : Widget(window)
+Button::Button(FrontierWindow* window, wstring text) : Widget(window, L"Button")
 {
     m_text = text;
     m_state = false;
@@ -44,8 +45,8 @@ Button::~Button()
 
 void Button::calculateSize()
 {
-    m_minSize.width = m_ui->getTheme()->getTextWidth(m_text) + (5 * 2);
-    m_minSize.height = m_ui->getTheme()->getTextHeight() + (5 * 2);
+    m_minSize.width = m_app->getTheme()->getTextWidth(m_text) + (5 * 2);
+    m_minSize.height = m_app->getTheme()->getTextHeight() + (5 * 2);
 
     m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     m_maxSize.height = m_minSize.height;
@@ -54,10 +55,10 @@ void Button::calculateSize()
 
 bool Button::draw(Surface* surface)
 {
-    int w = m_ui->getTheme()->getTextWidth(m_text);
+    int w = m_app->getTheme()->getTextWidth(m_text);
     int x = (m_setSize.width / 2) - (w / 2);
 
-    int y = (m_setSize.height / 2) - (m_ui->getTheme()->getTextHeight() / 2);
+    int y = (m_setSize.height / 2) - (m_app->getTheme()->getTextHeight() / 2);
 
     UIState state;
     if (m_state)
@@ -73,13 +74,13 @@ bool Button::draw(Surface* surface)
         state = STATE_NONE;
     }
 
-    m_ui->getTheme()->drawBorder(
+    m_app->getTheme()->drawBorder(
         surface,
         BORDER_BUTTON,
         state,
         0, 0,
         m_setSize.width, m_setSize.height);
-    m_ui->getTheme()->drawText(surface, x, y, m_text);
+    m_app->getTheme()->drawText(surface, x, y, m_text);
 
     return true;
 }
@@ -92,7 +93,7 @@ Widget* Button::handleMessage(Message* msg)
         switch (imsg->inputMessageType)
         {
             case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
-                printf("Button::handleMessage: Message! text=%ls\n", m_text.c_str());
+                log(DEBUG, "handleMessage: Message! text=%ls", m_text.c_str());
                 if (m_state != imsg->event.button.direction)
                 {
                     setDirty(DIRTY_CONTENT);

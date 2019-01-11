@@ -31,13 +31,25 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui)
+Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui, L"Frame")
 {
     m_horizontal = horizontal;
     m_border = false;
 }
 
-Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window)
+Frame::Frame(FrontierApp* ui, wstring widgetName, bool horizontal) : Widget(ui, widgetName)
+{
+    m_horizontal = horizontal;
+    m_border = false;
+}
+
+Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window, L"Frame")
+{
+    m_horizontal = horizontal;
+    m_border = false;
+}
+
+Frame::Frame(FrontierWindow* window, wstring widgetName, bool horizontal) : Widget(window, widgetName)
 {
     m_horizontal = horizontal;
     m_border = false;
@@ -79,7 +91,7 @@ bool Frame::draw(Surface* surface)
 void Frame::calculateSize()
 {
 #ifdef DEBUG_UI_FRAME
-    printf("Frame::calculateSize: %p: Calculating...\n", this);
+    log(DEBUG, "calculateSize: %p: Calculating...", this);
 #endif
 
     if (!m_border)
@@ -95,7 +107,7 @@ void Frame::calculateSize()
             if (parentFrame != NULL)
             {
 #ifdef DEBUG_UI_FRAME
-                printf("Frame::calculateSize: %p: Parent is Frame, margin=%d\n", this, parentFrame->getMargin());
+                log(DEBUG, "calculateSize: %p: Parent is Frame, margin=%d", this, parentFrame->getMargin());
                 //if (parentFrame->getMargin() > 0)
 #endif
                 {
@@ -118,7 +130,7 @@ void Frame::calculateSize()
         Size childMax = child->getMaxSize();
 
 #ifdef DEBUG_UI_FRAME
-        printf("Frame::calculateSize: %p: sizing child: %p: min=%s, max=%s\n", this, (*it), childMin.toString().c_str(), childMax.toString().c_str());
+        log(DEBUG, "calculateSize: %p: sizing child: %p: min=%s, max=%s", this, (*it), childMin.toString().c_str(), childMax.toString().c_str());
 #endif
 
         if (m_horizontal)
@@ -176,7 +188,7 @@ void Frame::calculateSize()
     m_maxSize.height += 2 * m_margin;
 
 #ifdef DEBUG_UI_FRAME
-    printf("Frame::calculateSize: %p: Done: min=%s, max=%s\n", this, m_minSize.toString().c_str(), m_maxSize.toString().c_str());
+    log(DEBUG, "calculateSize: %p: Done: min=%s, max=%s", this, m_minSize.toString().c_str(), m_maxSize.toString().c_str());
 #endif
 }
 
@@ -207,7 +219,7 @@ void Frame::layout()
     }
 
 #if 0
-    printf("Frame::layout: major=%d, minor=%d\n", major, minor);
+    log(DEBUG, "layout: major=%d, minor=%d", major, minor);
 #endif
 
     int q = major / m_children.size();
@@ -230,37 +242,11 @@ void Frame::layout()
         {
             slackable++;
         }
-
-
-/*
-        if (childMajorMax < q)
-        {
-            slack -= q - childMajorMax;
-printf("Frame::layout: Max < q: slack=%d\n", (q - childMajorMax));
-        }
-        else if (childMajorMin > q)
-        {
-            slack -= q - childMajorMin;
-printf("Frame::layout: Min < q: slack=%d\n", (q - childMajorMax));
-        }
-else
-{
-slackable++;
-}
-*/
-
-/*
-        if (childMajorMin > q)
-        {
-            slack -= childMajorMin - q;
-            //slackable++;
-        }
-*/
     }
 
     int slack = major - min;
 #ifdef DEBUG_UI_FRAME
-    printf("Frame::layout: major=%d, slack=%d, slackable=%d\n", major, slack, slackable);
+    log(DEBUG, "layout: major=%d, slack=%d, slackable=%d", major, slack, slackable);
 #endif
 
     int i;
@@ -320,7 +306,7 @@ slackable++;
         }
 
 #ifdef DEBUG_UI_FRAME
-        printf("Frame::layout: Child: min=%d, max=%d, settingTo=%d\n", childMajorMin, childMajorMax, childMajor);
+        log(DEBUG, "layout: Child: min=%d, max=%d, settingTo=%d", childMajorMin, childMajorMax, childMajor);
 #endif
 
         Size size;
@@ -341,66 +327,6 @@ slackable++;
         child->layout();
     }
 }
-
-#if 0
-void Frame::setWidth(int width)
-{
-    if (width < m_width)
-    {
-        printf("Frame::setWidth: %p: OH NOES! WIDTH IS TOO SMALL\n", this);
-    }
-    int extra = width - m_width;
-
-    m_width = width;
-
-    if (extra <= 0 || m_children.size() == 0)
-    {
-        return;
-    }
-
-    if (m_horizontal)
-    {
-        // Spread the extra out over our children
-        extra /= m_children.size();
-    }
-
-    vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
-    {
-        Widget* child = *it;
-        child->setWidth(child->getWidth() + extra);
-    }
-}
-
-void Frame::setHeight(int height)
-{
-    if (height < m_height)
-    {
-        printf("Frame::setHeight: %p: OH NOES! HEIGHT IS TOO SMALL\n", this);
-    }
-    int extra = height - m_height;
-
-    m_height = height;
-
-    if (extra <= 0 || m_children.size() == 0)
-    {
-        return;
-    }
-
-    if (!m_horizontal)
-    {
-        // Spread the extra out over our children
-        extra /= m_children.size();
-    }
-
-    vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
-    {
-        Widget* child = *it;
-        child->setHeight(child->getHeight() + extra);
-    }
-}
-#endif
 
 Widget* Frame::handleMessage(Message* msg)
 {

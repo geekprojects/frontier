@@ -26,25 +26,25 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek::Gfx;
 
-Label::Label(FrontierApp* ui, wstring text) : Widget(ui)
+Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
 }
 
-Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui)
+Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = align;
 }
 
-Label::Label(FrontierWindow* window, wstring text) : Widget(window)
+Label::Label(FrontierWindow* window, wstring text) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
 }
 
-Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window)
+Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = align;
@@ -69,7 +69,7 @@ void Label::setAlign(TextAlign align)
 
 void Label::calculateSize()
 {
-    m_lineHeight = m_ui->getTheme()->getTextHeight();
+    m_lineHeight = m_app->getTheme()->getTextHeight();
 
     m_minSize.set(0, 0);
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
@@ -86,7 +86,7 @@ void Label::calculateSize()
             {
                 line += m_text[pos];
             }
-            int w = m_ui->getTheme()->getTextWidth(line);
+            int w = m_app->getTheme()->getTextWidth(line);
             if (w > m_minSize.width)
             {
                 m_minSize.width = w;
@@ -132,7 +132,7 @@ bool Label::draw(Surface* surface)
             {
                 line += m_text[pos];
             }
-            int w = m_ui->getTheme()->getTextWidth(line);
+            int w = m_app->getTheme()->getTextWidth(line);
             int x = 0;
 
             switch (m_align)
@@ -148,7 +148,7 @@ bool Label::draw(Surface* surface)
                     break;
             }
 
-            m_ui->getTheme()->drawText(
+            m_app->getTheme()->drawText(
                 surface,
                 x,
                 y,

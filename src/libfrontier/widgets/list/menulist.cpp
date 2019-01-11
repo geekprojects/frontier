@@ -74,7 +74,7 @@ printf("MenuList::setMenu: Adding...\n");
     for (MenuItem* menuItem : m_menuItems)
     {
 printf("MenuList::setMenu: Adding item: %ls\n", menuItem->getTitle().c_str());
-        TextListItem* item = new TextListItem(m_ui, menuItem->getTitle());
+        TextListItem* item = new TextListItem(m_app, menuItem->getTitle());
         item->setPrivateData(menuItem);
         addItem(item);
     }

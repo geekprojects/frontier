@@ -46,11 +46,14 @@ enum DirtyFlag
     DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
 };
 
-class Widget : public FrontierObject
+class Widget : public FrontierObject, public Geek::Logger
 {
  protected:
-    FrontierApp* m_ui;
+    FrontierApp* m_app;
+    std::wstring m_widgetName;
+
     FrontierWindow* m_window;
+
     Widget* m_parent;
     bool m_initialised;
     void* m_privateData;
@@ -77,15 +80,15 @@ class Widget : public FrontierObject
     sigc::signal<void> m_activeSignal;
     sigc::signal<void> m_inactiveSignal;
 
-    void initWidget(FrontierApp* app);
+    void initWidget(FrontierApp* app, std::wstring widgetName);
     void callInit();
 
  protected:
     virtual void init();
 
  public:
-    Widget(FrontierApp* ui);
-    Widget(FrontierWindow* window);
+    Widget(FrontierApp* ui, std::wstring name);
+    Widget(FrontierWindow* window, std::wstring name);
     virtual ~Widget();
 
     void setPrivateData(void* data) { m_privateData = data; }

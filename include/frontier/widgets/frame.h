@@ -17,7 +17,9 @@ class Frame : public Widget
 
  public:
     Frame(FrontierApp* ui, bool horizontal);
+    Frame(FrontierApp* ui, std::wstring widgetName, bool horizontal);
     Frame(FrontierWindow* ui, bool horizontal);
+    Frame(FrontierWindow* ui, std::wstring widgetName, bool horizontal);
     virtual ~Frame();
 
     void setBorder(bool border) { m_border = border; }

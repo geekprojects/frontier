@@ -3,9 +3,10 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 using namespace Geek::Gfx;
 
-Grid::Grid(FrontierApp* app) : Widget(app)
+Grid::Grid(FrontierApp* app) : Widget(app, L"Grid")
 {
     m_colMinSizes = NULL;
     m_colMaxSizes = NULL;
@@ -13,7 +14,7 @@ Grid::Grid(FrontierApp* app) : Widget(app)
     m_rowMaxSizes = NULL;
 }
 
-Grid::Grid(FrontierWindow* window) : Widget(window)
+Grid::Grid(FrontierWindow* window) : Widget(window, L"Grid")
 {
     m_colMinSizes = NULL;
     m_colMaxSizes = NULL;
@@ -102,7 +103,7 @@ void Grid::calculateSize()
 
     Size gridSize = getGridSize();
 #if 0
-    printf("Grid::calculateSize: gridSize=%d,%d\n", gridSize.width, gridSize.height);
+    log(DEBUG, "calculateSize: gridSize=%d,%d", gridSize.width, gridSize.height);
 #endif
 
     m_colMinSizes = new int[gridSize.width];
@@ -149,7 +150,7 @@ void Grid::calculateSize()
     for (col = 0; col < gridSize.width; col++)
     {
 #if 0
-        printf("Grid::calculateSize: Column %d: min=%d, max=%d\n", col, m_colMinSizes[col], m_colMaxSizes[col]);
+        log(DEBUG, "calculateSize: Column %d: min=%d, max=%d", col, m_colMinSizes[col], m_colMaxSizes[col]);
 #endif
         m_minSize.width += m_colMinSizes[col];
         m_maxSize.width += m_colMaxSizes[col];
@@ -158,7 +159,7 @@ void Grid::calculateSize()
     for (row = 0; row < gridSize.height; row++)
     {
 #if 0
-        printf("Grid::calculateSize: Row %d: min=%d, max=%d\n", row, m_rowMinSizes[row], m_rowMaxSizes[row]);
+        log(DEBUG, "Grid::calculateSize: Row %d: min=%d, max=%d", row, m_rowMinSizes[row], m_rowMaxSizes[row]);
 #endif
         m_minSize.height += m_rowMinSizes[row];
         m_maxSize.height += m_rowMinSizes[row];
@@ -245,7 +246,7 @@ void Grid::layout()
                 colSizes[col] = m_colMaxSizes[col];
                 slackX += s;
             }
-        printf("Grid::layout: Col %d: Size=%d\n", col, colSizes[col]);
+            log(DEBUG, "layout: Col %d: Size=%d", col, colSizes[col]);
         }
     }
 
@@ -276,7 +277,7 @@ void Grid::layout()
                 slackY += s;
             }
         }
-        printf("Grid::layout: Row %d: Size=%d\n", row, rowSizes[row]);
+        log(DEBUG, "layout: Row %d: Size=%d", row, rowSizes[row]);
     }
 
     int y = m_margin;
@@ -295,7 +296,7 @@ void Grid::layout()
             }
 
 #if 0
-            printf("Grid::layout: Set Item: %d, %d, size=%d,%d (%p)\n", col, row, colSizes[col], rowSizes[row], item);
+            log(DEBUG, "layout: Set Item: %d, %d, size=%d,%d (%p)", col, row, colSizes[col], rowSizes[row], item);
 #endif
 
             x += colSizes[col] + m_padding;

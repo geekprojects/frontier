@@ -37,7 +37,7 @@
 using namespace std;
 using namespace Frontier;
 
-FrontierApp::FrontierApp(wstring name)
+FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
 {
     m_activeWindow = NULL;
     m_contextMenuWindow = NULL;
@@ -60,7 +60,7 @@ FrontierApp::~FrontierApp()
 
     for (FrontierObject* obj : m_objects)
     {
-        printf("FrontierApp::~FrontierApp: Leaked object %p: type=%s references=%d\n", obj, typeid(*obj).name(), obj->getRefCount());
+        log(Geek::DEBUG, "~FrontierApp: Leaked object %p: type=%s references=%d", obj, typeid(*obj).name(), obj->getRefCount());
     }
 
     if (m_theme != NULL)
@@ -83,7 +83,7 @@ void FrontierApp::setEngine(FrontierEngine* engine)
 {
     if (m_engine != NULL)
     {
-        printf("FrontierApp::setEngine: ERROR: Cannot change engine!\n");
+        log(Geek::ERROR, "setEngine: Cannot change engine!");
     }
     m_engine = engine;
 }
@@ -159,7 +159,7 @@ void FrontierApp::gc()
                 //printf("FrontierApp::gc: %p: references=%d\n", obj, obj->getRefCount());
                 if (count < 0)
                 {
-                    printf("FrontierApp::gc: %p: Reference Count is less than zero??\n", obj);
+                    log(Geek::WARN, "gc: %p: Reference Count is less than zero??", obj);
                 }
                 delete obj;
                 m_objects.erase(obj);
@@ -172,7 +172,7 @@ void FrontierApp::gc()
 
     if (totalFreed > 0)
     {
-        printf("FrontierApp::gc: totalFreed=%u, currentCount=%lu\n", totalFreed, m_objects.size());
+        log(Geek::DEBUG, "gc: totalFreed=%u, currentCount=%lu", totalFreed, m_objects.size());
     }
 }
 

@@ -29,7 +29,7 @@ using namespace Geek::Gfx;
 
 #define SCROLLBAR_BORDER 1
 
-ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui)
+ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui, L"ScrollBar")
 {
     m_pos = 0;
     m_size = 10;
@@ -37,7 +37,7 @@ ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui)
     m_dragOffset = 0;
 }
 
-ScrollBar::ScrollBar(FrontierWindow* window) : Widget(window)
+ScrollBar::ScrollBar(FrontierWindow* window) : Widget(window, L"ScrollBar")
 {
     m_pos = 0;
     m_size = 10;
@@ -61,11 +61,11 @@ bool ScrollBar::draw(Surface* surface)
 
 #if 0
     int drawHeight = m_setSize.height - (SCROLLBAR_BORDER * 2);
-    printf("ScrollBar::draw: drawWidth=%d, drawHeight=%d\n", drawWidth, drawHeight);
+    log(DEBUG, "draw: drawWidth=%d, drawHeight=%d", drawWidth, drawHeight);
 #endif
 
     //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
-    m_ui->getTheme()->drawBorder(
+    m_app->getTheme()->drawBorder(
         surface,
         BORDER_SCROLLBAR,
         STATE_NONE,
@@ -74,15 +74,15 @@ bool ScrollBar::draw(Surface* surface)
 
     int pos = getControlPos();
 #if 0
-    printf("ScrollBar::draw: m_pos=%d, pos=%d\n", m_pos, pos);
+    log(DEBUG, "draw: m_pos=%d, pos=%d", m_pos, pos);
 #endif
 
     int sizePix = getControlSize();
 #if 0
-    printf("ScrollBar::draw: sizePix=%d\n", sizePix);
+    log(DEBUG, "draw: sizePix=%d", sizePix);
 #endif
 
-    m_ui->getTheme()->drawBorder(
+    m_app->getTheme()->drawBorder(
         surface,
         BORDER_SCROLLBAR_CONTROL,
         STATE_NONE,

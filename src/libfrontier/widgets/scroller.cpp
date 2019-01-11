@@ -26,22 +26,22 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-Scroller::Scroller(FrontierApp* ui) : Widget(ui)
+Scroller::Scroller(FrontierApp* ui) : Widget(ui, L"Scroller")
 {
     initScroller(NULL);
 }
 
-Scroller::Scroller(FrontierApp* ui, Widget* child) : Widget(ui)
+Scroller::Scroller(FrontierApp* ui, Widget* child) : Widget(ui, L"Scroller")
 {
     initScroller(child);
 }
 
-Scroller::Scroller(FrontierWindow* window) : Widget(window)
+Scroller::Scroller(FrontierWindow* window) : Widget(window, L"Scroller")
 {
     initScroller(NULL);
 }
 
-Scroller::Scroller(FrontierWindow* window, Widget* child) : Widget(window)
+Scroller::Scroller(FrontierWindow* window, Widget* child) : Widget(window, L"Scroller")
 {
     initScroller(child);
 }
@@ -66,7 +66,7 @@ void Scroller::initScroller(Widget* child)
 {
     m_childSurface = NULL;
 
-    m_scrollBar = new ScrollBar(m_ui);
+    m_scrollBar = new ScrollBar(m_app);
     m_scrollBar->incRefCount();
     m_scrollBar->setParent(this);
 
@@ -139,7 +139,7 @@ void Scroller::checkSurfaceSize(bool highDPI)
 
 bool Scroller::draw(Surface* surface)
 {
-    m_ui->getTheme()->drawBorder(
+    m_app->getTheme()->drawBorder(
         surface,
         BORDER_WIDGET,
         STATE_NONE,
@@ -150,9 +150,8 @@ bool Scroller::draw(Surface* surface)
     {
         Size childSize = m_child->getSize();
 #ifdef DEBUG_UI_SCROLLER
-        printf("Scroller::draw: scroller width=%d, height=%d\n", m_setSize.width, m_setSize.height);
-        printf("Scroller::draw: child width=%d, height=%d\n", m_child->getWidth(), m_child->getHeight());
-        //printf("Scroller::draw: cw=%d, ch=%d\n", cw, ch);
+        log(DEBUG, "draw: scroller width=%d, height=%d", m_setSize.width, m_setSize.height);
+        log(DEBUG, "draw: child width=%d, height=%d", m_child->getWidth(), m_child->getHeight());
 #endif
 
         checkSurfaceSize(surface->isHighDPI());
@@ -195,7 +194,7 @@ Widget* Scroller::handleMessage(Message* msg)
 
 #if 0
             Vector2D thisPos = Widget::getAbsolutePosition();
-            printf("Scroller::handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d\n", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
+            log(DEBUG, "handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
 #endif
 
             int x = imsg->event.button.x;

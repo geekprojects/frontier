@@ -121,7 +121,7 @@ bool DemoApp::init()
         return false;
     }
 
-printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
+    log(DEBUG, "init: Config Dir: %s", getConfigDir().c_str());
 
     Frame* rootFrame = new Frame(this, false);
     m_tabs = new Tabs(this);
@@ -296,12 +296,12 @@ printf("DemoApp::init: Config Dir: %s\n", getConfigDir().c_str());
 
 void DemoApp::onIconButton()
 {
-    printf("DemoApp::onIconButton: Here!\n");
+    log(DEBUG, "onIconButton: Here!");
 }
 
 void DemoApp::onTextButton1()
 {
-    printf("DemoApp::onTextButton: Here!\n");
+    log(DEBUG, "onTextButton: Here!");
 
     Vector2D widgetPos = m_textButton1->getAbsolutePosition();
     widgetPos.y += m_textButton1->getHeight();
@@ -319,13 +319,13 @@ void DemoApp::onTextButton2()
 
 void DemoApp::onCloseTab(Widget* tab)
 {
-    printf("DemoApp::onCloseTab: Closing tab: %p\n", tab);
+    log(DEBUG, "onCloseTab: Closing tab: %p", tab);
     m_tabs->closeTab(tab);
 }
 
 void DemoApp::onContextMenu(ListItem* item, Geek::Vector2D pos)
 {
-    printf("DemoApp::onContextMenu: item=%p, pos=%d,%d\n", item, pos.x, pos.y);
+    log(DEBUG, "onContextMenu: item=%p, pos=%d,%d", item, pos.x, pos.y);
 
     Menu* menu = new Menu();
     MenuItem* item1 = new MenuItem(L"Hello!");

@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 
 @interface MenuTarget : NSObject
 {
@@ -95,7 +96,7 @@ MenuTarget* target = [MenuTarget alloc];
     vector<MenuItem*>* appMenu = m_app->getAppMenu();
     for (MenuItem* menu : *appMenu)
     {
-        printf("CocoaEngine::createApplication: Menu: %ls\n", menu->getTitle().c_str());
+        log(DEBUG, "createApplication: Menu: %ls", menu->getTitle().c_str());
         NSString* titleStr = [CocoaUtils wstringToNSString:menu->getTitle()];
 
         NSMenu* nsmenu = [[NSMenu alloc] initWithTitle:titleStr];
@@ -132,11 +133,11 @@ childItem.target = target;
 
 bool CocoaEngine::run()
 {
-    printf("CocoaEngine::run: Starting run\n");
+    log(INFO, "run: Starting run");
     NSApplication* app = (NSApplication*)m_application;
     [app run];
 
-    printf("CocoaEngine::run: run has exited\n");
+    log(INFO, "run: run has exited");
 
     return false;
 }
@@ -200,7 +201,7 @@ else
 
 bool CocoaEngine::onMenuItem(MenuItem* item)
 {
-    printf("CocoaEngine::onMenuItem: item=%p\n", item);
+    log(DEBUG, "onMenuItem: item=%p", item);
     return true;
 }
 

@@ -25,6 +25,7 @@
 #include <set>
 
 #include <geek/gfx-surface.h>
+#include <geek/core-logger.h>
 
 #include <frontier/object.h>
 #include <frontier/utils.h>
@@ -56,7 +57,7 @@ enum ChooseFileFlags
     DIRECTORIES_ONLY = 0x1
 };
 
-class FrontierApp
+class FrontierApp : public Geek::Logger
 {
  private:
     std::wstring m_name;
