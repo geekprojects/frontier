@@ -117,7 +117,7 @@ void TreeListItem::layout()
 bool TreeListItem::draw(Geek::Gfx::Surface* surface)
 {
 #if 0
-    printf("TreeListItem::draw: Drawing label...\n");
+    log(DEBUG, "draw: Drawing label...");
 #endif
 
     // Draw text & icon
@@ -141,7 +141,7 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
         {
             ListItem* item = *it;
 #if 0
-            printf("TreeListItem::draw: item: %d, %d size=%d,%d\n", item->getX(), item->getY(), item->getWidth(), item->getHeight());
+            log(DEBUG, "draw: item: %d, %d size=%d,%d", item->getX(), item->getY(), item->getWidth(), item->getHeight());
 #endif
             SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
             item->draw(&viewport);

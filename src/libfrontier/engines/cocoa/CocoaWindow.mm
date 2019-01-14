@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 
 #include "keycode_map.h"
 

@@ -64,21 +64,21 @@ void MenuList::init()
 
 void MenuList::setMenu(std::vector<MenuItem*> menuItems)
 {
-printf("MenuList::setMenu: Here!\n");
-printf("MenuList::setMenu: items=%lu\n", menuItems.size());
+    log(DEBUG, "setMenu: items=%lu", menuItems.size());
     m_menuItems = menuItems;
 
-printf("MenuList::setMenu: Clearing...\n");
+    log(DEBUG, "setMenu: Clearing...");
     clearItems();
-printf("MenuList::setMenu: Adding...\n");
+
+    log(DEBUG, "setMenu: Adding...");
     for (MenuItem* menuItem : m_menuItems)
     {
-printf("MenuList::setMenu: Adding item: %ls\n", menuItem->getTitle().c_str());
+        log(DEBUG, "setMenu: Adding item: %ls", menuItem->getTitle().c_str());
         TextListItem* item = new TextListItem(m_app, menuItem->getTitle());
         item->setPrivateData(menuItem);
         addItem(item);
     }
-printf("MenuList::setMenu: Done\n");
+    log(DEBUG, "setMenu: Done");
 }
 
 

@@ -152,11 +152,11 @@ void FrontierApp::gc()
         freed = 0;
         for (FrontierObject* obj : objects)
         {
-            //printf("FrontierApp::gc: %p: references=%d\n", obj, obj->getRefCount());
+            //log(DEBUG, "gc: %p: references=%d", obj, obj->getRefCount());
             int count = obj->getRefCount();
             if (count <= 0)
             {
-                //printf("FrontierApp::gc: %p: references=%d\n", obj, obj->getRefCount());
+                //log(DEBUG, "gc: %p: references=%d", obj, obj->getRefCount());
                 if (count < 0)
                 {
                     log(Geek::WARN, "gc: %p: Reference Count is less than zero??", obj);

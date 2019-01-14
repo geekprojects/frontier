@@ -258,7 +258,7 @@ Widget* TextInput::handleMessage(Message* msg)
                         c = inputMessage->event.key.chr;
                     }
 
-                    printf("Input::handleMessage: Key press: 0x%x (%d) -> %lc, modifiers=0x%x\n",
+                    log(DEBUG, "handleMessage: Key press: 0x%x (%d) -> %lc, modifiers=0x%x",
                         inputMessage->event.key.key,
                         inputMessage->event.key.key,
                         c,
@@ -313,7 +313,7 @@ Widget* TextInput::handleMessage(Message* msg)
                 Vector2D pos = getAbsolutePosition();
                 int x = inputMessage->event.button.x - pos.x;
                 x -= m_offsetX;
-                printf("TextInput::handleMessage: FRONTIER_MSG_INPUT_MOUSE_BUTTON: x=%d\n", x);
+                log(DEBUG, "handleMessage: FRONTIER_MSG_INPUT_MOUSE_BUTTON: x=%d", x);
 
                 int at = charAt(x);
                 if (inputMessage->event.button.direction)
@@ -339,7 +339,7 @@ Widget* TextInput::handleMessage(Message* msg)
                     Vector2D pos = getAbsolutePosition();
                     int x = inputMessage->event.button.x - pos.x;
                     x -= m_offsetX;
-                    printf("TextInput::handleMessage: FRONTIER_MSG_INPUT_MOUSE_MOTION: x=%d\n", x);
+                    log(DEBUG, "handleMessage: FRONTIER_MSG_INPUT_MOUSE_MOTION: x=%d", x);
 
                     int at = charAt(x);
 
@@ -359,22 +359,22 @@ Widget* TextInput::handleMessage(Message* msg)
 
 int TextInput::charAt(int x)
 {
-    printf("TextInput::charAt: x=%d\n", x);
+    log(DEBUG, "charAt: x=%d", x);
     int selected = -1;
     int i = 0;
     for (int charX : m_charX)
     {
-        printf("TextInput::charAt: -> charX=%d\n", charX);
+        log(DEBUG, "charAt: -> charX=%d", charX);
         if (x < charX)
         {
-            printf("TextInput::charAt:   -> Gone beyond!\n");
+            log(DEBUG, "charAt:   -> Gone beyond!");
             selected = i;
             break;
         }
         i++;
     }
 
-    printf("TextInput::charAt: selected=%d\n", selected);
+    log(DEBUG, "charAt: selected=%d", selected);
 
     if (selected >= 0)
     {

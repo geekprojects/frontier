@@ -91,12 +91,12 @@ void List::layout()
 
         Size itemSize = Size(m_setSize.width, itemMin.height);
 #if 0
-        printf("List::layout: itemSize(1): %d,%d, min=%d,%d, max=%d,%d\n", itemSize.width, itemSize.height, itemMin.width, itemMin.height, itemMax.width, itemMax.height);
+        log(DEBUG, "layout: itemSize(1): %d,%d, min=%d,%d, max=%d,%d", itemSize.width, itemSize.height, itemMin.width, itemMin.height, itemMax.width, itemMax.height);
 #endif
         itemSize.setMin(itemMax);
         itemSize.setMax(itemMin);
 #if 0
-printf("List::layout: itemSize(2): %d,%d\n", itemSize.width, itemSize.height);
+        log(DEBUG, "layout: itemSize(2): %d,%d", itemSize.width, itemSize.height);
 #endif
         item->setSize(itemSize);
         item->setPosition(x, y);
@@ -117,7 +117,7 @@ bool List::draw(Surface* surface, Rect visible)
     {
         ListItem* item = *it;
 #if 0
-        printf("List::draw: %d,%d, itemSize: %d,%d\n", item->getX(), item->getY(), item->getWidth(), item->getHeight());
+        log(DEBUG, "draw: %d,%d, itemSize: %d,%d", item->getX(), item->getY(), item->getWidth(), item->getHeight());
 #endif
 
         if (item->getX() >= visible.x - item->getWidth() && item->getY() >= visible.y - item->getHeight())
@@ -253,7 +253,7 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
         InputMessage* imsg = (InputMessage*)msg;
         if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
         {
-printf("ListItem::handleMessage: direction=%d, buttons=%d\n", imsg->event.button.direction, imsg->event.button.buttons);
+            log(DEBUG, "handleMessage: direction=%d, buttons=%d", imsg->event.button.direction, imsg->event.button.buttons);
             if (imsg->event.button.direction)
             {
                 if (m_selected)

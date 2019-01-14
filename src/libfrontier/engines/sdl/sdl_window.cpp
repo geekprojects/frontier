@@ -51,7 +51,7 @@ bool FrontierEngineWindowSDL::init()
         640, 480,
         flags);
 
-    printf("FrontierEngineWindowSDL::init: m_sdlWindow=%p\n", m_sdlWindow);
+    log(DEBUG, "init: m_sdlWindow=%p", m_sdlWindow);
     if (m_sdlWindow == NULL)
     {
         return false;
@@ -88,7 +88,7 @@ bool FrontierEngineWindowSDL::update()
     if (w != winSize.width || h != winSize.height)
     {
         SDL_SetWindowSize(m_sdlWindow, winSize.width, winSize.height);
-        printf("FrontierEngineWindowSDL::update: Setting window size: %s\n", winSize.toString().c_str());
+        log(DEBUG, "update: Setting window size: %s", winSize.toString().c_str());
     }
 
     SDL_Surface* sdlSurface = SDL_GetWindowSurface(m_sdlWindow);
@@ -104,7 +104,7 @@ bool FrontierEngineWindowSDL::update()
         sdlSurface->format->format, sdlSurface->pixels, sdlSurface->pitch);
     if (res < 0)
     {
-        printf("FrontierEngineWindowSDL::redraw: res=%d: %s\n", res, SDL_GetError());
+        log(ERROR, "redraw: res=%d: %s", res, SDL_GetError());
         return false;
     }
 
@@ -121,11 +121,11 @@ bool FrontierEngineWindowSDL::update()
     res = SDL_UpdateWindowSurface(m_sdlWindow);
     if (res < 0)
     {
-        printf("FrontierEngineWindowSDL::redraw: res=%d: %s\n", res, SDL_GetError());
+        log(ERROR, "redraw: res=%d: %s", res, SDL_GetError());
         return false;
     }
 
-    printf("FrontierEngineWindowSDL::redraw: Done!\n");
+    log(DEBUG, "redraw: Done!");
     return true;
 }
 

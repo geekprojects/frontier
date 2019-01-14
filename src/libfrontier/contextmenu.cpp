@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 
 
 ContextMenu::ContextMenu(FrontierApp* app, Menu* menu) : FrontierWindow(app, L"", 0)
@@ -56,7 +57,7 @@ void ContextMenu::lostFocus()
 void ContextMenu::itemSelected(ListItem* item)
 {
     MenuItem* menuItem = (MenuItem*)(item->getPrivateData());
-    printf("ContextMenu::itemSelected: %ls\n", menuItem->getTitle().c_str());
+    log(DEBUG, "itemSelected: %ls", menuItem->getTitle().c_str());
 
     menuItem->clickSignal().emit();
 

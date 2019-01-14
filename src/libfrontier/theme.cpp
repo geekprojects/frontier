@@ -26,7 +26,7 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-UITheme::UITheme(FrontierApp* app)
+UITheme::UITheme(FrontierApp* app) : Logger("UITheme")
 {
     m_app = app;
     m_initialised = false;
@@ -56,7 +56,7 @@ bool UITheme::init()
                 12);
             if (m_font == NULL)
             {
-                printf("UITheme::init: Failed to find UI font\n");
+                log(ERROR, "init: Failed to find UI font");
                 return false;
             }
         }
@@ -67,7 +67,7 @@ bool UITheme::init()
             12);
         if (m_font == NULL)
         {
-            printf("UITheme::init: Failed to find FontAwesome\n");
+            log(ERROR, "init: Failed to find FontAwesome");
             return false;
         }
     }
@@ -78,7 +78,7 @@ UITheme::~UITheme()
 {
 }
 
-uint32_t UITheme::getColour(ThemeColour colour) const
+uint32_t UITheme::getColour(ThemeColour colour)
 {
     switch (colour)
     {
@@ -108,24 +108,24 @@ uint32_t UITheme::getColour(ThemeColour colour) const
         case COLOUR_INPUT_BACKGROUND:
             return 0xff45494a;
         default:
-            printf("UITheme::getColour: Unknown colour: %d\n", colour);
+            log(WARN, "getColour: Unknown colour: %d", colour);
             return 0;
     }
 }
 
-void UITheme::drawBackground(Geek::Gfx::Surface* surface) const
+void UITheme::drawBackground(Geek::Gfx::Surface* surface)
 {
     surface->clear(getColour(COLOUR_WINDOW_BACKGROUND));
 }
 
-void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state) const
+void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state)
 {
     int w = surface->getWidth();
     int h = surface->getHeight();
     drawBorder(surface, type, state, 0, 0, w, h);
 }
 
-void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height) const
+void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height)
 {
     bool background = false;
     bool gradient = false;
@@ -291,7 +291,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
     }
 }
 
-void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted) const
+void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted)
 {
     uint32_t c = 0xffffffff;
 
@@ -325,7 +325,7 @@ int UITheme::getTextHeight() const
     return m_font->getPixelHeight(72);
 }
 
-void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted) const
+void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted)
 {
     uint32_t c = 0xffffffff;
     if (inverted)

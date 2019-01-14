@@ -72,7 +72,7 @@ enum ThemeColour
     COLOUR_INPUT_BACKGROUND
 };
 
-class UITheme
+class UITheme : public Geek::Logger
 {
  protected:
     bool m_initialised;
@@ -89,22 +89,22 @@ class UITheme
 
     virtual bool init();
 
-    virtual uint32_t getColour(ThemeColour colour) const;
+    virtual uint32_t getColour(ThemeColour colour);
     virtual int getMargin() const { return m_margin; }
     virtual int getPadding() const { return m_padding; }
 
     virtual void setMargin(int margin) { m_margin = margin; }
     virtual void setPadding(int padding) { m_padding = padding; }
 
-    virtual void drawBackground(Geek::Gfx::Surface* surface) const;
-    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state) const;
-    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state, int x, int y, int w, int h) const;
+    virtual void drawBackground(Geek::Gfx::Surface* surface);
+    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state);
+    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state, int x, int y, int w, int h);
 
-    virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false) const;
+    virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false);
     virtual int getTextWidth(std::wstring text) const;
     virtual int getTextHeight() const;
 
-    virtual void drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted = false) const;
+    virtual void drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted = false);
     virtual int getIconWidth(wchar_t icon) const;
     virtual int getIconHeight() const;
     virtual FontHandle* getFont(bool highDPI) const;

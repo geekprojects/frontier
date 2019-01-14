@@ -119,7 +119,7 @@ bool FrontierEngineSDL::checkEvents()
 
             msg->event.button.x = event.button.x;
             msg->event.button.y = event.button.y;
-            printf("FrontierEngineSDL::checkEvents: few=%p, x=%d, y=%d\n", few, msg->event.button.x, msg->event.button.y);
+            log(DEBUG, "checkEvents: few=%p, x=%d, y=%d", few, msg->event.button.x, msg->event.button.y);
             few->getWindow()->handleMessage(msg);
         } break;
 
@@ -155,7 +155,7 @@ bool FrontierEngineSDL::checkEvents()
 
             if (event.type == SDL_KEYUP)
             {
-                printf("FrontierEngineSDL::checkEvents: SDL_KEYUP: scancode=0x%x (%s), sym=0x%x (%s): lastText=%s\n", event.key.keysym.scancode, scancodename, event.key.keysym.sym, keyname, m_lastText.c_str());
+                log(DEBUG, "checkEvents: SDL_KEYUP: scancode=0x%x (%s), sym=0x%x (%s): lastText=%s", event.key.keysym.scancode, scancodename, event.key.keysym.sym, keyname, m_lastText.c_str());
                 if (m_lastText.length() > 0)
                 {
                     msg->event.key.chr = m_lastText.at(0);
@@ -185,7 +185,7 @@ bool FrontierEngineSDL::checkEvents()
         {
             if (m_keyDownMessage != NULL)
             {
-                printf("FrontierEngineSDL::checkEvents: SDL_TEXTINPUT: Sending DOWN: chr=%s, key=0x%x, mod=0x%x\n", event.text.text, m_keyDownMessage->event.key.key, m_keyDownMessage->event.key.modifiers);
+                log(DEBUG, "checkEvents: SDL_TEXTINPUT: Sending DOWN: chr=%s, key=0x%x, mod=0x%x", event.text.text, m_keyDownMessage->event.key.key, m_keyDownMessage->event.key.modifiers);
                 m_lastText = string(event.text.text);
 
                 InputMessage* msgCopy = new InputMessage();
@@ -200,12 +200,12 @@ bool FrontierEngineSDL::checkEvents()
             }
             else
             {
-                printf("FrontierEngineSDL::checkEvents: SDL_TEXTINPUT: m_keyDownMessage is NULL\n");
+                log(DEBUG, "checkEvents: SDL_TEXTINPUT: m_keyDownMessage is NULL");
             }
         } break;
 
         case SDL_TEXTEDITING:
-            printf("FrontierEngineSDL::checkEvents: SDL_TEXTEDITING: Here: %s\n", event.text.text);
+            log(DEBUG, "checkEvents: SDL_TEXTEDITING: Here: %s", event.text.text);
             break;
 
         case SDL_WINDOWEVENT:
@@ -217,27 +217,27 @@ bool FrontierEngineSDL::checkEvents()
                 case SDL_WINDOWEVENT_RESIZED:
                     few->getWindow()->setSize(Size(event.window.data1, event.window.data2));
                     few->getWindow()->update();
-                    printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT_RESIZED\n");
+                    log(DEBUG, "checkEvents: SDL_WINDOWEVENT_RESIZED");
                     break;
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT_SIZE_CHANGED\n");
+                    log(DEBUG, "checkEvents: SDL_WINDOWEVENT_SIZE_CHANGED");
                     break;
 
                 case SDL_WINDOWEVENT_SHOWN:
                 case SDL_WINDOWEVENT_EXPOSED:
-                    printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT: Forcing update\n");
+                    log(DEBUG, "checkEvents: SDL_WINDOWEVENT: Forcing update");
                     few->getWindow()->update(true);
                     break;
 
                 default:
-                    printf("FrontierEngineSDL::checkEvents: SDL_WINDOWEVENT: Unknown event: %d\n", event.window.event);
+                    log(ERROR, "checkEvents: SDL_WINDOWEVENT: Unknown event: %d", event.window.event);
                     break;
             }
         } break;
 
         default:
-            printf("FrontierEngineSDL::checkEvents: Unhandled event: %d\n", event.type);
+            log(ERROR, "checkEvents: Unhandled event: %d", event.type);
             break;
     }
 
