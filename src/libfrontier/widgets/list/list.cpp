@@ -253,18 +253,29 @@ Widget* ListItem::handleMessage(Frontier::Message* msg)
         InputMessage* imsg = (InputMessage*)msg;
         if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
         {
-            log(DEBUG, "handleMessage: direction=%d, buttons=%d", imsg->event.button.direction, imsg->event.button.buttons);
+            log(DEBUG, "handleMessage: direction=%d, buttons=%d, doubleClick=%d", imsg->event.button.direction, imsg->event.button.buttons, imsg->event.button.doubleClick);
             if (imsg->event.button.direction)
             {
                 if (m_selected)
                 {
                     // Ignore
+                    if (imsg->event.button.doubleClick)
+                    {
+                        m_doubleClickSignal.emit(this);
+                    }
                 }
                 else
                 {
                     setSelected();
 
-                    m_clickSignal.emit(this);
+                    if (imsg->event.button.doubleClick)
+                    {
+                        m_doubleClickSignal.emit(this);
+                    }
+                    else
+                    {
+                        m_clickSignal.emit(this);
+                    }
                     if (m_list != NULL)
                     {
                         m_list->selectSignal().emit(this);
