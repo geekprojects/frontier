@@ -50,7 +50,7 @@ class FrontierEngineSDL : public Frontier::FrontierEngine
  private:
     std::string m_lastText;
     
-    Frontier::InputMessage* m_keyDownMessage;
+    Frontier::KeyEvent* m_keyDownEvent;
 
  public:
     FrontierEngineSDL(Frontier::FrontierApp* app);

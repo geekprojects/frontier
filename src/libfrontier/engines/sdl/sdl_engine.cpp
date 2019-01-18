@@ -30,7 +30,7 @@ using namespace Frontier;
 FrontierEngineSDL::FrontierEngineSDL(FrontierApp* app) : FrontierEngine(app)
 {
     m_lastText = "";
-    m_keyDownMessage = NULL;
+    m_keyDownEvent = NULL;
 }
 
 FrontierEngineSDL::~FrontierEngineSDL()
@@ -99,28 +99,26 @@ bool FrontierEngineSDL::checkEvents()
                 return true;
             }
 
-            InputMessage* msg = new InputMessage();
-            msg->messageType = FRONTIER_MSG_INPUT;
-            msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_BUTTON;
-            msg->event.button.direction =
-                (event.button.type == SDL_MOUSEBUTTONDOWN);
+            MouseButtonEvent* mouseButtonEvent = new MouseButtonEvent();
+            mouseButtonEvent->eventType = FRONTIER_EVENT_MOUSE_BUTTON;
+            mouseButtonEvent->direction = (event.button.type == SDL_MOUSEBUTTONDOWN);
 
-            msg->event.button.buttons = 0;
+            mouseButtonEvent->buttons = 0;
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                msg->event.button.buttons = BUTTON_LEFT;
+                mouseButtonEvent->buttons = BUTTON_LEFT;
             }
             else if (event.button.button == SDL_BUTTON_RIGHT)
             {
-                msg->event.button.buttons = BUTTON_RIGHT;
+                mouseButtonEvent->buttons = BUTTON_RIGHT;
             }
 
-            msg->event.button.doubleClick = (event.button.clicks == 2);
+            mouseButtonEvent->doubleClick = (event.button.clicks == 2);
 
-            msg->event.button.x = event.button.x;
-            msg->event.button.y = event.button.y;
-            log(DEBUG, "checkEvents: few=%p, x=%d, y=%d", few, msg->event.button.x, msg->event.button.y);
-            few->getWindow()->handleMessage(msg);
+            mouseButtonEvent->x = event.button.x;
+            mouseButtonEvent->y = event.button.y;
+            log(DEBUG, "checkEvents: few=%p, x=%d, y=%d", few, mouseButtonEvent->x, mouseButtonEvent->y);
+            few->getWindow()->handleEvent(mouseButtonEvent);
         } break;
 
         case SDL_MOUSEMOTION:
@@ -131,51 +129,54 @@ bool FrontierEngineSDL::checkEvents()
                 return true;
             }
 
-            InputMessage* msg = new InputMessage();
-            msg->messageType = FRONTIER_MSG_INPUT;
-            msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_MOTION;
-            msg->event.button.x = event.button.x;
-            msg->event.button.y = event.button.y;
+            MouseMotionEvent* mouseMotionEvent = new MouseMotionEvent();
+            mouseMotionEvent->eventType = FRONTIER_EVENT_MOUSE_MOTION;
+            mouseMotionEvent->x = event.button.x;
+            mouseMotionEvent->y = event.button.y;
 
-            few->getWindow()->handleMessage(msg);
+            few->getWindow()->handleEvent(mouseMotionEvent);
         } break;
 
         case SDL_KEYDOWN:
         case SDL_KEYUP:
         {
-
-            InputMessage* msg = new InputMessage();
-            msg->messageType = FRONTIER_MSG_INPUT;
-            msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
-            msg->event.key.direction = (event.type == SDL_KEYDOWN);
-            msg->event.key.key = event.key.keysym.sym;
+            KeyEvent* keyEvent = new KeyEvent();
+            keyEvent->eventType = FRONTIER_EVENT_KEY;
+            keyEvent->direction = (event.type == SDL_KEYDOWN);
+            keyEvent->key = event.key.keysym.sym;
 
             const char* scancodename = SDLCALL SDL_GetScancodeName(event.key.keysym.scancode);
             const char* keyname = SDLCALL SDL_GetKeyName(event.key.keysym.sym);
 
             if (event.type == SDL_KEYUP)
             {
-                log(DEBUG, "checkEvents: SDL_KEYUP: scancode=0x%x (%s), sym=0x%x (%s): lastText=%s", event.key.keysym.scancode, scancodename, event.key.keysym.sym, keyname, m_lastText.c_str());
+                log(DEBUG,
+                    "checkEvents: SDL_KEYUP: scancode=0x%x (%s), sym=0x%x (%s): lastText=%s",
+                    event.key.keysym.scancode,
+                    scancodename,
+                    event.key.keysym.sym,
+                    keyname,
+                    m_lastText.c_str());
                 if (m_lastText.length() > 0)
                 {
-                    msg->event.key.chr = m_lastText.at(0);
+                    keyEvent->chr = m_lastText.at(0);
                 }
                 m_lastText = "";
 
                 FrontierEngineWindowSDL* few = getWindow(event.key.windowID);
-                few->getWindow()->handleMessage(msg);
+                few->getWindow()->handleEvent(keyEvent);
             }
             else
             {
                 if (isprint(event.key.keysym.sym) && !(event.key.keysym.sym & SDLK_SCANCODE_MASK))
                 {
-                    m_keyDownMessage = msg;
+                    m_keyDownEvent = keyEvent;
                 }
                 else
                 {
-                    m_keyDownMessage = NULL;
+                    m_keyDownEvent = NULL;
                     FrontierEngineWindowSDL* few = getWindow(event.key.windowID);
-                    few->getWindow()->handleMessage(msg);
+                    few->getWindow()->handleEvent(keyEvent);
                 }
             }
 
@@ -183,24 +184,28 @@ bool FrontierEngineSDL::checkEvents()
 
         case SDL_TEXTINPUT:
         {
-            if (m_keyDownMessage != NULL)
+            if (m_keyDownEvent != NULL)
             {
-                log(DEBUG, "checkEvents: SDL_TEXTINPUT: Sending DOWN: chr=%s, key=0x%x, mod=0x%x", event.text.text, m_keyDownMessage->event.key.key, m_keyDownMessage->event.key.modifiers);
+                log(DEBUG,
+                    "checkEvents: SDL_TEXTINPUT: Sending DOWN: chr=%s, key=0x%x, mod=0x%x",
+                    event.text.text,
+                    m_keyDownEvent->key,
+                    m_keyDownEvent->modifiers);
                 m_lastText = string(event.text.text);
 
-                InputMessage* msgCopy = new InputMessage();
-                *msgCopy = *m_keyDownMessage;
+                KeyEvent* eventCopy = new KeyEvent();
+                *eventCopy = *m_keyDownEvent;
                 if (m_lastText.length() > 0)
                 {
-                    msgCopy->event.key.chr = m_lastText.at(0);
+                    eventCopy->chr = m_lastText.at(0);
                 }
 
                 FrontierEngineWindowSDL* few = getWindow(event.key.windowID);
-                few->getWindow()->handleMessage(msgCopy);
+                few->getWindow()->handleEvent(eventCopy);
             }
             else
             {
-                log(DEBUG, "checkEvents: SDL_TEXTINPUT: m_keyDownMessage is NULL");
+                log(DEBUG, "checkEvents: SDL_TEXTINPUT: m_keyDownEvent is NULL");
             }
         } break;
 
