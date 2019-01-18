@@ -133,31 +133,24 @@ bool List::draw(Surface* surface, Rect visible)
     return true;
 }
 
-Widget* List::handleMessage(Message* msg)
+Widget* List::handleEvent(Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    if (event->is(FRONTIER_EVENT_MOUSE))
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
-        {
-            int x = imsg->event.button.x;
-            int y = imsg->event.button.y;
+        MouseEvent* mouseEvent = (MouseEvent*)event;
 
-            vector<ListItem*>::iterator it;
-            for (it = m_list.begin(); it != m_list.end(); it++)
+        vector<ListItem*>::iterator it;
+        for (it = m_list.begin(); it != m_list.end(); it++)
+        {
+            ListItem* child = *it;
+            if (child->intersects(mouseEvent->x, mouseEvent->y))
             {
-                ListItem* child = *it;
-                if (child->intersects(x, y))
-                {
-                    return child->handleMessage(msg);
-                }
+                return child->handleEvent(event);
             }
-            if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
-            {
-                return this;
-            }
+        }
+        if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
+        {
+            return this;
         }
     }
 
@@ -246,52 +239,53 @@ void ListItem::clearSelected(bool updateList)
     }
 }
 
-Widget* ListItem::handleMessage(Frontier::Message* msg)
+Widget* ListItem::handleEvent(Frontier::Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON)
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
+        MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
+        log(DEBUG,
+            "handleMessage: direction=%d, buttons=%d, doubleClick=%d",
+            mouseButtonEvent->direction,
+            mouseButtonEvent->buttons,
+            mouseButtonEvent->doubleClick);
+        if (mouseButtonEvent->direction)
         {
-            log(DEBUG, "handleMessage: direction=%d, buttons=%d, doubleClick=%d", imsg->event.button.direction, imsg->event.button.buttons, imsg->event.button.doubleClick);
-            if (imsg->event.button.direction)
+            if (m_selected)
             {
-                if (m_selected)
+                // Ignore
+                if (mouseButtonEvent->doubleClick)
                 {
-                    // Ignore
-                    if (imsg->event.button.doubleClick)
-                    {
-                        m_doubleClickSignal.emit(this);
-                    }
-                }
-                else
-                {
-                    setSelected();
-
-                    if (imsg->event.button.doubleClick)
-                    {
-                        m_doubleClickSignal.emit(this);
-                    }
-                    else
-                    {
-                        m_clickSignal.emit(this);
-                    }
-                    if (m_list != NULL)
-                    {
-                        m_list->selectSignal().emit(this);
-                    }
-                    return this;
+                    m_doubleClickSignal.emit(this);
                 }
             }
             else
             {
-                if (imsg->event.button.buttons == BUTTON_RIGHT)
+                setSelected();
+
+                if (mouseButtonEvent->doubleClick)
                 {
-                    m_list->contextMenuSignal().emit(this, Vector2D(imsg->event.button.x, imsg->event.button.y));
-                    return this;
+                    m_doubleClickSignal.emit(this);
                 }
-                return NULL;
+                else
+                {
+                    m_clickSignal.emit(this);
+                }
+                if (m_list != NULL)
+                {
+                    m_list->selectSignal().emit(this);
+                }
+                return this;
             }
+        }
+        else
+        {
+            if (mouseButtonEvent->buttons == BUTTON_RIGHT)
+            {
+                m_list->contextMenuSignal().emit(this, Vector2D(mouseButtonEvent->x, mouseButtonEvent->y));
+                return this;
+            }
+            return NULL;
         }
     }
     return this;

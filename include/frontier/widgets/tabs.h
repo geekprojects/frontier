@@ -36,7 +36,7 @@ class Tabs : public Widget
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 
     void addTab(std::wstring title, Widget* content, bool closeable = false);
     void closeTab(Widget* tab, bool emitChangeSignal = true);

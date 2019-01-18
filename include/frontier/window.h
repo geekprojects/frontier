@@ -27,7 +27,7 @@
 
 #include <frontier/utils.h>
 #include <frontier/fonts.h>
-#include <frontier/messages.h>
+#include <frontier/events.h>
 #include <frontier/theme.h>
 
 #include <sigc++/sigc++.h>
@@ -120,8 +120,8 @@ class FrontierWindow : public Geek::Logger
 
     void openContextMenu(Geek::Vector2D pos, Menu* menu);
 
-    void postMessage(Frontier::Message* message);
-    virtual bool handleMessage(Frontier::Message* message);
+    void postEvent(Frontier::Event* event);
+    virtual bool handleEvent(Frontier::Event* event);
     sigc::signal<bool> closeSignal() { return m_closeSignal; }
 
     virtual void gainedFocus();

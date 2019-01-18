@@ -183,39 +183,58 @@ bool Scroller::draw(Surface* surface)
     return true;
 }
 
-Widget* Scroller::handleMessage(Message* msg)
+Widget* Scroller::handleEvent(Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    switch (event->eventType)
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
+        case FRONTIER_EVENT_MOUSE_BUTTON:
+        case FRONTIER_EVENT_MOUSE_MOTION:
         {
-
+            MouseEvent* mouseEvent = (MouseEvent*)event;
 #if 0
             Vector2D thisPos = Widget::getAbsolutePosition();
             log(DEBUG, "handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
 #endif
 
-            int x = imsg->event.button.x;
-            int y = imsg->event.button.y;
+            int x = mouseEvent->x;
+            int y = mouseEvent->y;
 
             if (m_scrollBar->intersects(x, y))
             {
-                return m_scrollBar->handleMessage(msg);
+                return m_scrollBar->handleEvent(event);
             }
             else
             {
-                InputMessage childMessage = *imsg;
-                childMessage.event.button.y += m_scrollBar->getPos();
-                return m_child->handleMessage(&childMessage);
+                switch (event->eventType)
+                {
+                    case FRONTIER_EVENT_MOUSE_BUTTON:
+                    {
+                        MouseButtonEvent mouseButtonEvent = *((MouseButtonEvent*)event);
+                        mouseButtonEvent.y += m_scrollBar->getPos();
+                        return m_child->handleEvent(&mouseButtonEvent);
+                    }
+
+
+                    case FRONTIER_EVENT_MOUSE_MOTION:
+                    {
+                        MouseMotionEvent mouseMotionEvent = *((MouseMotionEvent*)event);
+                        mouseMotionEvent.y += m_scrollBar->getPos();
+                        return m_child->handleEvent(&mouseMotionEvent);
+                    }
+
+                    default:
+                        break;
+                }
             }
-        }
-        else if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
-        {
-            return m_scrollBar->handleMessage(msg);
-        }
+        } break;
+
+        case FRONTIER_EVENT_MOUSE_SCROLL:
+            return m_scrollBar->handleEvent(event);
+
+        default:
+            break;
     }
+
     return this;
 }
 

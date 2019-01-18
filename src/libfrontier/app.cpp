@@ -245,12 +245,12 @@ void FrontierApp::update()
     gc();
 }
 
-void FrontierApp::postMessage(Message* message)
+void FrontierApp::postEvent(Event* event)
 {
-    handleMessage(message);
+    handleEvent(event);
 }
 
-void FrontierApp::handleMessage(Message* message)
+void FrontierApp::handleEvent(Event* event)
 {
 }
 

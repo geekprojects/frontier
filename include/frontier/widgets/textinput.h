@@ -45,7 +45,7 @@ class TextInput : public Widget
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 
     virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_EDIT; }
 };

@@ -85,30 +85,28 @@ bool Button::draw(Surface* surface)
     return true;
 }
 
-Widget* Button::handleMessage(Message* msg)
+Widget* Button::handleEvent(Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    switch (event->eventType)
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        switch (imsg->inputMessageType)
+        case FRONTIER_EVENT_MOUSE_BUTTON:
         {
-            case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
-                log(DEBUG, "handleMessage: Message! text=%ls", m_text.c_str());
-                if (m_state != imsg->event.button.direction)
+            MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
+            log(DEBUG, "handleEvent: Message! text=%ls", m_text.c_str());
+            if (m_state != mouseButtonEvent->direction)
+            {
+                setDirty(DIRTY_CONTENT);
+
+                m_state = mouseButtonEvent->direction;
+                if (!m_state)
                 {
-                    setDirty(DIRTY_CONTENT);
-
-                    m_state = imsg->event.button.direction;
-                    if (!m_state)
-                    {
-                        m_clickSignal.emit();
-                    }
+                    m_clickSignal.emit();
                 }
-                break;
+            }
+        } break;
 
-            default:
-                break;
-        }
+        default:
+            break;
     }
     return this;
 }

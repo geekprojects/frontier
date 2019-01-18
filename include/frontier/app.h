@@ -30,7 +30,7 @@
 #include <frontier/object.h>
 #include <frontier/utils.h>
 #include <frontier/fonts.h>
-#include <frontier/messages.h>
+#include <frontier/events.h>
 #include <frontier/theme.h>
 #include <frontier/menu.h>
 
@@ -107,8 +107,8 @@ class FrontierApp : public Geek::Logger
 
     void update();
 
-    void postMessage(Frontier::Message* message);
-    virtual void handleMessage(Frontier::Message* message);
+    void postEvent(Frontier::Event* event);
+    virtual void handleEvent(Frontier::Event* event);
 
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);

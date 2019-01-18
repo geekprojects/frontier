@@ -29,26 +29,23 @@ namespace Frontier {
 
 class FrontierWindow;
 
-enum MessageType
-{
-    FRONTIER_MSG_INPUT = 1,
-};
-
-struct Message
-{
-    uint32_t messageType;
-};
-
 /*
  * User Input Events
  */
 
-enum InputMessageType
+enum EventCategory
 {
-    FRONTIER_MSG_INPUT_KEY = 1,
-    FRONTIER_MSG_INPUT_MOUSE_BUTTON = 2,
-    FRONTIER_MSG_INPUT_MOUSE_MOTION = 3,
-    FRONTIER_MSG_INPUT_MOUSE_WHEEL  = 4
+    FRONTIER_EVENT_KEYBOARD = 0x10000,
+    FRONTIER_EVENT_MOUSE    = 0x20000,
+    FRONTIER_EVENT_MASK     = 0xFFFF0000
+};
+
+enum EventType
+{
+    FRONTIER_EVENT_KEY =          FRONTIER_EVENT_KEYBOARD | 0x1,
+    FRONTIER_EVENT_MOUSE_BUTTON = FRONTIER_EVENT_MOUSE | 0x1,
+    FRONTIER_EVENT_MOUSE_MOTION = FRONTIER_EVENT_MOUSE | 0x2,
+    FRONTIER_EVENT_MOUSE_SCROLL = FRONTIER_EVENT_MOUSE | 0x3
 };
 
 enum MouseButton
@@ -57,42 +54,47 @@ enum MouseButton
     BUTTON_RIGHT = 2
 };
 
-struct InputMessage : public Message
+struct Event
 {
-    InputMessageType inputMessageType;
+    EventType eventType;
     FrontierWindow* window;
 
-    union
+    bool is(EventCategory category)
     {
-        struct
-        {
-            bool direction;
-            uint32_t key;
-            wchar_t chr;
-            uint32_t modifiers;
-        } key;
-        struct
-        {
-            uint32_t x;
-            uint32_t y;
-        } motion;
-        struct
-        {
-            uint32_t x;
-            uint32_t y;
+        return !!(((unsigned int)eventType & (unsigned int)FRONTIER_EVENT_MASK) == (unsigned int)category);
+    }
+};
 
-            bool direction;
-            int buttons;
-            bool doubleClick;
-        } button;
-        struct
-        {
-            uint32_t x;
-            uint32_t y;
-            int32_t scrollX;
-            int32_t scrollY;
-        } wheel;
-    } event;
+
+struct KeyEvent : Event
+{
+    bool direction;
+    uint32_t key;
+    wchar_t chr;
+    uint32_t modifiers;
+};
+
+struct MouseEvent : Event
+{
+    uint32_t x;
+    uint32_t y;
+};
+
+struct MouseMotionEvent : MouseEvent
+{
+};
+
+struct MouseButtonEvent : MouseEvent
+{
+    bool direction;
+    int buttons;
+    bool doubleClick;
+};
+
+struct MouseScrollEvent : MouseEvent
+{
+    int32_t scrollX;
+    int32_t scrollY;
 };
 
 };

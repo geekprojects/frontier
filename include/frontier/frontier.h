@@ -27,7 +27,7 @@
 
 #include <frontier/utils.h>
 #include <frontier/fonts.h>
-#include <frontier/messages.h>
+#include <frontier/events.h>
 #include <frontier/theme.h>
 
 #include <frontier/app.h>

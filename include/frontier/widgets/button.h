@@ -22,7 +22,7 @@ class Button : public Widget
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 
     virtual sigc::signal<void> clickSignal() { return m_clickSignal; }
 };

@@ -27,7 +27,7 @@ class ListItem : public Widget
     virtual void clearSelected(bool updateList = true);
     virtual void setSelected(bool updateList = true);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 
     virtual sigc::signal<void, ListItem*> clickSignal() { return m_clickSignal; }
     virtual sigc::signal<void, ListItem*> doubleClickSignal() { return m_doubleClickSignal; }
@@ -75,7 +75,7 @@ class TreeListItem : public TextListItem
     virtual void layout();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 };
 
 class List : public Widget
@@ -96,7 +96,7 @@ class List : public Widget
     virtual void layout();
     virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 
     void clearItems(bool setDirty = true);
     void addItem(ListItem* item);

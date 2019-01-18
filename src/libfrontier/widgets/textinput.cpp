@@ -241,118 +241,118 @@ void TextInput::drawCursor(Surface* surface, int x, int y)
     }
 }
 
-Widget* TextInput::handleMessage(Message* msg)
+Widget* TextInput::handleEvent(Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    switch (event->eventType)
     {
-        InputMessage* inputMessage = (InputMessage*)msg;
-        switch (inputMessage->inputMessageType)
+        case FRONTIER_EVENT_KEY:
         {
-            case FRONTIER_MSG_INPUT_KEY:
+            KeyEvent* keyEvent = (KeyEvent*)event;
+
+            if (keyEvent->direction)
             {
-                if (inputMessage->event.key.direction)
+                wchar_t c = L'?';
+                if (iswprint(keyEvent->chr))
                 {
-                    wchar_t c = L'?';
-                    if (iswprint(inputMessage->event.key.chr))
-                    {
-                        c = inputMessage->event.key.chr;
-                    }
+                    c = keyEvent->chr;
+                }
 
-                    log(DEBUG, "handleMessage: Key press: 0x%x (%d) -> %lc, modifiers=0x%x",
-                        inputMessage->event.key.key,
-                        inputMessage->event.key.key,
-                        c,
-                        inputMessage->event.key.modifiers);
+                log(DEBUG, "handleMessage: Key press: 0x%x (%d) -> %lc, modifiers=0x%x",
+                    keyEvent->key,
+                    keyEvent->key,
+                    c,
+                    keyEvent->modifiers);
 
-                    switch (inputMessage->event.key.key)
-                    {
-                        case KC_LEFT:
-                            if (m_column > 0)
-                            {
-                                m_column--;
-                            }
-                            break;
-                        case KC_RIGHT:
-                            if (m_column < m_text.length())
-                            {
-                                m_column++;
-                            }
-                            break;
-                        case KC_BACKSPACE:
+                switch (keyEvent->key)
+                {
+                    case KC_LEFT:
+                        if (m_column > 0)
+                        {
+                            m_column--;
+                        }
+                        break;
+                    case KC_RIGHT:
+                        if (m_column < m_text.length())
+                        {
+                            m_column++;
+                        }
+                        break;
+                    case KC_BACKSPACE:
+                        if (hasSelection())
+                        {
+                            cutSelected();
+                        }
+                        else if (m_column > 0)
+                        {
+                            m_column--;
+                            m_text.erase(m_column, 1);
+                        }
+                        break;
+
+                    default:
+                        if (iswprint(c))
+                        {
                             if (hasSelection())
                             {
                                 cutSelected();
                             }
-                            else if (m_column > 0)
-                            {
-                                m_column--;
-                                m_text.erase(m_column, 1);
-                            }
-                            break;
-
-                        default:
-                            if (iswprint(c))
-                            {
-                                if (hasSelection())
-                                {
-                                    cutSelected();
-                                }
-                                m_text.insert(m_column, 1, c);
-                                m_column++;
-                            }
-                    }
-                    setDirty();
+                            m_text.insert(m_column, 1, c);
+                            m_column++;
+                        }
                 }
-                return this;
+                setDirty();
+            }
+            return this;
+        }
+
+        case FRONTIER_EVENT_MOUSE_BUTTON:
+        {
+            MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
+            setDirty(DIRTY_CONTENT);
+
+            Vector2D pos = getAbsolutePosition();
+            int x = mouseButtonEvent->x - pos.x;
+            x -= m_offsetX;
+            log(DEBUG, "handleMessage: FRONTIER_EVENT_MOUSE_BUTTON: x=%d", x);
+
+            int at = charAt(x);
+            if (mouseButtonEvent->direction)
+            {
+                m_selecting = true;
+                m_selectStart = at;
+                m_selectEnd = at;
+                m_column = at;
+            }
+            else
+            {
+                m_selecting = false;
             }
 
-            case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
+            return this;
+        } break;
+
+        case FRONTIER_EVENT_MOUSE_MOTION:
+        {
+            MouseMotionEvent* mouseMotionEvent = (MouseMotionEvent*)event;
+            if (m_selecting)
             {
                 setDirty(DIRTY_CONTENT);
-
                 Vector2D pos = getAbsolutePosition();
-                int x = inputMessage->event.button.x - pos.x;
+                int x = mouseMotionEvent->x - pos.x;
                 x -= m_offsetX;
-                log(DEBUG, "handleMessage: FRONTIER_MSG_INPUT_MOUSE_BUTTON: x=%d", x);
+                log(DEBUG, "handleMessage: FRONTIER_EVENT_MOUSE_MOTION: x=%d", x);
 
                 int at = charAt(x);
-                if (inputMessage->event.button.direction)
-                {
-                    m_selecting = true;
-                    m_selectStart = at;
-                    m_selectEnd = at;
-                    m_column = at;
-                }
-                else
-                {
-                    m_selecting = false;
-                }
 
-                return this;
+                m_selectEnd = at;
+                m_column = at;
             }
 
-            case FRONTIER_MSG_INPUT_MOUSE_MOTION:
-            {
-                if (m_selecting)
-                {
-                    setDirty(DIRTY_CONTENT);
-                    Vector2D pos = getAbsolutePosition();
-                    int x = inputMessage->event.button.x - pos.x;
-                    x -= m_offsetX;
-                    log(DEBUG, "handleMessage: FRONTIER_MSG_INPUT_MOUSE_MOTION: x=%d", x);
-
-                    int at = charAt(x);
-
-                    m_selectEnd = at;
-                    m_column = at;
-                }
-
-                return this;
-            }
-
-            default:
-                break;
+            return this;
         }
+
+        default:
+            break;
     }
     return NULL;
 }

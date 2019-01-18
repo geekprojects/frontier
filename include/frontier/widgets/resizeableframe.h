@@ -26,7 +26,7 @@ class ResizeableFrame : public Frame
     virtual void add(Widget* widget);
     virtual void addWithSize(Widget* widget, int setPc);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 
     virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_RESIZE_HORIZONTAL; }
 };

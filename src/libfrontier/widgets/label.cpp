@@ -166,7 +166,7 @@ bool Label::draw(Surface* surface)
    return true;
 }
 
-Widget* Label::handleMessage(Message* msg)
+Widget* Label::handleEvent(Event* event)
 {
     // We just swallow events
     return NULL;

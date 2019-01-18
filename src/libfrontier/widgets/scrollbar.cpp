@@ -92,23 +92,23 @@ bool ScrollBar::draw(Surface* surface)
     return true;
 }
 
-Widget* ScrollBar::handleMessage(Message* msg)
+Widget* ScrollBar::handleEvent(Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    switch (event->eventType)
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON)
+        case FRONTIER_EVENT_MOUSE_BUTTON:
         {
+            MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
             FrontierWindow* window = getWindow();
             Vector2D thisPos = getAbsolutePosition();
 
             int pos = getControlPos();
             int sizePix = getControlSize();
 
-            int y = imsg->event.button.y - thisPos.y;
+            int y = mouseButtonEvent->y - thisPos.y;
             y -= SCROLLBAR_BORDER;
 
-            if (imsg->event.button.direction)
+            if (mouseButtonEvent->direction)
             {
                 if (y >= pos && y < pos + sizePix)
                 {
@@ -128,16 +128,18 @@ Widget* ScrollBar::handleMessage(Message* msg)
                     window->setDragWidget(NULL);
                 }
             }
-        }
-        else if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
+        } break;
+
+        case FRONTIER_EVENT_MOUSE_MOTION:
         {
+            MouseMotionEvent* mouseMotionEvent = (MouseMotionEvent*)event;
             if (m_dragging)
             {
                 Vector2D thisPos = getAbsolutePosition();
 
                 int range = m_max - (m_min + m_size);
 
-                int y = imsg->event.motion.y - thisPos.y;
+                int y = mouseMotionEvent->y - thisPos.y;
                 y -= m_dragOffset;
 
                 int oldPos = m_pos;
@@ -162,13 +164,18 @@ Widget* ScrollBar::handleMessage(Message* msg)
                     m_changedPositionSignal.emit(m_pos);
                 }
             }
-        }
-        else if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
+        } break;
+
+        case FRONTIER_EVENT_MOUSE_SCROLL:
         {
+            MouseScrollEvent* mouseScrollEvent = (MouseScrollEvent*)event;
             int scrollPos = getPos();
-            scrollPos -= imsg->event.wheel.scrollY;
+            scrollPos -= mouseScrollEvent->scrollY;
             setPos(scrollPos);
-        }
+        } break;
+
+        default:
+            break;
     }
 
     return this;

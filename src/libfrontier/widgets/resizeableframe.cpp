@@ -200,93 +200,86 @@ void ResizeableFrame::layout()
     }
 }
 
-Widget* ResizeableFrame::handleMessage(Message* msg)
+Widget* ResizeableFrame::handleEvent(Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    if (event->is(FRONTIER_EVENT_MOUSE))
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
-        {
-            int x = imsg->event.button.x;
-            int y = imsg->event.button.y;
+        MouseEvent* mouseEvent = (MouseEvent*)event;
+        int x = mouseEvent->x;
+        int y = mouseEvent->y;
 
-            if (!m_dragging)
+        if (!m_dragging)
+        {
+            vector<Widget*>::iterator it;
+            for (it = m_children.begin(); it != m_children.end(); it++)
             {
-                vector<Widget*>::iterator it;
-                for (it = m_children.begin(); it != m_children.end(); it++)
+                Widget* child = *it;
+                if (child->intersects(x, y))
+                {
+                    return child->handleEvent(event);
+                }
+            }
+
+            if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON && ((MouseButtonEvent*)event)->direction)
+            {
+                int pos;
+                for (it = m_children.begin(), pos = 0; (it + 1) != m_children.end(); it++, pos++)
                 {
                     Widget* child = *it;
-                    if (child->intersects(x, y))
+                    Vector2D childPos = child->getAbsolutePosition();
+                    int width = child->getWidth();
+                    if (x > childPos.x + width && x < childPos.x + width + m_padding)
                     {
-                        return child->handleMessage(msg);
-                    }
-                }
+                        log(DEBUG, "handleMessage: Starting resize!");
+                        m_dragging = true;
+                        m_dragWidget = pos;
+                        Vector2D thisPos = getAbsolutePosition();
+                        m_dragPos = x - thisPos.x;
 
-                if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON &&
-                    imsg->event.button.direction)
-                {
-                    int pos;
-                    for (it = m_children.begin(), pos = 0; (it + 1) != m_children.end(); it++, pos++)
-                    {
-                        Widget* child = *it;
-                        Vector2D childPos = child->getAbsolutePosition();
-                        int width = child->getWidth();
-                        if (x > childPos.x + width && x < childPos.x + width + m_padding)
+                        if (event->window != NULL)
                         {
-                            log(DEBUG, "handleMessage: Starting resize!");
-                            m_dragging = true;
-                            m_dragWidget = pos;
-                            Vector2D thisPos = getAbsolutePosition();
-                            m_dragPos = x - thisPos.x;
-
-                            if (imsg->window != NULL)
-                            {
-                                imsg->window->setDragWidget(this);
-                            }
-
-                            return NULL;
+                            event->window->setDragWidget(this);
                         }
+
+                        return NULL;
                     }
                 }
+            }
 
-                if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
+            if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
+            {
+                return this;
+            }
+        }
+        else
+        {
+            if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON && !((MouseButtonEvent*)event)->direction)
+            {
+                log(DEBUG, "handleMessage: Stopping resize!");
+
+                m_dragging = false;
+                if (event->window != NULL)
                 {
-                    return this;
+                    event->window->setDragWidget(NULL);
                 }
             }
             else
             {
-                if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON &&
-                    !imsg->event.button.direction)
-                {
-                    log(DEBUG, "handleMessage: Stopping resize!");
+                Vector2D thisPos = getAbsolutePosition();
+                x -= thisPos.x;
+                int diff = m_dragPos - x;
 
-                    m_dragging = false;
-                    if (imsg->window != NULL)
-                    {
-                        imsg->window->setDragWidget(NULL);
-                    }
-                }
-                else
-                {
-                    Vector2D thisPos = getAbsolutePosition();
-                    x -= thisPos.x;
-                    int diff = m_dragPos - x;
-
-                    float pc = (((float)diff / (float)getWidth()) * 100.0);
+                float pc = (((float)diff / (float)getWidth()) * 100.0);
 #if 0
-                    log(DEBUG, "handleMessage: diff=%d, pc=%0.2f", diff, pc);
+                log(DEBUG, "handleMessage: diff=%d, pc=%0.2f", diff, pc);
 #endif
-                    m_sizes[m_dragWidget] -= pc;
-                    m_sizes[m_dragWidget + 1] += pc;
-                    setDirty();
+                m_sizes[m_dragWidget] -= pc;
+                m_sizes[m_dragWidget + 1] += pc;
+                setDirty();
 
-                    m_dragPos = x;
-                }
-                return NULL;
+                m_dragPos = x;
             }
+            return NULL;
         }
     }
 

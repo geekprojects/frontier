@@ -139,7 +139,7 @@ class Widget : public FrontierObject, public Geek::Logger
     void openContextMenu();
     void openContextMenu(Geek::Vector2D pos);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* msg);
     
     virtual void onMouseEnter();
     virtual void onMouseLeave();

@@ -30,7 +30,7 @@ class ScrollBar : public Widget
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 
     void set(int min, int max, int size);
     void setPos(int pos);

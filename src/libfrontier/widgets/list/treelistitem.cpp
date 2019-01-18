@@ -151,55 +151,52 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
     return true;
 }
 
-Widget* TreeListItem::handleMessage(Frontier::Message* msg)
+Widget* TreeListItem::handleEvent(Frontier::Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON ||
+        event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
-        {
-            Vector2D thisPos = getAbsolutePosition();
-            int widgetx = imsg->event.button.x - thisPos.x;
-            int widgety = imsg->event.button.y - thisPos.y;
+        MouseEvent* mouseEvent = (MouseEvent*)event;
+        Vector2D thisPos = getAbsolutePosition();
+        int widgetx = mouseEvent->x - thisPos.x;
+        int widgety = mouseEvent->y - thisPos.y;
 
-            if (widgety < m_titleHeight)
+        if (widgety < m_titleHeight)
+        {
+            if (widgetx > TREELISTITEM_INDENT)
             {
-                if (widgetx > TREELISTITEM_INDENT)
-                {
-                    return TextListItem::handleMessage(msg);
-                }
-                else
-                {
-                    if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON && imsg->event.button.direction)
-                    {
-                        m_open = !m_open;
-                        setDirty();
-                        return this;
-                    }
-                }
+                return TextListItem::handleEvent(event);
             }
             else
             {
-                if (!m_open)
+                if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON && ((MouseButtonEvent*)event)->direction)
                 {
-                    // Shouldn't be here!
-                    return NULL;
+                    m_open = !m_open;
+                    setDirty();
+                    return this;
                 }
-                int x = imsg->event.button.x;
-                int y = imsg->event.button.y;
-
-                vector<ListItem*>::iterator it;
-                for (it = m_items.begin(); it != m_items.end(); it++)
-                {
-                    ListItem* child = *it;
-                    if (child->intersects(x, y))
-                    {
-                        return child->handleMessage(msg);
-                    }
-                }
-
             }
+        }
+        else
+        {
+            if (!m_open)
+            {
+                // Shouldn't be here!
+                return NULL;
+            }
+            int x = mouseEvent->x;
+            int y = mouseEvent->y;
+
+            vector<ListItem*>::iterator it;
+            for (it = m_items.begin(); it != m_items.end(); it++)
+            {
+                ListItem* child = *it;
+                if (child->intersects(x, y))
+                {
+                    return child->handleEvent(event);
+                }
+            }
+
         }
     }
     return NULL;

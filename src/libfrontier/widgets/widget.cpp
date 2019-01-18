@@ -235,7 +235,7 @@ void Widget::openContextMenu(Geek::Vector2D pos)
     getWindow()->openContextMenu(pos, m_contextMenu);
 }
 
-Widget* Widget::handleMessage(Message* msg)
+Widget* Widget::handleEvent(Event* event)
 {
     return NULL;
 }

@@ -28,7 +28,7 @@ class Frame : public Widget
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 
-    virtual Widget* handleMessage(Frontier::Message* msg);
+    virtual Widget* handleEvent(Frontier::Event* event);
 };
 
 class HFrame : public Frame

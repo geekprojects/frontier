@@ -334,76 +334,70 @@ void FrontierWindow::openContextMenu(Geek::Vector2D pos, Menu* menu)
     cm->setPosition(screenPos);
 }
 
-void FrontierWindow::postMessage(Message* message)
+void FrontierWindow::postEvent(Event* event)
 {
 }
 
-bool FrontierWindow::handleMessage(Message* message)
+bool FrontierWindow::handleEvent(Event* event)
 {
     Widget* prevActiveWidget = m_activeWidget;
     Widget* destWidget = NULL;
     bool updateActive = false;
 
-    if (message->messageType == FRONTIER_MSG_INPUT)
+    event->window = this;
+
+    switch (event->eventType)
     {
-        InputMessage* imsg = (InputMessage*)message;
-        imsg->window = this;
+        case FRONTIER_EVENT_MOUSE_BUTTON:
+            m_app->setActiveWindow(this);
+            // Fall through
+        case FRONTIER_EVENT_MOUSE_SCROLL:
+            updateActive = true;
+            destWidget = m_widget->handleEvent(event);
+           break;
 
-        switch (imsg->inputMessageType)
-        {
-            case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
-                m_app->setActiveWindow(this);
-                // Fall through
-            case FRONTIER_MSG_INPUT_MOUSE_WHEEL:
-                updateActive = true;
-                destWidget = m_widget->handleMessage(message);
-               break;
+        case FRONTIER_EVENT_MOUSE_MOTION:
+            destWidget = m_widget->handleEvent(event);
 
-            case FRONTIER_MSG_INPUT_MOUSE_MOTION:
-                destWidget = m_widget->handleMessage(message);
-
-                if (m_mouseOverWidget != destWidget)
-                {
-                    if (m_mouseOverWidget != NULL)
-                    {
-                        m_mouseOverWidget->onMouseLeave();
-                        m_mouseOverWidget->decRefCount();
-                    }
-
-                    m_mouseOverWidget = destWidget;
-
-                    if (m_mouseOverWidget != NULL)
-                    {
-                        m_mouseOverWidget->incRefCount();
-                        m_mouseOverWidget->onMouseEnter();
-                    }
-
-                }
-                updateCursor();
-
-                break;
-
-            case FRONTIER_MSG_INPUT_KEY:
-                if (m_activeWidget != NULL)
-                {
-                    destWidget = m_activeWidget->handleMessage(message);
-                }
-                break;
-        }
-
-        if (m_dragWidget != NULL)
-        {
-            uint64_t now = m_app->getTimestamp();
-            uint64_t diff = now - m_dragTime;
-            if (diff >= 100)
+            if (m_mouseOverWidget != destWidget)
             {
-                destWidget = m_dragWidget->handleMessage(message);
-                m_dragTime = m_app->getTimestamp();
+                if (m_mouseOverWidget != NULL)
+                {
+                    m_mouseOverWidget->onMouseLeave();
+                    m_mouseOverWidget->decRefCount();
+                }
+
+                m_mouseOverWidget = destWidget;
+
+                if (m_mouseOverWidget != NULL)
+                {
+                    m_mouseOverWidget->incRefCount();
+                    m_mouseOverWidget->onMouseEnter();
+                }
+
             }
-        }
+            updateCursor();
+
+            break;
+
+        case FRONTIER_EVENT_KEY:
+            if (m_activeWidget != NULL)
+            {
+                destWidget = m_activeWidget->handleEvent(event);
+            }
+            break;
     }
 
-
+    if (m_dragWidget != NULL)
+    {
+        uint64_t now = m_app->getTimestamp();
+        uint64_t diff = now - m_dragTime;
+        if (diff >= 100)
+        {
+            destWidget = m_dragWidget->handleEvent(event);
+            m_dragTime = m_app->getTimestamp();
+        }
+    }
 
     bool updateRequired = m_widget->isDirty();
     if (destWidget != NULL || updateRequired || updateActive)
@@ -423,7 +417,7 @@ bool FrontierWindow::handleMessage(Message* message)
         }
     }
 
-    delete message;
+    delete event;
 
     m_app->update();
 

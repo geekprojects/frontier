@@ -230,112 +230,103 @@ bool Tabs::draw(Surface* surface)
     return true;
 }
 
-Widget* Tabs::handleMessage(Message* msg)
+Widget* Tabs::handleEvent(Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    if (event->is(FRONTIER_EVENT_MOUSE))
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        switch (imsg->inputMessageType)
+        MouseEvent* mouseEvent = (MouseEvent*)event;
+        int x = mouseEvent->x;
+        int y = mouseEvent->y;
+
+        Vector2D thisPos = getAbsolutePosition();
+        x -= thisPos.x;
+        y -= thisPos.y;
+
+        if (y < TAB_HEIGHT)
         {
-            case FRONTIER_MSG_INPUT_MOUSE_BUTTON:
-            case FRONTIER_MSG_INPUT_MOUSE_MOTION:
-            case FRONTIER_MSG_INPUT_MOUSE_WHEEL:
+            if (event->eventType != FRONTIER_EVENT_MOUSE_BUTTON)
             {
-                int x = imsg->event.button.x;
-                int y = imsg->event.button.y;
+                return this;
+            }
 
-                Vector2D thisPos = getAbsolutePosition();
-                x -= thisPos.x;
-                y -= thisPos.y;
+            MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
 
-                if (y < TAB_HEIGHT)
-                {
-                    if (imsg->inputMessageType != FRONTIER_MSG_INPUT_MOUSE_BUTTON)
-                    {
-                        return this;
-                    }
+            if (m_tabs.empty())
+            {
+                return this;
+            }
 
-                    if (m_tabs.empty())
-                    {
-                        return this;
-                    }
+            int tabWidth = getTabWidth();
+            unsigned int tab = 0;
 
-
-                    int tabWidth = getTabWidth();
-                    unsigned int tab = 0;
-
-                    if (tabWidth > 0)
-                    {
-                        tab = x / tabWidth;
-                    }
+            if (tabWidth > 0)
+            {
+                tab = x / tabWidth;
+            }
 
 #if 0
                     log(DEBUG, "handleMessage: x=%d, titleWidth=%d, m_activeTab=%d", x, titleWidth, m_activeTab);
 #endif
-                    if (tab >= m_tabs.size())
+            if (tab >= m_tabs.size())
+            {
+                return NULL;
+            }
+
+            Widget* activeTab = getActiveTab();
+
+            if (m_tabs.at(tab).closeable)
+            {
+                int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
+                if (x > (int)((tab * tabWidth) + (tabWidth - (closeWidth + 5))))
+                {
+                    if (!mouseButtonEvent->direction)
                     {
-                        return NULL;
+                        m_closeTabSignal.emit(m_tabs.at(tab).content);
                     }
 
-                    Widget* activeTab = getActiveTab();
+                    return this;
+                }
+            }
 
-                    if (m_tabs.at(tab).closeable)
-                    {
-                        int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
-                        if (x > (int)((tab * tabWidth) + (tabWidth - (closeWidth + 5))))
-                        {
-                            if (!imsg->event.button.direction)
-                            {
-                                m_closeTabSignal.emit(m_tabs.at(tab).content);
-                            }
+            if (mouseButtonEvent->buttons == BUTTON_RIGHT)
+            {
+                log(DEBUG, "handleMessage: CONTEXT MENU!!!");
+                openContextMenu(Geek::Vector2D(mouseButtonEvent->x, mouseButtonEvent->y));
+            }
+            else if (!mouseButtonEvent->direction)
+            {
+                return NULL;
+            }
 
-                            return this;
-                        }
-                    }
+            m_activeTab = tab;
+            activeTab = getActiveTab();
 
-                    if (imsg->event.button.buttons == BUTTON_RIGHT)
-                    {
-                        log(DEBUG, "handleMessage: CONTEXT MENU!!!");
-                        openContextMenu(Geek::Vector2D(imsg->event.button.x, imsg->event.button.y));
-                    }
-                    else if (!imsg->event.button.direction)
-                    {
-                        return NULL;
-                    }
-
-                    m_activeTab = tab;
-                    activeTab = getActiveTab();
-
-                    setDirty();
+            setDirty();
 
 #if 0
-                    log(DEBUG, "handleMessage: activeTab=%p", activeTab);
+            log(DEBUG, "handleMessage: activeTab=%p", activeTab);
 #endif
 
-                    m_changeTabSignal.emit(activeTab);
-                    if (activeTab != NULL)
-                    {
-                        activeTab->setDirty();
-                        return activeTab;
-                    }
-                    else
-                    {
-                        return this;
-                    }
-                }
-                else if (!m_tabs.empty())
-                {
-                    Widget* activeWidget = m_tabs.at(m_activeTab).content;
+            m_changeTabSignal.emit(activeTab);
+            if (activeTab != NULL)
+            {
+                activeTab->setDirty();
+                return activeTab;
+            }
+            else
+            {
+                return this;
+            }
+        }
+        else if (!m_tabs.empty())
+        {
+            Widget* activeWidget = m_tabs.at(m_activeTab).content;
 
-                    if (activeWidget != NULL)
-                    {
-                        return activeWidget->handleMessage(msg);
-                    }
+            if (activeWidget != NULL)
+            {
+                return activeWidget->handleEvent(event);
+            }
 
-                }
-            } break;
-            default:
-                break;
         }
     }
     return NULL;

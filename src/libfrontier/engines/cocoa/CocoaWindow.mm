@@ -89,8 +89,8 @@ using namespace Geek;
 - (void)keyUp:(NSEvent *)theEvent;
 - (void)keyDown:(NSEvent *)theEvent;
 
-- (Frontier::InputMessage*)createKeyMessage:(NSEvent*)event;
-- (Frontier::InputMessage*)createMouseButtonMessage:(NSEvent*)event;
+- (Frontier::KeyEvent*)createKeyEvent:(NSEvent*)event;
+- (Frontier::MouseButtonEvent*)createMouseButtonEvent:(NSEvent*)event;
 
 - (void)setCursor:(NSCursor*)cursor;
 - (void)resetCursorRects;
@@ -135,11 +135,11 @@ using namespace Geek;
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
 
-    Frontier::InputMessage* msg = [self createMouseButtonMessage: theEvent];
-    msg->event.button.direction = true;
+    Frontier::MouseButtonEvent* event = [self createMouseButtonEvent: theEvent];
+    event->direction = true;
 
     CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    cwindow->getWindow()->handleEvent(event);
 
 }
 
@@ -147,11 +147,11 @@ using namespace Geek;
 {
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
 
-    Frontier::InputMessage* msg = [self createMouseButtonMessage: theEvent];
-    msg->event.button.direction = false;
+    Frontier::MouseButtonEvent* event = [self createMouseButtonEvent: theEvent];
+    event->direction = false;
 
     CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    cwindow->getWindow()->handleEvent(event);
 }
 
 - (void)touchesBeganWithEvent:(NSEvent *)theEvent
@@ -161,16 +161,16 @@ using namespace Geek;
     if (count == 2)
     {
         printf("touchesBeganWithEvent: TWO FINGERS\n");
-        Frontier::InputMessage* msg = [self createMouseButtonMessage: theEvent];
-        msg->event.button.direction = false;
+        Frontier::MouseButtonEvent* event = [self createMouseButtonEvent: theEvent];
+        event->direction = false;
 
         CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
         CocoaWindow* cwindow = [window getEngineWindow];
-        cwindow->getWindow()->handleMessage(msg);
+        cwindow->getWindow()->handleEvent(event);
     }
 }
 
-- (Frontier::InputMessage*)createMouseButtonMessage:(NSEvent*)theEvent
+- (Frontier::MouseButtonEvent*)createMouseButtonEvent:(NSEvent*)theEvent
 {
     NSPoint pos = [theEvent locationInWindow];
 
@@ -184,7 +184,6 @@ using namespace Geek;
     else
     {
         clickCount = [theEvent clickCount];
-        printf("createMouseButtonMessage: clickCount=%d\n", clickCount);
 
         if (([theEvent modifierFlags] & NSEventModifierFlagControl))
         {
@@ -196,17 +195,16 @@ using namespace Geek;
         }
     }
 
-    Frontier::InputMessage* msg = new Frontier::InputMessage();
-    msg->messageType = FRONTIER_MSG_INPUT;
-    msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_BUTTON;
-    msg->event.button.buttons = button;
-    msg->event.button.doubleClick = clickCount == 2;
+    Frontier::MouseButtonEvent* event = new Frontier::MouseButtonEvent();
+    event->eventType = FRONTIER_EVENT_MOUSE_BUTTON;
+    event->buttons = button;
+    event->doubleClick = clickCount == 2;
 
     int height = [self frame].size.height;
-    msg->event.button.x = (int)pos.x;
-    msg->event.button.y = height - (int)pos.y;
+    event->x = (int)pos.x;
+    event->y = height - (int)pos.y;
 
-    return msg;
+    return event;
 }
 
 - (void)mouseMoved:(NSEvent *)theEvent
@@ -215,16 +213,15 @@ using namespace Geek;
 
     NSPoint pos = [theEvent locationInWindow];
 
-    Frontier::InputMessage* msg = new Frontier::InputMessage();
-    msg->messageType = FRONTIER_MSG_INPUT;
-    msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_MOTION;
+    Frontier::MouseMotionEvent* event = new Frontier::MouseMotionEvent();
+    event->eventType = FRONTIER_EVENT_MOUSE_MOTION;
 
     int height = [self frame].size.height;
-    msg->event.button.x = (int)pos.x;
-    msg->event.button.y = height - (int)pos.y;
+    event->x = (int)pos.x;
+    event->y = height - (int)pos.y;
 
     CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    cwindow->getWindow()->handleEvent(event);
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
@@ -233,26 +230,25 @@ using namespace Geek;
 
     NSPoint pos = [theEvent locationInWindow];
 
-    Frontier::InputMessage* msg = new Frontier::InputMessage();
-    msg->messageType = FRONTIER_MSG_INPUT;
-    msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_MOTION;
+    Frontier::MouseMotionEvent* event = new Frontier::MouseMotionEvent();
+    event->eventType = FRONTIER_EVENT_MOUSE_MOTION;
 
     int height = [self frame].size.height;
-    msg->event.button.x = (int)pos.x;
-    msg->event.button.y = height - (int)pos.y;
+    event->x = (int)pos.x;
+    event->y = height - (int)pos.y;
 
     CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    cwindow->getWindow()->handleEvent(event);
 }
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-printf("mouseEntered: Here!\n");
+    printf("mouseEntered: Here!\n");
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-printf("mouseExited: Here!\n");
+    printf("mouseExited: Here!\n");
 }
 
 
@@ -269,41 +265,40 @@ printf("mouseExited: Here!\n");
     NSLog(@"scrollWheel: scroll: %0.2f, %0.2f  hasPreciseScrollingDeltas=%d\n", scrollX, scrollY, hasPreciseScrollingDeltas);
 #endif
 
-    Frontier::InputMessage* msg = new Frontier::InputMessage();
-    msg->messageType = FRONTIER_MSG_INPUT;
-    msg->inputMessageType = FRONTIER_MSG_INPUT_MOUSE_WHEEL;
+    Frontier::MouseScrollEvent* event = new Frontier::MouseScrollEvent();
+    event->eventType = FRONTIER_EVENT_MOUSE_SCROLL;
 
     int height = [self frame].size.height;
-    msg->event.wheel.x = (int)pos.x;
-    msg->event.wheel.y = height - (int)pos.y;
-    msg->event.wheel.scrollX = (int)scrollX;
-    msg->event.wheel.scrollY = (int)scrollY;
+    event->x = (int)pos.x;
+    event->y = height - (int)pos.y;
+    event->scrollX = (int)scrollX;
+    event->scrollY = (int)scrollY;
 
     CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    cwindow->getWindow()->handleEvent(event);
 }
 
 - (void)keyUp:(NSEvent *)theEvent
 {
-    Frontier::InputMessage* msg = [self createKeyMessage: theEvent];
-    msg->event.key.direction = false;
+    Frontier::KeyEvent* event = [self createKeyEvent: theEvent];
+    event->direction = false;
 
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
     CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    cwindow->getWindow()->handleEvent(event);
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-    Frontier::InputMessage* msg = [self createKeyMessage: theEvent];
-    msg->event.key.direction = true;
+    Frontier::KeyEvent* event = [self createKeyEvent: theEvent];
+    event->direction = true;
 
     CocoaNSWindow* window = (CocoaNSWindow*)[theEvent window];
     CocoaWindow* cwindow = [window getEngineWindow];
-    cwindow->getWindow()->handleMessage(msg);
+    cwindow->getWindow()->handleEvent(event);
 }
 
-- (Frontier::InputMessage*)createKeyMessage:(NSEvent*)theEvent
+- (Frontier::KeyEvent*)createKeyEvent:(NSEvent*)theEvent
 {
     uint16_t keyCode = [theEvent keyCode];
     NSString* chars = [theEvent characters];
@@ -311,16 +306,15 @@ printf("mouseExited: Here!\n");
 
     std::string wchars = std::string([chars UTF8String], [chars lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 
-    Frontier::InputMessage* msg = new Frontier::InputMessage();
-    msg->messageType = FRONTIER_MSG_INPUT;
-    msg->inputMessageType = FRONTIER_MSG_INPUT_KEY;
+    Frontier::KeyEvent* event = new Frontier::KeyEvent();
+    event->eventType = FRONTIER_EVENT_KEY;
 
     if (wchars.length() > 0)
     {
-        msg->event.key.key = wchars.at(0);
+        event->key = wchars.at(0);
     }
 
-    msg->event.key.chr = 0;
+    event->chr = 0;
     unsigned int c = wchars.at(0);
     if (wchars.length() > 0 && c != 0xffffffef && !iscntrl(c))
     {
@@ -333,41 +327,41 @@ printf("mouseExited: Here!\n");
             NSLog(@"createKeyMessage: keyCode=0x%x, chars=0x%x", keyCode, c);
         }
 
-        msg->event.key.chr = c;
-        msg->event.key.key = toupper(c);
+        event->chr = c;
+        event->key = toupper(c);
     }
     else if (keyCode < 128)
     {
-        msg->event.key.key = g_darwinKeyCodeMap[keyCode];
+        event->key = g_darwinKeyCodeMap[keyCode];
     }
     else
     {
-        msg->event.key.key = KC_UNKNOWN;
+        event->key = KC_UNKNOWN;
     }
 
-    msg->event.key.modifiers = 0;
+    event->modifiers = 0;
     if (modifierFlags & NSEventModifierFlagCapsLock)
     {
-        msg->event.key.modifiers |= KMOD_CAPS_LOCK;
+        event->modifiers |= KMOD_CAPS_LOCK;
     }
     if (modifierFlags & NSEventModifierFlagShift)
     {
-        msg->event.key.modifiers |= KMOD_SHIFT;
+        event->modifiers |= KMOD_SHIFT;
     }
     if (modifierFlags & NSEventModifierFlagControl)
     {
-        msg->event.key.modifiers |= KMOD_CONTROL;
+        event->modifiers |= KMOD_CONTROL;
     }
     if (modifierFlags & NSEventModifierFlagOption)
     {
-        msg->event.key.modifiers |= KMOD_ALT;
+        event->modifiers |= KMOD_ALT;
     }
     if (modifierFlags & NSEventModifierFlagCommand)
     {
-        msg->event.key.modifiers |= KMOD_COMMAND;
+        event->modifiers |= KMOD_COMMAND;
     }
 
-    return msg;
+    return event;
 }
 
 - (void)setCursor:(NSCursor*)cursor

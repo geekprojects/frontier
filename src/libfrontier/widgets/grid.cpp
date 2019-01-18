@@ -320,30 +320,25 @@ bool Grid::draw(Geek::Gfx::Surface* surface)
     return true;
 }
 
-Widget* Grid::handleMessage(Frontier::Message* msg)
+Widget* Grid::handleEvent(Frontier::Event* event)
 {
-    if (msg->messageType == FRONTIER_MSG_INPUT)
+    if (event->is(FRONTIER_EVENT_MOUSE))
     {
-        InputMessage* imsg = (InputMessage*)msg;
-        if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_BUTTON ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION ||
-            imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_WHEEL)
-        {
-            int x = imsg->event.button.x;
-            int y = imsg->event.button.y;
+        MouseEvent* mouseEvent = (MouseEvent*)event;
+        int x = mouseEvent->x;
+        int y = mouseEvent->y;
 
-            for (GridItem* item : m_grid)
+        for (GridItem* item : m_grid)
+        {
+            Widget* child = item->widget;
+            if (child->intersects(x, y))
             {
-                Widget* child = item->widget;
-                if (child->intersects(x, y))
-                {
-                    return child->handleMessage(msg);
-                }
+                return child->handleEvent(event);
             }
-            if (imsg->inputMessageType == FRONTIER_MSG_INPUT_MOUSE_MOTION)
-            {
-                return this;
-            }
+        }
+        if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
+        {
+            return this;
         }
     }
     return NULL;
