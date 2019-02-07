@@ -74,7 +74,8 @@ class FontManager : public Geek::Logger
         uint32_t c,
         bool draw,
         int* width,
-        int maxWidth = -1);
+        int maxWidth = -1,
+        int rotate = 0);
 
     int width(
         FontHandle* font,
@@ -137,6 +138,7 @@ class FontHandle
     ~FontHandle();
 
     FT_Face getFTFace();
+    FontFace* getFontFace() { return m_face; }
     int getPointSize() { return m_pointSize; }
 
     int getPixelHeight(int dpi);

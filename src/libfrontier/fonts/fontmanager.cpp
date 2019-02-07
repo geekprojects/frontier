@@ -196,7 +196,10 @@ bool FontManager::addFontFile(string path)
     error = FT_New_Face(m_library, path.c_str(), 0, &face);
     if (error != 0)
     {
-        log(ERROR, "addFontFile: Unable to open file: 0x%x", error);
+        if (error != FT_Err_Unknown_File_Format)
+        {
+            log(ERROR, "addFontFile: Unable to open file: 0x%x", error);
+        }
         return false;
     }
 
@@ -258,7 +261,8 @@ bool FontManager::write(
     uint32_t col,
     bool draw,
     int* widthReturn,
-    int maxWidth)
+    int maxWidth,
+    int rotate)
 {
     FT_Error error;
     FT_Face face;
@@ -271,6 +275,12 @@ bool FontManager::write(
     if (font == NULL)
     {
         log(ERROR, "write: font is NULL!");
+        return false;
+    }
+
+    if (rotate != 0 && rotate != 90 && rotate != 270)
+    {
+        log(ERROR, "write: Unhandled rotate value: %d", rotate);
         return false;
     }
 
@@ -316,7 +326,14 @@ bool FontManager::write(
         return false;
     }
     face = size->face;
-
+    if (face == NULL)
+    {
+        log(DEBUG,
+            "write: Face is NULL? Font=%s:%s",
+            font->getFontFace()->getPath().c_str(),
+            font->getFontFace()->getStyle().c_str());
+        return false;
+    }
 
     bool useKerning = FT_HAS_KERNING(face);
 
@@ -343,7 +360,16 @@ bool FontManager::write(
     for (pos = 0; pos < text.length(); pos++)
     {
         uint32_t glyphIndex;
-        wchar_t currentChar = text[pos];
+        wchar_t currentChar;
+
+        if (rotate == 90)
+        {
+            currentChar = text[(text.length() - 1) - pos];
+        }
+        else
+        {
+            currentChar = text[pos];
+        }
 
         glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font, -1, currentChar);
         if (glyphIndex == 0)
@@ -476,20 +502,66 @@ bool FontManager::write(
             int sh = surface->getHeight();
             int sw = surface->getWidth();
 
+            /*
+             *   0:
+             *   o**
+             *   *  *
+             *   ****
+             *   *  *
+             *
+             *   90:
+             *   o**
+             *    * *
+             *    * *
+             *   ***
+             *
+             *   270:
+             *   o***
+             *   * * 
+             *   * * 
+             *    ***
+             */
+
             unsigned int yp;
             for (yp = 0; yp < bitmap.rows; yp++)
             {
-                int y1 = y + yp + yoff;
-                if (y1 < 0 || y1 >= sh)
+                int x1 = 0;
+                int y1 = 0;
+                if (rotate == 0)
                 {
-                    continue;
+                    y1 = y + yp + yoff;
                 }
+                else if (rotate == 90)
+                {
+                    x1 = x + yp + yoff;
+                }
+                else if (rotate == 270)
+                {
+                    x1 = (bitmap.rows - yp) + x;
+                }
+
 
                 unsigned int xp;
                 for (xp = 0; xp < bitmap.width; xp++)
                 {
-                    int x1 = x + xp + left;
+                    if (rotate == 0)
+                    {
+                        x1 = x + xp + left;
+                    }
+                    else if (rotate == 90)
+                    {
+                        y1 = (bitmap.width - xp) + y + yoff;
+                    }
+                    else if (rotate == 270)
+                    {
+                        y1 = y + xp + yoff;
+                    }
+
                     if (x1 < 0 || x1 >= sw)
+                    {
+                        continue;
+                    }
+                    if (y1 < 0 || y1 >= sh)
                     {
                         continue;
                     }
@@ -518,9 +590,27 @@ bool FontManager::write(
             }
         }
 
-        x += xAdvance;
-        y += yAdvance;
-        width += xAdvance;
+        if (rotate == 0)
+        {
+            x += xAdvance;
+            y += yAdvance;
+            width += xAdvance;
+        }
+        else if (rotate == 90)
+        {
+            x += yAdvance;
+            y += xAdvance;
+            width += xAdvance;
+        }
+        else if (rotate == 270)
+        {
+            x += yAdvance;
+            y += xAdvance;
+            width += xAdvance;
+        }
+        else if (rotate == 180)
+        {
+        }
 
         FTC_Node_Unref(glyphNode, m_cacheManager);
 
