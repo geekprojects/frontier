@@ -18,6 +18,8 @@ class ResizeableFrame : public Frame
 
     virtual void layout();
 
+    float borrow(int which, float amount, int major, int direction);
+
  public:
     ResizeableFrame(FrontierApp* ui, bool horizontal);
     ResizeableFrame(FrontierWindow* ui, bool horizontal);
@@ -28,7 +30,17 @@ class ResizeableFrame : public Frame
 
     virtual Widget* handleEvent(Frontier::Event* event);
 
-    virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_RESIZE_HORIZONTAL; }
+    virtual Frontier::WindowCursor getCursor()
+    {
+        if (m_horizontal)
+        {
+            return Frontier::CURSOR_RESIZE_HORIZONTAL;
+        }
+        else
+        {
+            return Frontier::CURSOR_RESIZE_VERTICAL;
+        }
+    }
 };
 
 };
