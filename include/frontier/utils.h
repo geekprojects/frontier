@@ -134,6 +134,11 @@ struct Rect
         width = _width;
         height = _height;
     }
+
+    bool intersects(int _x, int _y)
+    {
+        return (_x >= x && _y >= y && _x < (x + width) && _y < (y + height));
+    }
 };
 
 class Utils
