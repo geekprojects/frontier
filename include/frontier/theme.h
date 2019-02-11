@@ -78,6 +78,7 @@ class UITheme : public Geek::Logger
     bool m_initialised;
     FontHandle* m_font;
     FontHandle* m_iconFont;
+    FontHandle* m_monospaceFont;
     FrontierApp* m_app;
 
     int m_margin;
@@ -100,7 +101,7 @@ class UITheme : public Geek::Logger
     virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state);
     virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state, int x, int y, int w, int h);
 
-    virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false);
+    virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false, int rotate = 0);
     virtual int getTextWidth(std::wstring text) const;
     virtual int getTextHeight() const;
 
@@ -108,6 +109,9 @@ class UITheme : public Geek::Logger
     virtual int getIconWidth(wchar_t icon) const;
     virtual int getIconHeight() const;
     virtual FontHandle* getFont(bool highDPI) const;
+
+    virtual FontHandle* getMonospaceFont(bool highDPI) const;
+    virtual int getMonospaceHeight() const;
 
     FrontierApp* getApp() const { return m_app; }
 };

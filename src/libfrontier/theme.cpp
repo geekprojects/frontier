@@ -65,9 +65,19 @@ bool UITheme::init()
             "Font Awesome 5 Free",
             "Solid",
             12);
-        if (m_font == NULL)
+        if (m_iconFont == NULL)
         {
             log(ERROR, "init: Failed to find FontAwesome");
+            return false;
+        }
+
+        m_monospaceFont = m_app->getFontManager()->openFont(
+            "Hack",
+            "Regular",
+            10);
+        if (m_monospaceFont == NULL)
+        {
+            log(ERROR, "init: Failed to find Hack font");
             return false;
         }
     }
@@ -291,7 +301,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
     }
 }
 
-void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted)
+void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth, bool inverted, int rotate)
 {
     uint32_t c = 0xffffffff;
 
@@ -311,7 +321,8 @@ void UITheme::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring t
         c,
         true,
         NULL,
-        maxWidth);
+        maxWidth,
+        rotate);
 }
 
 int UITheme::getTextWidth(std::wstring text) const
@@ -364,5 +375,15 @@ int UITheme::getIconHeight() const
 FontHandle* UITheme::getFont(bool highDPI) const
 {
     return m_font;
+}
+
+FontHandle* UITheme::getMonospaceFont(bool highDPI) const
+{
+    return m_monospaceFont;
+}
+
+int UITheme::getMonospaceHeight() const
+{
+    return m_monospaceFont->getPixelHeight(72);
 }
 
