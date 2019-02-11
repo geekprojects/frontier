@@ -33,6 +33,7 @@
 #include <frontier/widgets/textinput.h>
 #include <frontier/widgets/grid.h>
 #include <frontier/widgets/combobox.h>
+#include <frontier/widgets/terminal.h>
 
 using namespace std;
 using namespace Frontier;
@@ -123,8 +124,9 @@ bool DemoApp::init()
 
     log(DEBUG, "init: Config Dir: %s", getConfigDir().c_str());
 
+    //Frame* rootFrame = new ResizeableFrame(this, false);
     Frame* rootFrame = new Frame(this, false);
-    m_tabs = new Tabs(this);
+    m_tabs = new Tabs(this, true, TAB_TOP);
     rootFrame->add(m_tabs);
     m_tabs->closeTabSignal().connect(sigc::mem_fun(*this, &DemoApp::onCloseTab));
 
@@ -233,6 +235,10 @@ bool DemoApp::init()
     comboBoxTab->add(comboBoxFrame1);
     m_tabs->addTab(L"ComboBox", comboBoxTab);
 
+    Frame* terminalTab = new Frame(this, false);
+    Terminal* terminal = new Terminal(this);
+    terminalTab->add(terminal);
+    m_tabs->addTab(L"Terminal", terminalTab);
 
     Frame* closeableTab = new Frame(this, false);
     m_tabs->addTab(L"Closeable", closeableTab, true);
