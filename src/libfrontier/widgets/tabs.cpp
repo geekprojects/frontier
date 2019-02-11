@@ -29,16 +29,38 @@ using namespace Geek;
 using namespace Geek::Gfx;
 
 #define MAX_TAB_SIZE 250
-#define TAB_HEIGHT 22
+#define TAB_SIZE 22
 
 Tabs::Tabs(FrontierApp* ui) : Widget(ui, L"Tabs")
 {
     m_activeTab = 0;
+    m_collapsible = false;
+    m_collapsed = false;
+    m_placement = TAB_TOP;
+}
+
+Tabs::Tabs(FrontierApp* ui, bool collapsible, TabPlacement placement) : Widget(ui, L"Tabs")
+{
+    m_activeTab = 0;
+    m_collapsible = collapsible;
+    m_collapsed = false;
+    m_placement = placement;
 }
 
 Tabs::Tabs(FrontierWindow* window) : Widget(window, L"Tabs")
 {
     m_activeTab = 0;
+    m_collapsible = false;
+    m_collapsed = false;
+    m_placement = TAB_TOP;
+}
+
+Tabs::Tabs(FrontierWindow* window, bool collapsible, TabPlacement placement) : Widget(window, L"Tabs")
+{
+    m_activeTab = 0;
+    m_collapsible = collapsible;
+    m_collapsed = false;
+    m_placement = placement;
 }
 
 Tabs::~Tabs()
@@ -71,10 +93,18 @@ void Tabs::init()
 
 void Tabs::calculateSize()
 {
-    if (m_tabs.empty())
+    if (m_tabs.empty() || (m_collapsible && m_collapsed))
     {
-        m_minSize.set(0, TAB_HEIGHT);
-        m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+        if (isHorizontal())
+        {
+            m_minSize.set(0, TAB_SIZE);
+            m_maxSize.set(WIDGET_SIZE_UNLIMITED, TAB_SIZE);
+        }
+        else
+        {
+            m_minSize.set(TAB_SIZE, 0);
+            m_maxSize.set(TAB_SIZE, WIDGET_SIZE_UNLIMITED);
+        }
         return;
     }
 
@@ -89,10 +119,20 @@ void Tabs::calculateSize()
     Size activeMinSize = activeWidget->getMinSize();
     Size activeMaxSize = activeWidget->getMaxSize();
 
-    activeMinSize.height += TAB_HEIGHT;
+    if (isHorizontal())
+    {
+        activeMinSize.height += TAB_SIZE;
 
-    activeMaxSize.width = WIDGET_SIZE_UNLIMITED;
-    activeMaxSize.height += TAB_HEIGHT;
+        activeMaxSize.width = WIDGET_SIZE_UNLIMITED;
+        activeMaxSize.height += TAB_SIZE;
+    }
+    else
+    {
+        activeMinSize.width += TAB_SIZE;
+
+        activeMaxSize.width += TAB_SIZE;
+        activeMaxSize.height = WIDGET_SIZE_UNLIMITED;
+    }
 
     m_minSize = activeMinSize;
     m_maxSize = activeMaxSize;
@@ -108,9 +148,19 @@ void Tabs::calculateSize()
         }
     }
 
-    if (m_minSize.width < tabsWidth)
+    if (isHorizontal())
     {
-        m_minSize.width = tabsWidth;
+        if (m_minSize.width < tabsWidth)
+        {
+            m_minSize.width = tabsWidth;
+        }
+    }
+    else
+    {
+        if (m_minSize.height < tabsWidth)
+        {
+            m_minSize.height = tabsWidth;
+        }
     }
 }
 
@@ -121,47 +171,121 @@ void Tabs::layout()
         return;
     }
 
-    Widget* activeWidget = getActiveTab();
+    if (!m_collapsible || !m_collapsed)
+    {
+        Widget* activeWidget = getActiveTab();
 
-    Size tabSize = Size(m_setSize.width, m_setSize.height - TAB_HEIGHT);
-    activeWidget->setSize(tabSize);
-    activeWidget->setPosition(0, TAB_HEIGHT);
-    activeWidget->layout();
+        Rect contentRect = getContentRect();
+
+        activeWidget->setSize(Size(contentRect.width, contentRect.height));
+        activeWidget->setPosition(contentRect.x, contentRect.y);
+        activeWidget->layout();
+    }
 }
 
 bool Tabs::draw(Surface* surface)
 {
+    Rect tabsRect = getTabsRect();
+
     int labelHeight = m_app->getTheme()->getTextHeight();
-    int labelY = (TAB_HEIGHT / 2) - (labelHeight / 2);
+
+    //surface->clear(0x0);
 
     m_app->getTheme()->drawBorder(
         surface,
         BORDER_WIDGET,
         STATE_NONE,
-        0, TAB_HEIGHT,
-        m_setSize.width, m_setSize.height - TAB_HEIGHT);
+        tabsRect.x, tabsRect.y,
+        tabsRect.width, tabsRect.height);
 
-    if (m_tabs.empty())
-    {
-        return true;
-    }
-
-    if (m_activeTab >= m_tabs.size())
+    if (!m_tabs.empty() && m_activeTab >= m_tabs.size())
     {
         log(ERROR, "draw: Invalid active tab: %d", m_activeTab);
         m_activeTab = m_tabs.size() - 1;
     }
 
-    int tabWidth = getTabWidth();
+    Size tabSize = getTabSize();
 
 #if 0
-    log(DEBUG, "draw: tabs=%lu, titleWidth=%d", m_tabs.size(), titleWidth);
+    log(DEBUG, "draw: tabs=%lu", m_tabs.size());
 #endif
 
     int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
 
+    int labelY = ((TAB_SIZE / 2) - (labelHeight / 2));
+
     vector<Tab>::iterator it;
-    int x = 0;
+    int x = tabsRect.x;
+    int y = tabsRect.y;
+
+    if (m_collapsible)
+    {
+        int icon;
+        if (m_collapsed)
+        {
+            switch (m_placement)
+            {
+                case TAB_TOP:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_UP;
+                    break;
+                case TAB_BOTTOM:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_DOWN;
+                    break;
+                case TAB_LEFT:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_LEFT;
+                    break;
+                case TAB_RIGHT:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_RIGHT;
+                    break;
+            }
+        }
+        else
+        {
+            switch (m_placement)
+            {
+                case TAB_TOP:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_DOWN;
+                    break;
+                case TAB_BOTTOM:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_UP;
+                    break;
+                case TAB_LEFT:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_RIGHT;
+                    break;
+                case TAB_RIGHT:
+                    icon = FRONTIER_ICON_ANGLE_DOUBLE_LEFT;
+                    break;
+            }
+
+        }
+
+        m_app->getTheme()->drawIcon(
+            surface,
+            tabsRect.x,
+            tabsRect.y,
+            icon,
+            false);
+ 
+        if (isHorizontal())
+        {
+            x += TAB_SIZE;
+        }
+        else
+        {
+            y += TAB_SIZE;
+        }
+    }
+
+    int rotate = 0;
+    if (m_placement == TAB_LEFT)
+    {
+        rotate = 90;
+    }
+    else if (m_placement == TAB_RIGHT)
+    {
+        rotate = 270;
+    }
+
     unsigned int tab;
     for (it = m_tabs.begin(), tab = 0; it != m_tabs.end(); it++, tab++)
     {
@@ -177,54 +301,76 @@ bool Tabs::draw(Surface* surface)
         {
             //backgroundCol = m_app->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND);
         }
-        //surface->drawRectFilled(x, 0, titleWidth - 1, 24, backgroundCol);
+
+#if 0
+        log(DEBUG, "draw: %d,%d, width=%d, height=%d", x, y, tabSize.width, tabSize.height);
+#endif
 
         m_app->getTheme()->drawBorder(
             surface,
             BORDER_TAB,
             state,
-            x, 0,
-            tabWidth, TAB_HEIGHT);
+            x, y,
+            tabSize.width, tabSize.height);
 
-        int titleWidth = tabWidth - 10;
+        int titleWidth;
+if (isHorizontal())
+{
+        titleWidth = tabSize.width - 10;
+}
+else
+{
+        titleWidth = tabSize.height - 10;
+}
         if (it->closeable)
         {
             titleWidth -= closeWidth + 5;
         }
 
-#if 0
-        log(DEUG, "draw:  -> %ls: active=%d x=%d, tabWidth=%d, titleWidth=%d, closeable=%d", it->title.c_str(), isActive, x, tabWidth, titleWidth, it->closeable);
+#if 1
+        log(DEBUG, "draw:  -> %ls: active=%d titleWidth=%d, closeable=%d", it->title.c_str(), isActive, titleWidth, it->closeable);
 #endif
 
         m_app->getTheme()->drawText(
             surface,
             x + 5,
-            labelY,
-           it->title.c_str(),
-            titleWidth); 
+            labelY + y,
+            it->title.c_str(),
+            titleWidth, false, rotate); 
 
         if (it->closeable)
         {
             m_app->getTheme()->drawIcon(
                 surface,
-                x + tabWidth - (closeWidth + 5),
-                labelY,
+                x + tabSize.width - (closeWidth + 5),
+                labelY + y,
                 FRONTIER_ICON_WINDOW_CLOSE,
                 false);
         }
-        x += tabWidth;
+
+        if (isHorizontal())
+        {
+            x += tabSize.width;
+        }
+        else
+        {
+            y += tabSize.height;
+        }
     }
 
-    Widget* activeWidget = m_tabs.at(m_activeTab).content;
-    if (activeWidget != NULL)
+    if (!m_tabs.empty() && (!m_collapsible || !m_collapsed))
     {
-        SurfaceViewPort viewport(
-            surface,
-            activeWidget->getX(),
-            activeWidget->getY(),
-            activeWidget->getWidth(),
-            activeWidget->getHeight());
-        return activeWidget->draw(&viewport, Rect(0, 0, activeWidget->getWidth(), activeWidget->getHeight()));
+        Widget* activeWidget = m_tabs.at(m_activeTab).content;
+        if (activeWidget != NULL)
+        {
+            SurfaceViewPort viewport(
+                surface,
+                activeWidget->getX(),
+                activeWidget->getY(),
+                activeWidget->getWidth(),
+                activeWidget->getHeight());
+            return activeWidget->draw(&viewport, Rect(0, 0, activeWidget->getWidth(), activeWidget->getHeight()));
+        }
     }
 
     return true;
@@ -242,7 +388,9 @@ Widget* Tabs::handleEvent(Event* event)
         x -= thisPos.x;
         y -= thisPos.y;
 
-        if (y < TAB_HEIGHT)
+        Rect tabsRect = getTabsRect();
+
+        if (tabsRect.intersects(x, y))
         {
             if (event->eventType != FRONTIER_EVENT_MOUSE_BUTTON)
             {
@@ -251,25 +399,63 @@ Widget* Tabs::handleEvent(Event* event)
 
             MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
 
+            x -= tabsRect.x;
+            y -= tabsRect.y;
+
+            int tabPos;
+            if (isHorizontal())
+            {
+               tabPos = x;
+            }
+            else
+            {
+               tabPos = y;
+            }
+ 
+            if (m_collapsible)
+            {
+                if (tabPos < TAB_SIZE)
+                {
+                     if (mouseButtonEvent->direction)
+                     {
+                         m_collapsed = !m_collapsed;
+                         setDirty();
+                    }
+                    return this;
+                }
+                tabPos -= TAB_SIZE;
+            }
+
             if (m_tabs.empty())
             {
                 return this;
             }
 
-            int tabWidth = getTabWidth();
+            Size tabSize = getTabSize();
             unsigned int tab = 0;
 
-            if (tabWidth > 0)
+            if (isHorizontal())
             {
-                tab = x / tabWidth;
+                if (tabSize.width > 0)
+                {
+                    tab = tabPos / tabSize.width;
+                }
+            }
+            else
+            {
+                if (tabSize.height > 0)
+                {
+                    tab = tabPos / tabSize.height;
+                }
             }
 
 #if 0
-                    log(DEBUG, "handleMessage: x=%d, titleWidth=%d, m_activeTab=%d", x, titleWidth, m_activeTab);
+            log(DEBUG, "handleMessage: x=%d, m_activeTab=%d", x, m_activeTab);
 #endif
+
             if (tab >= m_tabs.size())
             {
-                return NULL;
+                return this;
             }
 
             Widget* activeTab = getActiveTab();
@@ -277,7 +463,7 @@ Widget* Tabs::handleEvent(Event* event)
             if (m_tabs.at(tab).closeable)
             {
                 int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
-                if (x > (int)((tab * tabWidth) + (tabWidth - (closeWidth + 5))))
+                if (x > (int)((tab * tabSize.width) + (tabSize.width - (closeWidth + 5))))
                 {
                     if (!mouseButtonEvent->direction)
                     {
@@ -300,6 +486,7 @@ Widget* Tabs::handleEvent(Event* event)
 
             m_activeTab = tab;
             activeTab = getActiveTab();
+            m_collapsed = false;
 
             setDirty();
 
@@ -326,8 +513,8 @@ Widget* Tabs::handleEvent(Event* event)
             {
                 return activeWidget->handleEvent(event);
             }
-
         }
+        return this;
     }
     return NULL;
 }
@@ -472,18 +659,121 @@ void Tabs::dump(int level)
 */
 }
 
-int Tabs::getTabWidth()
+Size Tabs::getTabSize()
 {
     if (m_tabs.empty())
     {
-        return 0;
+        return Size(0, 0);
     }
 
-    int tabWidth = m_setSize.width / m_tabs.size();
-    if (tabWidth > MAX_TAB_SIZE)
+    int major;
+    if (isHorizontal())
     {
-        tabWidth = MAX_TAB_SIZE;
+        major = m_setSize.width;
     }
-    return tabWidth;
+    else
+    {
+        major = m_setSize.height;
+    }
+
+    if (m_collapsible)
+    {
+        major -= TAB_SIZE;
+    }
+
+    int tabMajor = major / m_tabs.size();
+    if (tabMajor > MAX_TAB_SIZE)
+    {
+        tabMajor = MAX_TAB_SIZE;
+    }
+
+    Size size;
+    if (isHorizontal())
+    {
+        size.width = tabMajor;
+        size.height = TAB_SIZE;
+    }
+    else
+    {
+        size.width = TAB_SIZE;
+        size.height = tabMajor;
+    }
+
+    return size;
+}
+
+Frontier::Rect Tabs::getTabsRect()
+{
+    Rect r;
+
+    r.x = 0;
+    r.y = 0;
+
+    if (isHorizontal())
+    {
+        r.width = m_setSize.width;
+        r.height = TAB_SIZE;
+    }
+    else
+    {
+        r.width = TAB_SIZE;
+        r.height = m_setSize.height;
+    }
+
+    switch (m_placement)
+    {
+        case TAB_TOP:
+            break;
+
+        case TAB_BOTTOM:
+            r.y = m_setSize.height - TAB_SIZE;
+            break;
+
+        case TAB_LEFT:
+            break;
+
+        case TAB_RIGHT:
+            r.x = m_setSize.width - TAB_SIZE;
+            break;
+    }
+
+    return r;
+}
+
+Frontier::Rect Tabs::getContentRect()
+{
+    Rect r;
+
+    r.x = 0;
+    r.y = 0;
+
+    if (isHorizontal())
+    {
+        r.width = m_setSize.width;
+        r.height = m_setSize.height - TAB_SIZE;
+    }
+    else
+    {
+        r.width = m_setSize.width - TAB_SIZE;
+        r.height = m_setSize.height;
+    }
+
+    switch (m_placement)
+    {
+        case TAB_TOP:
+	    r.y = TAB_SIZE;
+            break;
+
+        case TAB_BOTTOM:
+            break;
+
+        case TAB_LEFT:
+	    r.x = TAB_SIZE;
+            break;
+
+        case TAB_RIGHT:
+            break;
+    }
+    return r;
 }
 

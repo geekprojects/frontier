@@ -6,6 +6,14 @@
 namespace Frontier
 {
 
+enum TabPlacement
+{
+    TAB_TOP,
+    TAB_BOTTOM,
+    TAB_LEFT,
+    TAB_RIGHT
+};
+
 struct Tab
 {
     std::wstring title;
@@ -19,14 +27,23 @@ class Tabs : public Widget
     unsigned int m_activeTab;
     std::vector<Tab> m_tabs;
 
+    TabPlacement m_placement;
+    bool m_collapsible;
+    bool m_collapsed;
+
     sigc::signal<void, Widget*> m_changeTabSignal;
     sigc::signal<void, Widget*> m_closeTabSignal;
 
-    int getTabWidth();
+    Frontier::Size getTabSize();
+    Frontier::Rect getTabsRect();
+    Frontier::Rect getContentRect();
+    bool isHorizontal() { return (m_placement == TAB_TOP || m_placement == TAB_BOTTOM); }
 
  public:
     Tabs(FrontierApp* app);
     Tabs(FrontierWindow* app);
+    Tabs(FrontierApp* app, bool collapsible, TabPlacement placement);
+    Tabs(FrontierWindow* window, bool collapsible, TabPlacement placement);
     virtual ~Tabs();
 
     virtual void init();
@@ -37,6 +54,11 @@ class Tabs : public Widget
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleEvent(Frontier::Event* event);
+
+    void setCollapsible(bool collapsible);
+    bool isCollapsible() { return m_collapsible; }
+    void setTabPlacement(TabPlacement tabPlacement);
+    TabPlacement getTabPlacement() { return m_placement; }
 
     void addTab(std::wstring title, Widget* content, bool closeable = false);
     void closeTab(Widget* tab, bool emitChangeSignal = true);
