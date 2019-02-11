@@ -91,6 +91,7 @@ class Widget : public FrontierObject, public Geek::Logger
     Widget(FrontierWindow* window, std::wstring name);
     virtual ~Widget();
 
+    std::wstring getWidgetName() { return m_widgetName; }
     void setPrivateData(void* data) { m_privateData = data; }
     void* getPrivateData() const { return m_privateData; }
 
