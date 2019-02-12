@@ -93,6 +93,8 @@ void Scroller::calculateSize()
         Size childMax = m_child->getMaxSize();
         m_minSize.setMin(childMax);
     }
+
+    m_minSize.width += m_scrollBar->getMinSize().width;
 }
 
 void Scroller::layout()
