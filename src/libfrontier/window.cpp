@@ -1,4 +1,5 @@
 /*
+ *
  * Frontier - A toolkit for creating simple OS-independent user interfaces
  * Copyright (C) 2018 Ian Parker <ian@geekprojects.com>
  *
@@ -39,6 +40,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
 
     m_title = title;
     m_flags = flags;
+    m_visible = false;
 
     m_widget = NULL;
     m_dragWidget = NULL;
@@ -177,12 +179,16 @@ void FrontierWindow::show()
         m_app->setActiveWindow(this);
     }
 
+    m_visible = true;
+
     m_widget->setDirty();
     update();
 }
 
 void FrontierWindow::hide()
 {
+    m_visible = false;
+
     if (m_engineWindow != NULL)
     {
         m_engineWindow->hide();
@@ -202,6 +208,11 @@ void FrontierWindow::setSize(Size size)
 
 void FrontierWindow::update(bool force)
 {
+    if (!m_visible)
+    {
+        return;
+    }
+
     initInternal();
 
     if (m_widget->isDirty(DIRTY_SIZE))
@@ -392,7 +403,7 @@ bool FrontierWindow::handleEvent(Event* event)
     {
         uint64_t now = m_app->getTimestamp();
         uint64_t diff = now - m_dragTime;
-        if (diff >= 100)
+        if (diff >= 10)
         {
             destWidget = m_dragWidget->handleEvent(event);
             m_dragTime = m_app->getTimestamp();

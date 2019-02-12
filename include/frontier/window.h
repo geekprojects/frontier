@@ -69,6 +69,7 @@ class FrontierWindow : public Geek::Logger
     std::wstring m_title;
     int m_flags;
     //bool m_isMain;
+    bool m_visible;
     Frontier::Size m_size;
 
     Widget* m_widget;
