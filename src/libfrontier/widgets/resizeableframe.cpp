@@ -84,113 +84,107 @@ void ResizeableFrame::layout()
     }
 
 
-        vector<Widget*>::iterator it;
-        int i;
+    vector<Widget*>::iterator it;
+    int i;
 
+    // First, work out if we have any children that are too big or too small
+    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    {
+        Widget* child = *it;
+        Size childMinSize = child->getMinSize();
+        Size childMaxSize = child->getMaxSize();
 
-        // First, work out if we have any children that are too big or too small
-        for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
-        {
-            Widget* child = *it;
-            Size childMinSize = child->getMinSize();
-            Size childMaxSize = child->getMaxSize();
+        int childMajorMin = childMinSize.get(m_horizontal);
+        int childMajorMax = childMaxSize.get(m_horizontal);
 
-            int childMajorMin = childMinSize.get(m_horizontal);
-            int childMajorMax = childMaxSize.get(m_horizontal);
-
-            float pc = m_sizes.at(i);
-            int childMajor = (int)((float)major * (pc / 100.0));
+        float pc = m_sizes.at(i);
+        int childMajor = (int)((float)major * (pc / 100.0));
 
 #if 1
             log(Geek::DEBUG, "layout: pc=%0.2f, childMajor=%d, minSize=%d, maxSize=%d", pc, childMajor, childMajorMin, childMajorMax);
 #endif
 
-            if (childMajor < childMajorMin)
-            {
-                // Too small!
-                int under = childMajorMin - childMajor;
-                childMajor = childMajorMin;
-                float extrapc = (((float)under / (float)major) * 100.0);
-                //m_sizes[i] += extrapc;
-                log(Geek::DEBUG, "layout:  -> Under min by %d (%0.2f%%)", under, extrapc);
+        if (childMajor < childMajorMin)
+        {
+            // Too small!
+            int under = childMajorMin - childMajor;
+            childMajor = childMajorMin;
+            float extrapc = (((float)under / (float)major) * 100.0);
+            //m_sizes[i] += extrapc;
+            log(Geek::DEBUG, "layout:  -> Under min by %d (%0.2f%%)", under, extrapc);
 
-                // Borrow some space from a neighbour?
-                float d;
-                d = borrow(i - 1, -extrapc, major, -1);
+            // Borrow some space from a neighbour?
+            float d;
+            d = borrow(i - 1, -extrapc, major, -1);
+            extrapc += d;
+            m_sizes[i] -= d;
+            if (d != extrapc)
+            {
+                d = borrow(i + 1, -extrapc, major, 1);
                 extrapc += d;
                 m_sizes[i] -= d;
-                if (d != extrapc)
-                {
-                    d = borrow(i + 1, -extrapc, major, 1);
-                    extrapc += d;
-                    m_sizes[i] -= d;
-                }
             }
-            else if (childMajor > childMajorMax)
+        }
+        else if (childMajor > childMajorMax)
+        {
+            // Too big!
+            int over = childMajor - childMajorMax;
+            childMajor = childMajorMax;
+            float extrapc = (((float)over / (float)major) * 100.0);
+
+            log(Geek::DEBUG, "layout:  -> Over max by %d (%0.2f%%), shrinking", over, extrapc);
+
+            // Give some space from a neighbour?
+            float d;
+            d = borrow(i - 1, extrapc, major, -1);
+            extrapc -= d;
+            m_sizes[i] -= d;
+            if (extrapc > 0)
             {
-                // Too big!
-                int over = childMajor - childMajorMax;
-                childMajor = childMajorMax;
-                float extrapc = (((float)over / (float)major) * 100.0);
-
-                log(Geek::DEBUG, "layout:  -> Over max by %d (%0.2f%%), shrinking", over, extrapc);
-
-                // Give some space from a neighbour?
-                float d;
-                d = borrow(i - 1, extrapc, major, -1);
-                extrapc -= d;
+                d = borrow(i + 1, extrapc, major, 1);
                 m_sizes[i] -= d;
-                if (extrapc > 0)
-                {
-                    d = borrow(i + 1, extrapc, major, 1);
-                    m_sizes[i] -= d;
-                }
             }
         }
+    }
 
-        // Sanity check out sizes
-        float total = 0;
-        for (float pc : m_sizes)
-        {
-            total += pc;
-        }
-        log(DEBUG, "layout: total=%0.2f%%", total);
+    int majorPos = m_margin;
+    int minorPos = m_margin;
 
-        int majorPos = m_margin;
-        int minorPos = m_margin;
+    // Actually set the child sizes and positions
+    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    {
+        Widget* child = *it;
 
-        // Actually set the child sizes and positions
-        for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
-        {
-            Widget* child = *it;
-
-            float pc = m_sizes.at(i);
-            int childMajor = (int)((float)major * (pc / 100.0));
-            int childMinor = minor;
+        float pc = m_sizes.at(i);
+        int childMajor = (int)((float)major * (pc / 100.0));
+        int childMinor = minor;
+/*
             int maxMinor = child->getMaxSize().get(!m_horizontal);
             if (childMinor > maxMinor)
             {
                 childMinor = maxMinor;
             }
-            log(DEBUG, "layout: m_sizes[%d]=%0.2f%%: major=%d", i, pc, childMajor);
+*/
 
-            Size size;
-            if (m_horizontal)
-            {
-                size = Size(childMajor, childMinor);
-                child->setPosition(majorPos, minorPos);
-            }
-            else
-            {
-                size = Size(childMinor, childMajor);
-                child->setPosition(minorPos, majorPos);
-            }
-            child->setSize(size);
+        log(DEBUG, "layout: majorPos=%d, m_sizes[%d]=%0.2f%%: major=%d", majorPos, i, pc, childMajor);
 
-            majorPos += childMajor + m_padding;
-
-            child->layout();
+        Size size;
+        if (m_horizontal)
+        {
+            size = Size(childMajor, childMinor);
+            child->setPosition(majorPos, minorPos);
         }
+        else
+        {
+            size = Size(childMinor, childMajor);
+            child->setPosition(minorPos, majorPos);
+        }
+        child->setSize(size);
+
+        majorPos += childMajor + m_padding;
+
+        child->layout();
+    }
 }
 
 float ResizeableFrame::borrow(int which, float amount, int major, int direction)
@@ -219,54 +213,61 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
     float pc = m_sizes.at(which);
     int childMajor = (int)((float)major * (pc / 100.0));
 
-    log(DEBUG, "borrow:  -> childMajor=%d, min=%d, max=%d", childMajor, childMajorMin, childMajorMax);
+    log(DEBUG, "borrow: which=%d, pc=%0.2f%%, amount=%0.2f%%", which, pc, amount);
 
     if (amount > 0)
     {
+        float grow = 0.0;
+
         // Can we grow?
         if (childMajor < childMajorMax)
         {
             // Yes we can!
             float maxPC = (childMajorMax / major) * 100.0;
-            float grow = amount;
+            grow = amount;
             if (grow > (maxPC - pc))
             {
                 grow = maxPC - pc;
             }
-            log(DEBUG, "borrow:  -> maxPC=%0.2f, grow=%0.2f%%", maxPC, grow);
+            log(DEBUG, "borrow:  -> Can grow! maxPC=%0.2f, grow=%0.2f%%", maxPC, grow);
             m_sizes[which] += grow;
-
-            if (grow != amount)
-            {
-                // Check neighbour
-                grow += borrow(which + direction, amount - grow, major, direction);
-            }
-
-            return grow;
         }
+
+        if (grow != amount)
+        {
+            // Check neighbour
+            grow += borrow(which + direction, amount - grow, major, direction);
+        }
+
+        return grow;
     }
     else
     {
+        float shrink = 0.0;
+
         // Can we shrink?
         if (childMajor > childMajorMin)
         {
             // Yes we can!
             float minPC = (childMajorMin / major) * 100.0;
-            float shrink = -amount;
+            shrink = -amount;
             if (shrink > (pc - minPC))
             {
                 shrink = pc - minPC;
             }
-            log(DEBUG, "borrow:  -> minPC=%0.2f, grow=%0.2f%%", minPC, shrink);
+            log(DEBUG, "borrow:  -> Can shrink! minPC=%0.2f, shrink=%0.2f%%", minPC, shrink);
             m_sizes[which] -= shrink;
 
-            if (shrink != amount)
-            {
-                // Check neighbour
-                shrink += -borrow(which + direction, amount - shrink, major, direction);
-            }
-            return -shrink;
         }
+        if (shrink != -amount)
+        {
+            // Check neighbour
+            log(DEBUG, "borrow:  -> Still got %0.2f%% to go, Checking neighbour", amount - shrink);
+            float ns = borrow(which + direction, amount - shrink, major, direction);
+            log(DEBUG, "borrow:  -> Neighbour shrunk by %0.2f%%", ns);
+            shrink += -ns;
+        }
+        return -shrink;
     }
 
     return 0.0;
