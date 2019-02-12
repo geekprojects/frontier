@@ -314,8 +314,13 @@ using namespace Geek;
         event->key = wchars.at(0);
     }
 
-    event->chr = 0;
-    unsigned int c = wchars.at(0);
+    unsigned int c = 0;
+    if (wchars.length() > 0)
+    {
+        c = wchars.at(0);
+    }
+    event->chr = c;
+
     if (wchars.length() > 0 && c != 0xffffffef && !iscntrl(c))
     {
         if (isprint(c))
@@ -327,7 +332,6 @@ using namespace Geek;
             NSLog(@"createKeyMessage: keyCode=0x%x, chars=0x%x", keyCode, c);
         }
 
-        event->chr = c;
         event->key = toupper(c);
     }
     else if (keyCode < 128)
