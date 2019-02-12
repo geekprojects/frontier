@@ -21,7 +21,7 @@ enum TerminalState
 
 class Terminal;
 
-class TerminalProcess : public Geek::Thread
+class TerminalProcess : public Geek::Thread, Geek::Logger
 {
  private:
     Terminal* m_terminal;

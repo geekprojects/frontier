@@ -23,45 +23,24 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <util.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
+
+#define DEBUG_TERMINAL
 
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-static void hexdump(const char* pos, int len)
-{
-    int i;
-    for (i = 0; i < len; i += 16)
-    {
-        int j;
-        printf("%08llx: ", (uint64_t)(pos + i));
-        for (j = 0; j < 16 && (i + j) < len; j++)
-        {
-            printf("%02x ", (uint8_t)pos[i + j]);
-        }
-        for (j = 0; j < 16 && (i + j) < len; j++)
-        {
-            char c = pos[i + j];
-            if (!isprint(c))
-            {
-                c = '.';
-            }
-            printf("%c", c);
-        }
-        printf("\n");
-    }
-}
+#ifdef DEBUG_TERMINAL
+static void hexdump(const char* pos, int len);
+#endif
 
 Terminal::Terminal(FrontierApp* ui) : Widget(ui, L"Terminal")
 {
-    //run("/usr/bin/uname -a");
-    run("CLICOLOR_FORCE=1 /bin/ls -lG");
-    //run("/usr/bin/make");
-    //run("/usr/local/bin/bash");
-
+    m_process = NULL;
     m_state = STATE_NORMAL;
 }
 
@@ -75,13 +54,20 @@ Terminal::~Terminal()
     if (m_process != NULL)
     {
         m_process->stop();
+        delete m_process;
     }
 }
 
 void Terminal::calculateSize()
 {
-    m_minSize.width = 8;
-    m_minSize.height = 8;
+    FontHandle* font = m_app->getTheme()->getMonospaceFont(true);
+    int fontHeight = m_app->getTheme()->getMonospaceHeight();
+
+    FontManager* fm = m_app->getFontManager();
+    int fontWidth = fm->width(font, L"M");
+
+    m_minSize.width = fontWidth * 20;
+    m_minSize.height = fontHeight * 2;
 
     m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     m_maxSize.height = WIDGET_SIZE_UNLIMITED;
@@ -90,6 +76,11 @@ void Terminal::calculateSize()
 bool Terminal::draw(Surface* surface)
 {
     surface->clear(0x0000ff);
+
+    if (m_buffer.empty())
+    {
+        return true;
+    }
 
     FontManager* fm = m_app->getFontManager();
 
@@ -143,13 +134,12 @@ Widget* Terminal::handleEvent(Event* event)
                 {
                     c = keyEvent->chr;
                 }
-m_process->typeChar(c);
-receiveChar(c);
-}
-}
-default:
-break;
-}
+                m_process->typeChar(c);
+            }
+        }
+        default:
+            break;
+    }
     return this;
 }
 
@@ -165,7 +155,7 @@ void Terminal::receiveChar(wchar_t c)
     switch (m_state)
     {
         case STATE_NORMAL:
-            if (c == 10 || c == 0x0d)
+            if (c == 10)
             {
                 m_buffer.push_back(L"");
             }
@@ -215,58 +205,39 @@ void Terminal::receiveChar(wchar_t c)
     }
 
     setDirty(DIRTY_CONTENT);
-}
 
+}
 
 void Terminal::receiveChars(char* c, int length)
 {
-hexdump(c, length);
+#ifdef DEBUG_TERMINAL
+    hexdump(c, length);
+#endif
     int i;
     for (i = 0; i < length; i++)
     {
         // TODO: Handle UTF-8
         receiveChar(c[i]);
     }
+
+    /*
+    FrontierWindow* window = getWindow();
+    if (window != NULL)
+    {
+        window->update();
+    }
+    */
 }
 
 bool Terminal::run(const char* command)
 {
+    m_process = new TerminalProcess(this);
+    m_process->start();
 
-//m_process = new TerminalProcess(this);
-//m_process->start();
-
-/*
-    FILE *fp;
-
-    log(DEBUG, "run: cmd: %s\n", command);
-    fp = popen(command, "r");
-    if (fp == NULL)
-    {
-        return;
-    }
-
-    char buffer[1024];
-    string result = "";
-    while (!feof(fp))
-    {
-        int res;
-        res = fread(buffer, 1, 1024, fp);
-        if (res <= 0)
-        {
-            break;
-        }
-
-        receiveChars(buffer, res);
-    }
-
-    pclose(fp);
-
-    return;
-*/
-return true;
+    return true;
 }
 
-TerminalProcess::TerminalProcess(Terminal* terminal)
+TerminalProcess::TerminalProcess(Terminal* terminal) : Logger("TerminalProcess")
 {
     m_terminal = terminal;
 }
@@ -277,41 +248,39 @@ TerminalProcess::~TerminalProcess()
 
 bool TerminalProcess::main()
 {
-    int read_pipe[2];
-    int write_pipe[2];
+    int res;
 
-    pipe(read_pipe);
-    pipe(write_pipe);
+    int master;
+    int slave;
+    char name[1024];
+
+    res = openpty(&master, &slave, name, NULL, NULL);
+    if (res != 0)
+    {
+        int err = errno;
+        log(ERROR, "main: Failed to open PTY: %d", err);
+        return false;
+    }
+    log(INFO, "main: master=%d, slave=%d, name=%s", master, slave, name);
 
     pid_t pid = fork();
     printf("TerminalProcess::main: pid=%d\n", pid);
     if (pid > 0)
     {
         // Parent
+        close(slave);
+
         m_childPid = pid;
-        m_childOut = read_pipe[0];
-        m_childIn = write_pipe[1];
-
-        close(read_pipe[1]);
-        close(write_pipe[0]);
-
-/*
-            struct timeval tv;
-            fd_set readfds;
-            tv.tv_sec = 10;
-            tv.tv_usec = 0;
-            FD_ZERO(&readfds);
-            FD_SET(m_childOut, &readfds);
-            select(m_childOut + 1, &readfds, NULL, NULL, &tv);
-*/
+        m_childOut = master;
+        m_childIn = master;
 
         char buffer[4097];
         while (true)
         {
             int res;
-            printf("TerminalProcess::main: (Parent) Waiting for data...\n");
+            log(DEBUG, "main: (Parent) Waiting for data...");
             res = read(m_childOut, buffer, 4096);
-            printf("TerminalProcess::main: (Parent) Read %d bytes\n", res);
+            log(DEBUG, "main: (Parent) Read %d bytes", res);
             if (res <= 0)
             {
                 break;
@@ -320,33 +289,27 @@ bool TerminalProcess::main()
             buffer[res] = 0;
             m_terminal->receiveChars(buffer, res);
         }
-        printf("TerminalProcess::main: (Parent) Child exited\n");
+        log(DEBUG, "main: (Parent) Child exited");
     }
     else if (pid == 0)
     {
-        printf("TerminalProcess::main: (Child) Setting up pipes...\n");
-        close(read_pipe[0]);
-        close(write_pipe[1]);
-
-        dup2(read_pipe[1], STDOUT_FILENO);
-        dup2(write_pipe[0], STDIN_FILENO);
-
-        close(write_pipe[0]);
-        close(read_pipe[1]);
+        dup2(slave, STDOUT_FILENO);
+        dup2(slave, STDIN_FILENO);
+        dup2(slave, STDERR_FILENO);
 
         //printf("TerminalProcess::main: (Child) Calling watch!\n");
         //execl("/usr/local/bin/watch", "watch", "/bin/ls", "-l", NULL);
         //execl("/bin/ls", "/bin/ls", "-l", NULL);
         //execl("/bin/bash", "-l", NULL);
         //printf("TerminalProcess::main: (Child) Starting command...\n");
-        //execl("/usr/local/bin/bash", "bash", "-i", NULL);
+        execl("/usr/local/bin/bash", "bash", "-i", NULL);
         //execl("/usr/bin/make", "make", NULL);
 //char* const[] env = {
 //"TERM
 //};
         //execl("/usr/bin/top", "top", "-n", "5", NULL);
 
-        execl("/usr/bin/uname", "uname", "-a", NULL);
+//        execl("/usr/bin/uname", "uname", "-a", NULL);
         perror("execl() failed");
         _exit(errno);
     }
@@ -366,6 +329,40 @@ void TerminalProcess::typeChar(wchar_t c)
 
 void TerminalProcess::stop()
 {
+    log(DEBUG, "stop: Killing child...");
     kill(m_childPid, SIGHUP);
+
+    if (m_childIn != 0)
+    {
+        log(DEBUG, "stop: Closing PTY");
+        close(m_childIn);
+    }
+    log(DEBUG, "stop: done");
 }
+
+#ifdef DEBUG_TERMINAL
+static void hexdump(const char* pos, int len)
+{
+    int i;
+    for (i = 0; i < len; i += 16)
+    {
+        int j;
+        printf("%08llx: ", (uint64_t)(pos + i));
+        for (j = 0; j < 16 && (i + j) < len; j++)
+        {
+            printf("%02x ", (uint8_t)pos[i + j]);
+        }
+        for (j = 0; j < 16 && (i + j) < len; j++)
+        {
+            char c = pos[i + j];
+            if (!isprint(c))
+            {
+                c = '.';
+            }
+            printf("%c", c);
+        }
+        printf("\n");
+    }
+}
+#endif
 
