@@ -124,8 +124,7 @@ bool DemoApp::init()
 
     log(DEBUG, "init: Config Dir: %s", getConfigDir().c_str());
 
-    //Frame* rootFrame = new ResizeableFrame(this, false);
-    Frame* rootFrame = new Frame(this, false);
+    ResizeableFrame* rootFrame = new ResizeableFrame(this, false);
     m_tabs = new Tabs(this, true, TAB_TOP);
     rootFrame->add(m_tabs);
     m_tabs->closeTabSignal().connect(sigc::mem_fun(*this, &DemoApp::onCloseTab));
