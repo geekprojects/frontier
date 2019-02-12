@@ -220,7 +220,7 @@ bool Tabs::draw(Surface* surface)
 
     if (m_collapsible)
     {
-        int icon;
+        int icon = 0;
         if (m_collapsed)
         {
             switch (m_placement)
@@ -327,7 +327,7 @@ else
             titleWidth -= closeWidth + 5;
         }
 
-#if 1
+#if 0
         log(DEBUG, "draw:  -> %ls: active=%d titleWidth=%d, closeable=%d", it->title.c_str(), isActive, titleWidth, it->closeable);
 #endif
 
