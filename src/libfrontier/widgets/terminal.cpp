@@ -25,7 +25,7 @@
 #include <signal.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
-
+#include <wctype.h>
 
 // openpty
 #if defined(__APPLE__) && defined(__MACH__)
@@ -34,7 +34,7 @@
 #include <pty.h>
 #endif
 
-#define DEBUG_TERMINAL
+#undef DEBUG_TERMINAL
 
 using namespace std;
 using namespace Frontier;
@@ -326,12 +326,19 @@ bool TerminalProcess::main()
 
 void TerminalProcess::typeChar(wchar_t c)
 {
+    int res;
     printf("TerminalProcess::typeChar: c=0x%x\n", c);
 
     char buf[2];
     buf[0] = c;
     buf[1] = 0;
-    write(m_childIn, buf, 1);
+
+    res = write(m_childIn, buf, 1);
+    if (res < 0)
+    {
+        int err = errno;
+        log(ERROR, "Failed to write char: errno=%d", err);
+    }
 }
 
 void TerminalProcess::stop()
