@@ -124,18 +124,9 @@ bool FontManager::scan(string dir)
         return false;
     }
 
-    dirent* direntEntry = NULL;
-    dirent* direntResult = direntEntry;
-
-    int len_entry = sizeof(struct dirent) + fpathconf(dirfd(fd), _PC_NAME_MAX) + 1;
-    direntEntry = (dirent*)malloc(len_entry);
-    while (true)
+    dirent* direntEntry;
+    while ((direntEntry = readdir(fd)) != NULL)
     {
-        int res = readdir_r(fd, direntEntry, &direntResult);
-        if (res != 0 || direntResult == NULL)
-        {
-            break;
-        }
         if (direntEntry->d_name[0] == '.')
         {
             continue;
@@ -153,7 +144,6 @@ bool FontManager::scan(string dir)
             addFontFile(path);
         }
     }
-    free(direntEntry);
 
     closedir(fd);
 
