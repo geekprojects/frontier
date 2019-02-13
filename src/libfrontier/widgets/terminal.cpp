@@ -23,9 +23,16 @@
 
 #include <unistd.h>
 #include <signal.h>
-#include <util.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
+
+
+// openpty
+#if defined(__APPLE__) && defined(__MACH__)
+#include <util.h>
+#else
+#include <pty.h>
+#endif
 
 #define DEBUG_TERMINAL
 
