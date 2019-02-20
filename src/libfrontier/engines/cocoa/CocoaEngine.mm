@@ -1,5 +1,6 @@
 
-#include "cocoa_engine.h"
+#include "CocoaEngine.h"
+#include "CocoaWindow.h"
 #include "utils.h"
 
 #include <Cocoa/Cocoa.h>
@@ -11,23 +12,20 @@ using namespace Geek;
 
 @interface MenuTarget : NSObject
 {
-    CocoaEngine* m_engine;
 }
 
-- (void)setCocoaEngine:(CocoaEngine*) engine;
-- (void)onMenuItem;
+- (void)onMenuItem:(id)sender;
 
 @end
 
 @implementation MenuTarget
-- (void)setCocoaEngine:(CocoaEngine*) engine
+- (void)onMenuItem:(id)sender
 {
-    m_engine = engine;
-}
-
-- (void)onMenuItem
-{
-    printf("MenuTarget.menuItemAction: Here!\n");
+    MenuItem* menuItem = (MenuItem*)[(NSValue*)[sender representedObject] pointerValue];
+    if (menuItem != NULL)
+    {
+        menuItem->clickSignal().emit(menuItem);
+    }
 }
 
 @end
@@ -56,25 +54,101 @@ using namespace Geek;
 }
 @end
 
+
+CocoaEngine::CocoaEngine(FrontierApp* app) : FrontierEngine(app)
+{
+    m_currentMenu = (Menu*)-1;
+    m_windowMenu = NULL;
+}
+
+CocoaEngine::~CocoaEngine()
+{
+}
+
+bool CocoaEngine::init()
+{
+    bool res;
+
+    res = createApplication();
+    if (!res)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool CocoaEngine::initWindow(FrontierWindow* window)
+{
+
+    bool res;
+
+    CocoaWindow* cw = new CocoaWindow(this, window);
+
+    res = cw->init();
+    if (!res)
+    {
+        return false;
+    }
+
+    window->setEngineWindow(cw);
+    return true;
+}
+
+bool CocoaEngine::checkEvents()
+{
+    return run();
+}
+
 bool CocoaEngine::createApplication()
 {
     m_application = [NSApplication sharedApplication];
 
     FrontierAppDelegate* appDelegate = [[FrontierAppDelegate alloc] init];
     m_appDelegate = appDelegate;
-
     [NSApp setDelegate:appDelegate];
 
     [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 
+
+    log(DEBUG, "createApplication: Creating Window menu...");
+    NSMenu* windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
+    [NSApp setWindowsMenu:windowMenu];
+
+    /* Add menu items */
+    [windowMenu addItemWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
+    [windowMenu addItemWithTitle:@"Zoom" action:@selector(performZoom:) keyEquivalent:@""];
+
+    /* Put menu into the menubar */
+    NSMenuItem* windowMenuItem = [[NSMenuItem alloc] initWithTitle:@"Window" action:nil keyEquivalent:@""];
+    [windowMenuItem setSubmenu:windowMenu];
+    m_windowMenu = windowMenuItem;
+
+    updateMenu(m_app->getAppMenu());
+
+    m_app->activeWindowChangedSignal().connect(sigc::mem_fun(*this, &CocoaEngine::onActiveWindowChanged));
+
+    return true;
+}
+
+void CocoaEngine::updateMenu(Menu* frontierMenu)
+{
+    if (m_currentMenu == frontierMenu)
+    {
+        return;
+    }
+
+    [[NSApp mainMenu] removeItem:(NSMenuItem*)m_windowMenu];
+
+    m_currentMenu = frontierMenu;
+    printf("CocoaEngine::updateMenu: Updating menu: %p", frontierMenu);
+
+    // Create NSMenu
+    NSMenu* mainMenu = [[NSMenu alloc] init];
+
     NSString* appName = [[NSProcessInfo processInfo] processName];
 
-    NSMenu* mainMenu = [[NSMenu alloc] init];
-    [NSApp setMainMenu:mainMenu];
-
-    [mainMenu release];  /* we're done with it, let NSApp own it. */
-    mainMenu = nil;
-
+    // Main app menu
     NSMenu* appleMenu = [[NSMenu alloc] initWithTitle:@""];
 
     NSString* quitTitle = [@"About " stringByAppendingString:appName];
@@ -85,50 +159,44 @@ bool CocoaEngine::createApplication()
     NSString* title = [@"Quit " stringByAppendingString:appName];
     [appleMenu addItemWithTitle:title action:@selector(terminate:) keyEquivalent:@"q"];
 
-    /* Put menu into the menubar */
+    /* Put app menu into the menubar */
     NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:@"" action:nil keyEquivalent:@""];
     [menuItem setSubmenu:appleMenu];
-    [[NSApp mainMenu] addItem:menuItem];
+    [mainMenu addItem:menuItem];
     [menuItem release];
 
-MenuTarget* target = [MenuTarget alloc];
-
-    vector<MenuItem*>* appMenu = m_app->getAppMenu();
-    for (MenuItem* menu : *appMenu)
+    if (frontierMenu != NULL)
     {
-        log(DEBUG, "createApplication: Menu: %ls", menu->getTitle().c_str());
-        NSString* titleStr = [CocoaUtils wstringToNSString:menu->getTitle()];
-
-        NSMenu* nsmenu = [[NSMenu alloc] initWithTitle:titleStr];
-
-        for (MenuItem* child : menu->getChildren())
+        MenuTarget* target = [MenuTarget alloc];
+        for (MenuItem* menu : frontierMenu->getMenuItems())
         {
-            NSString* childTitleStr = [CocoaUtils wstringToNSString:child->getTitle()];
-            NSMenuItem* childItem = [nsmenu addItemWithTitle:childTitleStr action:@selector(target:onMenuItem:) keyEquivalent:@""];
-childItem.target = target;
+            log(DEBUG, "updateMenu: Menu: %ls", menu->getTitle().c_str());
+            NSString* titleStr = [CocoaUtils wstringToNSString:menu->getTitle()];
 
+            NSMenu* nsmenu = [[NSMenu alloc] initWithTitle:titleStr];
+
+            for (MenuItem* child : menu->getChildren())
+            {
+                NSString* childTitleStr = [CocoaUtils wstringToNSString:child->getTitle()];
+                NSMenuItem* childItem = [nsmenu addItemWithTitle:childTitleStr action:@selector(onMenuItem:) keyEquivalent:@""];
+                childItem.representedObject = [NSValue valueWithPointer:child];
+                childItem.target = target;
+            }
+
+            menuItem = [[NSMenuItem alloc] initWithTitle:titleStr action:nil keyEquivalent:@""];
+            [menuItem setSubmenu:nsmenu];
+            [mainMenu addItem:menuItem];
         }
-
-        menuItem = [[NSMenuItem alloc] initWithTitle:titleStr action:nil keyEquivalent:@""];
-        [menuItem setSubmenu:nsmenu];
-        [[NSApp mainMenu] addItem:menuItem];
     }
 
-    /* Create the window menu */
-    NSMenu* windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
+    log(DEBUG, "updateMenu: Adding Window menu");
+    [mainMenu addItem:(NSMenuItem*)m_windowMenu];
 
-    /* Add menu items */
-    [windowMenu addItemWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
+    log(DEBUG, "updateMenu: Setting main menu...");
+    [NSApp setMainMenu:mainMenu];
 
-    [windowMenu addItemWithTitle:@"Zoom" action:@selector(performZoom:) keyEquivalent:@""];
-
-    /* Put menu into the menubar */
-    menuItem = [[NSMenuItem alloc] initWithTitle:@"Window" action:nil keyEquivalent:@""];
-    [menuItem setSubmenu:windowMenu];
-    [[NSApp mainMenu] addItem:menuItem];
-    [menuItem release];
-
-    return true;
+    [mainMenu release];  /* we're done with it, let NSApp own it. */
+    log(DEBUG, "updateMenu: Done!");
 }
 
 bool CocoaEngine::run()
@@ -140,6 +208,24 @@ bool CocoaEngine::run()
     log(INFO, "run: run has exited");
 
     return false;
+}
+
+void CocoaEngine::onActiveWindowChanged(FrontierWindow* window)
+{
+    printf("CocoaEngine::onActiveWindowChanged: window=%p\n", window);
+    Menu* menu = NULL;
+    if (window != NULL)
+    {
+        printf("CocoaEngine::onActiveWindowChanged: window title: %ls\n", window->getTitle().c_str());
+        menu = window->getMenu();
+        printf("CocoaEngine::onActiveWindowChanged: window menu=%p\n", menu);
+    }
+    if (menu == NULL)
+    {
+        menu = m_app->getAppMenu();
+        printf("CocoaEngine::onActiveWindowChanged: using app menu=%p\n", menu);
+    }
+    updateMenu(menu);
 }
 
 void CocoaEngine::message(string title, string message)
@@ -197,12 +283,6 @@ else
     }
 
     return "";
-}
-
-bool CocoaEngine::onMenuItem(MenuItem* item)
-{
-    log(DEBUG, "onMenuItem: item=%p", item);
-    return true;
 }
 
 string CocoaEngine::getConfigDir()

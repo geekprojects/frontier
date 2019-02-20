@@ -1,5 +1,5 @@
 
-#include "cocoa_engine.h"
+#include "CocoaWindow.h"
 #include "utils.h"
 
 #include <Cocoa/Cocoa.h>
@@ -18,7 +18,7 @@ using namespace Geek;
 - (void)setEngineWindow:(CocoaWindow*)cocoaWindow;
 - (CocoaWindow*)getEngineWindow;
 
--(BOOL) windowShouldClose:(id) sender;
+- (BOOL)windowShouldClose:(id) sender;
 - (void)windowDidResize: (NSNotification *)notification; 
 - (void)windowDidBecomeKey: (NSNotification *)notification; 
 - (void)windowDidResignKey: (NSNotification *)notification; 
@@ -56,10 +56,14 @@ using namespace Geek;
 
 - (void)windowDidBecomeKey: (NSNotification *)notification
 {
+    printf("windowDidBecomeKey: this=%p\n", self);
+    FrontierWindow* frnwin = m_engineWindow->getWindow();
+    frnwin->getApp()->setActiveWindow(frnwin);
 }
 
 - (void)windowDidResignKey: (NSNotification *)notification
 {
+printf("windowDidResignKey: this=%p\n", self);
 }
 
 @end
@@ -382,6 +386,38 @@ using namespace Geek;
 }
 
 @end
+
+CocoaWindow::CocoaWindow(FrontierEngine* engine, FrontierWindow* window) : FrontierEngineWindow(engine, window)
+{
+}
+
+CocoaWindow::~CocoaWindow()
+{
+}
+
+
+bool CocoaWindow::init()
+{
+    return createCocoaWindow();
+}
+
+bool CocoaWindow::update()
+{
+    Size winSize = m_window->getSize();
+    //setSize(winSize);
+
+#if 1
+    Size currentSize = getSize();
+    if (currentSize.width != winSize.width || currentSize.height != winSize.height)
+    {
+        setSize(winSize);
+    }
+#endif
+
+    drawSurface(m_window->getSurface());
+
+    return true;
+}
 
 bool CocoaWindow::createCocoaWindow()
 {
