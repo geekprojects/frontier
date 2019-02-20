@@ -29,10 +29,13 @@
 #ifdef FRONTIER_ENGINE_SDL
 #   include "engines/sdl/sdl_engine.h"
 #elif FRONTIER_ENGINE_COCOA
-#   include "engines/cocoa/cocoa_engine.h"
+#   include "engines/cocoa/CocoaEngine.h"
 #else
 #   error No engine defined
 #endif
+
+#define STRINGIFY(x) XSTRINGIFY(x)
+#define XSTRINGIFY(x) #x
 
 using namespace std;
 using namespace Frontier;
@@ -46,6 +49,8 @@ FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
     m_engine = NULL;
     m_theme = NULL;
     m_fontManager = NULL;
+
+    m_appMenu = NULL;
 }
 
 FrontierApp::~FrontierApp()
@@ -110,6 +115,7 @@ bool FrontierApp::init()
 return false;
     }
 
+#if defined(__APPLE__) && defined(__MACH__)
     m_fontManager = new FontManager("/Library/Fonts");
     res = m_fontManager->init();
     if (!res)
@@ -117,12 +123,15 @@ return false;
         return false;
     }
 
-#if defined(__APPLE__) && defined(__MACH__)
     m_fontManager->scan("/System/Library/Fonts");
     const char* homechar = getenv("HOME");
     m_fontManager->scan(string(homechar) + "/Library/Fonts");
 #else
     m_fontManager->scan("/usr/share/fonts");
+#endif
+
+#ifdef FONTSDIR
+    m_fontManager->scan(STRINGIFY(FONTSDIR));
 #endif
 
     m_fontManager->scan("fonts");
@@ -212,6 +221,8 @@ void FrontierApp::setActiveWindow(FrontierWindow* window)
     {
         m_activeWindow->gainedFocus();
     }
+
+    m_activeWindowChangedSignal.emit(m_activeWindow);
 }
 
 FrontierWindow* FrontierApp::getActiveWindow()

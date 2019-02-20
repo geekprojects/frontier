@@ -59,7 +59,7 @@ void ContextMenu::itemSelected(ListItem* item)
     MenuItem* menuItem = (MenuItem*)(item->getPrivateData());
     log(DEBUG, "itemSelected: %ls", menuItem->getTitle().c_str());
 
-    menuItem->clickSignal().emit();
+    menuItem->clickSignal().emit(menuItem);
 
     hide();
 }

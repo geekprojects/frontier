@@ -50,15 +50,19 @@ class FrontierEngine : public Geek::Logger
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
+
+    // Features
+    virtual bool providesMenus();
 };
 
 class FrontierEngineWindow : public Geek::Logger
 {
  protected:
+    FrontierEngine* m_engine;
     FrontierWindow* m_window;
 
  public:
-    FrontierEngineWindow(FrontierWindow* window);
+    FrontierEngineWindow(FrontierEngine* engine, FrontierWindow* window);
     virtual ~FrontierEngineWindow();
 
     virtual bool init();
@@ -67,6 +71,7 @@ class FrontierEngineWindow : public Geek::Logger
 
     virtual bool update();
 
+    FrontierEngine* getEngine() { return m_engine; }
     FrontierWindow* getWindow() { return m_window; }
 
     virtual void setPosition(unsigned int x, unsigned int y);

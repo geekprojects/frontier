@@ -41,6 +41,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_title = title;
     m_flags = flags;
     m_visible = false;
+    m_currentCursor = CURSOR_POINTER;
 
     m_widget = NULL;
     m_dragWidget = NULL;
@@ -49,6 +50,8 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_activeWidget = NULL;
 
     m_surface = NULL;
+
+    m_menu = NULL;
 
     m_size.set(640, 480);
 

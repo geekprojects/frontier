@@ -63,9 +63,9 @@ class Tabs : public Widget
     void addTab(std::wstring title, Widget* content, bool closeable = false);
     void closeTab(Widget* tab, bool emitChangeSignal = true);
 
-    void closeActiveTab();
-    void closeAllTabs();
-    void closeAllButActiveTab();
+    void closeActiveTab(MenuItem* item);
+    void closeAllTabs(MenuItem* item);
+    void closeAllButActiveTab(MenuItem* item);
 
     Widget* getActiveTab()
     {

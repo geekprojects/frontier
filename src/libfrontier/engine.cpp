@@ -84,8 +84,15 @@ string FrontierEngine::chooseFile(int flags, std::string path, std::string patte
     return "";
 }
 
-FrontierEngineWindow::FrontierEngineWindow(FrontierWindow* window) : Logger(L"FrontierEngineWindow")
+bool FrontierEngine::providesMenus()
 {
+    return false;
+}
+
+
+FrontierEngineWindow::FrontierEngineWindow(FrontierEngine* engine, FrontierWindow* window) : Logger(L"FrontierEngineWindow")
+{
+     m_engine = engine;
      m_window = window;
 }
 

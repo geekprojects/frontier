@@ -68,12 +68,13 @@ class FrontierApp : public Geek::Logger
     FontManager* m_fontManager;
     UITheme* m_theme;
 
+    Menu* m_appMenu;
     ContextMenu* m_contextMenuWindow;
-
-    std::vector<MenuItem*> m_appMenu;
 
     std::vector<FrontierWindow*> m_windows;
     FrontierWindow* m_activeWindow;
+
+    sigc::signal<void, FrontierWindow*> m_activeWindowChangedSignal;
 
  protected:
     void setEngine(FrontierEngine* m_engine);
@@ -96,7 +97,8 @@ class FrontierApp : public Geek::Logger
 
     std::string getConfigDir();
 
-    std::vector<MenuItem*>* getAppMenu() { return &m_appMenu; }
+    void setAppMenu(Menu* menu) { m_appMenu = menu; }
+    Menu* getAppMenu() { return m_appMenu; }
 
     void addWindow(FrontierWindow* window);
     void setActiveWindow(FrontierWindow* activeWindow);
@@ -115,6 +117,8 @@ class FrontierApp : public Geek::Logger
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 
     uint64_t getTimestamp() const;
+
+    virtual sigc::signal<void, FrontierWindow*> activeWindowChangedSignal() { return m_activeWindowChangedSignal; }
 };
 
 };

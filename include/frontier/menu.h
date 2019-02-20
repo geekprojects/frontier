@@ -21,6 +21,8 @@
 #ifndef __FRONTIER_MENU_H_
 #define __FRONTIER_MENU_H_
 
+#include <frontier/object.h>
+
 #include <string>
 #include <vector>
 
@@ -36,7 +38,7 @@ enum MenuType
     MENU_TYPE_HELP,
 };
 
-class MenuItem
+class MenuItem : public FrontierObject
 {
  private:
     std::wstring m_title;
@@ -44,7 +46,7 @@ class MenuItem
 
     void* m_enginePrivate;
 
-    sigc::signal<void> m_clickSignal;
+    sigc::signal<void, MenuItem*> m_clickSignal;
 
  public:
     MenuItem(std::wstring title);
@@ -56,13 +58,13 @@ class MenuItem
     void add(MenuItem* child);
     std::vector<MenuItem*>& getChildren() { return m_children; }
 
-    virtual sigc::signal<void> clickSignal() { return m_clickSignal; }
+    virtual sigc::signal<void, MenuItem*> clickSignal() { return m_clickSignal; }
 
     void setEnginePrivate(void* priv) { m_enginePrivate = priv; }
     void* getEnginePrivate() { return m_enginePrivate; }
 };
 
-class Menu
+class Menu : public FrontierObject
 {
  private:
     std::vector<MenuItem*> m_menuItems;

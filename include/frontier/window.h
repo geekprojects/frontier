@@ -81,6 +81,8 @@ class FrontierWindow : public Geek::Logger
 
     Geek::Gfx::Surface* m_surface;
 
+    Menu* m_menu;
+
     sigc::signal<bool> m_closeSignal;
     sigc::signal<bool> m_gainedFocusSignal;
     sigc::signal<bool> m_lostFocusSignal;
@@ -119,6 +121,8 @@ class FrontierWindow : public Geek::Logger
     Frontier::Size getSize() const { return m_size; }
     Geek::Gfx::Surface* getSurface() const { return m_surface; }
 
+    Menu* getMenu() { return m_menu; }
+    void setMenu(Menu* menu) { m_menu = menu; }
     void openContextMenu(Geek::Vector2D pos, Menu* menu);
 
     void postEvent(Frontier::Event* event);

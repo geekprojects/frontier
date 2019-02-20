@@ -565,7 +565,7 @@ void Tabs::closeTab(Widget* widget, bool emitChangeSignal)
     }
 }
 
-void Tabs::closeActiveTab()
+void Tabs::closeActiveTab(MenuItem* item)
 {
     Widget* activeWidget = getActiveTab();
     if (activeWidget != NULL)
@@ -574,7 +574,7 @@ void Tabs::closeActiveTab()
     }
 }
 
-void Tabs::closeAllTabs()
+void Tabs::closeAllTabs(MenuItem* item)
 {
     vector<Tab> tabs  = m_tabs; // Make a copy as the original will be modified
     for (Tab tab : tabs)
@@ -586,7 +586,7 @@ void Tabs::closeAllTabs()
     }
 }
 
-void Tabs::closeAllButActiveTab()
+void Tabs::closeAllButActiveTab(MenuItem* item)
 {
     Widget* activeWidget = getActiveTab();
 

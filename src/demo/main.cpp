@@ -57,6 +57,7 @@ class DemoApp : public FrontierApp
 
     void onCloseTab(Widget* tab);
     void onContextMenu(ListItem* item, Geek::Vector2D pos);
+    void onMenuItem(MenuItem* item);
 
  public:
     DemoApp();
@@ -103,17 +104,21 @@ DemoApp::~DemoApp()
 
 bool DemoApp::init()
 {
-    vector<MenuItem*>* appMenu = getAppMenu();
+    Menu* appMenu = new Menu();
+    setAppMenu(appMenu);
 
     MenuItem* fileMenu = new MenuItem(L"File");
-    fileMenu->add(new MenuItem(L"New..."));
-    appMenu->push_back(fileMenu);
+    appMenu->add(fileMenu);
+
+    MenuItem* newItem = new MenuItem(L"New...");
+    newItem->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onMenuItem));
+    fileMenu->add(newItem);
 
     MenuItem* projectMenu = new MenuItem(L"Project");
     projectMenu->add(new MenuItem(L"New..."));
     projectMenu->add(new MenuItem(L"Open..."));
     projectMenu->add(new MenuItem(L"Save"));
-    appMenu->push_back(projectMenu);
+    appMenu->add(projectMenu);
 
     bool res;
     res = FrontierApp::init();
@@ -337,6 +342,11 @@ void DemoApp::onContextMenu(ListItem* item, Geek::Vector2D pos)
     //closeItem->clickSignal().connect(sigc::mem_fun(*this, &Tabs::closeActiveTab));
     menu->add(item1);
     m_mainWindow->openContextMenu(pos, menu);
+}
+
+void DemoApp::onMenuItem(MenuItem* item)
+{
+    log(DEBUG, "onMenuItem: item=%p", item);
 }
 
 int main(int argc, char** argv)
