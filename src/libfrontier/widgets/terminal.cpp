@@ -53,6 +53,7 @@ Terminal::Terminal(FrontierApp* ui) : Widget(ui, L"Terminal")
 
 Terminal::Terminal(FrontierWindow* window) : Widget(window, L"Terminal")
 {
+    m_process = NULL;
     m_state = STATE_NORMAL;
 }
 
@@ -141,7 +142,10 @@ Widget* Terminal::handleEvent(Event* event)
                 {
                     c = keyEvent->chr;
                 }
-                m_process->typeChar(c);
+                if (m_process != NULL)
+                {
+                    m_process->typeChar(c);
+                }
             }
         }
         default:
