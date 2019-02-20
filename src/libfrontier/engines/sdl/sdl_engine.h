@@ -34,7 +34,7 @@ class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
     SDL_Window* m_sdlWindow;
 
  public:
-    FrontierEngineWindowSDL(Frontier::FrontierWindow* window);
+    FrontierEngineWindowSDL(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window);
     virtual ~FrontierEngineWindowSDL();
 
     virtual bool init();

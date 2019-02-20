@@ -54,7 +54,7 @@ bool FrontierEngineSDL::initWindow(FrontierWindow* window)
 {
     bool res;
 
-    FrontierEngineWindowSDL* few = new FrontierEngineWindowSDL(window);
+    FrontierEngineWindowSDL* few = new FrontierEngineWindowSDL(this, window);
 
     res = few->init();
     if (!res)

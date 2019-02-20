@@ -24,7 +24,8 @@
 using namespace Frontier;
 using namespace Geek;
 
-FrontierEngineWindowSDL::FrontierEngineWindowSDL(FrontierWindow* win) : FrontierEngineWindow(win)
+FrontierEngineWindowSDL::FrontierEngineWindowSDL(FrontierEngine* engine, FrontierWindow* win)
+    : FrontierEngineWindow(engine, win)
 {
 }
 
