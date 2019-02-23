@@ -115,14 +115,15 @@ bool FrontierApp::init()
 return false;
     }
 
-#if defined(__APPLE__) && defined(__MACH__)
-    m_fontManager = new FontManager("/Library/Fonts");
+    m_fontManager = new FontManager();
     res = m_fontManager->init();
     if (!res)
     {
         return false;
     }
 
+#if defined(__APPLE__) && defined(__MACH__)
+    m_fontManager->scan("/Library/Fonts");
     m_fontManager->scan("/System/Library/Fonts");
     const char* homechar = getenv("HOME");
     m_fontManager->scan(string(homechar) + "/Library/Fonts");

@@ -40,7 +40,6 @@ class FontHandle;
 class FontManager : public Geek::Logger
 {
  private:
-    std::string m_path;
     std::map<std::string, FontFamily*> m_fontFamilies;
 
     FT_Library m_library;
@@ -53,11 +52,10 @@ class FontManager : public Geek::Logger
 
  public:
 
-    FontManager(std::string fontPath);
+    FontManager();
     ~FontManager();
 
     bool init();
-    bool scan();
     bool scan(std::string dir);
 
     FontHandle* openFont(std::string name, std::string style, int size);

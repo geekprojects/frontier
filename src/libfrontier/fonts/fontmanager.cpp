@@ -42,10 +42,9 @@ static FT_Error fontManagerRequester(
     return 0;
 }
 
-FontManager::FontManager(string fontPath)
+FontManager::FontManager()
     : Logger("FontManager")
 {
-    m_path = fontPath;
 }
 
 FontManager::~FontManager()
@@ -107,8 +106,6 @@ bool FontManager::init()
         return false;
     }
 
-    scan();
-
     return true;
 }
 
@@ -148,11 +145,6 @@ bool FontManager::scan(string dir)
     closedir(fd);
 
     return true;
-}
-
-bool FontManager::scan()
-{
-    return scan(m_path);
 }
 
 FontHandle* FontManager::openFont(string familyName, string style, int size)
