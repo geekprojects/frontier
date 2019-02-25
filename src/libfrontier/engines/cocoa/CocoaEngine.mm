@@ -177,10 +177,24 @@ void CocoaEngine::updateMenu(Menu* frontierMenu)
 
             for (MenuItem* child : menu->getChildren())
             {
-                NSString* childTitleStr = [CocoaUtils wstringToNSString:child->getTitle()];
-                NSMenuItem* childItem = [nsmenu addItemWithTitle:childTitleStr action:@selector(onMenuItem:) keyEquivalent:@""];
-                childItem.representedObject = [NSValue valueWithPointer:child];
-                childItem.target = target;
+                if (!child->getIsSeparator())
+                {
+                    NSString* childTitleStr = [CocoaUtils wstringToNSString:child->getTitle()];
+                    NSMenuItem* childItem = [nsmenu addItemWithTitle:childTitleStr action:@selector(onMenuItem:) keyEquivalent:@""];
+                    childItem.representedObject = [NSValue valueWithPointer:child];
+                    if (child->getKey() != 0)
+                    {
+                        unichar c[2];
+                        c[0] = child->getKey();
+                        c[1] = 0;
+                        childItem.keyEquivalent = [[NSString alloc] initWithCharacters:c length:1];
+                    }
+                    childItem.target = target;
+                }
+                else
+                {
+                    [nsmenu addItem:[NSMenuItem separatorItem]];
+                }
             }
 
             menuItem = [[NSMenuItem alloc] initWithTitle:titleStr action:nil keyEquivalent:@""];

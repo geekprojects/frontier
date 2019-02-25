@@ -42,7 +42,11 @@ class MenuItem : public FrontierObject
 {
  private:
     std::wstring m_title;
+    bool m_isSeparator;
     std::vector<MenuItem*> m_children;
+
+    wchar_t m_key;
+    uint32_t m_keyModifiers;
 
     void* m_enginePrivate;
 
@@ -50,10 +54,16 @@ class MenuItem : public FrontierObject
 
  public:
     MenuItem(std::wstring title);
+    MenuItem(std::wstring title, wchar_t key, uint32_t keyModifiers);
     virtual ~MenuItem();
 
     void setTitle(std::wstring title) { m_title = title; }
     std::wstring getTitle() { return m_title; }
+    void setIsSeparator(bool isSeparator);
+    bool getIsSeparator() { return m_isSeparator; }
+
+    wchar_t getKey() { return m_key; }
+    wchar_t getKeyModifiers() { return m_keyModifiers; }
 
     void add(MenuItem* child);
     std::vector<MenuItem*>& getChildren() { return m_children; }
@@ -62,6 +72,15 @@ class MenuItem : public FrontierObject
 
     void setEnginePrivate(void* priv) { m_enginePrivate = priv; }
     void* getEnginePrivate() { return m_enginePrivate; }
+};
+
+class MenuSeparator : public MenuItem
+{
+ private:
+
+ public:
+    MenuSeparator();
+    virtual ~MenuSeparator();
 };
 
 class Menu : public FrontierObject

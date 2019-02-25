@@ -118,7 +118,19 @@ bool DemoApp::init()
     projectMenu->add(new MenuItem(L"New..."));
     projectMenu->add(new MenuItem(L"Open..."));
     projectMenu->add(new MenuItem(L"Save"));
+    projectMenu->add(new MenuSeparator());
+    projectMenu->add(new MenuItem(L"Something else..."));
     appMenu->add(projectMenu);
+
+    MenuItem* editMenu = new MenuItem(L"Edit");
+    editMenu->add(new MenuItem(L"Cut", L'x', 0));
+    MenuItem* copyItem = new MenuItem(L"Copy", L'c', 0);
+    copyItem->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onMenuItem));
+    editMenu->add(copyItem);
+    editMenu->add(new MenuItem(L"Paste", L'v', 0));
+    editMenu->add(new MenuSeparator());
+    editMenu->add(new MenuItem(L"Something different"));
+    appMenu->add(editMenu);
 
     bool res;
     res = FrontierApp::init();
@@ -241,6 +253,7 @@ bool DemoApp::init()
 
     Frame* terminalTab = new Frame(this, false);
     Terminal* terminal = new Terminal(this);
+    terminal->run("/usr/bin/top");
     terminalTab->add(terminal);
     m_tabs->addTab(L"Terminal", terminalTab);
 
