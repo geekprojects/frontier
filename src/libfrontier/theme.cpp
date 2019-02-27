@@ -336,6 +336,23 @@ int UITheme::getTextHeight() const
     return m_font->getPixelHeight(72);
 }
 
+Icon* UITheme::getIcon(uint32_t iconId)
+{
+    map<uint32_t, Icon*>::iterator it;
+    it = m_iconCache.find(iconId);
+    if (it != m_iconCache.end())
+    {
+        return it->second;
+    }
+
+
+    Icon* icon = new TextIcon(this, iconId);
+    m_app->registerObject(icon);
+    m_iconCache.insert(make_pair(iconId, icon));
+
+    return icon;
+}
+
 void UITheme::drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted)
 {
     uint32_t c = 0xffffffff;

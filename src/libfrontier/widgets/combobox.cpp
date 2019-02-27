@@ -40,7 +40,7 @@ void ComboBox::initComboBox()
     setPadding(0);
 
     m_textInput = new TextInput(m_app, L"");
-    m_button = new IconButton(m_app, new TextIcon(m_app->getTheme(), FRONTIER_ICON_ARROW_DOWN));
+    m_button = new IconButton(m_app, m_app->getTheme()->getIcon(FRONTIER_ICON_ARROW_DOWN));
 
     m_button->clickSignal().connect(sigc::mem_fun(*this, &ComboBox::openDropDown));
 

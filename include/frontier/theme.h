@@ -24,6 +24,9 @@
 #include <geek/gfx-surface.h>
 
 #include <frontier/fonts.h>
+#include <frontier/icon.h>
+
+#include <map>
 
 namespace Frontier
 {
@@ -81,6 +84,8 @@ class UITheme : public Geek::Logger
     FontHandle* m_monospaceFont;
     FrontierApp* m_app;
 
+    std::map<uint32_t, Icon*> m_iconCache;
+
     int m_margin;
     int m_padding;
 
@@ -104,6 +109,8 @@ class UITheme : public Geek::Logger
     virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false, int rotate = 0);
     virtual int getTextWidth(std::wstring text) const;
     virtual int getTextHeight() const;
+
+    Icon* getIcon(uint32_t icon);
 
     virtual void drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted = false);
     virtual int getIconWidth(wchar_t icon) const;
