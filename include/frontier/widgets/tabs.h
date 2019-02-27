@@ -17,6 +17,7 @@ enum TabPlacement
 struct Tab
 {
     std::wstring title;
+    Icon* icon;
     Widget* content;
     bool closeable;
 };
@@ -61,6 +62,7 @@ class Tabs : public Widget
     TabPlacement getTabPlacement() { return m_placement; }
 
     void addTab(std::wstring title, Widget* content, bool closeable = false);
+    void addTab(std::wstring title, Icon* icon, Widget* content, bool closeable = false);
     void closeTab(Widget* tab, bool emitChangeSignal = true);
 
     void closeActiveTab(MenuItem* item);

@@ -314,17 +314,42 @@ bool Tabs::draw(Surface* surface)
             tabSize.width, tabSize.height);
 
         int titleWidth;
-if (isHorizontal())
-{
-        titleWidth = tabSize.width - 10;
-}
-else
-{
-        titleWidth = tabSize.height - 10;
-}
+        if (isHorizontal())
+        {
+            titleWidth = tabSize.width - 10;
+        }
+        else
+        {
+            titleWidth = tabSize.height - 10;
+        }
+
         if (it->closeable)
         {
             titleWidth -= closeWidth + 5;
+        }
+
+        int textOffsetX = 0;
+        int textOffsetY = 0;
+        Size iconSize;
+        if (it->icon != NULL)
+        {
+            iconSize = it->icon->getSize();
+            int iconX = 5;
+            int iconY = 5;
+            if (isHorizontal())
+            {
+                titleWidth -= iconSize.width + 5;
+                textOffsetX = iconSize.width + 5;
+                iconY = (tabSize.height / 2) - (iconSize.height / 2);
+            }
+            else
+            {
+                titleWidth -= iconSize.height + 5;
+                textOffsetY = iconSize.height + 5;
+                iconX = (tabSize.width / 2) - (iconSize.width / 2);
+            }
+
+            it->icon->draw(surface, x + iconX, y + iconY);
         }
 
 #if 0
@@ -333,8 +358,8 @@ else
 
         m_app->getTheme()->drawText(
             surface,
-            x + 5,
-            labelY + y,
+            textOffsetX + x + 5,
+            textOffsetY + labelY + y,
             it->title.c_str(),
             titleWidth, false, rotate); 
 
@@ -521,8 +546,14 @@ Widget* Tabs::handleEvent(Event* event)
 
 void Tabs::addTab(std::wstring title, Widget* content, bool closeable)
 {
+    addTab(title, NULL, content, closeable);
+}
+
+void Tabs::addTab(std::wstring title, Icon* icon, Widget* content, bool closeable)
+{
     Tab tab;
     tab.title = title;
+    tab.icon = icon;
     tab.content = content;
     tab.closeable = closeable;
 
