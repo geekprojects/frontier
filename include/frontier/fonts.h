@@ -126,13 +126,14 @@ class FontFace
 class FontHandle
 {
  private:
+    FontManager* m_fontManager;
     FontFace* m_face;
     int m_pointSize;
 
     std::map<int, int> m_pixelSizes;
 
  public:
-    FontHandle(FontFace* face, int pointSize);
+    FontHandle(FontManager* fontManager, FontFace* face, int pointSize);
     ~FontHandle();
 
     FT_Face getFTFace();
@@ -140,6 +141,8 @@ class FontHandle
     int getPointSize() { return m_pointSize; }
 
     int getPixelHeight(int dpi);
+
+    FontManager* getFontManager() { return m_fontManager; }
 };
 
 #endif

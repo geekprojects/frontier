@@ -23,8 +23,9 @@
 
 using namespace std;
 
-FontHandle::FontHandle(FontFace* face, int pointSize)
+FontHandle::FontHandle(FontManager* fontManager, FontFace* face, int pointSize)
 {
+    m_fontManager = fontManager;
     m_face = face;
     m_pointSize = pointSize;
 }
