@@ -2,6 +2,7 @@
 #define __FRONTIER_ICON_H_
 
 #include <stdint.h>
+#include <frontier/object.h>
 #include <frontier/fontawesome.h>
 #include <frontier/utils.h>
 #include <geek/gfx-surface.h>
@@ -11,7 +12,7 @@ namespace Frontier
 
 class UITheme;
 
-class Icon
+class Icon : public FrontierObject
 {
  protected:
     UITheme* m_theme;

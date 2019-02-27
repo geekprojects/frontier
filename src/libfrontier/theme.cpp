@@ -86,6 +86,11 @@ bool UITheme::init()
 
 UITheme::~UITheme()
 {
+    map<uint32_t, Icon*>::iterator it;
+    for (it = m_iconCache.begin(); it != m_iconCache.end(); it++)
+    {
+        (it->second)->decRefCount();
+    }
 }
 
 uint32_t UITheme::getColour(ThemeColour colour)
@@ -347,6 +352,7 @@ Icon* UITheme::getIcon(uint32_t iconId)
 
 
     Icon* icon = new TextIcon(this, iconId);
+    icon->incRefCount();
     m_app->registerObject(icon);
     m_iconCache.insert(make_pair(iconId, icon));
 
