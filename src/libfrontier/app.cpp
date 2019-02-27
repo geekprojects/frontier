@@ -61,13 +61,6 @@ FrontierApp::~FrontierApp()
     }
     m_windows.clear();
 
-    gc();
-
-    for (FrontierObject* obj : m_objects)
-    {
-        log(Geek::DEBUG, "~FrontierApp: Leaked object %p: type=%s references=%d", obj, typeid(*obj).name(), obj->getRefCount());
-    }
-
     if (m_theme != NULL)
     {
         delete m_theme;
@@ -81,6 +74,13 @@ FrontierApp::~FrontierApp()
     if (m_engine != NULL)
     {
         delete m_engine;
+    }
+
+    gc();
+
+    for (FrontierObject* obj : m_objects)
+    {
+        log(Geek::DEBUG, "~FrontierApp: Leaked object %p: type=%s references=%d", obj, typeid(*obj).name(), obj->getRefCount());
     }
 }
 
