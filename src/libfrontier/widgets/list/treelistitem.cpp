@@ -34,7 +34,7 @@ TreeListItem::TreeListItem(FrontierApp* ui, std::wstring text) : TextListItem(ui
     m_open = false;
 }
 
-TreeListItem::TreeListItem(FrontierApp* ui, uint32_t icon, std::wstring text) : TextListItem(ui, icon, text)
+TreeListItem::TreeListItem(FrontierApp* ui, Icon* icon, std::wstring text) : TextListItem(ui, icon, text)
 {
     m_open = false;
 }
@@ -44,7 +44,7 @@ TreeListItem::TreeListItem(FrontierWindow* win, std::wstring text) : TextListIte
     m_open = false;
 }
 
-TreeListItem::TreeListItem(FrontierWindow* win, uint32_t icon, std::wstring text) : TextListItem(win, icon, text)
+TreeListItem::TreeListItem(FrontierWindow* win, Icon* icon, std::wstring text) : TextListItem(win, icon, text)
 {
     m_open = false;
 }

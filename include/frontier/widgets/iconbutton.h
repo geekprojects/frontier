@@ -3,6 +3,7 @@
 
 #include <frontier/widgets/button.h>
 #include <frontier/fontawesome.h>
+#include <frontier/icon.h>
 
 namespace Frontier
 {
@@ -10,11 +11,11 @@ namespace Frontier
 class IconButton : public Button
 {
  private:
-    wchar_t m_icon;
+    Icon* m_icon;
 
  public:
-    IconButton(FrontierApp* ui, wchar_t icon);
-    IconButton(FrontierWindow* ui, wchar_t icon);
+    IconButton(FrontierApp* ui, Icon* icon);
+    IconButton(FrontierWindow* ui, Icon* icon);
     virtual ~IconButton();
 
     virtual void calculateSize();

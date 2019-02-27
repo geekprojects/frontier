@@ -31,11 +31,11 @@ using namespace Geek::Gfx;
 
 TextListItem::TextListItem(FrontierApp* ui, std::wstring text) : ListItem(ui)
 {
-    m_icon = 0;
+    m_icon = NULL;
     m_text = text;
 }
 
-TextListItem::TextListItem(FrontierApp* ui, uint32_t icon, std::wstring text) : ListItem(ui)
+TextListItem::TextListItem(FrontierApp* ui, Icon* icon, std::wstring text) : ListItem(ui)
 {
     m_icon = icon;
     m_text = text;
@@ -43,11 +43,11 @@ TextListItem::TextListItem(FrontierApp* ui, uint32_t icon, std::wstring text) : 
 
 TextListItem::TextListItem(FrontierWindow* window, std::wstring text) : ListItem(window)
 {
-    m_icon = 0;
+    m_icon = NULL;
     m_text = text;
 }
 
-TextListItem::TextListItem(FrontierWindow* window, uint32_t icon, std::wstring text) : ListItem(window)
+TextListItem::TextListItem(FrontierWindow* window, Icon* icon, std::wstring text) : ListItem(window)
 {
     m_icon = icon;
     m_text = text;
@@ -71,10 +71,11 @@ void TextListItem::calculateSize()
 
     m_minSize.width = 1 + m_app->getTheme()->getTextWidth(m_text);
 
-    if (m_icon != 0)
+    if (m_icon != NULL)
     {
+        Size iconSize = m_icon->getSize();
         //m_minSize.width += m_app->getTheme()->getIconWidth(m_icon);
-        m_minSize.width += ICON_WIDTH;
+        m_minSize.width += iconSize.width;
     }
 
     m_minSize.width += (m_margin * 2);
@@ -99,11 +100,12 @@ bool TextListItem::draw(Geek::Gfx::Surface* surface)
     int x = 1;
     int y = (surface->getHeight() / 2) - (lineHeight) / 2;
 
-    if (m_icon != 0)
+    if (m_icon != NULL)
     {
-        int iconWidth = m_app->getTheme()->getIconWidth(m_icon);
-        int iconX = (ICON_WIDTH / 2) - (iconWidth / 2);
-        m_app->getTheme()->drawIcon(surface, x + iconX, y, m_icon, m_selected);
+        Size iconSize = m_icon->getSize();
+        int iconX = (ICON_WIDTH / 2) - (iconSize.width / 2);
+        //m_app->getTheme()->drawIcon(surface, x + iconX, y, m_icon, m_selected);
+        m_icon->draw(surface, x + iconX, y);
         x += ICON_WIDTH;
     }
 

@@ -149,9 +149,9 @@ bool DemoApp::init()
     Frame* toolbarTab = new Frame(this, false);
 
     Frame* toolbar1 = new Frame(this, true);
-    toolbar1->add(new IconButton(this, FRONTIER_ICON_FOLDER_OPEN));
-    toolbar1->add(new IconButton(this, FRONTIER_ICON_SAVE));
-    toolbar1->add(new IconButton(this, FRONTIER_ICON_SYNC));
+    toolbar1->add(new IconButton(this, new TextIcon(getTheme(), FRONTIER_ICON_FOLDER_OPEN)));
+    toolbar1->add(new IconButton(this, new TextIcon(getTheme(), FRONTIER_ICON_SAVE)));
+    toolbar1->add(new IconButton(this, new TextIcon(getTheme(), FRONTIER_ICON_SYNC)));
     toolbarTab->add(toolbar1);
     m_tabs->addTab(L"Tool Bars", toolbarTab);
 
@@ -202,7 +202,7 @@ bool DemoApp::init()
     Frame* iconButtonFrame1 = new Frame(this, true);
     IconButton* iconButton;
     iconButtonFrame1->add(new Label(this, L"Icon Button:"));
-    iconButtonFrame1->add(iconButton = new IconButton(this, 0xf0ae));
+    iconButtonFrame1->add(iconButton = new IconButton(this, new TextIcon(getTheme(), 0xf0ae)));
     iconButtonTab->add(iconButtonFrame1);
     m_tabs->addTab(L"Icon Buttons", iconButtonTab);
 
@@ -267,9 +267,9 @@ bool DemoApp::init()
 
     Frame* menuButtonTab = new Frame(this, false);
     List* menuList = new List(this);
-    menuList->addItem(new TextListItem(this, FRONTIER_ICON_FILE, L"New..."));
+    menuList->addItem(new TextListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_FILE), L"New..."));
     menuList->addItem(new TextListItem(this, L"Open..."));
-    menuList->addItem(new TextListItem(this, FRONTIER_ICON_SAVE, L"Save"));
+    menuList->addItem(new TextListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_SAVE), L"Save"));
     menuList->addItem(new TextListItem(this, L"Save As..."));
     menuButtonTab->add(menuList);
     m_tabs->addTab(L"Menu Test", menuButtonTab, true);
@@ -279,28 +279,28 @@ bool DemoApp::init()
 
     List* list = new List(this);
     list->contextMenuSignal().connect(sigc::mem_fun(*this, &DemoApp::onContextMenu));
-    list->addItem(new TextListItem(this, FRONTIER_ICON_FOLDER_OPEN, L"This is"));
-    list->addItem(new TextListItem(this, FRONTIER_ICON_THUMBS_UP, L"a list"));
-    list->addItem(new TextListItem(this, FRONTIER_ICON_TOGGLE_ON, L"with lots"));
+    list->addItem(new TextListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_FOLDER_OPEN), L"This is"));
+    list->addItem(new TextListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_THUMBS_UP), L"a list"));
+    list->addItem(new TextListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_TOGGLE_ON), L"with lots"));
     list->addItem(new TextListItem(this, L"of very"));
     list->addItem(new TextListItem(this, L"boring"));
     list->addItem(new TextListItem(this, L"items"));
 
     TreeListItem* tree1;
-    list->addItem(tree1 = new TreeListItem(this, FRONTIER_ICON_TREE, L"It's a tree!"));
+    list->addItem(tree1 = new TreeListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_TREE), L"It's a tree!"));
     tree1->addItem(new TextListItem(this, L"This tree"));
     tree1->addItem(new TextListItem(this, L"has lots"));
     tree1->addItem(new TextListItem(this, L"of very"));
     tree1->addItem(new TextListItem(this, L"exciting items!"));
 
     TreeListItem* tree2;
-    tree1->addItem(tree2 = new TreeListItem(this, FRONTIER_ICON_TREE, L"It's a tree IN A TREE!"));
+    tree1->addItem(tree2 = new TreeListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_TREE), L"It's a tree IN A TREE!"));
     tree2->addItem(new TextListItem(this, L"Wow!"));
 
     int i;
     for (i = 0; i < 100; i++)
     {
-        list->addItem(new TextListItem(this, FRONTIER_ICON_FOLDER_OPEN, L"Another item!"));
+        list->addItem(new TextListItem(this, new TextIcon(getTheme(), FRONTIER_ICON_FOLDER_OPEN), L"Another item!"));
     }
 
     Scroller* scroller = new Scroller(this);

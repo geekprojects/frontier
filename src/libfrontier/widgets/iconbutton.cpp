@@ -26,13 +26,13 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek::Gfx;
 
-IconButton::IconButton(FrontierApp* ui, wchar_t icon) : Button(ui, L"")
+IconButton::IconButton(FrontierApp* ui, Icon* icon) : Button(ui, L"")
 {
     m_icon = icon;
     m_state = false;
 }
 
-IconButton::IconButton(FrontierWindow* window, wchar_t icon) : Button(window, L"")
+IconButton::IconButton(FrontierWindow* window, Icon* icon) : Button(window, L"")
 {
     m_icon = icon;
     m_state = false;
@@ -44,8 +44,9 @@ IconButton::~IconButton()
 
 void IconButton::calculateSize()
 {
-    m_minSize.width = m_app->getTheme()->getIconWidth(m_icon) + (5 * 2);
-    m_minSize.height = m_app->getTheme()->getIconHeight() + (5 * 2);
+    m_minSize = m_icon->getSize();
+    m_minSize.width += (5 * 2);
+    m_minSize.height += (5 * 2);
 
     if (m_minSize.height > m_minSize.width)
     {
@@ -58,10 +59,9 @@ void IconButton::calculateSize()
 
 bool IconButton::draw(Surface* surface)
 {
-    int w = m_app->getTheme()->getIconWidth(m_icon);
-    int h = m_app->getTheme()->getIconHeight();
-    int x = (m_setSize.width / 2) - (w / 2);
-    int y = (m_setSize.height / 2) - (h / 2);
+    Size iconSize = m_icon->getSize();
+    int x = (m_setSize.width / 2) - (iconSize.width / 2);
+    int y = (m_setSize.height / 2) - (iconSize.height / 2);
 
     if (m_state || m_mouseOver)
     {
@@ -73,7 +73,8 @@ bool IconButton::draw(Surface* surface)
             m_setSize.width, m_setSize.height);
     }
 
-    m_app->getTheme()->drawIcon(surface, x, y, m_icon);
+    //m_app->getTheme()->drawIcon(surface, x, y, m_icon);
+    m_icon->draw(surface, x, y);
 
     return true;
 }

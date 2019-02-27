@@ -2,7 +2,7 @@
 #define __FRONTIER_WIDGETS_LIST_H_
 
 #include <frontier/widgets.h>
-#include <frontier/fontawesome.h>
+#include <frontier/icon.h>
 
 namespace Frontier
 {
@@ -36,14 +36,14 @@ class ListItem : public Widget
 class TextListItem : public ListItem
 {
  private:
-    uint32_t m_icon;
+    Icon* m_icon;
     std::wstring m_text;
 
  public:
     TextListItem(FrontierApp* ui, std::wstring text);
-    TextListItem(FrontierApp* ui, uint32_t icon, std::wstring text);
+    TextListItem(FrontierApp* ui, Icon* icon, std::wstring text);
     TextListItem(FrontierWindow* ui, std::wstring text);
-    TextListItem(FrontierWindow* ui, uint32_t icon, std::wstring text);
+    TextListItem(FrontierWindow* ui, Icon* icon, std::wstring text);
     virtual ~TextListItem();
 
     void setText(std::wstring wtext);
@@ -62,9 +62,9 @@ class TreeListItem : public TextListItem
 
  public:
     TreeListItem(FrontierApp* ui, std::wstring text);
-    TreeListItem(FrontierApp* ui, uint32_t icon, std::wstring text);
+    TreeListItem(FrontierApp* ui, Icon* icon, std::wstring text);
     TreeListItem(FrontierWindow* ui, std::wstring text);
-    TreeListItem(FrontierWindow* ui, uint32_t icon, std::wstring text);
+    TreeListItem(FrontierWindow* ui, Icon* icon, std::wstring text);
     virtual ~TreeListItem();
 
     void addItem(ListItem* item);
