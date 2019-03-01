@@ -127,6 +127,20 @@ void Widget::setParent(Widget* widget)
     callInit();
 }
 
+Widget* Widget::findParent(const type_info& type)
+{
+    if (m_parent == NULL)
+    {
+        return NULL;
+    }
+
+    if (typeid(*m_parent).hash_code() == type.hash_code())
+    {
+        return m_parent;
+    }
+    return m_parent->findParent(type);;
+}
+
 FrontierWindow* Widget::getWindow()
 {
     if (m_window != NULL)

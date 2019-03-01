@@ -120,6 +120,7 @@ class Widget : public FrontierObject, public Geek::Logger
 
     void setParent(Widget* w);
     Widget* getParent() const { return m_parent; }
+    Widget* findParent(const std::type_info& type);
 
     void setWindow(FrontierWindow* window) { m_window = window; }
     FrontierWindow* getWindow();
