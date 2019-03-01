@@ -103,11 +103,11 @@ void TreeListItem::layout()
             ListItem* item = *it;
             Size itemMin = item->getMinSize();
             Size itemMax = item->getMaxSize();
-            Size itemSize = Size(m_setSize.width - (TREELISTITEM_INDENT * 2), itemMin.height);
+            Size itemSize = Size(m_setSize.width - (TREELISTITEM_INDENT * 1), itemMin.height);
             itemSize.setMax(itemMin);
             itemSize.setMin(itemMax);
             item->setSize(itemSize);
-            item->setPosition((TREELISTITEM_INDENT * 2), y);
+            item->setPosition((TREELISTITEM_INDENT * 1), y);
             item->layout();
             y += itemSize.height;
         }
