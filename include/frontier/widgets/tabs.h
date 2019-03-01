@@ -31,6 +31,8 @@ class Tabs : public Widget
     TabPlacement m_placement;
     bool m_collapsible;
     bool m_collapsed;
+    Icon* m_openIcon;
+    Icon* m_closedIcon;
 
     sigc::signal<void, Widget*> m_changeTabSignal;
     sigc::signal<void, Widget*> m_closeTabSignal;
@@ -85,6 +87,9 @@ class Tabs : public Widget
     void setActiveTab(Widget* tabContent);
     int findTab(Widget* tabContent);
     const std::vector<Tab>& getTabs() { return m_tabs; }
+
+    void nextTab();
+    void prevTab();
 
     virtual void dump(int level);
 

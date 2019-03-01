@@ -89,6 +89,31 @@ void Tabs::init()
     menu->add(closeOthersItem);
 
     setContextMenu(menu);
+
+    uint32_t openIcon = 0;
+    uint32_t closedIcon = 0;
+    switch (m_placement)
+    {
+        case TAB_TOP:
+            openIcon = FRONTIER_ICON_ANGLE_DOUBLE_UP;
+            closedIcon = FRONTIER_ICON_ANGLE_DOUBLE_DOWN;
+            break;
+        case TAB_BOTTOM:
+            openIcon = FRONTIER_ICON_ANGLE_DOUBLE_DOWN;
+            closedIcon = FRONTIER_ICON_ANGLE_DOUBLE_UP;
+            break;
+        case TAB_LEFT:
+            openIcon = FRONTIER_ICON_ANGLE_DOUBLE_LEFT;
+            closedIcon = FRONTIER_ICON_ANGLE_DOUBLE_RIGHT;
+            break;
+        case TAB_RIGHT:
+            openIcon = FRONTIER_ICON_ANGLE_DOUBLE_RIGHT;
+            closedIcon = FRONTIER_ICON_ANGLE_DOUBLE_LEFT;
+            break;
+    }
+    m_openIcon = m_app->getTheme()->getIcon(openIcon);
+    m_closedIcon = m_app->getTheme()->getIcon(closedIcon);
+
 }
 
 void Tabs::calculateSize()
@@ -220,51 +245,24 @@ bool Tabs::draw(Surface* surface)
 
     if (m_collapsible)
     {
-        int icon = 0;
+        Icon* icon;
         if (m_collapsed)
         {
-            switch (m_placement)
-            {
-                case TAB_TOP:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_UP;
-                    break;
-                case TAB_BOTTOM:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_DOWN;
-                    break;
-                case TAB_LEFT:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_LEFT;
-                    break;
-                case TAB_RIGHT:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_RIGHT;
-                    break;
-            }
+            icon = m_closedIcon;
         }
         else
         {
-            switch (m_placement)
-            {
-                case TAB_TOP:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_DOWN;
-                    break;
-                case TAB_BOTTOM:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_UP;
-                    break;
-                case TAB_LEFT:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_RIGHT;
-                    break;
-                case TAB_RIGHT:
-                    icon = FRONTIER_ICON_ANGLE_DOUBLE_LEFT;
-                    break;
-            }
-
+            icon = m_openIcon;
         }
 
-        m_app->getTheme()->drawIcon(
-            surface,
-            tabsRect.x,
-            tabsRect.y,
-            icon,
-            false);
+        Size iconSize = icon->getSize();
+        int iconX = (TAB_SIZE / 2) - (iconSize.width / 2);
+        int iconY = (TAB_SIZE / 2) - (iconSize.height / 2);
+
+        icon->draw(
+            surface, 
+            tabsRect.x + iconX,
+            tabsRect.y + iconY);
  
         if (isHorizontal())
         {
@@ -541,6 +539,7 @@ Widget* Tabs::handleEvent(Event* event)
         }
         return this;
     }
+
     return NULL;
 }
 
@@ -664,6 +663,26 @@ int Tabs::findTab(Widget* tabContent)
 
     // Not found
     return -1;
+}
+
+void Tabs::nextTab()
+{
+    m_activeTab++;
+    if (m_activeTab >= m_tabs.size())
+    {
+        m_activeTab = 0;
+    }
+    setDirty();
+}
+
+void Tabs::prevTab()
+{
+    m_activeTab--;
+    if (m_activeTab < 0)
+    {
+        m_activeTab = m_tabs.size() - 1;
+    }
+    setDirty();
 }
 
 void Tabs::dump(int level)
