@@ -153,13 +153,13 @@ bool DemoApp::init()
     toolbar1->add(new IconButton(this, getTheme()->getIcon(FRONTIER_ICON_SAVE)));
     toolbar1->add(new IconButton(this, getTheme()->getIcon(FRONTIER_ICON_SYNC)));
     toolbarTab->add(toolbar1);
-    m_tabs->addTab(L"Tool Bars", toolbarTab);
+    m_tabs->addTab(L"Tool Bars", getTheme()->getIcon(FRONTIER_ICON_TOOLBOX), toolbarTab);
 
     /*
      * Labels
      */
     Frame* labelTab = new Frame(this, false);
-    m_tabs->addTab(L"Labels", labelTab);
+    m_tabs->addTab(L"Labels", getTheme()->getIcon(FRONTIER_ICON_TAG), labelTab);
 
     Frame* labelFrame1 = new Frame(this, true);
     labelFrame1->add(new Label(this, L"Label:"));
