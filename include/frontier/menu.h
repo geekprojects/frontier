@@ -90,6 +90,7 @@ class Menu : public FrontierObject
 
  public:
     Menu();
+    Menu(std::vector<MenuItem*>);
     ~Menu();
 
     void add(MenuItem* child) { m_menuItems.push_back(child); }

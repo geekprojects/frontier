@@ -266,11 +266,27 @@ bool DemoApp::init()
 
 
     Frame* menuButtonTab = new Frame(this, false);
-    List* menuList = new List(this);
-    menuList->addItem(new TextListItem(this, getTheme()->getIcon(FRONTIER_ICON_FILE), L"New..."));
-    menuList->addItem(new TextListItem(this, L"Open..."));
-    menuList->addItem(new TextListItem(this, getTheme()->getIcon(FRONTIER_ICON_SAVE), L"Save"));
-    menuList->addItem(new TextListItem(this, L"Save As..."));
+
+    Menu* menuListMenu = new Menu();
+    MenuItem* menuListFileMenu = new MenuItem(L"File");
+    menuListFileMenu->add(new MenuItem(L"New..."));
+    menuListFileMenu->add(new MenuItem(L"Open..."));
+    menuListFileMenu->add(new MenuItem(L"Save"));
+    menuListFileMenu->add(new MenuItem(L"Save As..."));
+    menuListMenu->add(menuListFileMenu);
+
+    MenuItem* menuListEditMenu = new MenuItem(L"Edit");
+    menuListEditMenu->add(new MenuItem(L"Cut"));
+    menuListEditMenu->add(new MenuItem(L"Copy"));
+    menuListEditMenu->add(new MenuItem(L"Paste"));
+    menuListMenu->add(menuListEditMenu);
+    MenuList* menuList = new MenuList(this, menuListMenu, true);
+
+
+    //menuList->addItem(new TextListItem(this, getTheme()->getIcon(FRONTIER_ICON_FILE), L"New..."));
+    //menuList->addItem(new TextListItem(this, L"Open..."));
+    //menuList->addItem(new TextListItem(this, getTheme()->getIcon(FRONTIER_ICON_SAVE), L"Save"));
+    //menuList->addItem(new TextListItem(this, L"Save As..."));
     menuButtonTab->add(menuList);
     m_tabs->addTab(L"Menu Test", menuButtonTab, true);
 

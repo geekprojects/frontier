@@ -27,7 +27,7 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-MenuList::MenuList(FrontierApp* ui, Menu* menu) : List(ui)
+MenuList::MenuList(FrontierApp* ui, Menu* menu, bool horizontal) : List(ui, horizontal)
 {
     if (menu != NULL)
     {
@@ -35,7 +35,7 @@ MenuList::MenuList(FrontierApp* ui, Menu* menu) : List(ui)
     }
 }
 
-MenuList::MenuList(FrontierWindow* window, Menu* menu) : List(window)
+MenuList::MenuList(FrontierWindow* window, Menu* menu, bool horizontal) : List(window, horizontal)
 {
     if (menu != NULL)
     {
@@ -43,12 +43,12 @@ MenuList::MenuList(FrontierWindow* window, Menu* menu) : List(window)
     }
 }
 
-MenuList::MenuList(FrontierApp* ui, std::vector<MenuItem*> menu) : List(ui)
+MenuList::MenuList(FrontierApp* ui, std::vector<MenuItem*> menu, bool horizontal) : List(ui, horizontal)
 {
     m_menuItems = menu;
 }
 
-MenuList::MenuList(FrontierWindow* window, std::vector<MenuItem*> menu) : List(window)
+MenuList::MenuList(FrontierWindow* window, std::vector<MenuItem*> menu, bool horizontal) : List(window, horizontal)
 {
     m_menuItems = menu;
 }
@@ -60,25 +60,77 @@ MenuList::~MenuList()
 void MenuList::init()
 {
     setMenu(m_menuItems);
+
+    selectSignal().connect(sigc::mem_fun(*this, &MenuList::onSelect));
+}
+
+void MenuList::calculateSize()
+{
+    if (m_menuItems.empty())
+    {
+        m_minSize.set(0, 0);
+        if (isHorizontal())
+        {
+            m_maxSize.set(WIDGET_SIZE_UNLIMITED, 0);
+        }
+        else
+        {
+            m_maxSize.set(0, WIDGET_SIZE_UNLIMITED);
+        }
+        return;
+    }
+
+    List::calculateSize();
+
+    if (isHorizontal())
+    {
+        m_maxSize.height = m_minSize.height;
+    }
+    else
+    {
+        m_maxSize.width = m_minSize.width;
+    }
+
 }
 
 void MenuList::setMenu(std::vector<MenuItem*> menuItems)
 {
-    log(DEBUG, "setMenu: items=%lu", menuItems.size());
     m_menuItems = menuItems;
 
-    log(DEBUG, "setMenu: Clearing...");
     clearItems();
 
-    log(DEBUG, "setMenu: Adding...");
     for (MenuItem* menuItem : m_menuItems)
     {
-        log(DEBUG, "setMenu: Adding item: %ls", menuItem->getTitle().c_str());
         TextListItem* item = new TextListItem(m_app, menuItem->getTitle());
         item->setPrivateData(menuItem);
         addItem(item);
     }
-    log(DEBUG, "setMenu: Done");
 }
 
+void MenuList::onSelect(ListItem* item)
+{
+    log(DEBUG, "onSelect: item=%p", item);
+    if (item == NULL)
+    {
+        // Shouldn't happen?
+        return;
+    }
+
+    clearSelected(item);
+
+    MenuItem* menuItem = (MenuItem*)(item->getPrivateData());
+
+    if (menuItem->getChildren().empty())
+    {
+        menuItem->clickSignal().emit(menuItem);
+    }
+    else
+    {
+        if (getWindow() != NULL)
+        {
+            Menu* menu = new Menu(menuItem->getChildren());
+            getWindow()->openContextMenu(item->getAbsolutePosition(), menu);
+        }
+    }
+}
 

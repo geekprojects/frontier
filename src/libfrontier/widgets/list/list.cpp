@@ -27,14 +27,16 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-List::List(FrontierApp* ui) : Widget(ui, L"List")
+List::List(FrontierApp* ui, bool horizontal) : Widget(ui, L"List")
 {
     m_selected = NULL;
+    m_horizontal = horizontal;
 }
 
-List::List(FrontierWindow* window) : Widget(window, L"List")
+List::List(FrontierWindow* window, bool horizontal) : Widget(window, L"List")
 {
     m_selected = NULL;
+    m_horizontal = horizontal;
 }
 
 List::~List()
@@ -56,18 +58,40 @@ void List::calculateSize()
         item->calculateSize();
 
         Size itemMin = item->getMinSize();
-        m_minSize.setMaxWidth(itemMin);
-        m_minSize.height += itemMin.height;
-
         Size itemMax = item->getMaxSize();
-        m_maxSize.setMaxWidth(itemMax);
-        if (itemMax.height == WIDGET_SIZE_UNLIMITED)
+
+        if (!m_horizontal)
         {
-            m_maxSize.height = WIDGET_SIZE_UNLIMITED;
+            m_minSize.setMaxWidth(itemMin);
+            m_maxSize.setMaxWidth(itemMax);
+
+            m_minSize.height += itemMin.height;
+
+            if (itemMax.height == WIDGET_SIZE_UNLIMITED)
+            {
+                m_maxSize.height = WIDGET_SIZE_UNLIMITED;
+            }
+            else if (m_maxSize.height < WIDGET_SIZE_UNLIMITED)
+            {
+                m_maxSize.height += itemMin.height;
+            }
         }
-        else if (m_maxSize.height < WIDGET_SIZE_UNLIMITED)
+        else
         {
-            m_maxSize.height += itemMin.height;
+            m_minSize.setMaxHeight(itemMin);
+            m_maxSize.setMaxHeight(itemMax);
+
+            m_minSize.width += itemMin.width;
+
+            if (itemMax.width == WIDGET_SIZE_UNLIMITED)
+            {
+                m_maxSize.width = WIDGET_SIZE_UNLIMITED;
+            }
+            else if (m_maxSize.width < WIDGET_SIZE_UNLIMITED)
+            {
+                m_maxSize.width += itemMin.height;
+            }
+
         }
     }
 
@@ -89,12 +113,26 @@ void List::layout()
         Size itemMin = item->getMinSize();
         Size itemMax = item->getMaxSize();
 
-        Size itemSize = Size(m_setSize.width, itemMin.height);
+        Size itemSize;
+        if (!m_horizontal)
+        {
+            itemSize = Size(m_setSize.width, itemMin.height);
 #if 0
-        log(DEBUG, "layout: itemSize(1): %d,%d, min=%d,%d, max=%d,%d", itemSize.width, itemSize.height, itemMin.width, itemMin.height, itemMax.width, itemMax.height);
+            log(DEBUG, "layout: itemSize(1): %d,%d, min=%d,%d, max=%d,%d", itemSize.width, itemSize.height, itemMin.width, itemMin.height, itemMax.width, itemMax.height);
 #endif
-        itemSize.setMin(itemMax);
-        itemSize.setMax(itemMin);
+            itemSize.setMin(itemMax);
+            itemSize.setMax(itemMin);
+        }
+        else
+        {
+            itemSize = Size(itemMin.width, m_setSize.height);
+#if 0
+            log(DEBUG, "layout: itemSize(1): %d,%d, min=%d,%d, max=%d,%d", itemSize.width, itemSize.height, itemMin.width, itemMin.height, itemMax.width, itemMax.height);
+#endif
+            itemSize.setMin(itemMax);
+            itemSize.setMax(itemMin);
+    }
+
 #if 0
         log(DEBUG, "layout: itemSize(2): %d,%d", itemSize.width, itemSize.height);
 #endif
@@ -103,7 +141,14 @@ void List::layout()
 
         item->layout();
 
-        y += itemSize.height;
+        if (!m_horizontal)
+        {
+            y += itemSize.height;
+        }
+        else
+        {
+            x += itemSize.width;
+        }
     }
 }
 
@@ -122,9 +167,19 @@ bool List::draw(Surface* surface, Rect visible)
 
         if (item->getX() >= visible.x - item->getWidth() && item->getY() >= visible.y - item->getHeight())
         {
-            if (item->getY() > visible.y + visible.height)
+            if (!m_horizontal)
             {
-                break;
+                if (item->getY() > visible.y + visible.height)
+                {
+                    break;
+                }
+            }
+            else
+            {
+                if (item->getX() > visible.x + visible.width)
+                {
+                    break;
+                }
             }
             SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
             item->draw(&viewport);
@@ -195,7 +250,15 @@ void List::setSelected(ListItem* item)
 
 void List::clearSelected(ListItem* item)
 {
-    m_selected = NULL;
+    if (m_selected == item)
+    {
+        m_selected = NULL;
+        if (item != NULL)
+        {
+            item->clearSelected(false);
+        }
+        setDirty(DIRTY_CONTENT);
+    }
 }
 
 ListItem::ListItem(FrontierApp* ui) : Widget(ui, L"ListItem")

@@ -83,14 +83,17 @@ class List : public Widget
  private:
     std::vector<ListItem*> m_list;
     ListItem* m_selected;
+    bool m_horizontal;
 
     sigc::signal<void, ListItem*> m_selectSignal;
     sigc::signal<void, ListItem*, Geek::Vector2D> m_contextMenuSignal;
 
  public:
-    List(FrontierApp* ui);
-    List(FrontierWindow* window);
+    List(FrontierApp* ui, bool horizontal = false);
+    List(FrontierWindow* window, bool horizontal = false);
     virtual ~List();
+
+    bool isHorizontal() { return m_horizontal; }
 
     virtual void calculateSize();
     virtual void layout();
@@ -114,16 +117,20 @@ class MenuList : public List
  private:
     std::vector<MenuItem*> m_menuItems;
 
+    void onSelect(ListItem* item);
+
  public:
-    MenuList(FrontierApp* ui, Menu* menu);
-    MenuList(FrontierWindow* window, Menu* menu);
-    MenuList(FrontierApp* ui, std::vector<MenuItem*> menu);
-    MenuList(FrontierWindow* window, std::vector<MenuItem*> menu);
+    MenuList(FrontierApp* ui, Menu* menu, bool horizontal = false);
+    MenuList(FrontierWindow* window, Menu* menu, bool horizontal = false);
+    MenuList(FrontierApp* ui, std::vector<MenuItem*> menu, bool horizontal = false);
+    MenuList(FrontierWindow* window, std::vector<MenuItem*> menu, bool horizontal = false);
     virtual ~MenuList();
 
     virtual void init();
 
-    void setMenu(std::vector<MenuItem*> menuItems);
+    virtual void calculateSize();
+
+    void setMenu(std::vector<MenuItem*> m_menu);
 };
 
 };

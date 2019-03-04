@@ -1,10 +1,16 @@
 
 #include <frontier/menu.h>
 
+using namespace std;
 using namespace Frontier;
 
 Menu::Menu()
 {
+}
+
+Menu::Menu(vector<MenuItem*> items)
+{
+    m_menuItems = items;
 }
 
 Menu::~Menu()
