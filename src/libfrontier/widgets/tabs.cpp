@@ -678,7 +678,7 @@ void Tabs::nextTab()
 void Tabs::prevTab()
 {
     m_activeTab--;
-    if (m_activeTab < 0)
+    if ((int)m_activeTab < 0)
     {
         m_activeTab = m_tabs.size() - 1;
     }
