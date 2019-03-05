@@ -12,9 +12,6 @@ class Frame : public Widget
     bool m_horizontal;
     bool m_border;
 
-    virtual void calculateSize();
-    virtual void layout();
-
  public:
     Frame(FrontierApp* ui, bool horizontal);
     Frame(FrontierApp* ui, std::wstring widgetName, bool horizontal);
@@ -25,6 +22,10 @@ class Frame : public Widget
     void setBorder(bool border) { m_border = border; }
 
     virtual void add(Widget* widget);
+    virtual void remove(Widget* widget);
+
+    virtual void calculateSize();
+    virtual void layout();
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 

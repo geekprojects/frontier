@@ -67,6 +67,24 @@ void Frame::add(Widget* widget)
     widget->setDirty();
 }
 
+void Frame::remove(Widget* widget)
+{
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); it++)
+    {
+        Widget* child = *it;
+        if (child == widget)
+        {
+            m_children.erase(it);
+            child->incRefCount();
+            child->setParent(NULL);
+            setDirty();
+
+            break;
+        }
+    }
+}
+
 bool Frame::draw(Surface* surface)
 {
     if (m_border)
