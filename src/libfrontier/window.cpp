@@ -24,6 +24,7 @@
 #include <frontier/engine.h>
 #include <frontier/widgets.h>
 #include <frontier/contextmenu.h>
+#include <frontier/widgets/frame.h>
 
 #include <typeinfo>
 
@@ -43,7 +44,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_visible = false;
     m_currentCursor = CURSOR_POINTER;
 
-    m_widget = NULL;
+    m_content = NULL;
     m_dragWidget = NULL;
     m_mouseOverWidget = NULL;
     m_dragWidget = NULL;
@@ -51,18 +52,35 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
 
     m_surface = NULL;
 
+    m_menuBar = NULL;
     m_menu = NULL;
 
     m_size.set(640, 480);
+
+    m_root = new Frame(app, false);
+    m_root->incRefCount();
+    m_root->setWindow(this);
+    m_root->setPadding(2);
+    m_root->setMargin(0);
+    if (hasBorder() && !m_app->getEngine()->providesMenus())
+    {
+        m_menuBar = new MenuList(m_app, NULL, true);
+        m_root->add(m_menuBar);
+    }
 
     m_app->addWindow(this);
 }
 
 FrontierWindow::~FrontierWindow()
 {
-    if (m_widget != NULL)
+    if (m_root != NULL)
     {
-        m_widget->decRefCount();
+        m_root->decRefCount();
+    }
+
+    if (m_content != NULL)
+    {
+        m_content->decRefCount();
     }
 
     if (m_activeWidget != NULL)
@@ -101,6 +119,7 @@ bool FrontierWindow::initInternal()
         m_initialised = true;
         return res;
     }
+
     return true;
 }
 
@@ -116,16 +135,19 @@ void FrontierWindow::setPosition(Geek::Vector2D position)
 
 void FrontierWindow::setContent(Widget* content)
 {
-    if (m_widget != NULL)
+    if (m_content != NULL)
     {
-        m_widget->decRefCount();
+        m_root->remove(m_content);
+        m_content->decRefCount();
     }
 
-    m_widget = content;
-    m_widget->incRefCount();
-    m_widget->setWindow(this);
-    m_widget->setPosition(0, 0);
-    m_widget->setDirty();
+    m_content = content;
+    m_content->incRefCount();
+    m_content->setWindow(this);
+    m_content->setPosition(0, 0);
+    m_content->setDirty();
+
+    m_root->add(m_content);
 }
 
 void FrontierWindow::setActiveWidget(Widget* widget)
@@ -184,7 +206,7 @@ void FrontierWindow::show()
 
     m_visible = true;
 
-    m_widget->setDirty();
+    m_root->setDirty();
     update();
 }
 
@@ -201,9 +223,9 @@ void FrontierWindow::hide()
 void FrontierWindow::setSize(Size size)
 {
     m_size = size;
-    if (m_widget != NULL)
+    if (m_root != NULL)
     {
-        m_widget->setDirty(DIRTY_SIZE, true);
+        m_root->setDirty(DIRTY_SIZE, true);
 
         update();
     }
@@ -218,27 +240,40 @@ void FrontierWindow::update(bool force)
 
     initInternal();
 
-    if (m_widget->isDirty(DIRTY_SIZE))
+    if (m_menu == NULL)
     {
-        m_widget->calculateSize();
+        if (hasBorder() && !m_app->getEngine()->providesMenus())
+        {
+            Menu* appMenu = m_app->getAppMenu();
+            if (appMenu != NULL)
+            {
+                setMenu(appMenu);
+            }
+        }
+    }
 
-        Size min = m_widget->getMinSize();
-        Size max = m_widget->getMaxSize();
+    if (m_root->isDirty(DIRTY_SIZE))
+    {
+        m_root->calculateSize();
+
+        Size min = m_root->getMinSize();
+        Size max = m_root->getMaxSize();
 
         m_size.setMax(min);
         m_size.setMin(max);
 
-        m_size = m_widget->setSize(m_size);
+        m_size = m_root->setSize(m_size);
 
 #if 0
         log(DEBUG, "update: min=%s, max=%s", min.toString().c_str(), max.toString().c_str());
         log(DEBUG, "update: Updating window size: %s", m_size.toString().c_str());
 #endif
 
-        m_widget->layout();
+        m_root->setPosition(0, 0);
+        m_root->layout();
 
         // Make sure we redraw
-        m_widget->setDirty(DIRTY_CONTENT);
+        m_root->setDirty(DIRTY_CONTENT);
 
         // Likely to be different?
         //m_mouseOverWidget = NULL;
@@ -246,7 +281,7 @@ void FrontierWindow::update(bool force)
     }
 
 #if 0
-    m_widget->dump(1);
+    m_root->dump(1);
 #endif
 
     float scale = m_engineWindow->getScaleFactor();
@@ -267,22 +302,22 @@ void FrontierWindow::update(bool force)
             m_surface = new Surface(m_size.width, m_size.height, 4);
         }
 
-        m_widget->setDirty(DIRTY_CONTENT);
+        m_root->setDirty(DIRTY_CONTENT);
     }
 #if 0
     log(DEBUG, "update: Window surface=%p", m_surface);
 #endif
 
-    if (m_widget->isDirty() || force)
+    if (m_root->isDirty() || force)
     {
         m_app->getTheme()->drawBackground(m_surface);
 
-        m_widget->draw(m_surface);
+        m_root->draw(m_surface);
 
         m_engineWindow->update();
 
     }
-    m_widget->clearDirty();
+    m_root->clearDirty();
 
 }
 
@@ -316,25 +351,14 @@ void FrontierWindow::updateCursor()
     }
 }
 
-/*
-int FrontierWindow::getWidth()
+void FrontierWindow::setMenu(Menu* menu)
 {
-    if (m_widget != NULL)
+    m_menu = menu;
+    if (m_menuBar != NULL)
     {
-        return m_widget->getWidth();
+        m_menuBar->setMenu(m_menu->getMenuItems());
     }
-    return 0;
 }
-
-int FrontierWindow::getHeight()
-{
-    if (m_widget != NULL)
-    {
-        return m_widget->getHeight();
-    }
-    return 0;
-}
-*/
 
 void FrontierWindow::openContextMenu(Geek::Vector2D pos, Menu* menu)
 {
@@ -367,11 +391,11 @@ bool FrontierWindow::handleEvent(Event* event)
             // Fall through
         case FRONTIER_EVENT_MOUSE_SCROLL:
             updateActive = true;
-            destWidget = m_widget->handleEvent(event);
+            destWidget = m_root->handleEvent(event);
            break;
 
         case FRONTIER_EVENT_MOUSE_MOTION:
-            destWidget = m_widget->handleEvent(event);
+            destWidget = m_root->handleEvent(event);
 
             if (m_mouseOverWidget != destWidget)
             {
@@ -391,7 +415,6 @@ bool FrontierWindow::handleEvent(Event* event)
 
             }
             updateCursor();
-
             break;
 
         case FRONTIER_EVENT_KEY:
@@ -413,7 +436,7 @@ bool FrontierWindow::handleEvent(Event* event)
         }
     }
 
-    bool updateRequired = m_widget->isDirty();
+    bool updateRequired = m_root->isDirty();
     if (destWidget != NULL || updateRequired || updateActive)
     {
         if (updateActive &&

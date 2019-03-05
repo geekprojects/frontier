@@ -38,6 +38,8 @@ class FrontierEngine;
 class FrontierApp;
 class Widget;
 class Menu;
+class MenuList;
+class Frame;
 
 class FrontierEngineWindow;
 
@@ -72,7 +74,8 @@ class FrontierWindow : public Geek::Logger
     bool m_visible;
     Frontier::Size m_size;
 
-    Widget* m_widget;
+    Frame* m_root;
+    Widget* m_content;
     Widget* m_activeWidget;
     Widget* m_mouseOverWidget;
     Widget* m_dragWidget;
@@ -82,6 +85,7 @@ class FrontierWindow : public Geek::Logger
     Geek::Gfx::Surface* m_surface;
 
     Menu* m_menu;
+    MenuList* m_menuBar;
 
     sigc::signal<bool> m_closeSignal;
     sigc::signal<bool> m_gainedFocusSignal;
@@ -104,7 +108,7 @@ class FrontierWindow : public Geek::Logger
     void setPosition(Geek::Vector2D position);
 
     void setContent(Widget* widget);
-    Widget* getContent() const { return m_widget; }
+    Widget* getContent() const { return m_content; }
     void setActiveWidget(Widget* widget);
     Widget* getActiveWidget() const { return m_activeWidget; }
     void setDragWidget(Widget* widget);
@@ -122,7 +126,7 @@ class FrontierWindow : public Geek::Logger
     Geek::Gfx::Surface* getSurface() const { return m_surface; }
 
     Menu* getMenu() { return m_menu; }
-    void setMenu(Menu* menu) { m_menu = menu; }
+    void setMenu(Menu* menu);
     void openContextMenu(Geek::Vector2D pos, Menu* menu);
 
     void postEvent(Frontier::Event* event);
