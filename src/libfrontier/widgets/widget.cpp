@@ -23,6 +23,8 @@
 #include <frontier/widgets.h>
 #include <frontier/contextmenu.h>
 
+#include <typeinfo>
+
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
