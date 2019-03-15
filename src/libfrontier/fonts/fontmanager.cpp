@@ -36,9 +36,7 @@ static FT_Error fontManagerRequester(
     FT_Pointer   request_data,
     FT_Face     *aface )
 {
-    FontHandle* handle = (FontHandle*)face_id;
-
-    *aface = handle->getFTFace();
+    *aface = (FT_Face)face_id;
     return 0;
 }
 
@@ -160,6 +158,7 @@ FontHandle* FontManager::openFont(string familyName, string style, int size)
         log(ERROR, "openFont: Failed to find font family: %s", familyName.c_str());
         return NULL;
     }
+
     FontFace* face = family->getFace(style);
     if (face == NULL)
     {
@@ -284,7 +283,7 @@ bool FontManager::write(
     }
 
     FTC_ScalerRec scaler;
-    scaler.face_id = font;
+    scaler.face_id = font->getFTFace();
     scaler.width = 0;
     scaler.height = font->getPointSize() * 64;
     scaler.pixel = 0;
@@ -353,7 +352,7 @@ bool FontManager::write(
             currentChar = text[pos];
         }
 
-        glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font, -1, currentChar);
+        glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font->getFTFace(), -1, currentChar);
         if (glyphIndex == 0)
         {
 #if 0
@@ -364,7 +363,7 @@ bool FontManager::write(
                 currentChar);
 #endif
 
-            glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font, -1, 0xFFFD);
+            glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font->getFTFace(), -1, 0xFFFD);
             if (glyphIndex == 0)
             {
                 continue;
