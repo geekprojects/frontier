@@ -31,12 +31,14 @@ List::List(FrontierApp* ui, bool horizontal) : Widget(ui, L"List")
 {
     m_selected = NULL;
     m_horizontal = horizontal;
+    m_listMutex = Thread::createMutex();
 }
 
 List::List(FrontierWindow* window, bool horizontal) : Widget(window, L"List")
 {
     m_selected = NULL;
     m_horizontal = horizontal;
+    m_listMutex = Thread::createMutex();
 }
 
 List::~List()
@@ -52,6 +54,7 @@ void List::calculateSize()
     m_maxSize.set(0, 0);
     //m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
+    m_listMutex->lock();
     for (it = m_list.begin(); it != m_list.end(); it++)
     {
         ListItem* item = *it;
@@ -94,6 +97,7 @@ void List::calculateSize()
 
         }
     }
+    m_listMutex->unlock();
 
     m_minSize.width += 2 * 2;
     m_minSize.height += 2 * 2;
@@ -104,6 +108,7 @@ void List::layout()
     int x = 2;
     int y = 2;
 
+    m_listMutex->lock();
     vector<ListItem*>::iterator it;
     int idx;
     for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
@@ -150,12 +155,14 @@ void List::layout()
             x += itemSize.width;
         }
     }
+    m_listMutex->unlock();
 }
 
 bool List::draw(Surface* surface, Rect visible)
 {
     m_app->getTheme()->drawBackground(surface);
 
+    m_listMutex->lock();
     int idx;
     vector<ListItem*>::iterator it;
     for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
@@ -185,6 +192,7 @@ bool List::draw(Surface* surface, Rect visible)
             item->draw(&viewport);
         }
     }
+    m_listMutex->unlock();
     return true;
 }
 
@@ -195,14 +203,18 @@ Widget* List::handleEvent(Event* event)
         MouseEvent* mouseEvent = (MouseEvent*)event;
 
         vector<ListItem*>::iterator it;
+        m_listMutex->lock();
         for (it = m_list.begin(); it != m_list.end(); it++)
         {
             ListItem* child = *it;
             if (child->intersects(mouseEvent->x, mouseEvent->y))
             {
+                m_listMutex->unlock();
                 return child->handleEvent(event);
             }
         }
+        m_listMutex->unlock();
+
         if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
         {
             return this;
@@ -214,12 +226,15 @@ Widget* List::handleEvent(Event* event)
 
 void List::clearItems(bool setDirty)
 {
+    m_listMutex->lock();
     for (ListItem* item : m_list)
     {
         item->decRefCount();
     }
 
     m_list.clear();
+    m_listMutex->unlock();
+
     m_selected = NULL;
 
     if (setDirty)
@@ -230,10 +245,12 @@ void List::clearItems(bool setDirty)
 
 void List::addItem(ListItem* item)
 {
+    m_listMutex->lock();
     m_list.push_back(item);
     item->incRefCount();
     item->setParent(this);
     item->setList(this);
+    m_listMutex->unlock();
 
     setDirty();
 }

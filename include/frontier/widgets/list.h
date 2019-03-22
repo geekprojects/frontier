@@ -4,6 +4,8 @@
 #include <frontier/widgets.h>
 #include <frontier/icon.h>
 
+#include <geek/core-thread.h>
+
 namespace Frontier
 {
 
@@ -59,6 +61,7 @@ class TreeListItem : public TextListItem
     std::vector<ListItem*> m_items;
     int m_titleHeight;
     bool m_open;
+    sigc::signal<void, ListItem*> m_expandSignal;
 
  public:
     TreeListItem(FrontierApp* ui, std::wstring text);
@@ -76,11 +79,14 @@ class TreeListItem : public TextListItem
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleEvent(Frontier::Event* event);
+
+    sigc::signal<void, ListItem*> expandSignal() { return m_expandSignal; }
 };
 
 class List : public Widget
 {
  private:
+    Geek::Mutex* m_listMutex;
     std::vector<ListItem*> m_list;
     ListItem* m_selected;
     bool m_horizontal;
