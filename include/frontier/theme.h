@@ -116,6 +116,7 @@ class UITheme : public Geek::Logger
     virtual int getIconWidth(wchar_t icon) const;
     virtual int getIconHeight() const;
     virtual FontHandle* getFont(bool highDPI) const;
+    virtual FontHandle* getIconFont(bool highDPI) const;
 
     virtual FontHandle* getMonospaceFont(bool highDPI) const;
     virtual int getMonospaceHeight() const;

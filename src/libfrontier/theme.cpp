@@ -400,6 +400,11 @@ FontHandle* UITheme::getFont(bool highDPI) const
     return m_font;
 }
 
+FontHandle* UITheme::getIconFont(bool highDPI) const
+{
+    return m_iconFont;
+}
+
 FontHandle* UITheme::getMonospaceFont(bool highDPI) const
 {
     return m_monospaceFont;
