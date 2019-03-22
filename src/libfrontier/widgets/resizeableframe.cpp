@@ -9,6 +9,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+#undef DEBUG_RESIZEABLE_FRAME
+
 ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, L"ResizeableFrame", horizontal)
 {
     m_dragging = false;
@@ -100,7 +102,7 @@ void ResizeableFrame::layout()
         float pc = m_sizes.at(i);
         int childMajor = (int)((float)major * (pc / 100.0));
 
-#if 1
+#ifdef DEBUG_RESIZEABLE_FRAME
             log(Geek::DEBUG, "layout: pc=%0.2f, childMajor=%d, minSize=%d, maxSize=%d", pc, childMajor, childMajorMin, childMajorMax);
 #endif
 
@@ -111,7 +113,9 @@ void ResizeableFrame::layout()
             childMajor = childMajorMin;
             float extrapc = (((float)under / (float)major) * 100.0);
             //m_sizes[i] += extrapc;
+#ifdef DEBUG_RESIZEABLE_FRAME
             log(Geek::DEBUG, "layout:  -> Under min by %d (%0.2f%%)", under, extrapc);
+#endif
 
             // Borrow some space from a neighbour?
             float d;
@@ -132,7 +136,9 @@ void ResizeableFrame::layout()
             childMajor = childMajorMax;
             float extrapc = (((float)over / (float)major) * 100.0);
 
+#ifdef DEBUG_RESIZEABLE_FRAME
             log(Geek::DEBUG, "layout:  -> Over max by %d (%0.2f%%), shrinking", over, extrapc);
+#endif
 
             // Give some space from a neighbour?
             float d;
@@ -166,7 +172,9 @@ void ResizeableFrame::layout()
             }
 */
 
+#ifdef DEBUG_RESIZEABLE_FRAME
         log(DEBUG, "layout: majorPos=%d, m_sizes[%d]=%0.2f%%: major=%d", majorPos, i, pc, childMajor);
+#endif
 
         Size size;
         if (m_horizontal)
@@ -199,7 +207,7 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
         return 0.0;
     }
 
-#if 0
+#ifdef DEBUG_RESIZEABLE_FRAME
     log(DEBUG, "borrow: which=%d, amount=%0.2f%%\n", which, amount);
 #endif
 
@@ -213,7 +221,9 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
     float pc = m_sizes.at(which);
     int childMajor = (int)((float)major * (pc / 100.0));
 
+#ifdef DEBUG_RESIZEABLE_FRAME
     log(DEBUG, "borrow: which=%d, pc=%0.2f%%, amount=%0.2f%%", which, pc, amount);
+#endif
 
     if (amount > 0)
     {
@@ -229,7 +239,9 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
             {
                 grow = maxPC - pc;
             }
+#ifdef DEBUG_RESIZEABLE_FRAME
             log(DEBUG, "borrow:  -> Can grow! maxPC=%0.2f, grow=%0.2f%%", maxPC, grow);
+#endif
             m_sizes[which] += grow;
         }
 
@@ -255,16 +267,22 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
             {
                 shrink = pc - minPC;
             }
+#ifdef DEBUG_RESIZEABLE_FRAME
             log(DEBUG, "borrow:  -> Can shrink! minPC=%0.2f, shrink=%0.2f%%", minPC, shrink);
+#endif
             m_sizes[which] -= shrink;
 
         }
         if (shrink != -amount)
         {
             // Check neighbour
+#ifdef DEBUG_RESIZEABLE_FRAME
             log(DEBUG, "borrow:  -> Still got %0.2f%% to go, Checking neighbour", amount - shrink);
+#endif
             float ns = borrow(which + direction, amount - shrink, major, direction);
+#ifdef DEBUG_RESIZEABLE_FRAME
             log(DEBUG, "borrow:  -> Neighbour shrunk by %0.2f%%", ns);
+#endif
             shrink += -ns;
         }
         return -shrink;
