@@ -106,6 +106,7 @@ class FrontierWindow : public Geek::Logger
     bool isResizeable() const { return !!(m_flags & WINDOW_RESIZEABLE); }
 
     void setPosition(Geek::Vector2D position);
+    Geek::Vector2D getPosition();
 
     void setContent(Widget* widget);
     Widget* getContent() const { return m_content; }

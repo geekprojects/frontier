@@ -133,6 +133,11 @@ void FrontierWindow::setPosition(Geek::Vector2D position)
     m_engineWindow->setPosition(position.x, position.y);
 }
 
+Geek::Vector2D FrontierWindow::getPosition()
+{
+    return m_engineWindow->getPosition();
+}
+
 void FrontierWindow::setContent(Widget* content)
 {
     if (m_content != NULL)

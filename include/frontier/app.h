@@ -78,6 +78,7 @@ class FrontierApp : public Geek::Logger
 
  protected:
     void setEngine(FrontierEngine* m_engine);
+    std::vector<FrontierWindow*>& getWindows() { return m_windows; }
 
  public:
     FrontierApp(std::wstring name);
