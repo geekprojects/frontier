@@ -63,8 +63,7 @@ FontHandle* FontFace::open(int pointSize)
 
     m_references++;
 
-    FontHandle* handle = new FontHandle(m_manager, this, pointSize);
-    return handle;
+    return new FontHandle(m_manager, this, pointSize);
 }
 
 void FontFace::close(FontHandle* handle)

@@ -112,7 +112,7 @@ bool FrontierApp::init()
     res = m_engine->init();
     if (!res)
     {
-return false;
+        return false;
     }
 
     m_fontManager = new FontManager();
