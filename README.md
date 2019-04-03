@@ -7,16 +7,18 @@ Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch
 
 
 #### Features
-* SDL and Cocoa engines
+* SDL, native MacOS (Cocoa) and OpenGL engines
 * sigc++ event handlers
 * High DPI support
 * Embeddable in to other applications (Games etc)
+
 
 ##### Requirements
 * [libgeek] (https://github.com/geekprojects/libgeek)
 * freetype 2
 * libsigc++ 2.0
 * SDL (For the SDL engine)
+* OpenGL (For OpenGL embedding)
 
 
 Documentation
