@@ -50,6 +50,12 @@ then
     fi
 fi
 
+AC_ARG_ENABLE(opengl,
+        [  --enable-opengl          Enable OpenGL library ],
+        [enable_opengl="yes" ],
+        [enable_opengl="no"])
+
+i
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h sys/time.h])
@@ -84,6 +90,14 @@ fi
 
 AM_CONDITIONAL([FRONTIER_ENGINE_COCOA], test "$enable_cocoa" = "yes")
 AM_CONDITIONAL([FRONTIER_ENGINE_SDL], test "$enable_sdl" = "yes")
+
+if test "$enable_opengl" != "no"
+then
+    AC_MSG_NOTICE([Building OpenGL library])
+    AC_DEFINE(FRONTIER_OPENGL, 1, [OpenGL Library])
+fi
+AM_CONDITIONAL([FRONTIER_OPENGL], test "$enable_opengl" = "yes")
+
 
 CPPFLAGS="$CPPFLAGS -Wall -Werror -Werror=sign-compare"
 
@@ -130,6 +144,7 @@ AC_CONFIG_FILES([Makefile
                  src/libfrontier/engines/embedded/Makefile
                  src/libfrontier/engines/sdl/Makefile
                  src/libfrontier/engines/cocoa/Makefile
+                 src/libfrontier-opengl/Makefile
                  src/demo/Makefile
                  fonts/Makefile
                  tests/Makefile
