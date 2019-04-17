@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
+#include <wchar.h>
 #include <wctype.h>
 
 // openpty
@@ -35,6 +36,8 @@
 #endif
 
 #undef DEBUG_TERMINAL
+
+#define ALIGN(V, SIZE) ((((V) + (SIZE) - 1) / (SIZE)) * (SIZE))
 
 using namespace std;
 using namespace Frontier;
@@ -48,13 +51,17 @@ static void hexdump(const char* pos, int len);
 Terminal::Terminal(FrontierApp* ui) : Widget(ui, L"Terminal")
 {
     m_process = NULL;
-    m_state = STATE_NORMAL;
+
+    reset();
+    clear();
 }
 
 Terminal::Terminal(FrontierWindow* window) : Widget(window, L"Terminal")
 {
     m_process = NULL;
-    m_state = STATE_NORMAL;
+
+    reset();
+    clear();
 }
 
 Terminal::~Terminal()
@@ -63,7 +70,24 @@ Terminal::~Terminal()
     {
         m_process->stop();
         delete m_process;
+        m_process = NULL;
     }
+}
+
+void Terminal::reset()
+{
+    m_fgColour = getColour8(9, true);
+    m_bgColour = getColour8(9, false);
+}
+
+void Terminal::clear()
+{
+    m_col = 0;
+    m_row = 0;
+    m_offsetRow = 0;
+    m_state = STATE_NORMAL;
+
+    m_buffer.clear();
 }
 
 void Terminal::calculateSize()
@@ -75,7 +99,7 @@ void Terminal::calculateSize()
     int fontWidth = fm->width(font, L"M");
 
     m_minSize.width = fontWidth * 20;
-    m_minSize.height = fontHeight * 2;
+    m_minSize.height = fontHeight * 4;
 
     m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     m_maxSize.height = WIDGET_SIZE_UNLIMITED;
@@ -83,7 +107,7 @@ void Terminal::calculateSize()
 
 bool Terminal::draw(Surface* surface)
 {
-    surface->clear(0x0000ff);
+    surface->clear(m_bgColour);
 
     if (m_buffer.empty())
     {
@@ -104,22 +128,68 @@ bool Terminal::draw(Surface* surface)
     unsigned int visibleRows = m_setSize.height / fontHeight;
     unsigned int visibleColumns = m_setSize.width / fontWidth;
 
-    int offsetRow = (m_buffer.size() - 0) - visibleRows;
-    if (offsetRow < 0)
+    // Make sure the current row is visible
+    if (m_row > m_offsetRow + visibleRows)
     {
-        offsetRow = 0;
+        m_offsetRow = (m_row - visibleRows) + 1;
+    }
+    else if (m_row < m_offsetRow)
+    {
+        m_offsetRow = m_row;
     }
 
     int y = 0;
     unsigned int row;
-    for (row = 0; row < visibleRows && (row + offsetRow) < m_buffer.size(); row++, y += fontHeight)
+    for (row = 0; row < visibleRows && (row + m_offsetRow) < m_buffer.size(); row++, y += fontHeight)
     {
-        wstring line = m_buffer.at(row + offsetRow);
+        TermLine& line = m_buffer.at(row + m_offsetRow);
         unsigned int col;
         int x = 0;
-        for (col = 0; col < visibleColumns && col < line.length(); col++, x += fontWidth)
+        for (col = 0; col < visibleColumns; col++, x += fontWidth)
         {
-            fm->write(font, surface, x, y, wstring(L"") + line.at(col), 0xffffffff, true, NULL);
+            uint32_t fg = m_fgColour;
+            uint32_t bg = m_bgColour;
+            TermChar c;
+            if (col < line.chars.size())
+            {
+                c = line.chars.at(col);
+                fg = c.fg;
+                bg = c.bg;
+            }
+            else
+            {
+                if (row + m_offsetRow != m_row || col > m_col)
+                {
+                    // No more to draw on this line!
+                    break;
+                }
+            }
+
+            bool isCursor = (row + m_offsetRow == m_row && col == m_col);
+            if (isCursor)
+            {
+                uint32_t tmp;
+                tmp = bg;
+                bg = fg;
+                fg = tmp;
+            }
+
+            if (bg != m_bgColour)
+            {
+                if (isCursor && !isActive())
+                {
+                    surface->drawRect(x, y, fontWidth, fontHeight, bg);
+                }
+                else
+                {
+                    surface->drawRectFilled(x, y, fontWidth, fontHeight, bg);
+                }
+            }
+
+            if (col < line.chars.size())
+            {
+                fm->write(font, surface, x, y, wstring(L"") + c.c, fg, true, NULL);
+            }
         }
     }
 
@@ -128,7 +198,6 @@ bool Terminal::draw(Surface* surface)
 
 Widget* Terminal::handleEvent(Event* event)
 {
-    // We just swallow events
     switch (event->eventType)
     {
         case FRONTIER_EVENT_KEY:
@@ -148,36 +217,89 @@ Widget* Terminal::handleEvent(Event* event)
                 }
             }
         }
+
         default:
             break;
     }
     return this;
 }
 
+void Terminal::setChar(unsigned int row, unsigned int col, wchar_t c)
+{
+    if (m_buffer.size() <= row)
+    {
+        m_buffer.resize(row + 1);
+    }
+
+    TermChar termChar;
+    termChar.c = c;
+    termChar.fg = m_fgColour;
+    termChar.bg = m_bgColour;
+
+    TermLine& line = m_buffer.at(row);
+    if (col >= line.chars.size())
+    {
+        int pad = col - line.chars.size();
+        int i;
+        for (i = 0; i < pad; i++)
+        {
+            TermChar padchar;
+            padchar.c = L' ';
+            padchar.fg = m_fgColour;
+            padchar.bg = m_bgColour;
+            line.chars.push_back(padchar);
+        }
+
+        line.chars.push_back(termChar);
+    }
+    else
+    {
+        line.chars[col] = termChar;
+    }
+}
+
 void Terminal::receiveChar(wchar_t c)
 {
     if (m_buffer.empty())
     {
-        m_buffer.push_back(L"");
+        TermLine line;
+        m_buffer.push_back(line);
     }
-    int y = m_buffer.size() - 1;
-
 
     switch (m_state)
     {
         case STATE_NORMAL:
-            if (c == 10)
+            if (c == 0x8)
             {
-                m_buffer.push_back(L"");
+                // Backspace
+                setChar(m_row, m_col, ' ');
+                m_col--;
+            }
+            else if (c == 0x9)
+            {
+                // TAB
+                m_col = ALIGN(m_col + 1, 8);
+            }
+            else if (c == 0xa)
+            {
+                // Line Feed
+                m_row++;
+            }
+            else if (c == 0xd)
+            {
+                // Carriage Return
+                m_col = 0;
             }
             else if (c == 0x1b)
             {
-                m_state = STATE_CSI;
+                // Escape
+                m_state = STATE_ESC;
                 m_command = L"";
             }
             else if (iswprint(c))
             {
-                m_buffer.at(y) += c;
+                setChar(m_row, m_col, c);
+                m_col++;
             }
             else
             {
@@ -185,27 +307,38 @@ void Terminal::receiveChar(wchar_t c)
             }
             break;
 
-        case STATE_CSI:
-            if (m_command.empty() && c == ']')
+        case STATE_ESC:
+            if (c == '[')
+            {
+                m_state = STATE_CSI;
+            }
+            else if (c == ']')
             {
                 m_state = STATE_OSC;
             }
             else
             {
-                m_command += c;
+                printf("Terminal::receiveChar: STATE_ESC: Unhandled char: %c (0x%x)\n", c, c);
+                m_state = STATE_NORMAL;
+            }
+            break;
 
-                if (iswalpha(c))
-                {
-                    printf("Terminal::receiveChar: Command: %ls\n", m_command.c_str());
-                    m_state = STATE_NORMAL;
-                }
+        case STATE_CSI:
+
+            if (iswalpha(c))
+            {
+                handleCSI(c);
+            }
+            else
+            {
+                m_command += c;
             }
             break;
 
         case STATE_OSC:
             if (c == 0x07)
             {
-                printf("Terminal::receiveChar: OSC: %ls\n", m_command.c_str());
+                printf("Terminal::receiveChar: STATE_OSC: %ls\n", m_command.c_str());
                 m_state = STATE_NORMAL;
             }
             else
@@ -217,6 +350,206 @@ void Terminal::receiveChar(wchar_t c)
 
     setDirty(DIRTY_CONTENT);
 
+}
+
+void Terminal::handleCSI(wchar_t c)
+{
+    std::vector<long> params;
+    if (m_command.length() > 0)
+    {
+        unsigned long pos = 0;
+        while (pos != wstring::npos)
+        {
+            unsigned long idx = m_command.find(';', pos);
+            wstring part;
+            if (idx != wstring::npos)
+            {
+                part = m_command.substr(pos, idx);
+            }
+            else
+            {
+                part = m_command.substr(pos);
+            }
+            long param = wcstol(part.c_str(), NULL, 10);
+            params.push_back(param);
+            if (idx == wstring::npos)
+            {
+                break;
+            }
+
+            pos = idx + 1;
+        }
+    }
+
+    long param1 = -1;
+    long param2 = -1;
+    if (params.size() > 0)
+    {
+        param1 = params.at(0);
+        if (params.size() > 1)
+        {
+            param2 = params.at(1);
+        }
+    }
+
+    switch (c)
+    {
+        case 'A':
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+            m_row -= param1;
+            break;
+
+        case 'B':
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+            m_row += param1;
+            break;
+        case 'C':
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+            m_col += param1;
+            break;
+        case 'D':
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+            m_col -= param1;
+            break;
+        case 'H':
+        {
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+            if (param2 == -1)
+            {
+                param2 = 1;
+            }
+            printf("Terminal::receiveChar: : STATE_CSI: Cursor Position: row=%ld, col=%ld\n", param1, param2);
+
+            m_row = param1 - 1;
+            m_col = param2 - 1;
+        } break;
+
+        case 'G':
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+            m_col = param1 - 1;
+            printf("Terminal::receiveChar: : STATE_CSI: Cursor Position: col=%ld\n", param1);
+            break;
+
+        case 'J':
+            if (param1 == -1)
+            {
+                param1 = 0;
+            }
+            switch (param1)
+            {
+                case 2:
+                    printf("Terminal::receiveChar: STATE_CSI: Erase in Display: ALL!\n");
+                    clear();
+                    break;
+                default:
+                    printf("Terminal::receiveChar: STATE_CSI: Erase in Display: Unhandled: %ld\n", param1);
+                    break;
+            }
+            break;
+
+        case 'K':
+            if (param1 == -1)
+            {
+                param1 = 0;
+            }
+            switch (param1)
+            {
+                case 0:
+                    printf("Terminal::receiveChar: STATE_CSI: Erase to Right\n");
+                    if (m_row < m_buffer.size() && m_col >= 0)
+                    {
+                        TermLine& line = m_buffer.at(m_row);
+                        if (m_col < line.chars.size())
+                        {
+                            line.chars.erase(line.chars.begin() + m_col);
+                        }
+                    }
+                    break;
+
+                default:
+                    printf("Terminal::receiveChar: STATE_CSI: Erase in Line: Unhandled: %ld\n", param1);
+                    break;
+            }
+            break;
+
+        case 'P':
+        {
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+
+            int count = param1;
+            printf("Terminal::receiveChar: : STATE_CSI: Delete Characters: count=%d\n", count);
+            if (m_row < m_buffer.size())
+            {
+                TermLine& line = m_buffer.at(m_row);
+                if (m_col < line.chars.size())
+                {
+                    //line.erase(m_col, count);
+                    int i;
+                    for (i = 0; i < count; i++)
+                    {
+                        line.chars.erase(line.chars.begin() + m_col);
+                    }
+                }
+            }
+        } break;
+
+        case 'd':
+            if (param1 == -1)
+            {
+                param1 = 1;
+            }
+
+            m_row = param1 - 1;
+            break;
+
+        case 'm':
+            printf("Terminal::receiveChar: : STATE_CSI: Character Attributes: %ld\n", param1);
+            if (param1 == 0)
+            {
+                m_fgColour = getColour8(9, true);
+                m_bgColour = getColour8(9, false);
+            }
+            else if (param1 >= 30 && param1 <= 39)
+            {
+                m_fgColour = getColour8(param1 - 30, true);
+            }
+            else if (param1 >= 40 && param1 <= 49)
+            {
+                m_bgColour = getColour8(param1 - 40, false);
+            }
+            else
+            {
+                printf("Terminal::receiveChar: : STATE_CSI: UNHANDLED Character Attributes: %ld\n", param1);
+            }
+            break;
+
+        default:
+            printf("Terminal::receiveChar: : STATE_CSI: UNHANDLED command: %c, params: %ls -> %ld, %ld\n", c, m_command.c_str(), param1, param2);
+            break;
+    }
+
+    m_state = STATE_NORMAL;
 }
 
 void Terminal::receiveChars(char* c, int length)
@@ -240,17 +573,63 @@ void Terminal::receiveChars(char* c, int length)
     */
 }
 
+uint32_t Terminal::getColour8(int code, bool fg)
+{
+    switch (code)
+    {
+        case 0: return 0x000000; // Black
+        case 1: return 0xc91b00; // Red
+        case 2: return 0x00c200; // Green
+        case 3: return 0xc7c400; // Yellow
+        case 4: return 0x0225c7; // Blue
+        case 5: return 0xc930c7; // Magenta
+        case 6: return 0x00c5c7; // Cyan
+        case 7: return 0xc7c7c7; // White
+
+        case 9:
+        default:
+            if (fg)
+            {
+                return 0xc7c7c7;
+            }
+            else
+            {
+                return 0x000000;
+            }
+    }
+}
+
 bool Terminal::run(const char* command)
 {
-    m_process = new TerminalProcess(this);
+    return run(command, vector<const char*>());
+}
+
+bool Terminal::run(const char* command, vector<const char*> args)
+{
+    return run(command, args, vector<const char*>());
+}
+
+bool Terminal::run(const char* command, vector<const char*> args, vector<const char*> env)
+{
+    m_process = new TerminalProcess(this, command, args, env);
     m_process->start();
 
     return true;
 }
 
-TerminalProcess::TerminalProcess(Terminal* terminal) : Logger("TerminalProcess")
+TerminalProcess::TerminalProcess(Terminal* terminal, const char* command, std::vector<const char*> args, std::vector<const char*> env) : Logger("TerminalProcess")
 {
     m_terminal = terminal;
+    m_command = strdup(command);
+
+    for (const char* arg : args)
+    {
+        m_args.push_back(strdup(arg));
+    }
+    for (const char* e : env)
+    {
+        m_env.push_back(strdup(e));
+    }
 }
 
 TerminalProcess::~TerminalProcess()
@@ -272,7 +651,9 @@ bool TerminalProcess::main()
         log(ERROR, "main: Failed to open PTY: %d", err);
         return false;
     }
+#if 0
     log(INFO, "main: master=%d, slave=%d, name=%s", master, slave, name);
+#endif
 
     pid_t pid = fork();
     printf("TerminalProcess::main: pid=%d\n", pid);
@@ -289,13 +670,14 @@ bool TerminalProcess::main()
         while (true)
         {
             int res;
-            log(DEBUG, "main: (Parent) Waiting for data...");
             res = read(m_childOut, buffer, 4096);
-            log(DEBUG, "main: (Parent) Read %d bytes", res);
             if (res <= 0)
             {
                 break;
             }
+#if 0
+            log(DEBUG, "main: (Parent) Read %d bytes", res);
+#endif
 
             buffer[res] = 0;
             m_terminal->receiveChars(buffer, res);
@@ -308,19 +690,26 @@ bool TerminalProcess::main()
         dup2(slave, STDIN_FILENO);
         dup2(slave, STDERR_FILENO);
 
-        //printf("TerminalProcess::main: (Child) Calling watch!\n");
-        //execl("/usr/local/bin/watch", "watch", "/bin/ls", "-l", NULL);
-        //execl("/bin/ls", "/bin/ls", "-l", NULL);
-        //execl("/bin/bash", "-l", NULL);
-        //printf("TerminalProcess::main: (Child) Starting command...\n");
-        execl("/usr/local/bin/bash", "bash", "-i", NULL);
-        //execl("/usr/bin/make", "make", NULL);
-//char* const[] env = {
-//"TERM
-//};
-        //execl("/usr/bin/top", "top", "-n", "5", NULL);
+        char* argv[m_args.size() + 2];
+        unsigned int i = 0;
+        argv[0] = m_command;
+        for (i = 0; i < m_args.size(); i++)
+        {
+            argv[i + 1] = m_args[i];
+        }
+        argv[i + 1] = 0;
 
-//        execl("/usr/bin/uname", "uname", "-a", NULL);
+        char* envp[m_env.size() + 3];
+        for (i = 0; i < m_env.size(); i++)
+        {
+            envp[i] = m_env[i];
+        }
+        envp[i++] = strdup((string("HOME=") + getenv("HOME")).c_str());
+        envp[i++] = strdup("TERM=xterm-256color");
+        envp[i] = 0;
+
+        execve(m_command, argv, envp);
+
         perror("execl() failed");
         _exit(errno);
     }
@@ -349,6 +738,10 @@ void TerminalProcess::stop()
 {
     log(DEBUG, "stop: Killing child...");
     kill(m_childPid, SIGHUP);
+
+    log(DEBUG, "stop: waiting...");
+    int stat_loc;
+    waitpid(m_childPid, &stat_loc, 0);
 
     if (m_childIn != 0)
     {

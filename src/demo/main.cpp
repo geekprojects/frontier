@@ -253,8 +253,18 @@ bool DemoApp::init()
 
     Frame* terminalTab = new Frame(this, false);
     Terminal* terminal = new Terminal(this);
-    terminal->run("/usr/bin/top");
+    //terminal->run("/usr/bin/top");
+    //terminal->run("/bin/ls");
+
+    vector<const char*> args;
+    //args.push_back("/bin/ls -l");
+    //terminal->run("/usr/local/bin/watch", args);
+    //args.push_back("-l");
+    //terminal->run("/bin/ls", args);
+    //args.push_back("-l");
+    terminal->run("/usr/local/bin/bash", args);
     terminalTab->add(terminal);
+
     m_tabs->addTab(L"Terminal", terminalTab);
 
     Frame* closeableTab = new Frame(this, false);
