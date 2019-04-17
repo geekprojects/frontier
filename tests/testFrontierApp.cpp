@@ -1,27 +1,7 @@
 
-#include <frontier/frontier.h>
-#include "engines/test/test_engine.h"
-
-#include <gtest/gtest.h>
+#include "testCommon.h"
 
 using namespace Frontier;
-
-class TestApp : public FrontierApp
-{
- public:
-    TestApp();
-    virtual ~TestApp();
-};
-
-TestApp::TestApp() : FrontierApp(L"Test App")
-{
-    TestEngine* testEngine = new TestEngine(this);
-    setEngine(testEngine);
-}
-
-TestApp::~TestApp()
-{
-}
 
 TEST(FrontierAppTest, initTest)
 {
