@@ -166,11 +166,15 @@ void Tabs::calculateSize()
     int tabsWidth = 0;
     for (Tab tab : m_tabs)
     {
-        tabsWidth += 20;
+        tabsWidth += TAB_SIZE * 2;
         if (tab.closeable)
         {
             tabsWidth += closeWidth;
         }
+    }
+    if (m_collapsible)
+    {
+        tabsWidth += TAB_SIZE;
     }
 
     if (isHorizontal())
@@ -301,7 +305,7 @@ bool Tabs::draw(Surface* surface)
         }
 
 #if 0
-        log(DEBUG, "draw: %d,%d, width=%d, height=%d", x, y, tabSize.width, tabSize.height);
+        log(DEBUG, "draw: tab %d: %d,%d, width=%d, height=%d", tab, x, y, tabSize.width, tabSize.height);
 #endif
 
         m_app->getTheme()->drawBorder(
