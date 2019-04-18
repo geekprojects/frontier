@@ -117,6 +117,7 @@ class FrontierWindow : public Geek::Logger
     void show();
     void hide();
     void update(bool force = false);
+    void requestUpdate();
 
     void setEngineWindow(FrontierEngineWindow* few) { m_engineWindow = few; }
     FrontierEngineWindow* getEngineWindow() { return m_engineWindow; }

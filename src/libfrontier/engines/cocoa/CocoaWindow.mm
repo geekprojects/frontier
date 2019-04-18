@@ -1,5 +1,6 @@
 
 #include "CocoaWindow.h"
+#include "CocoaEngine.h"
 #include "utils.h"
 
 #include <Cocoa/Cocoa.h>
@@ -104,6 +105,8 @@ printf("windowDidResignKey: this=%p\n", self);
 @implementation FrontierView
 - (void)drawRect:(NSRect)dirtyRect
 {
+    NSAssert( [NSThread isMainThread], @"This needs to run in the main thread" );
+
     if (m_image != NULL)
     {
         CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext]     graphicsPort];
@@ -475,6 +478,18 @@ bool CocoaWindow::createCocoaWindow()
         userInfo:nil];
     [view addTrackingArea:trackingArea];
 
+
+    // Capture any ApplicationDefined events. These are used to signal a redraw
+    NSEvent *(^monitor)(NSEvent *event) = ^NSEvent *(NSEvent *event)
+    {
+        CocoaNSWindow* window = (CocoaNSWindow*)[event window];
+        CocoaWindow* cwindow = [window getEngineWindow];
+        cwindow->getWindow()->update();
+        return event;
+    };
+
+    [NSEvent addLocalMonitorForEventsMatchingMask:NSApplicationDefinedMask handler:monitor];
+
     [window center];
 
     return true;
@@ -651,5 +666,22 @@ void CocoaWindow::updateCursor(WindowCursor cursor, int x, int y, int w, int h)
     [view setCursor:nscursor];
 
     [window invalidateCursorRectsForView:view];
+}
+
+void CocoaWindow::requestUpdate()
+{
+    // Insert an ApplicationDefined event in to the event loop
+    CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
+    NSEvent* event =[NSEvent otherEventWithType:NSEventTypeApplicationDefined
+        location: NSZeroPoint
+        modifierFlags: 0
+        timestamp: 0
+        windowNumber: [window windowNumber]
+        context: nil
+        subtype: 0
+        data1: 0
+        data2: 0];
+
+    [NSApp postEvent:event atStart:NO];
 }
 

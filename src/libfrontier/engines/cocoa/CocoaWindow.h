@@ -54,6 +54,8 @@ class CocoaWindow : public FrontierEngineWindow
 
     virtual void resetCursor();
     virtual void updateCursor(WindowCursor cursor, int x, int y, int w, int h);
+
+    virtual void requestUpdate();
 };
 
 }

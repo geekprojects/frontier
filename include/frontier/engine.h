@@ -81,6 +81,8 @@ class FrontierEngineWindow : public Geek::Logger
 
     virtual void resetCursor();
     virtual void updateCursor(Frontier::WindowCursor cursor, int x, int y, int w, int h);
+
+    virtual void requestUpdate();
 };
 
 };

@@ -326,6 +326,14 @@ void FrontierWindow::update(bool force)
 
 }
 
+void FrontierWindow::requestUpdate()
+{
+    if (m_engineWindow != NULL)
+    {
+        m_engineWindow->requestUpdate();
+    }
+}
+
 void FrontierWindow::updateCursor()
 {
     if (m_engineWindow == NULL)

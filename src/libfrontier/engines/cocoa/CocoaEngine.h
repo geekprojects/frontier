@@ -29,7 +29,6 @@ class CocoaEngine : public FrontierEngine
 
     virtual bool initWindow(FrontierWindow* window);
 
-
     virtual bool checkEvents();
 
     virtual std::string getConfigDir();
@@ -41,6 +40,8 @@ class CocoaEngine : public FrontierEngine
     bool providesMenus() { return true; }
 
     void updateMenu(FrontierWindow* window);
+
+    void* getApplication() { return m_application; }
 };
 
 }

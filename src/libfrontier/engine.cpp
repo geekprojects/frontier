@@ -140,3 +140,7 @@ void FrontierEngineWindow::updateCursor(WindowCursor cursor, int x, int y, int w
 {
 }
 
+void FrontierEngineWindow::requestUpdate()
+{
+}
+
