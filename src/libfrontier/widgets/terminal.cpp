@@ -475,7 +475,7 @@ void Terminal::handleCSI(wchar_t c)
             {
                 case 0:
                     printf("Terminal::receiveChar: STATE_CSI: Erase to Right\n");
-                    if (m_row < m_buffer.size() && m_col >= 0)
+                    if (m_row < m_buffer.size())
                     {
                         TermLine& line = m_buffer.at(m_row);
                         if (m_col < line.chars.size())
