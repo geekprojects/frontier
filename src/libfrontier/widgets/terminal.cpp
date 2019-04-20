@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
+#include <sys/wait.h> 
 #include <wchar.h>
 #include <wctype.h>
 
