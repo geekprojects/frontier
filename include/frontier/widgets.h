@@ -124,6 +124,7 @@ class Widget : public FrontierObject, public Geek::Logger
 
     void setWindow(FrontierWindow* window) { m_window = window; }
     FrontierWindow* getWindow();
+    FrontierApp* getApp() { return m_app; }
 
     virtual Geek::Vector2D getAbsolutePosition() const;
     bool intersects(int x, int y) const;

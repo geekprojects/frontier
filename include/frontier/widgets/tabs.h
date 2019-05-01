@@ -6,6 +6,8 @@
 namespace Frontier
 {
 
+class Tabs;
+
 enum TabPlacement
 {
     TAB_TOP,
@@ -14,19 +16,39 @@ enum TabPlacement
     TAB_RIGHT
 };
 
-struct Tab
+class Tab : public Widget
 {
-    std::wstring title;
-    Icon* icon;
-    Widget* content;
-    bool closeable;
+ protected:
+    Tabs* m_tabs;
+
+    std::wstring m_title;
+    Icon* m_icon;
+    Widget* m_content;
+    bool m_closeable;
+
+ public:
+    Tab(Tabs* tabs, std::wstring title, Icon* icon, Widget* content, bool closeable);
+    Tab(FrontierApp* app, std::wstring title, Icon* icon, Widget* content, bool closeable);
+    virtual ~Tab();
+
+    virtual void calculateSize();
+    virtual void layout();
+
+    virtual bool draw(Geek::Gfx::Surface* surface);
+
+    virtual Widget* handleEvent(Frontier::Event* event);
+
+    std::wstring getTitle() { return m_title; }
+    Icon* getIcon() { return m_icon; }
+    Widget* getContent() { return m_content; }
+    bool isCloseable() { return m_closeable; }
 };
 
 class Tabs : public Widget
 {
  protected:
-    unsigned int m_activeTab;
-    std::vector<Tab> m_tabs;
+    Tab* m_activeTab;
+    std::vector<Tab*> m_tabs;
 
     TabPlacement m_placement;
     bool m_collapsible;
@@ -41,6 +63,8 @@ class Tabs : public Widget
     Frontier::Rect getTabsRect();
     Frontier::Rect getContentRect();
     bool isHorizontal() { return (m_placement == TAB_TOP || m_placement == TAB_BOTTOM); }
+
+    int getTabIndex(Tab* tab);
 
  public:
     Tabs(FrontierApp* app);
@@ -73,20 +97,17 @@ class Tabs : public Widget
 
     Widget* getActiveTab()
     {
-        if (m_tabs.empty())
+        if (m_tabs.empty() || m_activeTab == NULL)
         {
             return NULL;
         }
-        if (m_activeTab >= m_tabs.size())
-        {
-            m_activeTab = m_tabs.size() - 1;
-        }
-        return m_tabs.at(m_activeTab).content;
+        return m_activeTab->getContent();
     }
 
+    void setActiveTab(Tab* tab);
     void setActiveTab(Widget* tabContent);
     int findTab(Widget* tabContent);
-    const std::vector<Tab>& getTabs() { return m_tabs; }
+    const std::vector<Tab*>& getTabs() { return m_tabs; }
 
     void nextTab();
     void prevTab();
