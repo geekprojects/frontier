@@ -340,7 +340,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                         FrontierWindow* window = getWindow();
                         if (window != NULL)
                         {
-                            window->setDragWidget(this);
+                            window->setMotionWidget(this);
                         }
                     }
 
@@ -358,7 +358,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 m_dragging = false;
                 if (event->window != NULL)
                 {
-                    event->window->setDragWidget(NULL);
+                    event->window->setMotionWidget(NULL);
                 }
             }
             else

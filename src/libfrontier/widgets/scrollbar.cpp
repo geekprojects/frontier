@@ -116,7 +116,7 @@ Widget* ScrollBar::handleEvent(Event* event)
                     m_dragOffset = y - pos;
                     if (window != NULL)
                     {
-                        window->setDragWidget(this);
+                        window->setMotionWidget(this);
                     }
                 }
             }
@@ -125,7 +125,7 @@ Widget* ScrollBar::handleEvent(Event* event)
                 m_dragging = false;
                 if (window != NULL)
                 {
-                    window->setDragWidget(NULL);
+                    window->setMotionWidget(NULL);
                 }
             }
         } break;

@@ -78,11 +78,15 @@ class FrontierWindow : public Geek::Logger
     Widget* m_content;
     Widget* m_activeWidget;
     Widget* m_mouseOverWidget;
-    Widget* m_dragWidget;
-    uint64_t m_dragTime;
+    Widget* m_motionWidget;
+    uint64_t m_motionTime;
     Frontier::WindowCursor m_currentCursor;
 
     Geek::Gfx::Surface* m_surface;
+
+    Widget* m_dragWidget;
+    Geek::Gfx::Surface* m_dragSurface;
+    Geek::Vector2D m_dragPosition;
 
     Menu* m_menu;
     MenuList* m_menuBar;
@@ -93,6 +97,8 @@ class FrontierWindow : public Geek::Logger
 
     bool initInternal();
     void updateCursor();
+
+    void dragOver(Geek::Vector2D position, Widget* current, bool dropped);
 
  protected:
     virtual bool init();
@@ -112,7 +118,10 @@ class FrontierWindow : public Geek::Logger
     Widget* getContent() const { return m_content; }
     void setActiveWidget(Widget* widget);
     Widget* getActiveWidget() const { return m_activeWidget; }
-    void setDragWidget(Widget* widget);
+    void setMotionWidget(Widget* widget);
+
+    void dragWidget(Widget* widget);
+
 
     void show();
     void hide();

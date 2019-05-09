@@ -45,10 +45,11 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_currentCursor = CURSOR_POINTER;
 
     m_content = NULL;
-    m_dragWidget = NULL;
     m_mouseOverWidget = NULL;
-    m_dragWidget = NULL;
+    m_motionWidget = NULL;
     m_activeWidget = NULL;
+    m_dragWidget = NULL;
+    m_dragSurface = NULL;
 
     m_surface = NULL;
 
@@ -93,9 +94,9 @@ FrontierWindow::~FrontierWindow()
         m_mouseOverWidget->decRefCount();
     }
 
-    if (m_dragWidget != NULL)
+    if (m_motionWidget != NULL)
     {
-        m_dragWidget->decRefCount();
+        m_motionWidget->decRefCount();
     }
 
     if (m_surface != NULL)
@@ -182,21 +183,83 @@ void FrontierWindow::setActiveWidget(Widget* widget)
     }
 }
 
-void FrontierWindow::setDragWidget(Widget* widget)
+void FrontierWindow::setMotionWidget(Widget* widget)
 {
-    if (m_dragWidget != widget)
+    if (m_motionWidget != widget)
     {
-        if (m_dragWidget != NULL)
+        if (m_motionWidget != NULL)
         {
-            m_dragWidget->decRefCount();
+            m_motionWidget->decRefCount();
         }
-        m_dragWidget = widget;
-        if (m_dragWidget != NULL)
+        m_motionWidget = widget;
+        if (m_motionWidget != NULL)
         {
-            m_dragWidget->incRefCount();
+            m_motionWidget->incRefCount();
         }
     }
-    m_dragTime = m_app->getTimestamp();
+    m_motionTime = m_app->getTimestamp();
+}
+
+void FrontierWindow::dragWidget(Widget* widget)
+{
+    m_dragWidget = widget;
+    m_dragWidget->incRefCount();
+
+    if (widget == NULL)
+    {
+        return;
+    }
+
+    if (m_dragSurface != NULL)
+    {
+        delete m_dragSurface;
+    }
+
+    Size size = m_dragWidget->getSize();
+
+    float scale = m_engineWindow->getScaleFactor();
+    if (scale > 1.0)
+    {
+        m_dragSurface = new HighDPISurface(size.width, size.height, 4);
+    }
+    else
+    {
+        m_dragSurface = new Surface(size.width, size.height, 4);
+    }
+
+    m_dragWidget->draw(m_dragSurface);
+}
+
+void FrontierWindow::dragOver(Vector2D position, Widget* current, bool dropped)
+{
+    log(DEBUG, "dragOver: position=%d,%d, current=%ls", position.x, position.y, current->getWidgetName().c_str());
+
+    bool stop = false;
+    if (dropped)
+    {
+        stop = current->dragDropSignal().emit(m_dragWidget);
+    }
+    else
+    {
+        stop = current->dragOverSignal().emit(m_dragWidget);
+    }
+
+    if (stop)
+    {
+        return;
+    }
+
+    vector<Widget*> children = current->getChildren();
+    for (Widget* child : children)
+    {
+
+        if (child->intersects(position.x, position.y))
+        {
+            dragOver(position, child, dropped);
+        }
+
+        //break;
+    }
 }
 
 void FrontierWindow::show()
@@ -322,6 +385,12 @@ void FrontierWindow::update(bool force)
         m_engineWindow->update();
 
     }
+
+    if (m_dragSurface != NULL)
+    {
+        m_surface->blit(m_dragPosition.x, m_dragPosition.y, m_dragSurface);
+    }
+
     m_root->clearDirty();
 
 }
@@ -394,14 +463,30 @@ bool FrontierWindow::handleEvent(Event* event)
     Widget* prevActiveWidget = m_activeWidget;
     Widget* destWidget = NULL;
     bool updateActive = false;
+    bool forceUpdate = false;
 
     event->window = this;
 
     switch (event->eventType)
     {
         case FRONTIER_EVENT_MOUSE_BUTTON:
+        {
+            MouseButtonEvent* mouseEvent = (MouseButtonEvent*)event;
             m_app->setActiveWindow(this);
-            // Fall through
+
+            if (!mouseEvent->direction && m_dragWidget != NULL)
+            {
+                dragOver(m_dragPosition, m_root, true);
+                m_dragWidget->decRefCount();
+                m_dragWidget = NULL;
+                if (m_dragSurface != NULL)
+                {
+                    m_dragSurface = NULL;
+                    delete m_dragSurface;
+                }
+                forceUpdate = true;
+            }
+        } // Fall through
         case FRONTIER_EVENT_MOUSE_SCROLL:
             updateActive = true;
             destWidget = m_root->handleEvent(event);
@@ -427,6 +512,16 @@ bool FrontierWindow::handleEvent(Event* event)
                 }
 
             }
+
+            if (m_dragSurface != NULL)
+            {
+                MouseEvent* mouseEvent = (MouseEvent*)event;
+                m_dragPosition.x = mouseEvent->x;
+                m_dragPosition.y = mouseEvent->y;
+                forceUpdate = true;
+dragOver(m_dragPosition, m_root, false);
+            }
+
             updateCursor();
             break;
 
@@ -438,19 +533,19 @@ bool FrontierWindow::handleEvent(Event* event)
             break;
     }
 
-    if (m_dragWidget != NULL)
+    if (m_motionWidget != NULL)
     {
         uint64_t now = m_app->getTimestamp();
-        uint64_t diff = now - m_dragTime;
+        uint64_t diff = now - m_motionTime;
         if (diff >= 10)
         {
-            destWidget = m_dragWidget->handleEvent(event);
-            m_dragTime = m_app->getTimestamp();
+            destWidget = m_motionWidget->handleEvent(event);
+            m_motionTime = m_app->getTimestamp();
         }
     }
 
     bool updateRequired = m_root->isDirty();
-    if (destWidget != NULL || updateRequired || updateActive)
+    if (destWidget != NULL || updateRequired || updateActive || forceUpdate)
     {
         if (updateActive &&
             destWidget != NULL &&
@@ -461,7 +556,7 @@ bool FrontierWindow::handleEvent(Event* event)
             updateRequired = true;
         }
 
-        if (updateRequired)
+        if (updateRequired || forceUpdate)
         {
             update();
         }
