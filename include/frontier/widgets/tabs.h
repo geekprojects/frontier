@@ -26,6 +26,8 @@ class Tab : public Widget
     Widget* m_content;
     bool m_closeable;
 
+    bool m_mouseDown;
+
  public:
     Tab(Tabs* tabs, std::wstring title, Icon* icon, Widget* content, bool closeable);
     Tab(FrontierApp* app, std::wstring title, Icon* icon, Widget* content, bool closeable);
@@ -37,6 +39,8 @@ class Tab : public Widget
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleEvent(Frontier::Event* event);
+
+    void setTabs(Tabs* tabs) { m_tabs = tabs; }
 
     std::wstring getTitle() { return m_title; }
     Icon* getIcon() { return m_icon; }
@@ -62,9 +66,10 @@ class Tabs : public Widget
     Frontier::Size getTabSize();
     Frontier::Rect getTabsRect();
     Frontier::Rect getContentRect();
-    bool isHorizontal() { return (m_placement == TAB_TOP || m_placement == TAB_BOTTOM); }
 
     int getTabIndex(Tab* tab);
+
+    bool onDragDrop(Widget* widget);
 
  public:
     Tabs(FrontierApp* app);
@@ -86,6 +91,9 @@ class Tabs : public Widget
     bool isCollapsible() { return m_collapsible; }
     void setTabPlacement(TabPlacement tabPlacement);
     TabPlacement getTabPlacement() { return m_placement; }
+    bool isHorizontal() { return (m_placement == TAB_TOP || m_placement == TAB_BOTTOM); }
+
+    virtual std::vector<Widget*> getChildren();
 
     void addTab(std::wstring title, Widget* content, bool closeable = false);
     void addTab(std::wstring title, Icon* icon, Widget* content, bool closeable = false);

@@ -114,6 +114,8 @@ void Tabs::init()
     m_openIcon = m_app->getTheme()->getIcon(openIcon);
     m_closedIcon = m_app->getTheme()->getIcon(closedIcon);
 
+
+    dragDropSignal().connect(sigc::mem_fun(*this, &Tabs::onDragDrop));
 }
 
 void Tabs::calculateSize()
@@ -222,7 +224,7 @@ void Tabs::layout()
     for (Tab* tab : m_tabs)
     {
         tab->setPosition(x, y);
-        tab->setSize(Size(tabSize.width, tabSize.height));
+        tab->setSize(tabSize);
 
         if (isHorizontal())
         {
@@ -335,11 +337,6 @@ Widget* Tabs::handleEvent(Event* event)
 
         if (tabsRect.intersects(x, y))
         {
-            if (event->eventType != FRONTIER_EVENT_MOUSE_BUTTON)
-            {
-                return this;
-            }
-
             MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
 
             x -= tabsRect.x;
@@ -355,7 +352,7 @@ Widget* Tabs::handleEvent(Event* event)
                tabPos = y;
             }
  
-            if (m_collapsible)
+            if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON && m_collapsible)
             {
                 if (tabPos < TAB_SIZE)
                 {
@@ -393,6 +390,18 @@ Widget* Tabs::handleEvent(Event* event)
     }
 
     return NULL;
+}
+
+vector<Widget*> Tabs::getChildren()
+{
+    vector<Widget*> children;
+
+    if (m_activeTab)
+    {
+        children.push_back(m_activeTab->getContent());
+    }
+
+    return children;
 }
 
 void Tabs::addTab(std::wstring title, Widget* content, bool closeable)
@@ -730,3 +739,24 @@ Frontier::Rect Tabs::getContentRect()
     return r;
 }
 
+bool Tabs::onDragDrop(Widget* widget)
+{
+    log(DEBUG, "onDragDrop: Dropped widget: %ls", widget->getWidgetName().c_str());
+
+    if (typeid(*widget) == typeid(Tab))
+    {
+        Tab* tab = (Tab*)widget;
+
+        tab->incRefCount();
+        tab->setParent(this);
+        tab->setTabs(this);
+        m_tabs.push_back(tab);
+
+        m_activeTab = (Tab*)widget;
+        widget->setDirty();
+        setDirty();
+        return true;
+    }
+
+    return false;
+}

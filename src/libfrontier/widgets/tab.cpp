@@ -18,6 +18,7 @@ Tab::Tab(Tabs* tabs, wstring title, Icon* icon, Widget* content, bool closeable)
     m_icon = icon;
     m_content = content;
     m_closeable = closeable;
+    m_mouseDown = false;
 
     m_content->setParent(m_tabs);
     m_content->incRefCount();
@@ -32,6 +33,7 @@ Tab::Tab(FrontierApp* app, wstring title, Icon* icon, Widget* content, bool clos
     m_icon = icon;
     m_content = content;
     m_closeable = closeable;
+    m_mouseDown = false;
 
     m_content->incRefCount();
 }
@@ -44,12 +46,28 @@ Tab::~Tab()
 void Tab::calculateSize()
 {
     m_minSize.set(TAB_SIZE, TAB_SIZE);
-    if (m_closeable)
-    {
-        m_minSize.width += TAB_SIZE;
-    }
 
-    m_maxSize.set(MAX_TAB_SIZE, TAB_SIZE);
+    bool horizontal = true;
+    if (m_tabs != NULL)
+    {
+        horizontal = m_tabs->isHorizontal();
+    }
+    if (horizontal)
+    {
+        if (m_closeable)
+        {
+            m_minSize.width += TAB_SIZE;
+        }
+        m_maxSize.set(MAX_TAB_SIZE, TAB_SIZE);
+    }
+    else
+    {
+        if (m_closeable)
+        {
+            m_minSize.height += TAB_SIZE;
+        }
+        m_maxSize.set(TAB_SIZE, MAX_TAB_SIZE);
+    }
 }
 
 void Tab::layout()
@@ -59,12 +77,6 @@ void Tab::layout()
 
 bool Tab::draw(Geek::Gfx::Surface* surface)
 {
-    UIState state = STATE_NONE;
-    if (m_tabs != NULL && m_tabs->getActiveTab() == m_content)
-    {
-        state = STATE_SELECTED;
-    }
-
     bool horizontal = true;
     int rotate = 0;
     if (m_tabs != NULL)
@@ -79,6 +91,16 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
             rotate = 270;
             horizontal = false;
         }
+    }
+
+    int state = STATE_NONE;
+    if (m_tabs != NULL && m_tabs->getActiveTab() == m_content)
+    {
+        state = STATE_SELECTED;
+    }
+    if (!horizontal)
+    {
+        state |= STATE_VERTICAL;
     }
 
     m_app->getTheme()->drawBorder(
@@ -99,11 +121,18 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
     }
 
 
-    int closeWidth = 0;
+    int closeSize = 0;
     if (m_closeable)
     {
-        closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
-        titleWidth -= closeWidth + 5;
+        if (horizontal)
+        {
+            closeSize = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
+        }
+        else
+        {
+            closeSize = m_app->getTheme()->getIconHeight();
+        }
+        titleWidth -= closeSize + 5;
     }
 
     int textOffsetX = 0;
@@ -116,14 +145,14 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
         int iconY = 5;
         if (horizontal)
         {
-            titleWidth -= iconSize.width + 5;
-            textOffsetX = iconSize.width + 5;
+            titleWidth -= iconSize.width + iconX;
+            textOffsetX = iconSize.width + iconX;
             iconY = (m_setSize.height / 2) - (iconSize.height / 2);
         }
         else
         {
-            titleWidth -= iconSize.height + 5;
-            textOffsetY = iconSize.height + 5;
+            titleWidth -= iconSize.height + iconY;
+            textOffsetY = iconSize.height + iconY;
             iconX = (m_setSize.width / 2) - (iconSize.width / 2);
         }
 
@@ -131,21 +160,45 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
     }
 
     int labelHeight = m_app->getTheme()->getTextHeight();
-    int labelY = ((TAB_SIZE / 2) - (labelHeight / 2));
+    int labelMid = ((TAB_SIZE / 2) - (labelHeight / 2));
+
+    if (horizontal)
+    {
+        textOffsetX += 5;
+        textOffsetY += labelMid;
+    }
+    else
+    {
+        textOffsetX += labelMid;
+        textOffsetY += 5;
+    }
 
     m_app->getTheme()->drawText(
         surface,
-        textOffsetX + 5,
-        textOffsetY + labelY,
+        textOffsetX,
+        textOffsetY,
         m_title.c_str(),
         titleWidth, false, rotate);
 
     if (m_closeable)
     {
+        int closeX;
+        int closeY;
+        if (horizontal)
+        {
+            closeX = m_setSize.width - (closeSize + 5);
+            closeY = labelMid;
+        }
+        else
+        {
+            closeX = labelMid;
+            closeY = m_setSize.height - (closeSize + 5);
+        }
+
         m_app->getTheme()->drawIcon(
             surface,
-            m_setSize.width - (closeWidth + 5),
-            labelY,
+            closeX,
+            closeY,
             FRONTIER_ICON_WINDOW_CLOSE,
             false);
     }
@@ -172,7 +225,17 @@ Widget* Tab::handleEvent(Event* event)
             if (m_closeable)
             {
                 int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
-                if (x > m_setSize.width - (closeWidth + 5))
+                bool close = false;
+                if (m_tabs == NULL || m_tabs->isHorizontal())
+                {
+                    close = (x > m_setSize.width - (closeWidth + 5));
+                }
+                else
+                {
+                    close = (y > m_setSize.height - (closeWidth + 5));
+                }
+
+                if (close)
                 {
                     if (!mouseButtonEvent->direction)
                     {
@@ -190,7 +253,12 @@ Widget* Tab::handleEvent(Event* event)
             }
             else if (!mouseButtonEvent->direction)
             {
+                m_mouseDown = false;
                 return NULL;
+            }
+            else if (mouseButtonEvent->direction)
+            {
+                m_mouseDown = true;
             }
 
             if (m_tabs != NULL)
@@ -199,6 +267,19 @@ Widget* Tab::handleEvent(Event* event)
             }
 
             return m_content;
+        }
+        else if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
+        {
+            if (m_mouseDown)
+            {
+                log(DEBUG, "Dragging tab!!");
+                m_mouseDown = false;
+                if (m_tabs != NULL)
+                {
+                    m_tabs->closeTab(m_content, false);
+                }
+                getWindow()->dragWidget(this);
+            }
         }
         else
         {
