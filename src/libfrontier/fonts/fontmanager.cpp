@@ -1,6 +1,6 @@
 /*
  * Frontier - A toolkit for creating simple OS-independent user interfaces
- * Copyright (C) 2018 Ian Parker <ian@geekprojects.com>
+ * Copyright (C) 2018, 2019 Ian Parker <ian@geekprojects.com>
  *
  * This file is part of Frontier.
  *
@@ -274,7 +274,6 @@ bool FontManager::write(
         highDPI = surface->isHighDPI();
     }
 
-
     int loadFlags = 0;
     if (draw)
     {
@@ -335,6 +334,21 @@ bool FontManager::write(
         surface = rootSurface;
     }
 
+    if (rotate == 90 && surface != NULL)
+    {
+        int precalcWidth;
+        if (highDPI)
+        {
+            precalcWidth = width(font, text, maxWidth / 2);
+            precalcWidth *= 2;
+        }
+        else
+        {
+            precalcWidth = width(font, text, maxWidth);
+        }
+        y += precalcWidth;
+    }
+
     unsigned int pos;
     unsigned int width = 0;
     uint32_t prevGlyph = 0;
@@ -343,26 +357,11 @@ bool FontManager::write(
         uint32_t glyphIndex;
         wchar_t currentChar;
 
-        if (rotate == 90)
-        {
-            currentChar = text[(text.length() - 1) - pos];
-        }
-        else
-        {
-            currentChar = text[pos];
-        }
+        currentChar = text[pos];
 
         glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font->getFTFace(), -1, currentChar);
         if (glyphIndex == 0)
         {
-#if 0
-            log(
-                ERROR,
-                "write: Unable to find glyph for: %c (0x%x)",
-                currentChar,
-                currentChar);
-#endif
-
             glyphIndex = FTC_CMapCache_Lookup(m_cmapCache, font->getFTFace(), -1, 0xFFFD);
             if (glyphIndex == 0)
             {
@@ -379,7 +378,19 @@ bool FontManager::write(
                 glyphIndex,
                 FT_KERNING_DEFAULT,
                 &delta );
-            x += delta.x >> 6;
+            if (rotate == 0)
+            {
+                x += delta.x >> 6;
+            }
+            else if (rotate == 90)
+            {
+                y -= delta.x >> 6;
+            }
+            else if (rotate == 270)
+            {
+                y += delta.x >> 6;
+            }
+            width += delta.x >> 6;
         }
         prevGlyph = glyphIndex;
 
@@ -457,6 +468,11 @@ bool FontManager::write(
             }
         }
 
+        if (rotate == 90)
+        {
+            y -= xAdvance;
+        }
+
         if (draw && bitmap.buffer == NULL)
         {
             if (currentChar != ' ')
@@ -518,9 +534,8 @@ bool FontManager::write(
                 }
                 else if (rotate == 270)
                 {
-                    x1 = (bitmap.rows - yp) + x;
+                    x1 = (bitmap.rows - yp) + x;// - yoff;
                 }
-
 
                 unsigned int xp;
                 for (xp = 0; xp < bitmap.width; xp++)
@@ -531,7 +546,7 @@ bool FontManager::write(
                     }
                     else if (rotate == 90)
                     {
-                        y1 = (bitmap.width - xp) + y + yoff;
+                        y1 = (bitmap.width - xp) + y;// + yoff;
                     }
                     else if (rotate == 270)
                     {
@@ -580,7 +595,6 @@ bool FontManager::write(
         else if (rotate == 90)
         {
             x += yAdvance;
-            y += xAdvance;
             width += xAdvance;
         }
         else if (rotate == 270)
@@ -611,10 +625,11 @@ bool FontManager::write(
 
 int FontManager::width(
     FontHandle* font,
-    wstring text)
+    wstring text,
+    int maxWidth)
 {
     int result;
-    write(font, NULL, 0, 0, text, 0, false, &result);
+    write(font, NULL, 0, 0, text, 0, false, &result, maxWidth);
     return result;
 }
 

@@ -77,7 +77,8 @@ class FontManager : public Geek::Logger
 
     int width(
         FontHandle* font,
-        std::wstring chr);
+        std::wstring chr,
+        int maxWidth = -1);
 };
 
 class FontFamily
