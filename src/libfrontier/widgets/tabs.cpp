@@ -23,6 +23,8 @@
 #include <frontier/widgets/tabs.h>
 #include <frontier/fontawesome.h>
 
+#include <typeinfo>
+
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
