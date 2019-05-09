@@ -133,14 +133,14 @@ void UITheme::drawBackground(Geek::Gfx::Surface* surface)
     surface->clear(getColour(COLOUR_WINDOW_BACKGROUND));
 }
 
-void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state)
+void UITheme::drawBorder(Surface* surface, UIBorderType type, int state)
 {
     int w = surface->getWidth();
     int h = surface->getHeight();
     drawBorder(surface, type, state, 0, 0, w, h);
 }
 
-void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int x, int y, int width, int height)
+void UITheme::drawBorder(Surface* surface, UIBorderType type, int state, int x, int y, int width, int height)
 {
     bool background = false;
     bool gradient = false;
@@ -169,7 +169,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         {
             gradient = true;
             border = true;
-            if (state == STATE_SELECTED)
+            if (!!(state & STATE_SELECTED))
             {
                 uint32_t tmp;
 
@@ -197,11 +197,11 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         case BORDER_LIST_ITEM_2:
         {
             background = true;
-            if (state == STATE_SELECTED)
+            if (!!(state & STATE_SELECTED))
             {
                 backgroundColour = getColour(COLOUR_LIST_ITEM_SELECTED);
             }
-            else if (state == STATE_HOVER)
+            else if (!!(state & STATE_HOVER))
             {
                 backgroundColour = 0xffbbbbbb;//getColour(COLOUR_LIST_ITEM_SELECTED);
             }
@@ -221,7 +221,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
             background = true;
             b1 = 0xff4b4b4b;
             b2 = 0xff4b4b4b;
-            if (state == STATE_SELECTED)
+            if (!!(state & STATE_SELECTED))
             {
                 backgroundColour = getColour(COLOUR_TAB_SELECTED_BACKGROUND);
                 //b1 = b2;
@@ -237,7 +237,7 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
             background = true;
             backgroundColour = getColour(COLOUR_INPUT_BACKGROUND);
             border = true;
-            if (state == STATE_SELECTED)
+            if (!!(state & STATE_SELECTED))
             {
                 b1 = 0xff4c708c;
                 b2 = 0xff4c708c;
@@ -300,9 +300,16 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, UIState state, int
         }
     }
 
-    if (type == BORDER_TAB && state == STATE_SELECTED)
+    if (type == BORDER_TAB && !!(state & STATE_SELECTED))
     {
-        surface->drawRectFilled(x + 1, y2 - 1, width - 2, 2, 0xff4a7987);
+        if (!!(state & STATE_VERTICAL))
+        {
+            surface->drawRectFilled(x2 - 1, y + 1, 2, height - 2, 0xff4a7987);
+        }
+        else
+        {
+            surface->drawRectFilled(x + 1, y2 - 1, width - 2, 2, 0xff4a7987);
+        }
     }
 }
 

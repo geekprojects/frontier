@@ -50,9 +50,11 @@ enum UIBorderType
 
 enum UIState
 {
-    STATE_NONE,
-    STATE_SELECTED,
-    STATE_HOVER
+    STATE_NONE       = 0x00,
+    STATE_SELECTED   = 0x01,
+    STATE_HOVER      = 0x02,
+    STATE_HORIZONTAL = 0x00,
+    STATE_VERTICAL   = 0x10,
 };
 
 enum ThemeColour
@@ -103,8 +105,8 @@ class UITheme : public Geek::Logger
     virtual void setPadding(int padding) { m_padding = padding; }
 
     virtual void drawBackground(Geek::Gfx::Surface* surface);
-    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state);
-    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, UIState state, int x, int y, int w, int h);
+    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, int state);
+    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, int state, int x, int y, int w, int h);
 
     virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false, int rotate = 0);
     virtual int getTextWidth(std::wstring text) const;
