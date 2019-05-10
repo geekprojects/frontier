@@ -20,18 +20,26 @@ Menu::~Menu()
 
 MenuItem::MenuItem(std::wstring title)
 {
-    m_title = title;
-    m_key = 0;
-    m_keyModifiers = 0;
-    m_isSeparator = false;
+    init(title, 0, 0, false);
+}
+
+MenuItem::MenuItem(std::wstring title, sigc::slot<void, MenuItem*> clickSignalSlot)
+{
+    init(title, 0, 0, false);
+
+    m_clickSignal.connect(clickSignalSlot);
 }
 
 MenuItem::MenuItem(std::wstring title, wchar_t key, uint32_t keyModifiers)
 {
-    m_title = title;
-    m_key = key;
-    m_keyModifiers = keyModifiers;
-    m_isSeparator = false;
+    init(title, key, keyModifiers, false);
+}
+
+MenuItem::MenuItem(std::wstring title, wchar_t key, uint32_t keyModifiers, sigc::slot<void, MenuItem*> clickSignalSlot)
+{
+    init(title, key, keyModifiers, false);
+
+    m_clickSignal.connect(clickSignalSlot);
 }
 
 MenuItem::~MenuItem()
@@ -42,6 +50,14 @@ MenuItem::~MenuItem()
     }
 
     m_children.clear();
+}
+
+void MenuItem::init(wstring title, wchar_t key, uint32_t keyModifiers, bool isSeparator)
+{
+    m_title = title;
+    m_key = key;
+    m_keyModifiers = keyModifiers;
+    m_isSeparator = isSeparator;
 }
 
 void MenuItem::setIsSeparator(bool isSeparator)

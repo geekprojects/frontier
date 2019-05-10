@@ -52,9 +52,13 @@ class MenuItem : public FrontierObject
 
     sigc::signal<void, MenuItem*> m_clickSignal;
 
+    void init(std::wstring title, wchar_t key, uint32_t keyModifiers, bool isSeparator);
+
  public:
     MenuItem(std::wstring title);
+    MenuItem(std::wstring title, sigc::slot<void, MenuItem*> clickSignalSlot);
     MenuItem(std::wstring title, wchar_t key, uint32_t keyModifiers);
+    MenuItem(std::wstring title, wchar_t key, uint32_t keyModifiers, sigc::slot<void, MenuItem*> clickSignalSlot);
     virtual ~MenuItem();
 
     void setTitle(std::wstring title) { m_title = title; }
