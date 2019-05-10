@@ -27,6 +27,7 @@ class Tab : public Widget
     bool m_closeable;
 
     bool m_mouseDown;
+    Geek::Vector2D m_mouseDownPos;
 
  public:
     Tab(Tabs* tabs, std::wstring title, Icon* icon, Widget* content, bool closeable);

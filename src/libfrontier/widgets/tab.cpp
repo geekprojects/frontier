@@ -259,6 +259,7 @@ Widget* Tab::handleEvent(Event* event)
             else if (mouseButtonEvent->direction)
             {
                 m_mouseDown = true;
+                m_mouseDownPos = Vector2D(mouseButtonEvent->x, mouseButtonEvent->y);
             }
 
             if (m_tabs != NULL)
@@ -270,15 +271,22 @@ Widget* Tab::handleEvent(Event* event)
         }
         else if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
         {
+            MouseMotionEvent* mouseMotionEvent = (MouseMotionEvent*)event;
             if (m_mouseDown)
             {
-                log(DEBUG, "Dragging tab!!");
-                m_mouseDown = false;
-                if (m_tabs != NULL)
+                int diffX = abs((int)(mouseMotionEvent->x - m_mouseDownPos.x));
+                int diffY = abs((int)(mouseMotionEvent->y - m_mouseDownPos.y));
+                int diff = (int)sqrt((double)((diffX * diffX) + (diffY * diffY)));
+                if (diff > 5)
                 {
-                    m_tabs->closeTab(m_content, false);
+                    log(DEBUG, "Dragging tab!! diff=%d", diff);
+                    m_mouseDown = false;
+                    if (m_tabs != NULL)
+                    {
+                        m_tabs->closeTab(m_content, false);
+                    }
+                    getWindow()->dragWidget(this);
                 }
-                getWindow()->dragWidget(this);
             }
         }
         else
