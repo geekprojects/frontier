@@ -100,6 +100,15 @@ bool CocoaEngine::checkEvents()
     return run();
 }
 
+bool CocoaEngine::quit()
+{
+    NSApplication* app = (NSApplication*)m_application;
+
+    [app terminate:nil];
+
+    return true;
+}
+
 bool CocoaEngine::createApplication()
 {
     m_application = [NSApplication sharedApplication];

@@ -44,6 +44,8 @@ class FrontierEngine : public Geek::Logger
 
     virtual bool checkEvents();
 
+    virtual bool quit();
+
     virtual std::string getConfigDir();
 
     // Dialogs

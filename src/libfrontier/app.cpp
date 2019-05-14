@@ -244,6 +244,11 @@ bool FrontierApp::main()
     }
 }
 
+bool FrontierApp::quit()
+{
+    return m_engine->quit();
+}
+
 void FrontierApp::update()
 {
     for (FrontierWindow* window : m_windows)
@@ -290,5 +295,14 @@ uint64_t FrontierApp::getTimestamp() const
     millis += tv.tv_usec / 1000l;
 
     return millis;
+}
+
+void FrontierApp::onAboutMenu(MenuItem* item)
+{
+}
+
+void FrontierApp::onQuitMenu(MenuItem* item)
+{
+    quit();
 }
 

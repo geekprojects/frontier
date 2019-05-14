@@ -32,6 +32,8 @@ class CocoaEngine : public FrontierEngine
 
     virtual bool checkEvents();
 
+    virtual bool quit();
+
     virtual std::string getConfigDir();
 
     virtual void message(std::string title, std::string message);

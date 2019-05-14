@@ -50,6 +50,13 @@ bool FrontierEngine::checkEvents()
     return false;
 }
 
+bool FrontierEngine::quit()
+{
+    log(WARN, "quit: Quit requested");
+
+    return true;
+}
+
 string FrontierEngine::getConfigDir()
 {
     wstring name = m_app->getName();

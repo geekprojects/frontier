@@ -107,6 +107,7 @@ class FrontierApp : public Geek::Logger
 
     virtual bool init();
     virtual bool main();
+    virtual bool quit();
 
     void update();
 
@@ -118,6 +119,9 @@ class FrontierApp : public Geek::Logger
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 
     uint64_t getTimestamp() const;
+
+    void onAboutMenu(MenuItem* item);
+    void onQuitMenu(MenuItem* item);
 
     virtual sigc::signal<void, FrontierWindow*> activeWindowChangedSignal() { return m_activeWindowChangedSignal; }
 };
