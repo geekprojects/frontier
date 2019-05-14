@@ -146,27 +146,15 @@ void CocoaEngine::updateMenu(Menu* frontierMenu)
     // Create NSMenu
     NSMenu* mainMenu = [[NSMenu alloc] init];
 
-    NSString* appName = [[NSProcessInfo processInfo] processName];
 
-    // Main app menu
-    NSMenu* appleMenu = [[NSMenu alloc] initWithTitle:@""];
-
-    NSString* quitTitle = [@"About " stringByAppendingString:appName];
-    [appleMenu addItemWithTitle:quitTitle action:@selector(orderFrontStandardAboutPanel:) keyEquivalent:@""];
-
-    [appleMenu addItem:[NSMenuItem separatorItem]];
-
-    NSString* title = [@"Quit " stringByAppendingString:appName];
-    [appleMenu addItemWithTitle:title action:@selector(terminate:) keyEquivalent:@"q"];
-
-    /* Put app menu into the menubar */
-    NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:@"" action:nil keyEquivalent:@""];
-    [menuItem setSubmenu:appleMenu];
-    [mainMenu addItem:menuItem];
-    [menuItem release];
-
-    if (frontierMenu != NULL)
+    if (frontierMenu != NULL && !frontierMenu->getMenuItems().empty())
     {
+        MenuItem* firstItem = frontierMenu->getMenuItems().at(0);
+        if (firstItem->getTitle() != L"__APP__")
+        {
+            addAppMenu(mainMenu);
+        }
+
         MenuTarget* target = [MenuTarget alloc];
         for (MenuItem* menu : frontierMenu->getMenuItems())
         {
@@ -197,10 +185,14 @@ void CocoaEngine::updateMenu(Menu* frontierMenu)
                 }
             }
 
-            menuItem = [[NSMenuItem alloc] initWithTitle:titleStr action:nil keyEquivalent:@""];
+            NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:titleStr action:nil keyEquivalent:@""];
             [menuItem setSubmenu:nsmenu];
             [mainMenu addItem:menuItem];
         }
+    }
+    else
+    {
+        addAppMenu(mainMenu);
     }
 
     log(DEBUG, "updateMenu: Adding Window menu");
@@ -212,6 +204,31 @@ void CocoaEngine::updateMenu(Menu* frontierMenu)
     [mainMenu release];  /* we're done with it, let NSApp own it. */
     log(DEBUG, "updateMenu: Done!");
 }
+
+void CocoaEngine::addAppMenu(void* menuPtr)
+{
+    NSMenu* mainMenu = (NSMenu*)menuPtr;
+
+    NSString* appName = [[NSProcessInfo processInfo] processName];
+
+    // Main app menu
+    NSMenu* appleMenu = [[NSMenu alloc] initWithTitle:@""];
+
+    NSString* quitTitle = [@"About " stringByAppendingString:appName];
+    [appleMenu addItemWithTitle:quitTitle action:@selector(orderFrontStandardAboutPanel:) keyEquivalent:@""];
+
+    [appleMenu addItem:[NSMenuItem separatorItem]];
+
+    NSString* title = [@"Quit " stringByAppendingString:appName];
+    [appleMenu addItemWithTitle:title action:@selector(terminate:) keyEquivalent:@"q"];
+
+    /* Put app menu into the menubar */
+    NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:@"" action:nil keyEquivalent:@""];
+    [menuItem setSubmenu:appleMenu];
+    [mainMenu addItem:menuItem];
+    [menuItem release];
+}
+
 
 bool CocoaEngine::run()
 {

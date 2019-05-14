@@ -18,6 +18,7 @@ class CocoaEngine : public FrontierEngine
     bool run();
 
     void updateMenu(Menu* menu);
+    void addAppMenu(void* menu);
 
     void onActiveWindowChanged(FrontierWindow* window);
 
