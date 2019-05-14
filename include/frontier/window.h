@@ -98,7 +98,7 @@ class FrontierWindow : public Geek::Logger
     bool initInternal();
     void updateCursor();
 
-    void dragOver(Geek::Vector2D position, Widget* current, bool dropped);
+    Widget* dragOver(Geek::Vector2D position, Widget* current, bool dropped);
 
  protected:
     virtual bool init();

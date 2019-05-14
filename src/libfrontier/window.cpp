@@ -230,23 +230,23 @@ void FrontierWindow::dragWidget(Widget* widget)
     m_dragWidget->draw(m_dragSurface);
 }
 
-void FrontierWindow::dragOver(Vector2D position, Widget* current, bool dropped)
+Widget* FrontierWindow::dragOver(Vector2D position, Widget* current, bool dropped)
 {
     log(DEBUG, "dragOver: position=%d,%d, current=%ls", position.x, position.y, current->getWidgetName().c_str());
 
     bool stop = false;
     if (dropped)
     {
-        stop = current->dragDropSignal().emit(m_dragWidget);
+        stop = current->dragDropSignal().emit(m_dragWidget, position);
     }
     else
     {
-        stop = current->dragOverSignal().emit(m_dragWidget);
+        stop = current->dragOverSignal().emit(m_dragWidget, position);
     }
 
     if (stop)
     {
-        return;
+        return current;
     }
 
     vector<Widget*> children = current->getChildren();
@@ -255,11 +255,14 @@ void FrontierWindow::dragOver(Vector2D position, Widget* current, bool dropped)
 
         if (child->intersects(position.x, position.y))
         {
-            dragOver(position, child, dropped);
+            Widget* accepted = dragOver(position, child, dropped);
+            if (accepted != NULL)
+            {
+                return accepted;
+            }
         }
-
-        //break;
     }
+    return NULL;
 }
 
 void FrontierWindow::show()
@@ -476,7 +479,13 @@ bool FrontierWindow::handleEvent(Event* event)
 
             if (!mouseEvent->direction && m_dragWidget != NULL)
             {
-                dragOver(m_dragPosition, m_root, true);
+                Widget* accepted = dragOver(m_dragPosition, m_root, true);
+                if (accepted == NULL)
+                {
+                    // No one wanted this widget :(
+                    m_dragWidget->dragCancelledSignal().emit(m_dragWidget);
+                }
+
                 m_dragWidget->decRefCount();
                 m_dragWidget = NULL;
                 if (m_dragSurface != NULL)
@@ -519,7 +528,7 @@ bool FrontierWindow::handleEvent(Event* event)
                 m_dragPosition.x = mouseEvent->x;
                 m_dragPosition.y = mouseEvent->y;
                 forceUpdate = true;
-dragOver(m_dragPosition, m_root, false);
+                dragOver(m_dragPosition, m_root, false);
             }
 
             updateCursor();

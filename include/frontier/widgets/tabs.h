@@ -68,9 +68,11 @@ class Tabs : public Widget
     Frontier::Rect getTabsRect();
     Frontier::Rect getContentRect();
 
+    void addTab(Tab* tab, std::vector<Tab*>::iterator pos);
     int getTabIndex(Tab* tab);
 
-    bool onDragDrop(Widget* widget);
+    bool onDragDrop(Widget* widget, Geek::Vector2D pos);
+    bool onDragCancelled(Widget* widget);
 
  public:
     Tabs(FrontierApp* app);

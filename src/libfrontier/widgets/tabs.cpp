@@ -414,9 +414,17 @@ void Tabs::addTab(std::wstring title, Widget* content, bool closeable)
 void Tabs::addTab(std::wstring title, Icon* icon, Widget* content, bool closeable)
 {
     Tab* tab = new Tab(this, title, icon, content, closeable);
+
+     addTab(tab, m_tabs.end());
+}
+
+void Tabs::addTab(Tab* tab, vector<Tab*>::iterator pos)
+{
     tab->setParent(this);
     tab->incRefCount();
-    m_tabs.push_back(tab);
+    tab->dragCancelledSignal().clear();
+    tab->dragCancelledSignal().connect(sigc::mem_fun(*this, &Tabs::onDragCancelled));
+    m_tabs.insert(pos, tab);
 
     if (m_activeTab == NULL)
     {
@@ -425,6 +433,7 @@ void Tabs::addTab(std::wstring title, Icon* icon, Widget* content, bool closeabl
 
     setDirty();
 }
+
 
 void Tabs::closeTab(Widget* widget, bool emitChangeSignal)
 {
@@ -741,24 +750,42 @@ Frontier::Rect Tabs::getContentRect()
     return r;
 }
 
-bool Tabs::onDragDrop(Widget* widget)
+bool Tabs::onDragDrop(Widget* widget, Vector2D pos)
 {
     log(DEBUG, "onDragDrop: Dropped widget: %ls", widget->getWidgetName().c_str());
 
     if (typeid(*widget) == typeid(Tab))
     {
-        Tab* tab = (Tab*)widget;
+        Tab* droppedTab = (Tab*)widget;
 
-        tab->incRefCount();
-        tab->setParent(this);
-        tab->setTabs(this);
-        m_tabs.push_back(tab);
+        vector<Tab*>::iterator it;
+        for (it = m_tabs.begin(); it != m_tabs.end(); it++)
+        {
+            if ((*it)->getX() > pos.x)
+            {
+                break;
+            }
+        }
 
-        m_activeTab = (Tab*)widget;
-        widget->setDirty();
+        m_tabs.insert(it, droppedTab);
+
         setDirty();
         return true;
     }
 
     return false;
 }
+
+bool Tabs::onDragCancelled(Widget* widget)
+{
+    
+    log(DEBUG, "onDragCancelled: widget: %ls", widget->getWidgetName().c_str());
+
+    if (typeid(*widget) == typeid(Tab))
+    {
+        Tab* tab = (Tab*)widget;
+        addTab(tab, m_tabs.end());
+    }
+    return true;
+}
+

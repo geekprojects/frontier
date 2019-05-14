@@ -80,8 +80,9 @@ class Widget : public FrontierObject, public Geek::Logger
     sigc::signal<void> m_activeSignal;
     sigc::signal<void> m_inactiveSignal;
 
-    sigc::signal<bool, Widget*> m_dragOverSignal;
-    sigc::signal<bool, Widget*> m_dragDropSignal;
+    sigc::signal<bool, Widget*, Geek::Vector2D> m_dragOverSignal;
+    sigc::signal<bool, Widget*, Geek::Vector2D> m_dragDropSignal;
+    sigc::signal<bool, Widget*> m_dragCancelledSignal;
 
     void initWidget(FrontierApp* app, std::wstring widgetName);
     void callInit();
@@ -155,8 +156,9 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual sigc::signal<void> signalActive() { return m_activeSignal; }
     virtual sigc::signal<void> signalInactive() { return m_inactiveSignal; }
 
-    virtual sigc::signal<bool, Widget*> dragOverSignal() { return m_dragOverSignal; }
-    virtual sigc::signal<bool, Widget*> dragDropSignal() { return m_dragDropSignal; }
+    virtual sigc::signal<bool, Widget*, Geek::Vector2D> dragOverSignal() { return m_dragOverSignal; }
+    virtual sigc::signal<bool, Widget*, Geek::Vector2D> dragDropSignal() { return m_dragDropSignal; }
+    virtual sigc::signal<bool, Widget*> dragCancelledSignal() { return m_dragCancelledSignal; }
 
     virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_POINTER; }
 
