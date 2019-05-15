@@ -767,9 +767,8 @@ bool Tabs::onDragDrop(Widget* widget, Vector2D pos)
             }
         }
 
-        m_tabs.insert(it, droppedTab);
+        addTab(droppedTab, it);
 
-        setDirty();
         return true;
     }
 
