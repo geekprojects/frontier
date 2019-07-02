@@ -26,7 +26,6 @@
 #include <geek/gfx-surface.h>
 
 #include <frontier/utils.h>
-#include <frontier/fonts.h>
 #include <frontier/events.h>
 #include <frontier/theme.h>
 

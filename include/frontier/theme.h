@@ -22,8 +22,8 @@
 #define __FRONTIER_THEME_H_
 
 #include <geek/gfx-surface.h>
+#include <geek/fonts.h>
 
-#include <frontier/fonts.h>
 #include <frontier/icon.h>
 
 #include <map>
@@ -81,9 +81,9 @@ class UITheme : public Geek::Logger
 {
  protected:
     bool m_initialised;
-    FontHandle* m_font;
-    FontHandle* m_iconFont;
-    FontHandle* m_monospaceFont;
+    Geek::FontHandle* m_font;
+    Geek::FontHandle* m_iconFont;
+    Geek::FontHandle* m_monospaceFont;
     FrontierApp* m_app;
 
     std::map<uint32_t, Icon*> m_iconCache;
@@ -117,10 +117,10 @@ class UITheme : public Geek::Logger
     virtual void drawIcon(Geek::Gfx::Surface* surface, int x, int y, wchar_t icon, bool inverted = false);
     virtual int getIconWidth(wchar_t icon) const;
     virtual int getIconHeight() const;
-    virtual FontHandle* getFont(bool highDPI) const;
-    virtual FontHandle* getIconFont(bool highDPI) const;
+    virtual Geek::FontHandle* getFont(bool highDPI) const;
+    virtual Geek::FontHandle* getIconFont(bool highDPI) const;
 
-    virtual FontHandle* getMonospaceFont(bool highDPI) const;
+    virtual Geek::FontHandle* getMonospaceFont(bool highDPI) const;
     virtual int getMonospaceHeight() const;
 
     FrontierApp* getApp() const { return m_app; }

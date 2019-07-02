@@ -2,6 +2,7 @@
 #include "testCommon.h"
 
 using namespace Frontier;
+using namespace Geek;
 
 TEST(FontManagerTest, multipleOpens)
 {

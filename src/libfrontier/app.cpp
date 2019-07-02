@@ -39,6 +39,7 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 
 FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
 {

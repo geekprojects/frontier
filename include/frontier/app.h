@@ -26,10 +26,10 @@
 
 #include <geek/gfx-surface.h>
 #include <geek/core-logger.h>
+#include <geek/fonts.h>
 
 #include <frontier/object.h>
 #include <frontier/utils.h>
-#include <frontier/fonts.h>
 #include <frontier/events.h>
 #include <frontier/theme.h>
 #include <frontier/menu.h>
@@ -65,7 +65,7 @@ class FrontierApp : public Geek::Logger
 
     std::set<FrontierObject*> m_objects;
 
-    FontManager* m_fontManager;
+    Geek::FontManager* m_fontManager;
     UITheme* m_theme;
 
     Menu* m_appMenu;
@@ -91,7 +91,7 @@ class FrontierApp : public Geek::Logger
     unsigned int getObjectCount() { return m_objects.size(); }
 
     FrontierEngine* getEngine() { return m_engine; }
-    FontManager* getFontManager() const { return m_fontManager; }
+    Geek::FontManager* getFontManager() const { return m_fontManager; }
     UITheme* getTheme() const { return m_theme; }
 
     ContextMenu* getContextMenuWindow();

@@ -130,15 +130,14 @@ else
     AM_CONDITIONAL([BUILD_TESTS], false, [tests])
 fi
 
-#CPPFLAGS="$CPPFLAGS -g -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer"
-#DFLAGSS="$LDFLAGS -fsanitize=address"
+#CPPFLAGS="$CPPFLAGS -g -O0 -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer"
+#LDFLAGSS="$LDFLAGS -fsanitize=address"
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/libfrontier/Makefile
                  src/libfrontier/widgets/Makefile
                  src/libfrontier/widgets/list/Makefile
-                 src/libfrontier/fonts/Makefile
                  src/libfrontier/engines/Makefile
                  src/libfrontier/engines/test/Makefile
                  src/libfrontier/engines/embedded/Makefile
