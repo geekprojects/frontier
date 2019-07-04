@@ -257,16 +257,11 @@ bool Tabs::draw(Surface* surface)
 {
     Rect tabsRect = getTabsRect();
 
+#if 0
     log(DEBUG, "draw: m_setSize: width=%d, height=%d", m_setSize.width, m_setSize.height);
 
     log(DEBUG, "draw: tabsRect: x=%d, y=%d, width=%d, height=%d", tabsRect.x, tabsRect.y, tabsRect.width, tabsRect.height);
-
-    m_app->getTheme()->drawBorder(
-        surface,
-        BORDER_WIDGET,
-        STATE_NONE,
-        tabsRect.x, tabsRect.y,
-        tabsRect.width, tabsRect.height);
+#endif
 
     if (!m_tabs.empty() && m_activeTab == NULL)
     {
