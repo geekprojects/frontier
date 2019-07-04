@@ -40,7 +40,7 @@ using namespace Geek;
 
 -(BOOL) windowShouldClose:(id) sender
 {
-    printf("CocoaNSWindow::windowShouldClose: Here!\n");
+    m_engineWindow->getWindow()->closeSignal().emit();
     return NO;
 }
 
