@@ -367,7 +367,10 @@ Widget* Tabs::handleEvent(Event* event)
             {
                 if (tab->intersects(mouseEvent->x, mouseEvent->y))
                 {
-                    m_collapsed = false;
+                    if (mouseButtonEvent->direction)
+                    {
+                        m_collapsed = false;
+                    }
                     return tab->handleEvent(event);
                 }
             }
