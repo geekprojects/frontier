@@ -304,11 +304,11 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, int state, int x, 
     {
         if (!!(state & STATE_VERTICAL))
         {
-            surface->drawRectFilled(x2 - 1, y + 1, 2, height - 2, 0xff4a7987);
+            surface->drawRectFilled(x2 - 2, y + 1, 2, height - 2, 0xff4a7987);
         }
         else
         {
-            surface->drawRectFilled(x + 1, y2 - 1, width - 2, 2, 0xff4a7987);
+            surface->drawRectFilled(x + 1, y2 - 2, width - 2, 2, 0xff4a7987);
         }
     }
 }
