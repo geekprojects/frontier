@@ -120,9 +120,17 @@ void Scroller::layout()
 
 void Scroller::checkSurfaceSize(bool highDPI)
 {
+    int w = m_child->getWidth();
+    int h = m_child->getHeight();
+    if (highDPI)
+    {
+        w *= 2;
+        h *= 2;
+    }
+
     if (m_childSurface == NULL ||
-        m_child->getWidth() != (int)m_childSurface->getWidth() ||
-        m_child->getHeight() != (int)m_childSurface->getHeight())
+        w != (int)m_childSurface->getWidth() ||
+        h != (int)m_childSurface->getHeight())
     {
         if (m_childSurface != NULL)
         {
@@ -158,7 +166,6 @@ bool Scroller::draw(Surface* surface)
 
         checkSurfaceSize(surface->isHighDPI());
         int childY = m_scrollBar->getPos();
-
 
         Size size = m_setSize;
         size.width -= 2;
