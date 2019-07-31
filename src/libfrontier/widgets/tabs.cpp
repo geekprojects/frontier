@@ -21,6 +21,7 @@
 
 #include <frontier/frontier.h>
 #include <frontier/widgets/tabs.h>
+#include <frontier/widgets/iconbutton.h>
 #include <frontier/fontawesome.h>
 
 #include <typeinfo>
@@ -30,39 +31,52 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-#define MAX_TAB_SIZE 250
+#define TABS_WIDGET_NAME L"Tabs"
+
 #define TAB_SIZE 22
+#define MIN_TAB_SIZE (TAB_SIZE * 2)
+#define MAX_TAB_SIZE 250
 
-Tabs::Tabs(FrontierApp* ui) : Widget(ui, L"Tabs")
+Tabs::Tabs(FrontierApp* ui) : Widget(ui, TABS_WIDGET_NAME)
 {
-    m_activeTab = NULL;
-    m_collapsible = false;
-    m_collapsed = false;
-    m_placement = TAB_TOP;
+    setup(false, false, TAB_TOP);
 }
 
-Tabs::Tabs(FrontierApp* ui, bool collapsible, TabPlacement placement) : Widget(ui, L"Tabs")
+Tabs::Tabs(FrontierWindow* window) : Widget(window, TABS_WIDGET_NAME)
 {
-    m_activeTab = NULL;
+    setup(false, false, TAB_TOP);
+}
+
+Tabs::Tabs(FrontierApp* ui, bool collapsible, TabPlacement placement) : Widget(ui, TABS_WIDGET_NAME)
+{
+    setup(collapsible, false, placement);
+}
+
+Tabs::Tabs(FrontierWindow* window, bool collapsible, TabPlacement placement) : Widget(window, TABS_WIDGET_NAME)
+{
+    setup(collapsible, false, placement);
+}
+
+Tabs::Tabs(FrontierApp* ui, bool collapsible, bool addButton, TabPlacement placement) : Widget(ui, TABS_WIDGET_NAME)
+{
+    setup(collapsible, addButton, placement);
+}
+
+Tabs::Tabs(FrontierWindow* window, bool collapsible, bool addButton, TabPlacement placement) : Widget(window, TABS_WIDGET_NAME)
+{
+    setup(collapsible, addButton, placement);
+}
+
+
+void Tabs::setup(bool collapsible, bool addButton, TabPlacement placement)
+{
     m_collapsible = collapsible;
     m_collapsed = false;
+    m_addButton = addButton;
     m_placement = placement;
-}
 
-Tabs::Tabs(FrontierWindow* window) : Widget(window, L"Tabs")
-{
     m_activeTab = NULL;
-    m_collapsible = false;
-    m_collapsed = false;
-    m_placement = TAB_TOP;
-}
-
-Tabs::Tabs(FrontierWindow* window, bool collapsible, TabPlacement placement) : Widget(window, L"Tabs")
-{
-    m_activeTab = NULL;
-    m_collapsible = collapsible;
-    m_collapsed = false;
-    m_placement = placement;
+    m_addButtonWidget = NULL;
 }
 
 Tabs::~Tabs()
@@ -116,23 +130,44 @@ void Tabs::init()
     m_openIcon = m_app->getTheme()->getIcon(openIcon);
     m_closedIcon = m_app->getTheme()->getIcon(closedIcon);
 
+    if (m_addButton)
+    {
+        m_addButtonWidget = new IconButton(m_app, m_app->getTheme()->getIcon(FRONTIER_ICON_PLUS));
+        m_addButtonWidget->incRefCount();
+        m_addButtonWidget->setParent(this);
+        m_addButtonWidget->clickSignal().connect(sigc::mem_fun(*this, &Tabs::onAddTab));
+    }
+
 
     dragDropSignal().connect(sigc::mem_fun(*this, &Tabs::onDragDrop));
 }
 
 void Tabs::calculateSize()
 {
+    if (m_addButton)
+    {
+        m_addButtonWidget->calculateSize();
+    }
+
     if (m_tabs.empty() || (m_collapsible && m_collapsed))
     {
         if (isHorizontal())
         {
             m_minSize.set(TAB_SIZE, TAB_SIZE);
             m_maxSize.set(WIDGET_SIZE_UNLIMITED, TAB_SIZE);
+            if (m_addButton)
+            {
+                m_minSize.width += m_addButtonWidget->getMinSize().width;
+            }
         }
         else
         {
             m_minSize.set(TAB_SIZE, TAB_SIZE);
             m_maxSize.set(TAB_SIZE, WIDGET_SIZE_UNLIMITED);
+            if (m_addButton)
+            {
+                m_minSize.width += m_addButtonWidget->getMinSize().height;
+            }
         }
         return;
     }
@@ -182,6 +217,10 @@ void Tabs::calculateSize()
     {
         tabsWidth += TAB_SIZE;
     }
+    if (m_addButton)
+    {
+        tabsWidth += TAB_SIZE;
+    }
 
     if (isHorizontal())
     {
@@ -201,13 +240,31 @@ void Tabs::calculateSize()
 
 void Tabs::layout()
 {
+    Rect tabsRect = getTabsRect();
+    if (m_addButton)
+    {
+        Vector2D pos;
+        if (isHorizontal())
+        {
+            pos.x = (tabsRect.x + tabsRect.width) - m_addButtonWidget->getMinSize().width;
+            pos.y = tabsRect.y;
+        }
+        else
+        {
+            pos.x = tabsRect.x;
+            pos.y = (tabsRect.y + tabsRect.height) - m_addButtonWidget->getMinSize().height;
+        }
+        m_addButtonWidget->setPosition(pos.x, pos.y);
+        m_addButtonWidget->setSize(m_addButtonWidget->getMinSize());
+    }
+
+
     if (m_tabs.empty())
     {
         return;
     }
 
     Size tabSize = getTabSize();
-    Rect tabsRect = getTabsRect();
 
     int x = tabsRect.x;
     int y = tabsRect.y;
@@ -300,6 +357,18 @@ bool Tabs::draw(Surface* surface)
         tab->draw(&viewport);
     }
 
+    if (m_addButton)
+    {
+        SurfaceViewPort viewport(
+            surface,
+            m_addButtonWidget->getX(),
+            m_addButtonWidget->getY(),
+            m_addButtonWidget->getWidth(),
+            m_addButtonWidget->getHeight());
+        m_addButtonWidget->draw(&viewport);
+    }
+
+
     if (!m_tabs.empty() && (!m_collapsible || !m_collapsed))
     {
         Widget* activeWidget = m_activeTab->getContent();
@@ -373,6 +442,11 @@ Widget* Tabs::handleEvent(Event* event)
                     }
                     return tab->handleEvent(event);
                 }
+            }
+
+            if (m_addButtonWidget != NULL && m_addButtonWidget->intersects(mouseEvent->x, mouseEvent->y))
+            {
+                return m_addButtonWidget->handleEvent(event);
             }
 
             return this;
@@ -540,6 +614,18 @@ void Tabs::setActiveTab(Widget* tabContent)
     return;
 }
 
+Tab* Tabs::getTab(Widget* tabContent)
+{
+    for (Tab* tab : m_tabs)
+    {
+        if (tab->getContent() == tabContent)
+        {
+            return tab;
+        }
+    }
+    return NULL;
+}
+
 int Tabs::findTab(Widget* tabContent)
 {
     int i = 0;
@@ -648,6 +734,10 @@ Size Tabs::getTabSize()
     }
 
     if (m_collapsible)
+    {
+        major -= TAB_SIZE;
+    }
+    if (m_addButton)
     {
         major -= TAB_SIZE;
     }
@@ -784,5 +874,10 @@ bool Tabs::onDragCancelled(Widget* widget)
         addTab(tab, m_tabs.end());
     }
     return true;
+}
+
+void Tabs::onAddTab()
+{
+    m_addTabSignal.emit();
 }
 

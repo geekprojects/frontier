@@ -7,6 +7,7 @@ namespace Frontier
 {
 
 class Tabs;
+class IconButton;
 
 enum TabPlacement
 {
@@ -43,6 +44,7 @@ class Tab : public Widget
 
     void setTabs(Tabs* tabs) { m_tabs = tabs; }
 
+    void setTitle(std::wstring title);
     std::wstring getTitle() { return m_title; }
     Icon* getIcon() { return m_icon; }
     Widget* getContent() { return m_content; }
@@ -58,27 +60,37 @@ class Tabs : public Widget
     TabPlacement m_placement;
     bool m_collapsible;
     bool m_collapsed;
+    bool m_addButton;
     Icon* m_openIcon;
     Icon* m_closedIcon;
+    Icon* m_dropDownIcon;
+    Frontier::IconButton* m_collapseButtonWidget;
+    Frontier::IconButton* m_addButtonWidget;
 
     sigc::signal<void, Widget*> m_changeTabSignal;
     sigc::signal<void, Widget*> m_closeTabSignal;
+    sigc::signal<void> m_addTabSignal;
 
     Frontier::Size getTabSize();
     Frontier::Rect getTabsRect();
     Frontier::Rect getContentRect();
+
+    void setup(bool collapsible, bool addButton, TabPlacement placement);
 
     void addTab(Tab* tab, std::vector<Tab*>::iterator pos);
     int getTabIndex(Tab* tab);
 
     bool onDragDrop(Widget* widget, Geek::Vector2D pos);
     bool onDragCancelled(Widget* widget);
+    void onAddTab();
 
  public:
     Tabs(FrontierApp* app);
     Tabs(FrontierWindow* app);
     Tabs(FrontierApp* app, bool collapsible, TabPlacement placement);
     Tabs(FrontierWindow* window, bool collapsible, TabPlacement placement);
+    Tabs(FrontierApp* app, bool collapsible, bool addButton, TabPlacement placement);
+    Tabs(FrontierWindow* window, bool collapsible, bool addButton, TabPlacement placement);
     virtual ~Tabs();
 
     virtual void init();
@@ -118,6 +130,7 @@ class Tabs : public Widget
     void setActiveTab(Tab* tab);
     void setActiveTab(Widget* tabContent);
     int findTab(Widget* tabContent);
+    Tab* getTab(Widget* tabContent);
     const std::vector<Tab*>& getTabs() { return m_tabs; }
 
     void nextTab();
@@ -127,6 +140,7 @@ class Tabs : public Widget
 
     virtual sigc::signal<void, Widget*> changeTabSignal() { return m_changeTabSignal; }
     virtual sigc::signal<void, Widget*> closeTabSignal() { return m_closeTabSignal; }
+    virtual sigc::signal<void> addClickSignal() { return m_addTabSignal; }
 };
 
 };

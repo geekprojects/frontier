@@ -298,4 +298,9 @@ Widget* Tab::handleEvent(Event* event)
     return NULL;
 }
 
+void Tab::setTitle(wstring title)
+{
+    m_title = title;
+    setDirty();
+}
 
