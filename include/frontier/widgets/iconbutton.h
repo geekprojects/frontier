@@ -18,6 +18,9 @@ class IconButton : public Button
     IconButton(FrontierWindow* ui, Icon* icon);
     virtual ~IconButton();
 
+    void setIcon(Icon* icon);
+    Icon* getIcon() { return m_icon; }
+
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 };
