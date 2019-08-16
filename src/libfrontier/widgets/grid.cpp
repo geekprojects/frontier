@@ -24,12 +24,20 @@ Grid::Grid(FrontierWindow* window) : Widget(window, L"Grid")
 
 Grid::~Grid()
 {
+    clear();
+}
+
+void Grid::clear()
+{
     for (GridItem* item : m_grid)
     {
         item->widget->decRefCount();
+        delete item;
     }
 
     freeSizes();
+
+    m_grid.clear();
 }
 
 void Grid::put(int x, int y, Widget* widget)
