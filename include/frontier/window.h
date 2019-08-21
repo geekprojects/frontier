@@ -90,7 +90,7 @@ class FrontierWindow : public Geek::Logger
     Menu* m_menu;
     MenuList* m_menuBar;
 
-    sigc::signal<bool> m_closeSignal;
+    sigc::signal<void> m_closeSignal;
     sigc::signal<bool> m_gainedFocusSignal;
     sigc::signal<bool> m_lostFocusSignal;
 
@@ -141,7 +141,7 @@ class FrontierWindow : public Geek::Logger
 
     void postEvent(Frontier::Event* event);
     virtual bool handleEvent(Frontier::Event* event);
-    sigc::signal<bool> closeSignal() { return m_closeSignal; }
+    sigc::signal<void> closeSignal() { return m_closeSignal; }
 
     virtual void gainedFocus();
     virtual void lostFocus();
