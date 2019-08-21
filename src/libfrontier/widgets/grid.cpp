@@ -38,9 +38,16 @@ void Grid::clear()
     freeSizes();
 
     m_grid.clear();
+
+    setDirty();
 }
 
 void Grid::put(int x, int y, Widget* widget)
+{
+    put(x, y, widget, m_app->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND));
+}
+
+void Grid::put(int x, int y, Widget* widget, uint32_t background)
 {
     widget->incRefCount();
     widget->setParent(this);
@@ -51,7 +58,6 @@ void Grid::put(int x, int y, Widget* widget)
         item = new GridItem();
         item->x = x;
         item->y = y;
-        item->widget = widget;
         m_grid.push_back(item);
     }
     else
@@ -60,8 +66,9 @@ void Grid::put(int x, int y, Widget* widget)
         {
             item->widget->decRefCount();
         }
-        item->widget = widget;
     }
+    item->widget = widget;
+    item->background = background;
 }
 
 GridItem* Grid::getGridItem(int x, int y)
@@ -254,7 +261,9 @@ void Grid::layout()
                 colSizes[col] = m_colMaxSizes[col];
                 slackX += s;
             }
+#if 0
             log(DEBUG, "layout: Col %d: Size=%d", col, colSizes[col]);
+#endif
         }
     }
 
@@ -285,7 +294,9 @@ void Grid::layout()
                 slackY += s;
             }
         }
+#if 0
         log(DEBUG, "layout: Row %d: Size=%d", row, rowSizes[row]);
+#endif
     }
 
     int y = m_margin;
@@ -315,10 +326,12 @@ void Grid::layout()
 
 bool Grid::draw(Geek::Gfx::Surface* surface)
 {
+    surface->clear(m_app->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND));
     for (GridItem* item : m_grid)
     {
         Widget* child = item->widget;
         SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
+        viewport.clear(item->background);
         child->draw(&viewport, Rect(0, 0, child->getWidth(), child->getHeight()));
 
 #if 0
@@ -357,18 +370,22 @@ void Grid::freeSizes()
     if (m_colMinSizes != NULL)
     {
         delete[] m_colMinSizes;
+        m_colMinSizes = NULL;
     }
     if (m_colMaxSizes != NULL)
     {
         delete[] m_colMaxSizes;
+        m_colMaxSizes = NULL;
     }
     if (m_rowMinSizes != NULL)
     {
         delete[] m_rowMinSizes;
+        m_rowMinSizes = NULL;
     }
     if (m_rowMaxSizes != NULL)
     {
         delete[] m_rowMaxSizes;
+        m_rowMaxSizes = NULL;
     }
 }
 

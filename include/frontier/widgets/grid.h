@@ -9,6 +9,7 @@ struct GridItem
 {
     int x;
     int y;
+    uint32_t background;
     Widget* widget;
 };
 
@@ -33,6 +34,7 @@ class Grid : public Frontier::Widget
     virtual ~Grid();
 
     virtual void put(int x, int y, Widget* widget);
+    virtual void put(int x, int y, Widget* widget, uint32_t background);
     GridItem* getGridItem(int x, int y);
     Widget* getItem(int x, int y);
     Size getGridSize();
