@@ -22,6 +22,7 @@
 #include <frontier/frontier.h>
 #include <frontier/config.h>
 #include <frontier/contextmenu.h>
+#include <frontier/windows/datepicker.h>
 #include <sys/time.h>
 
 #include <typeinfo>
@@ -52,6 +53,8 @@ FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
     m_fontManager = NULL;
 
     m_appMenu = NULL;
+
+    m_datePickerWindow = NULL;
 }
 
 FrontierApp::~FrontierApp()
@@ -296,6 +299,16 @@ uint64_t FrontierApp::getTimestamp() const
     millis += tv.tv_usec / 1000l;
 
     return millis;
+}
+
+void FrontierApp::openDatePicker()
+{
+    if (m_datePickerWindow == NULL)
+    {
+        m_datePickerWindow = new DatePickerWindow(this);
+    }
+
+    m_datePickerWindow->show();
 }
 
 void FrontierApp::onAboutMenu(MenuItem* item)

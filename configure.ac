@@ -138,6 +138,7 @@ AC_CONFIG_FILES([Makefile
                  src/libfrontier/Makefile
                  src/libfrontier/widgets/Makefile
                  src/libfrontier/widgets/list/Makefile
+                 src/libfrontier/windows/Makefile
                  src/libfrontier/engines/Makefile
                  src/libfrontier/engines/test/Makefile
                  src/libfrontier/engines/embedded/Makefile
