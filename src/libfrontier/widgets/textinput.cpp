@@ -32,6 +32,7 @@ using namespace Geek::Gfx;
 TextInput::TextInput(FrontierApp* ui) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
+    m_maxLength = -1;
 
     setText(L"");
 }
@@ -39,6 +40,7 @@ TextInput::TextInput(FrontierApp* ui) : Widget(ui, L"TextInput")
 TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
+    m_maxLength = -1;
 
     setText(text);
 }
@@ -46,6 +48,7 @@ TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui, L"TextInput")
 TextInput::TextInput(FrontierWindow* window) : Widget(window, L"TextInput")
 {
     m_textSurface = NULL;
+    m_maxLength = -1;
 
     setText(L"");
 }
@@ -53,6 +56,7 @@ TextInput::TextInput(FrontierWindow* window) : Widget(window, L"TextInput")
 TextInput::TextInput(FrontierWindow* window, wstring text) : Widget(window, L"TextInput")
 {
     m_textSurface = NULL;
+    m_maxLength = -1;
 
     setText(text);
 }
@@ -89,7 +93,16 @@ void TextInput::calculateSize()
     int lineHeight = m_app->getTheme()->getTextHeight();
 
     m_minSize.set(50, lineHeight + (m_margin * 2));
+if (m_maxLength == -1)
+{
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, lineHeight + (m_margin * 2));
+}
+else
+{
+int width = m_app->getTheme()->getTextWidth(L"M");
+width *= m_maxLength;
+    m_maxSize.set(width + (m_margin * 2), lineHeight + (m_margin * 2));
+}
 }
 
 bool TextInput::draw(Surface* surface)
@@ -287,6 +300,10 @@ Widget* TextInput::handleEvent(Event* event)
                             m_column--;
                             m_text.erase(m_column, 1);
                         }
+                        break;
+
+                    case KC_RETURN:
+                        m_signalTextEnter.emit(this);
                         break;
 
                     default:

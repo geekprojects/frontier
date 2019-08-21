@@ -12,6 +12,7 @@ class TextInput : public Widget
     std::wstring m_text;
     unsigned int m_column;
     unsigned int m_offsetX;
+    int m_maxLength;
 
     std::vector<int> m_charX;
 
@@ -25,12 +26,19 @@ class TextInput : public Widget
 
     Geek::Gfx::Surface* m_textSurface;
 
+    sigc::signal<void, TextInput*> m_signalTextEnter;
+
  public:
     TextInput(FrontierApp* ui);
     TextInput(FrontierApp* ui, std::wstring text);
     TextInput(FrontierWindow* ui);
     TextInput(FrontierWindow* ui, std::wstring text);
     virtual ~TextInput();
+
+    void setMaxLength(int maxLen)
+    {
+        m_maxLength = maxLen;
+    }
 
     void setText(std::wstring wtext);
     std::wstring getText() { return m_text; }
