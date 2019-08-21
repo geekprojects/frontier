@@ -51,9 +51,9 @@ class DemoApp : public FrontierApp
 
     TooltipWindow* m_tooltipWindow;
 
-    void onTextButton1();
-    void onTextButton2();
-    void onIconButton();
+    void onTextButton1(Button* button);
+    void onTextButton2(Button* button);
+    void onIconButton(Button* button);
 
     void onCloseTab(Widget* tab);
     void onContextMenu(ListItem* item, Geek::Vector2D pos);
@@ -365,12 +365,12 @@ bool DemoApp::init()
     return true;
 }
 
-void DemoApp::onIconButton()
+void DemoApp::onIconButton(Button* button)
 {
     log(DEBUG, "onIconButton: Here!");
 }
 
-void DemoApp::onTextButton1()
+void DemoApp::onTextButton1(Button* button)
 {
     log(DEBUG, "onTextButton: Here!");
 
@@ -383,7 +383,7 @@ void DemoApp::onTextButton1()
     m_tooltipWindow->setPosition(screenPos);
 }
 
-void DemoApp::onTextButton2()
+void DemoApp::onTextButton2(Button* button)
 {
     m_tooltipWindow->hide();
 }

@@ -8,6 +8,7 @@ namespace Frontier
 
 class Tabs;
 class IconButton;
+class Button;
 
 enum TabPlacement
 {
@@ -82,7 +83,7 @@ class Tabs : public Widget
 
     bool onDragDrop(Widget* widget, Geek::Vector2D pos);
     bool onDragCancelled(Widget* widget);
-    void onAddTab();
+    void onAddTab(Button* button);
 
  public:
     Tabs(FrontierApp* app);

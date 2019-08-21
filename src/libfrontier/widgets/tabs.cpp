@@ -876,7 +876,7 @@ bool Tabs::onDragCancelled(Widget* widget)
     return true;
 }
 
-void Tabs::onAddTab()
+void Tabs::onAddTab(Button* button)
 {
     m_addTabSignal.emit();
 }

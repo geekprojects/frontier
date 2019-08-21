@@ -11,20 +11,24 @@ class Button : public Widget
  protected:
     std::wstring m_text;
     bool m_state;
+    bool m_highlight;
 
-    sigc::signal<void> m_clickSignal;
+    sigc::signal<void, Button*> m_clickSignal;
 
  public:
     Button(FrontierApp* ui, std::wstring text);
     Button(FrontierWindow* ui, std::wstring text);
     virtual ~Button();
 
+    void setHighlight(bool highlight);
+    bool getHighlight() { return m_highlight; }
+
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleEvent(Frontier::Event* event);
 
-    virtual sigc::signal<void> clickSignal() { return m_clickSignal; }
+    virtual sigc::signal<void, Button*> clickSignal() { return m_clickSignal; }
 };
 
 };

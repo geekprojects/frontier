@@ -64,7 +64,7 @@ void ComboBox::updateOptions()
     }
 }
 
-void ComboBox::openDropDown()
+void ComboBox::openDropDown(Button* button)
 {
     Vector2D widgetPos = getAbsolutePosition();
     widgetPos.y += m_textInput->getHeight();

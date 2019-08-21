@@ -24,7 +24,7 @@ class ComboBox : public Frame
 
     void initComboBox();
 
-    void openDropDown();
+    void openDropDown(Button* button);
     void optionSelected(ListItem* option);
 
  public:
