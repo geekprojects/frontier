@@ -55,6 +55,7 @@ enum UIState
     STATE_HOVER      = 0x02,
     STATE_HORIZONTAL = 0x00,
     STATE_VERTICAL   = 0x10,
+    STATE_ACTIVE     = 0x20,
 };
 
 enum ThemeColour

@@ -31,16 +31,24 @@ Button::Button(FrontierApp* ui, wstring text) : Widget(ui, L"Button")
 {
     m_text = text;
     m_state = false;
+    m_highlight = false;
 }
 
 Button::Button(FrontierWindow* window, wstring text) : Widget(window, L"Button")
 {
     m_text = text;
     m_state = false;
+    m_highlight = false;
 }
 
 Button::~Button()
 {
+}
+
+void Button::setHighlight(bool highlight)
+{
+    m_highlight = highlight;
+    setDirty(DIRTY_CONTENT);
 }
 
 void Button::calculateSize()
@@ -55,12 +63,17 @@ void Button::calculateSize()
 
 bool Button::draw(Surface* surface)
 {
+    if (m_highlight)
+    {
+        surface->clear(0xff0000);
+    }
+
     int w = m_app->getTheme()->getTextWidth(m_text);
     int x = (m_setSize.width / 2) - (w / 2);
 
     int y = (m_setSize.height / 2) - (m_app->getTheme()->getTextHeight() / 2);
 
-    UIState state;
+    int state;
     if (m_state)
     {
         state = STATE_SELECTED;
@@ -72,6 +85,11 @@ bool Button::draw(Surface* surface)
     else
     {
         state = STATE_NONE;
+    }
+
+    if (m_highlight)
+    {
+        state |= STATE_ACTIVE;
     }
 
     m_app->getTheme()->drawBorder(
@@ -100,7 +118,7 @@ Widget* Button::handleEvent(Event* event)
                 m_state = mouseButtonEvent->direction;
                 if (!m_state)
                 {
-                    m_clickSignal.emit();
+                    m_clickSignal.emit(this);
                 }
             }
         } break;

@@ -169,6 +169,13 @@ void UITheme::drawBorder(Surface* surface, UIBorderType type, int state, int x, 
         {
             gradient = true;
             border = true;
+            if (!!(state & STATE_ACTIVE))
+            {
+                background = true;
+                backgroundColour = 0xff4a7987;
+                gradient = false;
+            }
+
             if (!!(state & STATE_SELECTED))
             {
                 uint32_t tmp;
