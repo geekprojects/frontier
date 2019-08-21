@@ -11,6 +11,7 @@ class Frame : public Widget
  protected:
     bool m_horizontal;
     bool m_border;
+    bool m_expanding;
 
  public:
     Frame(FrontierApp* ui, bool horizontal);
@@ -20,6 +21,7 @@ class Frame : public Widget
     virtual ~Frame();
 
     void setBorder(bool border) { m_border = border; }
+    void setExpanding(bool expanding) { m_expanding = expanding; }
 
     virtual void add(Widget* widget);
     virtual void remove(Widget* widget);

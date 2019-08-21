@@ -35,24 +35,28 @@ Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui, L"Frame")
 {
     m_horizontal = horizontal;
     m_border = false;
+    m_expanding = false;
 }
 
 Frame::Frame(FrontierApp* ui, wstring widgetName, bool horizontal) : Widget(ui, widgetName)
 {
     m_horizontal = horizontal;
     m_border = false;
+    m_expanding = false;
 }
 
 Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window, L"Frame")
 {
     m_horizontal = horizontal;
     m_border = false;
+    m_expanding = false;
 }
 
 Frame::Frame(FrontierWindow* window, wstring widgetName, bool horizontal) : Widget(window, widgetName)
 {
     m_horizontal = horizontal;
     m_border = false;
+    m_expanding = false;
 }
 
 Frame::~Frame()
@@ -204,6 +208,11 @@ void Frame::calculateSize()
     m_minSize.height += 2 * m_margin;
     m_maxSize.width += 2 * m_margin;
     m_maxSize.height += 2 * m_margin;
+
+    if (m_expanding)
+    {
+        m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+    }
 
 #ifdef DEBUG_UI_FRAME
     log(DEBUG, "calculateSize: %p: Done: min=%s, max=%s", this, m_minSize.toString().c_str(), m_maxSize.toString().c_str());
