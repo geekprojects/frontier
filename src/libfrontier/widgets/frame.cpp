@@ -35,28 +35,24 @@ Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui, L"Frame")
 {
     m_horizontal = horizontal;
     m_border = false;
-    m_expanding = false;
 }
 
 Frame::Frame(FrontierApp* ui, wstring widgetName, bool horizontal) : Widget(ui, widgetName)
 {
     m_horizontal = horizontal;
     m_border = false;
-    m_expanding = false;
 }
 
 Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window, L"Frame")
 {
     m_horizontal = horizontal;
     m_border = false;
-    m_expanding = false;
 }
 
 Frame::Frame(FrontierWindow* window, wstring widgetName, bool horizontal) : Widget(window, widgetName)
 {
     m_horizontal = horizontal;
     m_border = false;
-    m_expanding = false;
 }
 
 Frame::~Frame()
@@ -120,7 +116,7 @@ void Frame::calculateSize()
     {
         if (m_parent == NULL)
         {
-            m_margin = 0;
+            setStyle(STYLE_MARGIN, 0);
         }
         else
         {
@@ -133,7 +129,7 @@ void Frame::calculateSize()
                 //if (parentFrame->getMargin() > 0)
 #endif
                 {
-                    m_margin = 0;
+                    setStyle(STYLE_MARGIN, 0);
                 }
             }
         }
@@ -141,6 +137,9 @@ void Frame::calculateSize()
 
     m_minSize.set(0, 0);
     m_maxSize.set(0, 0);
+
+    int margin = (int)getStyle(STYLE_MARGIN);
+    int padding = (int)getStyle(STYLE_PADDING);
 
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
@@ -162,11 +161,11 @@ void Frame::calculateSize()
 
             if (m_minSize.width > 0)
             {
-                m_minSize.width += m_padding;
+                m_minSize.width += padding;
             }
             if (m_maxSize.width > 0)
             {
-                m_maxSize.width += m_padding;
+                m_maxSize.width += padding;
             }
             m_minSize.width += childMin.width;
             m_maxSize.width += childMax.width;
@@ -178,11 +177,11 @@ void Frame::calculateSize()
 
             if (m_minSize.height > 0)
             {
-                m_minSize.height += m_padding;
+                m_minSize.height += padding;
             }
             if (m_maxSize.height > 0)
             {
-                m_maxSize.height += m_padding;
+                m_maxSize.height += padding;
             }
             m_minSize.height += childMin.height;
             m_maxSize.height += childMax.height;
@@ -204,14 +203,18 @@ void Frame::calculateSize()
     }
 */
 
-    m_minSize.width += 2 * m_margin;
-    m_minSize.height += 2 * m_margin;
-    m_maxSize.width += 2 * m_margin;
-    m_maxSize.height += 2 * m_margin;
+    m_minSize.width += 2 * margin;
+    m_minSize.height += 2 * margin;
+    m_maxSize.width += 2 * margin;
+    m_maxSize.height += 2 * margin;
 
-    if (m_expanding)
+    if (hasStyle(STYLE_EXPAND_HORIZONTAL) && getStyle(STYLE_EXPAND_HORIZONTAL) == 1)
     {
-        m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
+        m_maxSize.width = WIDGET_SIZE_UNLIMITED;
+    }
+    if (hasStyle(STYLE_EXPAND_VERTICAL) && getStyle(STYLE_EXPAND_VERTICAL) == 1)
+    {
+        m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
 
 #ifdef DEBUG_UI_FRAME
@@ -227,6 +230,9 @@ void Frame::layout()
     int major;
     int minor;
 
+    int margin = (int)getStyle(STYLE_MARGIN);
+    int padding = (int)getStyle(STYLE_PADDING);
+
     if (m_horizontal)
     {
         major = m_setSize.width;
@@ -238,11 +244,11 @@ void Frame::layout()
         minor = m_setSize.width;
     }
 
-    major -= (2 * m_margin);
-    minor -= 2 * m_margin;
+    major -= (2 * margin);
+    minor -= 2 * margin;
     if (!m_children.empty())
     {
-        major -= (m_children.size() - 1) * m_padding;
+        major -= (m_children.size() - 1) * padding;
     }
 
 #if 0
@@ -278,8 +284,8 @@ void Frame::layout()
 
     int i;
 
-    int majorPos = m_margin;
-    int minorPos = m_margin;
+    int majorPos = margin;
+    int minorPos = margin;
 
     for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
     {
@@ -349,7 +355,7 @@ void Frame::layout()
         }
         child->setSize(size);
 
-        majorPos += childMajor + m_padding;
+        majorPos += childMajor + padding;
 
         child->layout();
     }

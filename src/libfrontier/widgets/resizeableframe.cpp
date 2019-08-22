@@ -16,7 +16,7 @@ ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, L
     m_dragging = false;
     m_dragWidget = 0;
 
-    m_padding = 3;
+    setStyle(STYLE_PADDING, 3);
 }
 
 ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Frame(window, L"ResizeableFrame", horizontal)
@@ -24,7 +24,7 @@ ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Fram
     m_dragging = false;
     m_dragWidget = 0;
 
-    m_padding = 3;
+    setStyle(STYLE_PADDING, 3);
 }
 
 ResizeableFrame::~ResizeableFrame()
@@ -67,6 +67,9 @@ void ResizeableFrame::layout()
     int major;
     int minor;
 
+    int margin = (int)getStyle(STYLE_MARGIN);
+    int padding = (int)getStyle(STYLE_PADDING);
+
     if (m_horizontal)
     {
         major = m_setSize.width;
@@ -78,11 +81,11 @@ void ResizeableFrame::layout()
         minor = m_setSize.width;
     }
 
-    major -= (2 * m_margin);
-    minor -= 2 * m_margin;
+    major -= (2 * margin);
+    minor -= 2 * margin;
     if (!m_children.empty())
     {
-        major -= (m_children.size() - 1) * m_padding;
+        major -= (m_children.size() - 1) * padding;
     }
 
 
@@ -153,8 +156,8 @@ void ResizeableFrame::layout()
         }
     }
 
-    int majorPos = m_margin;
-    int minorPos = m_margin;
+    int majorPos = margin;
+    int minorPos = margin;
 
     // Actually set the child sizes and positions
     for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
@@ -189,7 +192,7 @@ void ResizeableFrame::layout()
         }
         child->setSize(size);
 
-        majorPos += childMajor + m_padding;
+        majorPos += childMajor + padding;
 
         child->layout();
     }
@@ -311,6 +314,8 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 }
             }
 
+            int padding = (int)getStyle(STYLE_PADDING);
+
             // Is the mouse pointer between children?
             int pos;
             for (it = m_children.begin(), pos = 0; (it + 1) != m_children.end(); it++, pos++)
@@ -319,8 +324,8 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 Vector2D childPos = child->getAbsolutePosition();
                 int width = child->getWidth();
                 int height = child->getHeight();
-                if ((m_horizontal && (x > childPos.x + width && x < childPos.x + width + m_padding)) ||
-                    (!m_horizontal && (y > childPos.y + height && y < childPos.y + height + m_padding)))
+                if ((m_horizontal && (x > childPos.x + width && x < childPos.x + width + padding)) ||
+                    (!m_horizontal && (y > childPos.y + height && y < childPos.y + height + padding)))
                 {
                     if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON && ((MouseButtonEvent*)event)->direction)
                     {

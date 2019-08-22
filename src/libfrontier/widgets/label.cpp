@@ -99,8 +99,13 @@ void Label::calculateSize()
         }
     }
 
-    m_minSize.width += (m_margin * 2);
-    m_minSize.height = (m_lineHeight * lines) + (m_margin * 2);
+    int margin = (int)getStyle(STYLE_MARGIN);
+    m_minSize.width += (margin * 2);
+    if (lines < 0)
+    {
+        lines = 1;
+    }
+    m_minSize.height = (m_lineHeight * lines) + (margin * 2);
 
     m_maxSize.height = m_minSize.height;
 }
@@ -109,7 +114,13 @@ bool Label::draw(Surface* surface)
 {
     Widget::draw(surface);
 
-    int y = m_margin;
+    int margin = (int)getStyle(STYLE_MARGIN);
+    int y = margin;
+
+    if (hasStyle(STYLE_BORDER) && getStyle(STYLE_BORDER))
+    {
+        surface->drawRectRounded(0, 0, getWidth(), getHeight(), 5, 0xff4b4b4b);
+    }
 
     int lines = 1;
     unsigned int pos = 0;
@@ -138,13 +149,13 @@ bool Label::draw(Surface* surface)
             switch (m_align)
             {
                 case ALIGN_LEFT:
-                    x = m_margin;
+                    x = margin;
                     break;
                 case ALIGN_CENTER:
                     x = (m_setSize.width / 2) - (w / 2);
                     break;
                 case ALIGN_RIGHT:
-                    x = (m_setSize.width - m_margin) - w;
+                    x = (m_setSize.width - margin) - w;
                     break;
             }
 

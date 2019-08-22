@@ -65,8 +65,8 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
     m_maxSize = Size(0, 0);
     m_setSize = Size(0, 0);
 
-    m_margin = m_app->getTheme()->getMargin();
-    m_padding = m_app->getTheme()->getPadding();
+    setStyle(STYLE_MARGIN, m_app->getTheme()->getMargin());
+    setStyle(STYLE_PADDING, m_app->getTheme()->getPadding());
 
     m_mouseOver = false;
 
@@ -120,6 +120,31 @@ void Widget::callInit()
         m_initialised = true;
         init();
     }
+}
+
+bool Widget::hasStyle(StyleAttribute style)
+{
+    return (m_styles.find(style) != m_styles.end());
+}
+
+uint64_t Widget::getStyle(StyleAttribute style)
+{
+    auto it = m_styles.find(style);
+    if (it != m_styles.end())
+    {
+        return it->second;
+    }
+    return (uint64_t)-1ll;
+}
+
+void Widget::setStyle(StyleAttribute style, uint64_t value)
+{
+    auto it = m_styles.find(style);
+    if (it != m_styles.end())
+    {
+        m_styles.erase(it);
+    }
+    m_styles.insert(make_pair(style, value));
 }
 
 void Widget::setParent(Widget* widget)

@@ -116,6 +116,9 @@ void Grid::calculateSize()
 {
     freeSizes();
 
+    int margin = (int)getStyle(STYLE_MARGIN);
+    int padding = (int)getStyle(STYLE_PADDING);
+
     Size gridSize = getGridSize();
 #if 0
     log(DEBUG, "calculateSize: gridSize=%d,%d", gridSize.width, gridSize.height);
@@ -180,20 +183,23 @@ void Grid::calculateSize()
         m_maxSize.height += m_rowMinSizes[row];
     }
 
-    m_minSize.width += m_padding * (gridSize.width - 1);
-    m_minSize.height += m_padding * (gridSize.height - 1);
-    m_maxSize.width += m_padding * (gridSize.width - 1);
-    m_maxSize.height += m_padding * (gridSize.height - 1);
+    m_minSize.width += padding * (gridSize.width - 1);
+    m_minSize.height += padding * (gridSize.height - 1);
+    m_maxSize.width += padding * (gridSize.width - 1);
+    m_maxSize.height += padding * (gridSize.height - 1);
 
-    m_minSize.width += m_margin;
-    m_minSize.height += m_margin;
-    m_maxSize.width += m_margin;
-    m_maxSize.height += m_margin;
+    m_minSize.width += margin;
+    m_minSize.height += margin;
+    m_maxSize.width += margin;
+    m_maxSize.height += margin;
 }
 
 void Grid::layout()
 {
     Size gridSize = getGridSize();
+
+    int margin = (int)getStyle(STYLE_MARGIN);
+    int padding = (int)getStyle(STYLE_PADDING);
 
     if (gridSize.width == 0 || gridSize.height == 0)
     {
@@ -202,11 +208,11 @@ void Grid::layout()
 
     int width = m_setSize.width;
     int height = m_setSize.height;
-    width -= (2 * m_margin);
-    height -= (2 * m_margin);
+    width -= (2 * margin);
+    height -= (2 * margin);
 
-    width -= m_padding * (gridSize.width - 1);
-    height -= m_padding * (gridSize.height - 1);
+    width -= padding * (gridSize.width - 1);
+    height -= padding * (gridSize.height - 1);
 
     int widthq = width / gridSize.width;
     int heightq = height / gridSize.height;
@@ -299,10 +305,10 @@ void Grid::layout()
 #endif
     }
 
-    int y = m_margin;
+    int y = margin;
     for (row = 0; row < gridSize.height; row++)
     {
-        int x = m_margin;
+        int x = margin;
         for (col = 0; col < gridSize.width; col++)
         {
             GridItem* item = getGridItem(col, row);
@@ -318,9 +324,9 @@ void Grid::layout()
             log(DEBUG, "layout: Set Item: %d, %d, size=%d,%d (%p)", col, row, colSizes[col], rowSizes[row], item);
 #endif
 
-            x += colSizes[col] + m_padding;
+            x += colSizes[col] + padding;
         }
-        y += rowSizes[row] + m_padding;
+        y += rowSizes[row] + padding;
     }
 }
 

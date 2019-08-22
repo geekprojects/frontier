@@ -22,6 +22,7 @@
 #define __FRONTIER_WIDGETS_H_
 
 #include <vector>
+#include <map>
 
 #include <frontier/frontier.h>
 
@@ -44,6 +45,17 @@ enum DirtyFlag
 {
     DIRTY_SIZE = 0x1,   // The size of the widget or its children have changed
     DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
+};
+
+enum StyleAttribute
+{
+    STYLE_BORDER,
+    STYLE_MARGIN,
+    STYLE_PADDING,
+    STYLE_BACKGROUND_COLOUR,
+    STYLE_BORDER_COLOUR,
+    STYLE_EXPAND_HORIZONTAL,
+    STYLE_EXPAND_VERTICAL,
 };
 
 class Widget : public FrontierObject, public Geek::Logger
@@ -71,8 +83,7 @@ class Widget : public FrontierObject, public Geek::Logger
 
     int m_dirty;
 
-    int m_margin;
-    int m_padding;
+    std::map<StyleAttribute, uint64_t> m_styles;
 
     bool m_mouseOver;
 
@@ -106,6 +117,10 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual bool draw(Geek::Gfx::Surface* surface);
     virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
 
+    bool hasStyle(StyleAttribute style);
+    uint64_t getStyle(StyleAttribute style);
+    void setStyle(StyleAttribute style, uint64_t value);
+
     int getX() const { return m_x; }
     int getY() const { return m_y; }
     void setPosition(int x, int y) { m_x = x; m_y = y; }
@@ -119,10 +134,12 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual int getWidth() const { return m_setSize.width; }
     virtual int getHeight() const { return m_setSize.height; }
 
+/*
     virtual void setMargin(int margin) { m_margin = margin; }
     virtual int getMargin() const { return m_margin; }
     virtual void setPadding(int padding) { m_padding = padding; }
     virtual int getPadding() const { return m_padding; }
+*/
 
     void setParent(Widget* w);
     Widget* getParent() const { return m_parent; }
