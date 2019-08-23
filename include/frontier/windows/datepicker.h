@@ -23,11 +23,11 @@ class DatePickerWindow : public Frontier::FrontierWindow
 
     Grid* m_dayGrid;
 
-    sigc::signal<void, int, int, int> m_dateSelectSignal;
+    sigc::signal<bool, int, int, int> m_dateSelectSignal;
 
-    void onDateSelected(Button* button);
-    void onPrevMonth(Button* button);
-    void onNextMonth(Button* button);
+    void onDateSelected(Widget* button);
+    void onPrevMonth(Widget* button);
+    void onNextMonth(Widget* button);
 
  public:
     DatePickerWindow(Frontier::FrontierApp* app);
@@ -36,7 +36,7 @@ class DatePickerWindow : public Frontier::FrontierWindow
     bool init();
     bool update();
 
-    sigc::signal<void, int, int, int> dateSelectSignal() { return m_dateSelectSignal; }
+    sigc::signal<bool, int, int, int> dateSelectSignal() { return m_dateSelectSignal; }
 };
 
 };

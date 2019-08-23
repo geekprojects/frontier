@@ -13,8 +13,6 @@ class Button : public Widget
     bool m_state;
     bool m_highlight;
 
-    sigc::signal<void, Button*> m_clickSignal;
-
  public:
     Button(FrontierApp* ui, std::wstring text);
     Button(FrontierWindow* ui, std::wstring text);
@@ -27,8 +25,6 @@ class Button : public Widget
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleEvent(Frontier::Event* event);
-
-    virtual sigc::signal<void, Button*> clickSignal() { return m_clickSignal; }
 };
 
 };

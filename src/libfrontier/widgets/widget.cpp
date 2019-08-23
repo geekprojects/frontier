@@ -278,6 +278,27 @@ void Widget::openContextMenu(Geek::Vector2D pos)
 
 Widget* Widget::handleEvent(Event* event)
 {
+    switch (event->eventType)
+    {
+        case FRONTIER_EVENT_MOUSE_BUTTON:
+        {
+            MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
+            if (mouseButtonEvent->direction)
+            {
+                if (mouseButtonEvent->doubleClick)
+                {
+                    m_doubleClickSignal.emit(this);
+                }
+                else
+                {
+                    m_clickSignal.emit(this);
+                }
+            }
+        } break;
+
+        default:
+            break;
+    }
     return NULL;
 }
 

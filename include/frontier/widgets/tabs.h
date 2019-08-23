@@ -83,7 +83,7 @@ class Tabs : public Widget
 
     bool onDragDrop(Widget* widget, Geek::Vector2D pos);
     bool onDragCancelled(Widget* widget);
-    void onAddTab(Button* button);
+    void onAddTab(Widget* button);
 
  public:
     Tabs(FrontierApp* app);

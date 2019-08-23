@@ -17,8 +17,6 @@ class ListItem : public Widget
  protected:
     List* m_list;
     bool m_selected;
-    sigc::signal<void, ListItem*> m_clickSignal;
-    sigc::signal<void, ListItem*> m_doubleClickSignal;
 
  public:
     ListItem(FrontierApp* ui);
@@ -30,9 +28,6 @@ class ListItem : public Widget
     virtual void setSelected(bool updateList = true);
 
     virtual Widget* handleEvent(Frontier::Event* event);
-
-    virtual sigc::signal<void, ListItem*> clickSignal() { return m_clickSignal; }
-    virtual sigc::signal<void, ListItem*> doubleClickSignal() { return m_doubleClickSignal; }
 };
 
 class TextListItem : public ListItem
