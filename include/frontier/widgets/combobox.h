@@ -20,7 +20,7 @@ class ComboBox : public Frame
 
     ComboBoxDropDown* m_comboBoxDropDown;
 
-    std::vector<std::wstring> m_options;
+    std::vector<ListItem*> m_options;
 
     void initComboBox();
 
@@ -34,8 +34,16 @@ class ComboBox : public Frame
     ComboBox(FrontierWindow* ui, std::vector<std::wstring> options);
     virtual ~ComboBox();
 
-    std::vector<std::wstring>& getOptions() { return m_options; }
+    void addOption(std::wstring text);
+    void addOption(std::wstring text, void* data);
+    std::vector<ListItem*>& getOptions() { return m_options; }
+    void clearOptions();
     void updateOptions();
+
+    void selectOption(ListItem* item);
+    void selectOption(std::wstring text);
+    void selectOption(void* data);
+    ListItem* getSelectedOption();
 };
 
 class ComboBoxDropDown : public FrontierWindow

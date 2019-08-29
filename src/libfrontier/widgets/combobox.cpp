@@ -1,6 +1,7 @@
 
 #include <frontier/widgets/combobox.h>
 #include <frontier/widgets/label.h>
+#include <typeinfo>
 
 using namespace std;
 using namespace Geek;
@@ -18,20 +19,29 @@ ComboBox::ComboBox(FrontierWindow* ui) : Frame(ui, true)
 
 ComboBox::ComboBox(FrontierApp* ui, vector<wstring> options) : Frame(ui, true)
 {
-    m_options = options;
-
     initComboBox();
+
+    for (wstring option : options)
+    {
+        addOption(option);
+    }
+    updateOptions();
 }
 
 ComboBox::ComboBox(FrontierWindow* ui, vector<wstring> options) : Frame(ui, true)
 {
-    m_options = options;
-
     initComboBox();
+
+    for (wstring option : options)
+    {
+        addOption(option);
+    }
+    updateOptions();
 }
 
 ComboBox::~ComboBox()
 {
+    clearOptions();
 }
 
 void ComboBox::initComboBox()
@@ -48,20 +58,92 @@ void ComboBox::initComboBox()
     add(m_button);
 
     m_comboBoxDropDown = new ComboBoxDropDown(m_app);
-
     m_comboBoxDropDown->getList()->selectSignal().connect(sigc::mem_fun(*this, &ComboBox::optionSelected));
 
     updateOptions();
+}
+
+void ComboBox::addOption(wstring text)
+{
+    addOption(text, NULL);
+}
+
+void ComboBox::addOption(wstring text, void* data)
+{
+    ListItem* item = new TextListItem(m_comboBoxDropDown, text);
+    item->setPrivateData(data);
+    item->incRefCount();
+    m_options.push_back(item);
+}
+
+void ComboBox::clearOptions()
+{
+    //m_comboBoxDropDown->getList()->clearItems();
+
+    for (ListItem* option : m_options)
+    {
+        option->decRefCount();
+    }
+    m_options.clear();
 }
 
 void ComboBox::updateOptions()
 {
     m_comboBoxDropDown->getList()->clearItems();
 
-    for (wstring option : m_options)
+    for (ListItem* option : m_options)
     {
-        m_comboBoxDropDown->getList()->addItem(new TextListItem(m_comboBoxDropDown, option));
+        m_comboBoxDropDown->getList()->addItem(option);
     }
+}
+
+void ComboBox::selectOption(ListItem* option)
+{
+    m_comboBoxDropDown->getList()->setSelected(option);
+    if (typeid(*option) == typeid(TextListItem))
+    {
+        TextListItem* tli = (TextListItem*)option;
+        m_textInput->setText(tli->getText());
+    }
+    else
+    {
+        log(WARN, "selectOption: selected item is not a TextListItem");
+    }
+
+    m_comboBoxDropDown->getList()->setSelected(option);
+}
+
+void ComboBox::selectOption(std::wstring text)
+{
+    for (ListItem* option : m_options)
+    {
+        if (typeid(*option) == typeid(TextListItem))
+        {
+            TextListItem* tli = (TextListItem*)option;
+            if (tli->getText() == text)
+            {
+                selectOption(option);
+                break;
+            }
+        }
+    }
+}
+
+void ComboBox::selectOption(void* data)
+{
+    for (ListItem* option : m_options)
+    {
+        if (option->getPrivateData() == data)
+        {
+            selectOption(option);
+            break;
+        }
+    }
+}
+
+ListItem* ComboBox::getSelectedOption()
+{
+    return m_comboBoxDropDown->getList()->getSelected();
 }
 
 void ComboBox::openDropDown(Widget* button)
@@ -81,8 +163,7 @@ void ComboBox::optionSelected(ListItem* option)
     log(DEBUG, "optionSelected: Here!");
     if (option != NULL)
     {
-        wstring text = ((TextListItem*)option)->getText();
-        m_textInput->setText(text);
+        selectOption(option);
     }
     m_comboBoxDropDown->hide();
 }

@@ -262,6 +262,7 @@ bool DemoApp::init()
         ComboBox* comboBox1;
         comboBoxFrame1->add(new Label(this, L"Combo Box:"));
         comboBoxFrame1->add(comboBox1 = new ComboBox(this, options));
+        comboBox1->selectOption(L"Option 2");
         comboBoxTab->add(comboBoxFrame1);
         m_tabs->addTab(L"ComboBox", comboBoxTab);
     }
