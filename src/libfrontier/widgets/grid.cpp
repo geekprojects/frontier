@@ -24,10 +24,17 @@ Grid::Grid(FrontierWindow* window) : Widget(window, L"Grid")
 
 Grid::~Grid()
 {
-    clear();
+    clearChildren();
 }
 
 void Grid::clear()
+{
+    clearChildren();
+
+    setDirty();
+}
+
+void Grid::clearChildren()
 {
     for (GridItem* item : m_grid)
     {
@@ -38,9 +45,8 @@ void Grid::clear()
     freeSizes();
 
     m_grid.clear();
-
-    setDirty();
 }
+
 
 void Grid::put(int x, int y, Widget* widget)
 {

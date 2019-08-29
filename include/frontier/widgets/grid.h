@@ -24,6 +24,7 @@ class Grid : public Frontier::Widget
     int* m_rowMaxSizes;
 
     void freeSizes();
+    void clearChildren();
 
     virtual void calculateSize();
     virtual void layout();

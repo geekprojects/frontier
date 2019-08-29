@@ -58,7 +58,7 @@ FrontierApp::~FrontierApp()
 {
     for (FrontierWindow* window : m_windows)
     {
-        delete window;
+        window->decRefCount();
     }
     m_windows.clear();
 
