@@ -151,6 +151,7 @@ AC_CONFIG_FILES([Makefile
                  include/Makefile
                  include/frontier/Makefile
                  include/frontier/widgets/Makefile
+                 include/frontier/windows/Makefile
                  libfrontier.pc
 ])
 
