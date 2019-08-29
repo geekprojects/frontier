@@ -43,7 +43,6 @@ class FrontierApp;
 class Widget;
 class UITheme;
 class ContextMenu;
-class DatePickerWindow;
 
 class FrontierEngineWindow;
 
@@ -77,8 +76,6 @@ class FrontierApp : public Geek::Logger
 
     sigc::signal<void, FrontierWindow*> m_activeWindowChangedSignal;
 
-    DatePickerWindow* m_datePickerWindow;
-
  protected:
     void setEngine(FrontierEngine* m_engine);
     std::vector<FrontierWindow*>& getWindows() { return m_windows; }
@@ -105,6 +102,7 @@ class FrontierApp : public Geek::Logger
     Menu* getAppMenu() { return m_appMenu; }
 
     void addWindow(FrontierWindow* window);
+    void removeWindow(FrontierWindow* window);
     void setActiveWindow(FrontierWindow* activeWindow);
     FrontierWindow* getActiveWindow();
 
@@ -122,8 +120,6 @@ class FrontierApp : public Geek::Logger
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 
     uint64_t getTimestamp() const;
-
-    void openDatePicker();
 
     void onAboutMenu(MenuItem* item);
     void onQuitMenu(MenuItem* item);
