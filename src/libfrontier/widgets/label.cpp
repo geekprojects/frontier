@@ -30,24 +30,32 @@ Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
+    setStyle(STYLE_EXPAND_HORIZONTAL, true);
+    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = align;
+    setStyle(STYLE_EXPAND_HORIZONTAL, true);
+    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierWindow* window, wstring text) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
+    setStyle(STYLE_EXPAND_HORIZONTAL, true);
+    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = align;
+    setStyle(STYLE_EXPAND_HORIZONTAL, true);
+    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 
@@ -72,20 +80,23 @@ void Label::calculateSize()
     m_lineHeight = m_app->getTheme()->getTextHeight();
 
     m_minSize.set(0, 0);
-    m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
     unsigned int pos = 0;
-    int lines = 0;
+    int lines = 1;
     wstring line = L"";
     for (pos = 0; pos < m_text.length(); pos++)
     {
         if (m_text[pos] == '\n' || pos == m_text.length() - 1)
         {
-            lines++;
             if (pos == m_text.length() - 1)
             {
                 line += m_text[pos];
             }
+            else
+            {
+                lines++;
+            }
+
             int w = m_app->getTheme()->getTextWidth(line);
             if (w > m_minSize.width)
             {
@@ -101,13 +112,26 @@ void Label::calculateSize()
 
     int margin = (int)getStyle(STYLE_MARGIN);
     m_minSize.width += (margin * 2);
-    if (lines < 0)
-    {
-        lines = 1;
-    }
     m_minSize.height = (m_lineHeight * lines) + (margin * 2);
 
-    m_maxSize.height = m_minSize.height;
+    if (getStyle(STYLE_EXPAND_HORIZONTAL))
+    {
+        m_maxSize.width = WIDGET_SIZE_UNLIMITED;
+    }
+    else
+    {
+        m_maxSize.width = m_minSize.width;
+    }
+
+    if (getStyle(STYLE_EXPAND_VERTICAL))
+    {
+        m_maxSize.height = WIDGET_SIZE_UNLIMITED;
+    }
+    else
+    {
+        m_maxSize.height = m_minSize.height;
+    }
+
 }
 
 bool Label::draw(Surface* surface)
@@ -175,11 +199,5 @@ bool Label::draw(Surface* surface)
     }
 
    return true;
-}
-
-Widget* Label::handleEvent(Event* event)
-{
-    // We just swallow events
-    return NULL;
 }
 

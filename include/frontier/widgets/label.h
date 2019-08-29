@@ -26,8 +26,6 @@ class Label : public Widget
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);
-
-    virtual Widget* handleEvent(Frontier::Event* event);
 };
 
 };
