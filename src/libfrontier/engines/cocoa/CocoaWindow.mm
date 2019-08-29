@@ -585,14 +585,13 @@ float CocoaWindow::getScaleFactor()
 void CocoaWindow::setPosition(unsigned int x, unsigned int y)
 {
     CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
-    NSRect rect = [window frame];
 
     NSScreen* screen = [window screen];
     NSRect screenFrame = [screen frame];
 
     NSPoint point;
     point.x = x;
-    point.y = screenFrame.size.height - (y + (rect.size.height / 2));
+    point.y = screenFrame.size.height - y;
 
 #if 0
     printf("CocoaWindow::setPosition: y=%d, screen height=%d, window height=%d -> %d\n", (int)y, (int)screenFrame.size.height, (int)rect.size.height, (int)point.y);
@@ -608,10 +607,23 @@ Geek::Vector2D CocoaWindow::getPosition()
     NSScreen* screen = [window screen];
     NSRect screenFrame = [screen frame];
     NSRect rect = [window frame];
+    NSRect contentRect = [window contentRectForFrameRect:rect];
 
     Geek::Vector2D pos;
     pos.x = rect.origin.x;
-    pos.y = (int)(screenFrame.size.height - (rect.origin.y + rect.size.height));
+
+    /*
+     * Norm               Mac
+     * 0 +---------------+ 6
+     * 1 |               | 5 rect.y        = 2
+     * 2 |   +---+       | 4 rect.height   = 3
+     * 3 |   |   |       | 3 screen.height = 6
+     * 4 |   +---+       | 2
+     * 5 |               | 1 Target = 2 = (6 - (2 + 3)) + 1;
+     * 6 +---------------+ 0
+     */
+
+    pos.y = (int)(screenFrame.size.height - (contentRect.origin.y + contentRect.size.height)) + 1;
 
 #if 0
     printf(
