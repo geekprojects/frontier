@@ -129,7 +129,9 @@ void MenuList::onSelect(ListItem* item)
         if (getWindow() != NULL)
         {
             Menu* menu = new Menu(menuItem->getChildren());
-            getWindow()->openContextMenu(item->getAbsolutePosition(), menu);
+            Vector2D pos = item->getAbsolutePosition();
+            pos.y += m_setSize.height;
+            getWindow()->openContextMenu(pos, menu);
         }
     }
 }
