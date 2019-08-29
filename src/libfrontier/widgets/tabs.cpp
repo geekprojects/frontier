@@ -403,8 +403,6 @@ Widget* Tabs::handleEvent(Event* event)
 
         if (tabsRect.intersects(x, y))
         {
-            MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
-
             x -= tabsRect.x;
             y -= tabsRect.y;
 
@@ -418,29 +416,34 @@ Widget* Tabs::handleEvent(Event* event)
                tabPos = y;
             }
  
-            if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON && m_collapsible)
+            if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON)
             {
-                if (tabPos < TAB_SIZE)
-                {
-                     if (mouseButtonEvent->direction)
-                     {
-                         m_collapsed = !m_collapsed;
-                         setDirty();
-                    }
-                    return this;
-                }
-                tabPos -= TAB_SIZE;
-            }
+                MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
 
-            for (Tab* tab : m_tabs)
-            {
-                if (tab->intersects(mouseEvent->x, mouseEvent->y))
+                if (m_collapsible)
                 {
-                    if (mouseButtonEvent->direction)
+                    if (tabPos < TAB_SIZE)
                     {
-                        m_collapsed = false;
+                         if (mouseButtonEvent->direction)
+                         {
+                             m_collapsed = !m_collapsed;
+                             setDirty();
+                        }
+                        return this;
                     }
-                    return tab->handleEvent(event);
+                    tabPos -= TAB_SIZE;
+                }
+
+                for (Tab* tab : m_tabs)
+                {
+                    if (tab->intersects(mouseEvent->x, mouseEvent->y))
+                    {
+                        if (mouseButtonEvent->direction)
+                        {
+                            m_collapsed = false;
+                        }
+                        return tab->handleEvent(event);
+                    }
                 }
             }
 
