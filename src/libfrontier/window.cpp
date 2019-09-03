@@ -94,17 +94,21 @@ FrontierWindow::~FrontierWindow()
     if (m_mouseOverWidget != NULL)
     {
         m_mouseOverWidget->decRefCount();
+        m_mouseOverWidget = NULL;
     }
 
     if (m_motionWidget != NULL)
     {
         m_motionWidget->decRefCount();
+        m_motionWidget = NULL;
     }
 
     if (m_surface != NULL)
     {
         delete m_surface;
     }
+
+    delete m_engineWindow;
 }
 
 bool FrontierWindow::initInternal()
@@ -508,6 +512,11 @@ bool FrontierWindow::handleEvent(Event* event)
 
             if (m_mouseOverWidget != destWidget)
             {
+                if (destWidget != NULL)
+                {
+                    destWidget->incRefCount();
+                }
+
                 if (m_mouseOverWidget != NULL)
                 {
                     m_mouseOverWidget->onMouseLeave();
@@ -515,13 +524,10 @@ bool FrontierWindow::handleEvent(Event* event)
                 }
 
                 m_mouseOverWidget = destWidget;
-
                 if (m_mouseOverWidget != NULL)
                 {
-                    m_mouseOverWidget->incRefCount();
                     m_mouseOverWidget->onMouseEnter();
                 }
-
             }
 
             if (m_dragSurface != NULL)
