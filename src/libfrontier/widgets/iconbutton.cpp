@@ -38,6 +38,19 @@ IconButton::IconButton(FrontierWindow* window, Icon* icon) : Button(window, L"")
     m_state = false;
 }
 
+IconButton::IconButton(FrontierApp* ui, uint32_t iconId) : Button(ui, L"")
+{
+    m_icon = ui->getTheme()->getIcon(iconId);
+    m_state = false;
+}
+
+IconButton::IconButton(FrontierWindow* window, uint32_t iconId) : Button(window, L"")
+{
+    m_icon = window->getApp()->getTheme()->getIcon(iconId);
+    m_state = false;
+}
+
+
 IconButton::~IconButton()
 {
 }

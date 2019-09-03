@@ -16,6 +16,8 @@ class IconButton : public Button
  public:
     IconButton(FrontierApp* ui, Icon* icon);
     IconButton(FrontierWindow* ui, Icon* icon);
+    IconButton(FrontierApp* ui, uint32_t icon);
+    IconButton(FrontierWindow* ui, uint32_t icon);
     virtual ~IconButton();
 
     void setIcon(Icon* icon);
