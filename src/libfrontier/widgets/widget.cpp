@@ -46,6 +46,7 @@ Widget::~Widget()
     for (Widget* child : m_children)
     {
         child->decRefCount();
+        child->setParent(NULL);
     }
     m_children.clear();
 }

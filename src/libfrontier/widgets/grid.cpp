@@ -39,6 +39,7 @@ void Grid::clearChildren()
     for (GridItem* item : m_grid)
     {
         item->widget->decRefCount();
+        item->widget->setParent(NULL);
         delete item;
     }
 
@@ -71,6 +72,7 @@ void Grid::put(int x, int y, Widget* widget, uint32_t background)
         if (item->widget != NULL)
         {
             item->widget->decRefCount();
+            item->widget->setParent(NULL);
         }
     }
     item->widget = widget;
