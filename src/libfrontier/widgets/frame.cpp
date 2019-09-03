@@ -227,6 +227,12 @@ void Frame::calculateSize()
  */
 void Frame::layout()
 {
+    if (m_children.empty())
+    {
+        // Nothing to lay out!
+        return;
+    }
+
     int major;
     int minor;
 
@@ -246,10 +252,7 @@ void Frame::layout()
 
     major -= (2 * margin);
     minor -= 2 * margin;
-    if (!m_children.empty())
-    {
-        major -= (m_children.size() - 1) * padding;
-    }
+    major -= (m_children.size() - 1) * padding;
 
 #if 0
     log(DEBUG, "layout: major=%d, minor=%d", major, minor);
