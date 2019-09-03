@@ -396,6 +396,8 @@ CocoaWindow::CocoaWindow(FrontierEngine* engine, FrontierWindow* window) : Front
 
 CocoaWindow::~CocoaWindow()
 {
+    [(CocoaNSWindow*)m_cocoaWindow release];
+    [(FrontierView*)m_cocoaView release];
 }
 
 
