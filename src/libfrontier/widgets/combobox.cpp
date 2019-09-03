@@ -89,17 +89,22 @@ void ComboBox::clearOptions()
 
 void ComboBox::updateOptions()
 {
+    ListItem* selected = m_comboBoxDropDown->getList()->getSelected();
     m_comboBoxDropDown->getList()->clearItems();
 
     for (ListItem* option : m_options)
     {
         m_comboBoxDropDown->getList()->addItem(option);
     }
+
+    if (selected != NULL)
+    {
+        m_comboBoxDropDown->getList()->setSelected(selected);
+    }
 }
 
 void ComboBox::selectOption(ListItem* option)
 {
-    m_comboBoxDropDown->getList()->setSelected(option);
     if (typeid(*option) == typeid(TextListItem))
     {
         TextListItem* tli = (TextListItem*)option;
@@ -110,7 +115,7 @@ void ComboBox::selectOption(ListItem* option)
         log(WARN, "selectOption: selected item is not a TextListItem");
     }
 
-    m_comboBoxDropDown->getList()->setSelected(option);
+    option->setSelected();
 }
 
 void ComboBox::selectOption(std::wstring text)
@@ -166,6 +171,8 @@ void ComboBox::optionSelected(ListItem* option)
         selectOption(option);
     }
     m_comboBoxDropDown->hide();
+
+    m_selectSignal.emit(option);
 }
 
 ComboBoxDropDown::ComboBoxDropDown(FrontierApp* app) : FrontierWindow(app, L"", WINDOW_TOOL_TIP)

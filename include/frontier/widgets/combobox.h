@@ -22,6 +22,8 @@ class ComboBox : public Frame
 
     std::vector<ListItem*> m_options;
 
+    sigc::signal<void, ListItem*> m_selectSignal;
+
     void initComboBox();
 
     void openDropDown(Widget* button);
@@ -44,6 +46,8 @@ class ComboBox : public Frame
     void selectOption(std::wstring text);
     void selectOption(void* data);
     ListItem* getSelectedOption();
+
+    virtual sigc::signal<void, ListItem*> selectSignal() { return m_selectSignal; }
 };
 
 class ComboBoxDropDown : public FrontierWindow
