@@ -34,6 +34,7 @@
 #include <frontier/widgets/grid.h>
 #include <frontier/widgets/combobox.h>
 #include <frontier/widgets/terminal.h>
+#include <frontier/windows/datepicker.h>
 
 using namespace std;
 using namespace Frontier;
@@ -48,12 +49,15 @@ class DemoApp : public FrontierApp
     Tabs* m_tabs;
     Button* m_textButton1;
     Button* m_textButton2;
+    Label* m_dateLabel;
+    Button* m_dateButton;
 
     TooltipWindow* m_tooltipWindow;
 
     void onTextButton1(Widget* button);
     void onTextButton2(Widget* button);
     void onIconButton(Widget* button);
+    void onDateButton(Widget* button);
 
     void onCloseTab(Widget* tab);
     void onContextMenu(ListItem* item, Geek::Vector2D pos);
@@ -227,11 +231,21 @@ bool DemoApp::init()
         inputFrame1->add(new Label(this, L"Default Text:"));
         inputFrame1->add(input1 = new TextInput(this, L"Default text"));
         inputTab->add(inputFrame1);
+
         Frame* inputFrame2 = new Frame(this, true);
         TextInput* input2;
         inputFrame2->add(new Label(this, L"Empty Text:"));
         inputFrame2->add(input2 = new TextInput(this));
         inputTab->add(inputFrame2);
+
+        Frame* inputFrame3 = new Frame(this, true);
+        inputFrame3->add(new Label(this, L"Date:"));
+        inputFrame3->add(m_dateLabel = new Label(this, L"Choose Date"));
+        m_dateLabel->setStyle(STYLE_BORDER, true);
+        inputFrame3->add(m_dateButton = new IconButton(this, getTheme()->getIcon(FRONTIER_ICON_CALENDAR)));
+        m_dateButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onDateButton));
+        inputTab->add(inputFrame3);
+
         m_tabs->addTab(L"Inputs", inputTab);
     }
 
@@ -387,6 +401,12 @@ void DemoApp::onTextButton1(Widget* button)
 void DemoApp::onTextButton2(Widget* button)
 {
     m_tooltipWindow->hide();
+}
+
+void DemoApp::onDateButton(Widget* button)
+{
+    DatePickerWindow* datePicker = new DatePickerWindow(this);
+    datePicker->show();
 }
 
 void DemoApp::onCloseTab(Widget* tab)

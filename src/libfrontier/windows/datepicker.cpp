@@ -46,8 +46,20 @@ DatePickerWindow::DatePickerWindow(Frontier::FrontierApp* app)
     m_currentYear = m_selectedYear;
 }
 
+DatePickerWindow::DatePickerWindow(Frontier::FrontierApp* app, int year, int month, int day)
+    : FrontierWindow(app, L"Date Picker", WINDOW_NORMAL)
+{
+    m_selectedDay = day;
+    m_selectedMonth = month;
+    m_selectedYear = year;
+    m_currentMonth = m_selectedMonth;
+    m_currentYear = m_selectedYear;
+}
+
+
 DatePickerWindow::~DatePickerWindow()
 {
+    log(DEBUG, "~DatePickerWindow: Deleting!");
 }
 
 /*
@@ -66,16 +78,31 @@ bool DatePickerWindow::init()
     Frame* root = new Frame(this, false);
 
     Frame* dateFrame = new Frame(this, true);
-IconButton* prevButton;
-IconButton* nextButton;
+    IconButton* prevButton;
+    IconButton* nextButton;
     dateFrame->add(prevButton = new IconButton(this, getApp()->getTheme()->getIcon(FRONTIER_ICON_ANGLE_LEFT)));
     dateFrame->add(m_monthInput = new ComboBox(this));
     dateFrame->add(m_yearInput = new TextInput(this, L"2019"));
     dateFrame->add(nextButton = new IconButton(this, getApp()->getTheme()->getIcon(FRONTIER_ICON_ANGLE_RIGHT)));
     root->add(dateFrame);
 
-prevButton->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onPrevMonth));
-nextButton->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onNextMonth));
+    m_monthInput->addOption(L"January", (void*)1);
+    m_monthInput->addOption(L"February", (void*)2);
+    m_monthInput->addOption(L"March", (void*)3);
+    m_monthInput->addOption(L"April", (void*)4);
+    m_monthInput->addOption(L"May", (void*)5);
+    m_monthInput->addOption(L"June", (void*)6);
+    m_monthInput->addOption(L"July", (void*)7);
+    m_monthInput->addOption(L"August", (void*)8);
+    m_monthInput->addOption(L"September", (void*)9);
+    m_monthInput->addOption(L"October", (void*)10);
+    m_monthInput->addOption(L"November", (void*)11);
+    m_monthInput->addOption(L"December", (void*)12);
+    m_monthInput->updateOptions();
+    m_monthInput->selectSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onMonthSelected));
+
+    prevButton->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onPrevMonth));
+    nextButton->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onNextMonth));
 
     m_dayGrid = new Grid(this);
 
@@ -92,8 +119,9 @@ bool DatePickerWindow::update()
 {
     log(DEBUG, "update: %d/%d", m_currentMonth, m_currentYear);
 
-    wchar_t buf[5];
+    m_monthInput->selectOption((void*)(uintptr_t)m_currentMonth);
 
+    wchar_t buf[5];
     swprintf(buf, 5, L"%d", m_currentYear);
     m_yearInput->setText(buf);
 
@@ -150,19 +178,34 @@ bool DatePickerWindow::update()
     return true;
 }
 
-void DatePickerWindow::onDateSelected(Button* button)
+void DatePickerWindow::onDateSelected(Widget* button)
 {
     uint64_t data = (uint64_t)(button->getPrivateData());
-    int day = (data >> 24) & 0xf;
-    int month = (data >> 16) & 0xf;
-    int year = (data & 0xffff);
+    m_selectedDay = (data >> 24) & 0xff;
+    m_selectedMonth = (data >> 16) & 0xff;
+    m_selectedYear = (data & 0xffff);
 
-    log(DEBUG, "onDateSelected: day=%d, month=%d, year=%d", day, month, year);
+    log(DEBUG, "onDateSelected: day=%d, month=%d, year=%d", m_selectedDay, m_selectedMonth, m_selectedYear);
 
-    m_dateSelectSignal.emit(day, month, year);
+    bool close = m_dateSelectSignal.emit(m_selectedYear, m_selectedMonth, m_selectedDay);
+
+    if (close)
+    {
+        getApp()->removeWindow(this);
+    }
+    else
+    {
+        update();
+    }
 }
 
-void DatePickerWindow::onPrevMonth(Button* button)
+void DatePickerWindow::onMonthSelected(ListItem* item)
+{
+    m_currentMonth = (int)(intptr_t)item->getPrivateData();
+    update();
+}
+
+void DatePickerWindow::onPrevMonth(Widget* button)
 {
    m_currentMonth--;
    if (m_currentMonth < 1)
@@ -174,7 +217,7 @@ void DatePickerWindow::onPrevMonth(Button* button)
    update();
 }
 
-void DatePickerWindow::onNextMonth(Button* button)
+void DatePickerWindow::onNextMonth(Widget* button)
 {
    m_currentMonth++;
    if (m_currentMonth > 12)

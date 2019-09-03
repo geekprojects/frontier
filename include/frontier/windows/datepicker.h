@@ -26,11 +26,13 @@ class DatePickerWindow : public Frontier::FrontierWindow
     sigc::signal<bool, int, int, int> m_dateSelectSignal;
 
     void onDateSelected(Widget* button);
+    void onMonthSelected(ListItem* item);
     void onPrevMonth(Widget* button);
     void onNextMonth(Widget* button);
 
  public:
     DatePickerWindow(Frontier::FrontierApp* app);
+    DatePickerWindow(Frontier::FrontierApp* app, int year, int month, int day);
     virtual ~DatePickerWindow();
 
     bool init();
