@@ -34,6 +34,7 @@
 #include <frontier/widgets/grid.h>
 #include <frontier/widgets/combobox.h>
 #include <frontier/widgets/terminal.h>
+#include <frontier/widgets/numberinput.h>
 #include <frontier/windows/datepicker.h>
 
 using namespace std;
@@ -237,6 +238,15 @@ bool DemoApp::init()
         inputFrame2->add(new Label(this, L"Empty Text:"));
         inputFrame2->add(input2 = new TextInput(this));
         inputTab->add(inputFrame2);
+
+        Frame* numberFrame = new Frame(this, true);
+        NumberInput* numberInput;
+        numberFrame->add(new Label(this, L"Number Text:"));
+        numberFrame->add(numberInput = new NumberInput(this));
+numberInput->setIntegerOnly(false);
+numberInput->setNumber(3.14);
+        inputTab->add(numberFrame);
+
 
         Frame* inputFrame3 = new Frame(this, true);
         inputFrame3->add(new Label(this, L"Date:"));
