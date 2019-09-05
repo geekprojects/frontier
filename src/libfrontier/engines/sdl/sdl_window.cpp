@@ -31,6 +31,9 @@ FrontierEngineWindowSDL::FrontierEngineWindowSDL(FrontierEngine* engine, Frontie
 
 FrontierEngineWindowSDL::~FrontierEngineWindowSDL()
 {
+    hide();
+
+    SDL_DestroyWindow(m_sdlWindow);
 }
 
 bool FrontierEngineWindowSDL::init()
