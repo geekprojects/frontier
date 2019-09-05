@@ -32,7 +32,7 @@ using namespace Geek::Gfx;
 TextInput::TextInput(FrontierApp* ui) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
-    m_maxLength = -1;
+    m_maxLength = 0;
 
     setText(L"");
 }
@@ -40,7 +40,7 @@ TextInput::TextInput(FrontierApp* ui) : Widget(ui, L"TextInput")
 TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
-    m_maxLength = -1;
+    m_maxLength = 0;
 
     setText(text);
 }
@@ -48,7 +48,7 @@ TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui, L"TextInput")
 TextInput::TextInput(FrontierWindow* window) : Widget(window, L"TextInput")
 {
     m_textSurface = NULL;
-    m_maxLength = -1;
+    m_maxLength = 0;
 
     setText(L"");
 }
@@ -56,7 +56,7 @@ TextInput::TextInput(FrontierWindow* window) : Widget(window, L"TextInput")
 TextInput::TextInput(FrontierWindow* window, wstring text) : Widget(window, L"TextInput")
 {
     m_textSurface = NULL;
-    m_maxLength = -1;
+    m_maxLength = 0;
 
     setText(text);
 }
@@ -95,7 +95,7 @@ void TextInput::calculateSize()
     int margin = (int)getStyle(STYLE_MARGIN);
 
     m_minSize.set(50, lineHeight + (margin * 2));
-    if (m_maxLength == -1)
+    if (m_maxLength == 0)
     {
         m_maxSize.set(WIDGET_SIZE_UNLIMITED, lineHeight + (margin * 2));
     }
@@ -303,22 +303,38 @@ Widget* TextInput::handleEvent(Event* event)
                             m_column--;
                             m_text.erase(m_column, 1);
                         }
+                        m_signalTextChanged.emit(this);
                         break;
 
                     case KC_RETURN:
-                        m_signalTextEnter.emit(this);
+                        m_signalEditingEnd.emit(this);
+                        break;
+
+                    case KC_TAB:
+                        m_signalEditingEnd.emit(this);
                         break;
 
                     default:
                         if (iswprint(c))
                         {
+                            wstring originalText = m_text;
                             if (hasSelection())
                             {
                                 cutSelected();
                             }
+
                             m_text.insert(m_column, 1, c);
-                            m_column++;
+                            if (isValid(m_text))
+                            {
+                                m_column++;
+                                m_signalTextChanged.emit(this);
+                            }
+                            else
+                            {
+                                m_text = originalText;
+                            }
                         }
+                        break;
                 }
                 setDirty();
             }
@@ -436,5 +452,14 @@ wstring TextInput::cutSelected()
         return selectText;
     }
     return L"";
+}
+
+bool TextInput::isValid(std::wstring str)
+{
+    if (m_maxLength > 0)
+    {
+        return str.length() <= m_maxLength;
+    }
+    return true;
 }
 

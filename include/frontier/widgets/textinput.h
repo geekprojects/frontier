@@ -12,7 +12,7 @@ class TextInput : public Widget
     std::wstring m_text;
     unsigned int m_column;
     unsigned int m_offsetX;
-    int m_maxLength;
+    unsigned int m_maxLength;
 
     std::vector<int> m_charX;
 
@@ -26,7 +26,8 @@ class TextInput : public Widget
 
     Geek::Gfx::Surface* m_textSurface;
 
-    sigc::signal<void, TextInput*> m_signalTextEnter;
+    sigc::signal<void, TextInput*> m_signalEditingEnd;
+    sigc::signal<void, TextInput*> m_signalTextChanged;
 
  public:
     TextInput(FrontierApp* ui);
@@ -35,7 +36,7 @@ class TextInput : public Widget
     TextInput(FrontierWindow* ui, std::wstring text);
     virtual ~TextInput();
 
-    void setMaxLength(int maxLen)
+    void setMaxLength(unsigned int maxLen)
     {
         m_maxLength = maxLen;
     }
@@ -56,6 +57,11 @@ class TextInput : public Widget
     virtual Widget* handleEvent(Frontier::Event* event);
 
     virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_EDIT; }
+
+    virtual bool isValid(std::wstring str);
+
+    sigc::signal<void, TextInput*> signalEditingEnd() { return m_signalEditingEnd; }
+    sigc::signal<void, TextInput*> signalTextChanged() { return m_signalTextChanged; }
 };
 
 };
