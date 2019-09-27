@@ -21,7 +21,7 @@ addons:
   homebrew:
     packages:
       - freetype
-      - libsigc++
+      - libsigc++@2
       - libtool
     update: true
 
