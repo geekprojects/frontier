@@ -312,6 +312,10 @@ Widget* TextInput::handleEvent(Event* event)
 
                     case KC_TAB:
                         m_signalEditingEnd.emit(this);
+                        if (m_parent != NULL)
+                        {
+                            m_parent->activateNext(this);
+                        }
                         break;
 
                     default:
@@ -461,5 +465,13 @@ bool TextInput::isValid(std::wstring str)
         return str.length() <= m_maxLength;
     }
     return true;
+}
+
+void TextInput::activateNext(Widget* activeChild)
+{
+    if (activeChild == NULL)
+    {
+        getWindow()->setActiveWidget(this);
+    }
 }
 

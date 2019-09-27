@@ -379,6 +379,62 @@ Widget* Grid::handleEvent(Frontier::Event* event)
     return NULL;
 }
 
+void Grid::activateNext(Widget* activeChild)
+{
+    log(DEBUG, "activateNext: %p: activeChild=%p", this, activeChild);
+    if (m_grid.empty())
+    {
+        log(DEBUG, "activateNext: %p: No children. Stopping", this);
+        return;
+    }
+
+    Size gridSize = getGridSize();
+
+    bool foundCurrent = false;
+    int row;
+    for (row = 0; row < gridSize.height; row++)
+    {
+        int col;
+        for (col = 0; col < gridSize.width; col++)
+        {
+            Widget* child = getItem(col, row);
+            if (child == NULL)
+            {
+                continue;
+            }
+
+            bool foundNext = false;
+            if (activeChild == NULL )
+            {
+                foundNext = true;
+            }
+            else
+            {
+                if (child == activeChild)
+                {
+                    foundCurrent = true;
+                }
+                else if (foundCurrent == true)
+                {
+                    foundNext = true;
+                }
+            }
+
+            if (foundNext)
+            {
+                child->activateNext(NULL);
+                return;
+            }
+        }
+    }
+
+if (m_parent != NULL)
+{
+            m_parent->activateNext(this);
+}
+
+}
+
 void Grid::freeSizes()
 {
     if (m_colMinSizes != NULL)

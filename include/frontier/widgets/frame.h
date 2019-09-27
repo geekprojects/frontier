@@ -30,6 +30,8 @@ class Frame : public Widget
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleEvent(Frontier::Event* event);
+
+    virtual void activateNext(Widget* activeChild = NULL);
 };
 
 class HFrame : public Frame

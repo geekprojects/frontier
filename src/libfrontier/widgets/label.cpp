@@ -141,9 +141,21 @@ bool Label::draw(Surface* surface)
     int margin = (int)getStyle(STYLE_MARGIN);
     int y = margin;
 
+    if (hasStyle(STYLE_BACKGROUND_COLOUR))
+    {
+        surface->drawRectFilled(0, 0, getWidth(), getHeight(), getStyle(STYLE_BACKGROUND_COLOUR));
+    }
+
     if (hasStyle(STYLE_BORDER) && getStyle(STYLE_BORDER))
     {
-        surface->drawRectRounded(0, 0, getWidth(), getHeight(), 5, 0xff4b4b4b);
+        if (!isActive())
+        {
+            surface->drawRect(0, 0, getWidth(), getHeight(), 0xff4b4b4b);
+        }
+        else
+        {
+            surface->drawRect(0, 0, getWidth(), getHeight(), 0xff4a7987);
+        }
     }
 
     int lines = 1;

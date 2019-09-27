@@ -161,6 +161,7 @@ class Widget : public FrontierObject, public Geek::Logger
     void clearDirty();
 
     bool isActive();
+    virtual void activateNext(Widget* activeChild = NULL);
 
     void setContextMenu(Menu* menu) { m_contextMenu = menu; }
     Menu* getContextMenu() const { return m_contextMenu; }

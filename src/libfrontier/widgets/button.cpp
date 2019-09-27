@@ -87,7 +87,7 @@ bool Button::draw(Surface* surface)
         state = STATE_NONE;
     }
 
-    if (m_highlight)
+    if (m_highlight || isActive())
     {
         state |= STATE_ACTIVE;
     }
@@ -123,10 +123,43 @@ Widget* Button::handleEvent(Event* event)
             }
         } break;
 
+        case FRONTIER_EVENT_KEY:
+        {
+            KeyEvent* keyEvent = (KeyEvent*)event;
+            if (keyEvent->direction && keyEvent->key == KC_TAB)
+            {
+                if (m_parent != NULL)
+                {
+                    m_parent->activateNext(this);
+                }
+            }
+            else if (keyEvent->key == KC_SPACE)
+{
+            if (m_state != keyEvent->direction)
+            {
+                setDirty(DIRTY_CONTENT);
+
+                m_state = keyEvent->direction;
+                if (!m_state)
+                {
+                    m_clickSignal.emit(this);
+                }
+            }
+
+}
+        } break;
+
         default:
             break;
     }
     return this;
 }
 
+void Button::activateNext(Widget* activeChild)
+{
+    if (activeChild == NULL)
+    {
+        getWindow()->setActiveWidget(this);
+    }
+}
 

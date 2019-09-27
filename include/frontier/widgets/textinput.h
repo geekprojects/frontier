@@ -56,6 +56,8 @@ class TextInput : public Widget
 
     virtual Widget* handleEvent(Frontier::Event* event);
 
+    virtual void activateNext(Widget* activeChild = NULL);
+
     virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_EDIT; }
 
     virtual bool isValid(std::wstring str);

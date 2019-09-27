@@ -262,6 +262,14 @@ bool Widget::isActive()
     return false;
 }
 
+void Widget::activateNext(Widget* current)
+{
+    if (m_parent != NULL)
+    {
+        m_parent->activateNext(this);
+    }
+}
+
 void Widget::openContextMenu()
 {
     openContextMenu(getAbsolutePosition());

@@ -181,6 +181,7 @@ void FrontierWindow::setActiveWidget(Widget* widget)
     {
         log(DEBUG, "setActiveWidget: Active: %s (%p)", typeid(*widget).name(), widget);
         m_activeWidget->incRefCount();
+        m_activeWidget->setDirty();
         m_activeWidget->signalActive().emit();
     }
     else
@@ -546,6 +547,14 @@ bool FrontierWindow::handleEvent(Event* event)
             if (m_activeWidget != NULL)
             {
                 destWidget = m_activeWidget->handleEvent(event);
+            }
+            else
+            {
+                KeyEvent* keyEvent = (KeyEvent*)event;
+                if (keyEvent->direction && keyEvent->key == KC_TAB)
+                {
+                    m_root->activateNext(NULL);
+                }
             }
             break;
     }

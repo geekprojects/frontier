@@ -390,3 +390,51 @@ Widget* Frame::handleEvent(Event* event)
     return NULL;
 }
 
+void Frame::activateNext(Widget* activeChild)
+{
+log(DEBUG, "activateNext: %p: activeChild=%p", this, activeChild);
+    if (m_children.empty())
+    {
+log(DEBUG, "activateNext: %p: No children. Stop", this);
+/*
+        if (m_parent != NULL && activeChild == NULL)
+        {
+            m_parent->activateNext(this);
+        }
+*/
+        return;
+    }
+
+    if (activeChild == NULL)
+    {
+log(DEBUG, "activateNext: %p: From parent, try first child...", this);
+        m_children.at(0)->activateNext(NULL);
+        return;
+    }
+    else
+    {
+log(DEBUG, "activateNext: %p: From child, try next child", this);
+        bool foundCurrent = false;
+        for (Widget* child : m_children)
+        {
+            if (child == activeChild)
+            {
+log(DEBUG, "activateNext: %p:  -> found current!", this);
+                foundCurrent = true;
+            }
+            else if (foundCurrent)
+            {
+log(DEBUG, "activateNext: %p:  -> Next=%p", this, child);
+                child->activateNext(NULL);
+                return;
+            }
+        }
+
+        log(DEBUG, "activateNext: %p: No next child, try parent...", this);
+        if (m_parent != NULL)
+        {
+            m_parent->activateNext(this);
+        }
+    }
+}
+

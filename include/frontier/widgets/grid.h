@@ -44,6 +44,8 @@ class Grid : public Frontier::Widget
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     virtual Widget* handleEvent(Frontier::Event* event);
+
+    virtual void activateNext(Widget* activeChild = NULL);
 };
 
 };
