@@ -78,7 +78,7 @@ void TextListItem::calculateSize()
         m_minSize.width += iconSize.width;
     }
 
-    m_minSize.width += (getStyle(STYLE_MARGIN) * 2);
+    m_minSize.width += (getStyle("margin-left-width") + getStyle("margin-right-width")) * 2;
     m_minSize.height = lineHeight + (1 * 2);
 }
 

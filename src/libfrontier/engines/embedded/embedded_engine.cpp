@@ -6,6 +6,7 @@ using namespace Frontier;
 
 EmbeddedEngine::EmbeddedEngine(FrontierApp* app) : FrontierEngine(app)
 {
+    m_scaleFactor = 1.0;
 }
 
 EmbeddedEngine::~EmbeddedEngine()

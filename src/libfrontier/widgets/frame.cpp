@@ -116,7 +116,7 @@ void Frame::calculateSize()
     {
         if (m_parent == NULL)
         {
-            setStyle(STYLE_MARGIN, 0);
+            setWidgetClass(L"root");
         }
         else
         {
@@ -129,17 +129,24 @@ void Frame::calculateSize()
                 //if (parentFrame->getMargin() > 0)
 #endif
                 {
-                    setStyle(STYLE_MARGIN, 0);
+                    // TODO: Fancier CSS rules!
+                    setWidgetClass(L"nested");
                 }
             }
         }
     }
 
+/*Size borderSize =*/ getBorderSize();
+
     m_minSize.set(0, 0);
     m_maxSize.set(0, 0);
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
+    Size borderSize = getBorderSize();
+
+int paddingTop = getStyle("padding-top");
+//int paddingRight = getStyle("padding-right");
+//int paddingBottom = getStyle("padding-bottom");
+int paddingLeft = getStyle("padding-left");
 
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
@@ -161,11 +168,11 @@ void Frame::calculateSize()
 
             if (m_minSize.width > 0)
             {
-                m_minSize.width += padding;
+                m_minSize.width += paddingLeft;
             }
             if (m_maxSize.width > 0)
             {
-                m_maxSize.width += padding;
+                m_maxSize.width += paddingLeft;
             }
             m_minSize.width += childMin.width;
             m_maxSize.width += childMax.width;
@@ -177,11 +184,11 @@ void Frame::calculateSize()
 
             if (m_minSize.height > 0)
             {
-                m_minSize.height += padding;
+                m_minSize.height += paddingTop;
             }
             if (m_maxSize.height > 0)
             {
-                m_maxSize.height += padding;
+                m_maxSize.height += paddingTop;
             }
             m_minSize.height += childMin.height;
             m_maxSize.height += childMax.height;
@@ -203,16 +210,16 @@ void Frame::calculateSize()
     }
 */
 
-    m_minSize.width += 2 * margin;
-    m_minSize.height += 2 * margin;
-    m_maxSize.width += 2 * margin;
-    m_maxSize.height += 2 * margin;
+    m_minSize.width += borderSize.width;
+    m_minSize.height += borderSize.height;
+    m_maxSize.width += borderSize.width;
+    m_maxSize.height += borderSize.height;
 
-    if (hasStyle(STYLE_EXPAND_HORIZONTAL) && getStyle(STYLE_EXPAND_HORIZONTAL) == 1)
+    if (getStyle("expand-horizontal") == 1)
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
-    if (hasStyle(STYLE_EXPAND_VERTICAL) && getStyle(STYLE_EXPAND_VERTICAL) == 1)
+    if (getStyle("expand-horizontal") == 1)
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
@@ -236,23 +243,29 @@ void Frame::layout()
     int major;
     int minor;
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
+Size borderSize = getBorderSize();
+int paddingTop = getStyle("padding-top");
+//int paddingRight = getStyle("padding-right");
+//int paddingBottom = getStyle("padding-bottom");
+//int paddingLeft = getStyle("padding-left");
 
     if (m_horizontal)
     {
         major = m_setSize.width;
         minor = m_setSize.height;
+
+    major -= borderSize.width;
+    minor -= borderSize.height;
     }
     else
     {
         major = m_setSize.height;
         minor = m_setSize.width;
+    major -= borderSize.height;
+    minor -= borderSize.width;
     }
 
-    major -= (2 * margin);
-    minor -= 2 * margin;
-    major -= (m_children.size() - 1) * padding;
+    major -= (m_children.size() - 1) * paddingTop;
 
 #if 0
     log(DEBUG, "layout: major=%d, minor=%d", major, minor);
@@ -287,8 +300,19 @@ void Frame::layout()
 
     int i;
 
-    int majorPos = margin;
-    int minorPos = margin;
+    int majorPos = 0;
+    int minorPos = 0;
+
+if (m_horizontal)
+{
+majorPos = getStyle("margin-left");
+minorPos = getStyle("margin-top");
+}
+else
+{
+majorPos = getStyle("margin-top");
+minorPos = getStyle("margin-left");
+}
 
     for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
     {
@@ -358,7 +382,7 @@ void Frame::layout()
         }
         child->setSize(size);
 
-        majorPos += childMajor + padding;
+        majorPos += childMajor + paddingTop;
 
         child->layout();
     }

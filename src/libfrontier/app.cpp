@@ -145,6 +145,13 @@ bool FrontierApp::init()
         return false;
     }
 
+    m_styleEngine = new StyleEngine();
+    res = m_styleEngine->init();
+if (!res)
+{
+return false;
+}
+
     return true;
 }
 

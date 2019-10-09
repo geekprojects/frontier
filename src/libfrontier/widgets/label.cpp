@@ -30,32 +30,24 @@ Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = align;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierWindow* window, wstring text) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = align;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 
@@ -110,11 +102,11 @@ void Label::calculateSize()
         }
     }
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    m_minSize.width += (margin * 2);
-    m_minSize.height = (m_lineHeight * lines) + (margin * 2);
+    Size borderSize = getBorderSize();
+    m_minSize.width += borderSize.width;
+    m_minSize.height = (m_lineHeight * lines) + borderSize.height;
 
-    if (getStyle(STYLE_EXPAND_HORIZONTAL))
+    if (getStyle("expand-horizontal"))
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
@@ -123,7 +115,7 @@ void Label::calculateSize()
         m_maxSize.width = m_minSize.width;
     }
 
-    if (getStyle(STYLE_EXPAND_VERTICAL))
+    if (getStyle("expand-vertical"))
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
@@ -138,15 +130,15 @@ bool Label::draw(Surface* surface)
 {
     Widget::draw(surface);
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int y = margin;
+    int y = getStyle("margin-top");
 
-    if (hasStyle(STYLE_BACKGROUND_COLOUR))
+    if (hasStyle("background-color"))
     {
-        surface->drawRectFilled(0, 0, getWidth(), getHeight(), getStyle(STYLE_BACKGROUND_COLOUR));
+        surface->drawRectFilled(0, 0, getWidth(), getHeight(), getStyle("background-color"));
     }
 
-    if (hasStyle(STYLE_BORDER) && getStyle(STYLE_BORDER))
+/*
+    if (hasStyle("border-left") && getStyle(STYLE_BORDER))
     {
         if (!isActive())
         {
@@ -157,6 +149,7 @@ bool Label::draw(Surface* surface)
             surface->drawRect(0, 0, getWidth(), getHeight(), 0xff4a7987);
         }
     }
+*/
 
     int lines = 1;
     unsigned int pos = 0;
@@ -185,13 +178,13 @@ bool Label::draw(Surface* surface)
             switch (m_align)
             {
                 case ALIGN_LEFT:
-                    x = margin;
+                    x = getStyle("margin-left");
                     break;
                 case ALIGN_CENTER:
                     x = (m_setSize.width / 2) - (w / 2);
                     break;
                 case ALIGN_RIGHT:
-                    x = (m_setSize.width - margin) - w;
+                    x = (m_setSize.width - getStyle("margin-right")) - w;
                     break;
             }
 

@@ -15,16 +15,12 @@ ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, L
 {
     m_dragging = false;
     m_dragWidget = 0;
-
-    setStyle(STYLE_PADDING, 3);
 }
 
 ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Frame(window, L"ResizeableFrame", horizontal)
 {
     m_dragging = false;
     m_dragWidget = 0;
-
-    setStyle(STYLE_PADDING, 3);
 }
 
 ResizeableFrame::~ResizeableFrame()
@@ -67,8 +63,8 @@ void ResizeableFrame::layout()
     int major;
     int minor;
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
+    int margin = (int)getStyle("margin-left");
+    int padding = (int)getStyle("padding-left");
 
     if (m_horizontal)
     {
@@ -314,7 +310,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 }
             }
 
-            int padding = (int)getStyle(STYLE_PADDING);
+            int padding = (int)getStyle("padding-left");
 
             // Is the mouse pointer between children?
             int pos;

@@ -124,9 +124,6 @@ void Grid::calculateSize()
 {
     freeSizes();
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
-
     Size gridSize = getGridSize();
 #if 0
     log(DEBUG, "calculateSize: gridSize=%d,%d", gridSize.width, gridSize.height);
@@ -191,23 +188,23 @@ void Grid::calculateSize()
         m_maxSize.height += m_rowMinSizes[row];
     }
 
-    m_minSize.width += padding * (gridSize.width - 1);
-    m_minSize.height += padding * (gridSize.height - 1);
-    m_maxSize.width += padding * (gridSize.width - 1);
-    m_maxSize.height += padding * (gridSize.height - 1);
+int paddingTop = getStyle("padding-top");
+int paddingLeft = getStyle("padding-left");
+    m_minSize.width += paddingLeft * (gridSize.width - 1);
+    m_minSize.height += paddingTop * (gridSize.height - 1);
+    m_maxSize.width += paddingLeft * (gridSize.width - 1);
+    m_maxSize.height += paddingTop * (gridSize.height - 1);
 
-    m_minSize.width += margin;
-    m_minSize.height += margin;
-    m_maxSize.width += margin;
-    m_maxSize.height += margin;
+    Size borderSize = getBorderSize();
+    m_minSize.width += borderSize.width;
+    m_minSize.height += borderSize.height;
+    m_maxSize.width += borderSize.width;
+    m_maxSize.height += borderSize.height;
 }
 
 void Grid::layout()
 {
     Size gridSize = getGridSize();
-
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
 
     if (gridSize.width == 0 || gridSize.height == 0)
     {
@@ -216,11 +213,19 @@ void Grid::layout()
 
     int width = m_setSize.width;
     int height = m_setSize.height;
-    width -= (2 * margin);
-    height -= (2 * margin);
 
-    width -= padding * (gridSize.width - 1);
-    height -= padding * (gridSize.height - 1);
+    int marginTop = getStyle("margin-top");
+    int marginRight = getStyle("margin-right");
+    int marginBottom = getStyle("margin-bottom");
+    int marginLeft = getStyle("margin-left");
+    int paddingTop = getStyle("padding-top");
+    int paddingLeft = getStyle("padding-left");
+
+    width -= marginLeft + marginRight;
+    height -= marginTop + marginBottom;
+
+    width -= paddingLeft * (gridSize.width - 1);
+    height -= paddingTop * (gridSize.height - 1);
 
     int widthq = width / gridSize.width;
     int heightq = height / gridSize.height;
@@ -313,10 +318,10 @@ void Grid::layout()
 #endif
     }
 
-    int y = margin;
+    int y = marginTop;
     for (row = 0; row < gridSize.height; row++)
     {
-        int x = margin;
+        int x = marginLeft;
         for (col = 0; col < gridSize.width; col++)
         {
             GridItem* item = getGridItem(col, row);
@@ -332,9 +337,9 @@ void Grid::layout()
             log(DEBUG, "layout: Set Item: %d, %d, size=%d,%d (%p)", col, row, colSizes[col], rowSizes[row], item);
 #endif
 
-            x += colSizes[col] + padding;
+            x += colSizes[col] + paddingLeft;
         }
-        y += rowSizes[row] + padding;
+        y += rowSizes[row] + paddingTop;
     }
 }
 

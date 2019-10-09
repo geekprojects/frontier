@@ -92,25 +92,28 @@ void TextInput::calculateSize()
 {
     int lineHeight = m_app->getTheme()->getTextHeight();
 
-    int margin = (int)getStyle(STYLE_MARGIN);
+    Size borderSize = getBorderSize();
 
-    m_minSize.set(50, lineHeight + (margin * 2));
+    m_minSize.set(50, lineHeight + borderSize.height);
     if (m_maxLength == 0)
     {
-        m_maxSize.set(WIDGET_SIZE_UNLIMITED, lineHeight + (margin * 2));
+        m_maxSize.set(WIDGET_SIZE_UNLIMITED, lineHeight + borderSize.height);
     }
     else
     {
         int width = m_app->getTheme()->getTextWidth(L"M");
         width *= m_maxLength;
-        m_maxSize.set(width + (margin * 2), lineHeight + (margin * 2));
+        m_maxSize.set(width + borderSize.width, lineHeight + borderSize.height);
     }
 }
 
 bool TextInput::draw(Surface* surface)
 {
     int lineHeight = m_app->getTheme()->getTextHeight();
-    int margin = (int)getStyle(STYLE_MARGIN);
+    //int margin = (int)getStyle(STYLE_MARGIN);
+int marginLeft = getStyle("margin-left");
+int marginRight = getStyle("margin-right");
+int marginTop = getStyle("margin-top");
 
     FontManager* fm = m_app->getFontManager();
     FontHandle* font = m_app->getTheme()->getFont(surface->isHighDPI());
@@ -212,7 +215,7 @@ bool TextInput::draw(Surface* surface)
 
     drawCursor(m_textSurface, cursorX, y);
 
-    unsigned int drawWidth = m_setSize.width - (margin * 2);
+    unsigned int drawWidth = m_setSize.width - (marginLeft + marginRight);
     if (drawWidth > textWidth)
     {
         m_offsetX = 0;
@@ -243,7 +246,7 @@ bool TextInput::draw(Surface* surface)
         drawWidth *= 2;
         textHeight *= 2;
     }
-    surface->blit(margin, margin, m_textSurface, offsetX, 0, drawWidth, textHeight);
+    surface->blit(marginLeft, marginTop, m_textSurface, offsetX, 0, drawWidth, textHeight);
 
    return true;
 }

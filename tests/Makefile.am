@@ -10,8 +10,8 @@ noinst_PROGRAMS=frontier_test
 
 frontier_test_SOURCES=main.cpp testCommon.cpp testFrontierApp.cpp testFontManager.cpp
 frontier_test_LDADD=../src/libfrontier/libfrontier.la libgtest.la
-#frontier_test_LDFLAGS=-framework Cocoa -framework AppKit -fsanitize=address
-frontier_test_LDFLAGS=-framework Cocoa -framework AppKit
+frontier_test_LDFLAGS=-framework Cocoa -framework AppKit -fsanitize=address
+#frontier_test_LDFLAGS=-framework Cocoa -framework AppKit
 frontier_test_CPPFLAGS=-I${top_srcdir}/include -I${top_srcdir}/src/libfrontier -I$(top_srcdir)/tests//googletest/googletest/include
 
 test: all

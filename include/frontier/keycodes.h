@@ -289,6 +289,11 @@ enum KeyCode
 
 };
 
+#undef KMOD_CONTROL
+#undef KMOD_SHIFT
+#undef KMOD_ALT
+#undef KMOD_GUI
+
 enum KeyModifier
 {
     KMOD_NONE = 0x0000,

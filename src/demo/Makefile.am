@@ -3,7 +3,7 @@ noinst_PROGRAMS=demo
 
 demo_SOURCES=main.cpp
 demo_LDADD=../libfrontier/libfrontier.la
-demo_LDFLAGS=-framework Cocoa -framework AppKit
+demo_LDFLAGS=-framework Cocoa -framework AppKit -fsanitize=address
 demo_CPPFLAGS=-I${top_srcdir}/include
 
 app:

@@ -31,6 +31,7 @@
 #include <frontier/object.h>
 #include <frontier/utils.h>
 #include <frontier/events.h>
+#include <frontier/styles.h>
 #include <frontier/theme.h>
 #include <frontier/menu.h>
 
@@ -67,6 +68,7 @@ class FrontierApp : public Geek::Logger
 
     Geek::FontManager* m_fontManager;
     UITheme* m_theme;
+    StyleEngine* m_styleEngine;
 
     Menu* m_appMenu;
     ContextMenu* m_contextMenuWindow;
@@ -93,6 +95,7 @@ class FrontierApp : public Geek::Logger
     FrontierEngine* getEngine() { return m_engine; }
     Geek::FontManager* getFontManager() const { return m_fontManager; }
     UITheme* getTheme() const { return m_theme; }
+    StyleEngine* getStyleEngine() { return m_styleEngine; }
 
     ContextMenu* getContextMenuWindow();
 

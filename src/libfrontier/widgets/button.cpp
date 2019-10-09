@@ -53,6 +53,9 @@ void Button::setHighlight(bool highlight)
 
 void Button::calculateSize()
 {
+
+/*Size borderSize =*/ getBorderSize();
+
     m_minSize.width = m_app->getTheme()->getTextWidth(m_text) + (5 * 2);
     m_minSize.height = m_app->getTheme()->getTextHeight() + (5 * 2);
 

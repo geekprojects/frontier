@@ -66,8 +66,7 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
     m_maxSize = Size(0, 0);
     m_setSize = Size(0, 0);
 
-    setStyle(STYLE_MARGIN, m_app->getTheme()->getMargin());
-    setStyle(STYLE_PADDING, m_app->getTheme()->getPadding());
+    m_styleTimestamp = 0;
 
     m_mouseOver = false;
 
@@ -123,29 +122,81 @@ void Widget::callInit()
     }
 }
 
-bool Widget::hasStyle(StyleAttribute style)
+Size Widget::getBorderSize()
 {
-    return (m_styles.find(style) != m_styles.end());
+    //StyleEngine* styleEngine = m_app->getStyleEngine();
+//map<string, int64_t> props = styleEngine->getProperties(this);
+
+int marginTop = getStyle("margin-top"); 
+int marginRight = getStyle("margin-right"); 
+int marginBottom = getStyle("margin-bottom"); 
+int marginLeft = getStyle("margin-left"); 
+
+    return Size(marginLeft + marginRight, marginTop + marginBottom);
 }
 
-uint64_t Widget::getStyle(StyleAttribute style)
+bool Widget::hasStyle(string style)
 {
-    auto it = m_styles.find(style);
-    if (it != m_styles.end())
+    auto props = getStyleProperties();
+    return (props.find(style) != props.end());
+}
+
+int64_t Widget::getStyle(string style)
+{
+    auto props = getStyleProperties();
+    auto it = props.find(style);
+    if (it != props.end())
     {
         return it->second;
     }
     return (uint64_t)-1ll;
 }
 
-void Widget::setStyle(StyleAttribute style, uint64_t value)
+void Widget::setStyle(string style, int64_t value)
 {
+/*
     auto it = m_styles.find(style);
     if (it != m_styles.end())
     {
         m_styles.erase(it);
     }
     m_styles.insert(make_pair(style, value));
+*/
+    m_widgetStyleProperties.setProperty(style, value);
+    m_styleTimestamp = 0;
+}
+
+map<string, int64_t>& Widget::getStyleProperties()
+{
+    uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
+    if (styleTS != m_styleTimestamp)
+    {
+        m_styleTimestamp = styleTS;
+        m_cachedStyleProperties = m_app->getStyleEngine()->getProperties(this);
+    }
+    return m_cachedStyleProperties;
+}
+
+bool Widget::hasWidgetClass(std::wstring className)
+{
+    auto it = m_widgetClasses.find(className);
+    return (it != m_widgetClasses.end());
+}
+
+void Widget::setWidgetClass(std::wstring className)
+{
+    m_widgetClasses.insert(className);
+    m_styleTimestamp = 0;
+}
+
+void Widget::clearWidgetClass(std::wstring className)
+{
+    auto it = m_widgetClasses.find(className);
+    if (it != m_widgetClasses.end())
+    {
+        m_widgetClasses.erase(it);
+        m_styleTimestamp = 0;
+    }
 }
 
 void Widget::setParent(Widget* widget)

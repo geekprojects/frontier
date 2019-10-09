@@ -8,7 +8,7 @@ COPYRIGHT_OUTPUT_DIR ?= output
 COPYRIGHT_WORD_WRAP ?= 100
 COPYRIGHT_PATHS ?= src:include
 
-SUBDIRS=src include
+SUBDIRS=src include data
 
 if BUILD_TESTS
 SUBDIRS+=tests

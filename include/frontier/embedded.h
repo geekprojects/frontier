@@ -22,13 +22,14 @@ class EmbeddedWindow : public Frontier::FrontierEngineWindow
 
     virtual void setPosition(unsigned int x, unsigned int y) { m_position.x = x; m_position.y = y; }
     virtual Geek::Vector2D getPosition() { return m_position; }
-    
+
+    virtual float getScaleFactor();
 };
 
 class EmbeddedEngine : public FrontierEngine
 {
  protected:
-    
+    float m_scaleFactor;
 
  public:
     EmbeddedEngine(FrontierApp* app);
@@ -46,6 +47,9 @@ class EmbeddedEngine : public FrontierEngine
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
+
+    void setScaleFactor(float factor) { m_scaleFactor = factor; }
+    float getScaleFactor() { return m_scaleFactor; }
 };
 
 };

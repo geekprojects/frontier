@@ -25,6 +25,7 @@
 #include <map>
 
 #include <frontier/frontier.h>
+#include <frontier/styles.h>
 
 #include <sigc++/sigc++.h>
 
@@ -47,6 +48,7 @@ enum DirtyFlag
     DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
 };
 
+/*
 enum StyleAttribute
 {
     STYLE_BORDER,
@@ -57,12 +59,15 @@ enum StyleAttribute
     STYLE_EXPAND_HORIZONTAL,
     STYLE_EXPAND_VERTICAL,
 };
+*/
 
 class Widget : public FrontierObject, public Geek::Logger
 {
  protected:
     FrontierApp* m_app;
     std::wstring m_widgetName;
+    std::wstring m_widgetId;
+    std::set<std::wstring> m_widgetClasses;
 
     FrontierWindow* m_window;
 
@@ -83,7 +88,9 @@ class Widget : public FrontierObject, public Geek::Logger
 
     int m_dirty;
 
-    std::map<StyleAttribute, uint64_t> m_styles;
+    uint64_t m_styleTimestamp;
+    StyleRule m_widgetStyleProperties;
+    std::map<std::string, int64_t> m_cachedStyleProperties;
 
     bool m_mouseOver;
 
@@ -99,6 +106,9 @@ class Widget : public FrontierObject, public Geek::Logger
 
     void initWidget(FrontierApp* app, std::wstring widgetName);
     void callInit();
+
+    Size getBorderSize();
+    bool drawBorder();
 
  protected:
     virtual void init();
@@ -119,9 +129,17 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual bool draw(Geek::Gfx::Surface* surface);
     virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
 
-    bool hasStyle(StyleAttribute style);
-    uint64_t getStyle(StyleAttribute style);
-    void setStyle(StyleAttribute style, uint64_t value);
+    bool hasStyle(std::string style);
+    int64_t getStyle(std::string style);
+    void setStyle(std::string style, int64_t value);
+    void setWidgetId(std::wstring id) { m_widgetId = id; }
+    std::wstring getWidgetId() { return m_widgetId; }
+    bool hasWidgetClass(std::wstring className);
+    void setWidgetClass(std::wstring className);
+    void clearWidgetClass(std::wstring className);
+    std::set<std::wstring> getWidgetClasses() { return m_widgetClasses; }
+    StyleRule* getWidgetStyle() { return &m_widgetStyleProperties; }
+    std::map<std::string, int64_t>& getStyleProperties();
 
     int getX() const { return m_x; }
     int getY() const { return m_y; }

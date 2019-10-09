@@ -61,9 +61,10 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_root = new Frame(app, false);
     m_root->incRefCount();
     m_root->setWindow(this);
+    m_root->setWidgetClass(L"root");
 
-    m_root->setStyle(STYLE_PADDING, 2);
-    m_root->setStyle(STYLE_MARGIN, 0);
+    //m_root->setStyle(STYLE_PADDING, 2);
+    //m_root->setStyle(STYLE_MARGIN, 0);
 
     if (hasBorder() && !m_app->getEngine()->providesMenus())
     {
