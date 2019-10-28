@@ -1,0 +1,56 @@
+
+Widget {
+    background-color: #3c3f41;
+    padding: 5px;
+    margin: 5px;
+    border: 0px none #000;
+}
+
+Frame {
+}
+
+Frame.root, Frame.nested {
+    margin: 0px;
+}
+
+ResizeableFrame {
+    padding: 3px;
+}
+
+Label {
+    expand-horizontal: true;
+    expand-vertical: false;
+}
+
+Button {
+    /*background-color: #4a7987; */
+    border-radius: 3px;
+    border-top: 1px solid #4b4b4b;
+    border-left: 1px solid #4b4b4b;
+    border-right: 1px solid #0F0F0F;
+    border-bottom: 1px solid #0F0F0F;
+}
+
+Button.highlight {
+    background-color: #fff;
+}
+
+Button:active {
+    background-color: #4a7987;
+}
+
+Button:hover {
+    background-color: #0f0;
+}
+
+Label:hover {
+    background-color: #00f;
+}
+
+Button:selected {
+    background-color: #f00;
+    border-right: 1px solid #f00;
+    border-bottom: 1px solid #f00;
+    border-top: 1px solid #00f;
+    border-left: 1px solid #00f;
+}
