@@ -128,14 +128,10 @@ void Label::calculateSize()
 
 bool Label::draw(Surface* surface)
 {
-    Widget::draw(surface);
+    drawBorder(surface);
 
     int y = getStyle("margin-top");
 
-    if (hasStyle("background-color"))
-    {
-        surface->drawRectFilled(0, 0, getWidth(), getHeight(), getStyle("background-color"));
-    }
 
 /*
     if (hasStyle("border-left") && getStyle(STYLE_BORDER))

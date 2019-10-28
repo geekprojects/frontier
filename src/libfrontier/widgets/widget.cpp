@@ -69,6 +69,7 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
     m_styleTimestamp = 0;
 
     m_mouseOver = false;
+    m_selected = false;
 
     m_initialised = false;
 
@@ -124,15 +125,117 @@ void Widget::callInit()
 
 Size Widget::getBorderSize()
 {
-    //StyleEngine* styleEngine = m_app->getStyleEngine();
-//map<string, int64_t> props = styleEngine->getProperties(this);
+    int marginTop = getStyle("margin-top");
+    int marginRight = getStyle("margin-right");
+    int marginBottom = getStyle("margin-bottom");
+    int marginLeft = getStyle("margin-left");
 
-int marginTop = getStyle("margin-top"); 
-int marginRight = getStyle("margin-right"); 
-int marginBottom = getStyle("margin-bottom"); 
-int marginLeft = getStyle("margin-left"); 
+    int borderTopWidth = getStyle("border-top-width");
+    int borderRightWidth = getStyle("border-right-width");
+    int borderBottomWidth = getStyle("border-bottom-width");
+    int borderLeftWidth = getStyle("border-left-width");
 
-    return Size(marginLeft + marginRight, marginTop + marginBottom);
+    return Size(
+        marginLeft + marginRight + borderLeftWidth + borderRightWidth,
+        marginTop + marginBottom + borderTopWidth + borderBottomWidth);
+}
+
+bool Widget::drawBorder(Surface* surface)
+{
+    int marginTop = getStyle("margin-top");
+    int marginRight = getStyle("margin-right");
+    int marginBottom = getStyle("margin-bottom");
+    int marginLeft = getStyle("margin-left");
+
+    int borderTopWidth = getStyle("border-top-width");
+    int borderRightWidth = getStyle("border-right-width");
+    int borderBottomWidth = getStyle("border-bottom-width");
+    int borderLeftWidth = getStyle("border-left-width");
+
+    int borderRadius = getStyle("border-radius");
+
+    int surfaceWidth = surface->getWidth();
+    int surfaceHeight = surface->getHeight();
+
+    if (borderRadius > 0 && ((int)surfaceWidth < borderRadius * 2 || (int)surfaceHeight < borderRadius * 2))
+    {
+        borderRadius = 0;
+    }
+
+    int borderX = marginLeft;
+    int borderY = marginTop;
+    int borderWidth = surfaceWidth - (marginLeft + marginRight);
+    int borderHeight = surfaceHeight - (marginTop + marginBottom);
+
+    if (hasStyle("background-color"))
+    {
+        uint32_t backgroundColour = getStyle("background-color");
+        if (borderRadius > 0)
+        {
+            surface->drawRectFilledRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, backgroundColour);
+        }
+        else
+        {
+            surface->drawRectFilled(borderX, borderY, borderWidth, borderHeight, backgroundColour);
+        }
+    }
+
+    // Top
+    if (borderTopWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-top-color");
+        surface->drawLine(borderX + borderRadius, borderY, borderX + borderWidth - (borderRadius), borderY, 0xff000000 | borderColour);
+    }
+
+    // Right
+    if (borderRightWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-right-color");
+        surface->drawLine(borderX + borderWidth, borderY + borderRadius, borderX + borderWidth, borderY + borderHeight - (borderRadius), 0xff000000 | borderColour);
+    }
+
+    // Bottom
+    if (borderBottomWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-bottom-color");
+        surface->drawLine(borderX + borderRadius, borderY + borderHeight , borderX + borderWidth - (borderRadius),  borderY + borderHeight , 0xff000000 | borderColour);
+log(DEBUG, "drawBorder: Bottom: color=0x%x", borderColour);
+    }
+
+    // Left
+    if (borderLeftWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-left-color");
+        surface->drawLine(borderX, borderY + borderRadius, borderX, borderY + borderHeight - (borderRadius), 0xff000000 | borderColour);
+    }
+
+    if (borderRadius > 0)
+    {
+        if (borderTopWidth > 0 && borderRightWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-top-color");
+            surface->drawCorner(borderX + borderWidth, borderY, TOP_RIGHT, borderRadius, borderColour);
+        }
+        if (borderBottomWidth > 0 && borderRightWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color");
+            surface->drawCorner(borderX + borderWidth, borderY + borderHeight, BOTTOM_RIGHT, borderRadius, borderColour);
+        }
+
+        if (borderBottomWidth > 0 && borderLeftWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color");
+            surface->drawCorner(borderX, borderY + borderHeight, BOTTOM_LEFT, borderRadius, borderColour);
+        }
+
+        if (borderBottomWidth > 0 && borderLeftWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-top-color");
+            surface->drawCorner(borderX, borderY, TOP_LEFT, borderRadius, borderColour);
+        }
+    }
+
+    return true;
 }
 
 bool Widget::hasStyle(string style)
@@ -154,14 +257,6 @@ int64_t Widget::getStyle(string style)
 
 void Widget::setStyle(string style, int64_t value)
 {
-/*
-    auto it = m_styles.find(style);
-    if (it != m_styles.end())
-    {
-        m_styles.erase(it);
-    }
-    m_styles.insert(make_pair(style, value));
-*/
     m_widgetStyleProperties.setProperty(style, value);
     m_styleTimestamp = 0;
 }
@@ -303,6 +398,13 @@ void Widget::clearDirty()
     }
 }
 
+void Widget::setActive()
+{
+    getWindow()->setActiveWidget(this);
+    m_styleTimestamp = 0;
+    setDirty(DIRTY_CONTENT);
+}
+
 bool Widget::isActive()
 {
     FrontierWindow* window = getWindow();
@@ -366,6 +468,7 @@ void Widget::onMouseEnter()
 {
     m_mouseOver = true;
     m_mouseEnterSignal.emit(true);
+    m_styleTimestamp = 0;
     setDirty(DIRTY_CONTENT);
 }
 
@@ -373,6 +476,7 @@ void Widget::onMouseLeave()
 {
     m_mouseOver = false;
     m_mouseEnterSignal.emit(false);
+    m_styleTimestamp = 0;
     setDirty(DIRTY_CONTENT);
 }
 

@@ -48,19 +48,6 @@ enum DirtyFlag
     DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
 };
 
-/*
-enum StyleAttribute
-{
-    STYLE_BORDER,
-    STYLE_MARGIN,
-    STYLE_PADDING,
-    STYLE_BACKGROUND_COLOUR,
-    STYLE_BORDER_COLOUR,
-    STYLE_EXPAND_HORIZONTAL,
-    STYLE_EXPAND_VERTICAL,
-};
-*/
-
 class Widget : public FrontierObject, public Geek::Logger
 {
  protected:
@@ -93,6 +80,7 @@ class Widget : public FrontierObject, public Geek::Logger
     std::map<std::string, int64_t> m_cachedStyleProperties;
 
     bool m_mouseOver;
+    bool m_selected;
 
     sigc::signal<void, bool> m_mouseEnterSignal;
     sigc::signal<void> m_activeSignal;
@@ -108,7 +96,7 @@ class Widget : public FrontierObject, public Geek::Logger
     void callInit();
 
     Size getBorderSize();
-    bool drawBorder();
+    bool drawBorder(Geek::Gfx::Surface* surface);
 
  protected:
     virtual void init();
@@ -154,13 +142,6 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual int getWidth() const { return m_setSize.width; }
     virtual int getHeight() const { return m_setSize.height; }
 
-/*
-    virtual void setMargin(int margin) { m_margin = margin; }
-    virtual int getMargin() const { return m_margin; }
-    virtual void setPadding(int padding) { m_padding = padding; }
-    virtual int getPadding() const { return m_padding; }
-*/
-
     void setParent(Widget* w);
     Widget* getParent() const { return m_parent; }
     Widget* findParent(const std::type_info& type);
@@ -178,8 +159,12 @@ class Widget : public FrontierObject, public Geek::Logger
     bool isDirty(DirtyFlag flag) const { return !!(m_dirty & flag); }
     void clearDirty();
 
+    void setActive();
     bool isActive();
     virtual void activateNext(Widget* activeChild = NULL);
+
+    bool isMouseOver() { return m_mouseOver; }
+    bool isSelected() { return m_selected; }
 
     void setContextMenu(Menu* menu) { m_contextMenu = menu; }
     Menu* getContextMenu() const { return m_contextMenu; }

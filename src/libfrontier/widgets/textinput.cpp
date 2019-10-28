@@ -474,7 +474,7 @@ void TextInput::activateNext(Widget* activeChild)
 {
     if (activeChild == NULL)
     {
-        getWindow()->setActiveWidget(this);
+        setActive();
     }
 }
 
