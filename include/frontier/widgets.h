@@ -45,7 +45,8 @@ enum TextAlign
 enum DirtyFlag
 {
     DIRTY_SIZE = 0x1,   // The size of the widget or its children have changed
-    DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
+    DIRTY_CONTENT = 0x2, // Just the contents of the widget needs redrawing
+    DIRTY_STYLE = 0x4 // States on which style rules may apply have changed
 };
 
 class Widget : public FrontierObject, public Geek::Logger

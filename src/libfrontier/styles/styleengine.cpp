@@ -52,7 +52,8 @@ void StyleEngine::addRule(StyleRule* rule)
 
 map<string, int64_t> StyleEngine::getProperties(Widget* widget)
 {
-    map<string, int64_t> results;
+
+#if 0
     wstring classes = L"";
     bool comma = false;
     for (wstring clazz : widget->getWidgetClasses())
@@ -66,7 +67,9 @@ map<string, int64_t> StyleEngine::getProperties(Widget* widget)
         classes += clazz;
 
     }
+
     log(DEBUG, "getProperties: Widget: type=%ls, classes=%ls, id=%ls", widget->getWidgetName().c_str(), classes.c_str(), widget->getWidgetId().c_str());
+#endif
 
 map<StyleRule*, int> matchedRules;
     for (StyleRule* rule : m_styleRules)
@@ -108,6 +111,13 @@ map<StyleRule*, int> matchedRules;
                     continue;
                 }
             }
+            else if (rule->getState() == "selected")
+            {
+                if (!widget->isSelected())
+                {
+                    continue;
+                }
+            }
             else
             {
                 continue;
@@ -143,11 +153,14 @@ map<StyleRule*, int> matchedRules;
 
     matchedRules.insert(make_pair(widget->getWidgetStyle(), 10000));
 
+    map<string, int64_t> results;
     for (auto matchedRule : matchedRules)
     {
         StyleRule* rule = matchedRule.first;
+#ifdef DEBUG_STYLE_PROPERTIES
         int specificity = matchedRule.second;
         log(DEBUG, "getProperties: %d: %ls", specificity, rule->getKey().c_str());
+#endif
 
         for (auto prop : rule->getProperties())
         {
@@ -161,10 +174,12 @@ map<StyleRule*, int> matchedRules;
 
     }
 
+#ifdef DEBUG_STYLE_PROPERTIES
     for (auto prop : results)
     {
         log(DEBUG, "getProperties: %s -> %lld (0x%llx)", prop.first.c_str(), prop.second, prop.second);
     }
+#endif
 
     return results;
 }

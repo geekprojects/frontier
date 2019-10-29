@@ -78,9 +78,10 @@ Widget* Button::handleEvent(Event* event)
             log(DEBUG, "handleEvent: Message! text=%ls", m_text.c_str());
             if (m_selected != mouseButtonEvent->direction)
             {
-                setDirty(DIRTY_CONTENT);
+                setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 
                 m_selected = mouseButtonEvent->direction;
+
                 if (!m_selected)
                 {
                     m_clickSignal.emit(this);
@@ -102,7 +103,7 @@ Widget* Button::handleEvent(Event* event)
             {
                 if (m_selected != keyEvent->direction)
                 {
-                    setDirty(DIRTY_CONTENT);
+                    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 
                     m_selected = keyEvent->direction;
                     if (!m_selected)

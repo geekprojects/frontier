@@ -172,6 +172,7 @@ void FrontierWindow::setActiveWidget(Widget* widget)
 
     if (m_activeWidget != NULL)
     {
+        m_activeWidget->setDirty();
         m_activeWidget->signalInactive().emit();
         m_activeWidget->decRefCount();
     }
@@ -403,7 +404,6 @@ void FrontierWindow::update(bool force)
     }
 
     m_root->clearDirty();
-
 }
 
 void FrontierWindow::requestUpdate()

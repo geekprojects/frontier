@@ -258,13 +258,13 @@ int64_t Widget::getStyle(string style)
 void Widget::setStyle(string style, int64_t value)
 {
     m_widgetStyleProperties.setProperty(style, value);
-    m_styleTimestamp = 0;
+    setDirty(DIRTY_STYLE);
 }
 
 map<string, int64_t>& Widget::getStyleProperties()
 {
     uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
-    if (styleTS != m_styleTimestamp)
+    if ((m_dirty & DIRTY_STYLE) || styleTS != m_styleTimestamp)
     {
         m_styleTimestamp = styleTS;
         m_cachedStyleProperties = m_app->getStyleEngine()->getProperties(this);
@@ -281,7 +281,7 @@ bool Widget::hasWidgetClass(std::wstring className)
 void Widget::setWidgetClass(std::wstring className)
 {
     m_widgetClasses.insert(className);
-    m_styleTimestamp = 0;
+    setDirty(DIRTY_STYLE);
 }
 
 void Widget::clearWidgetClass(std::wstring className)
@@ -290,7 +290,7 @@ void Widget::clearWidgetClass(std::wstring className)
     if (it != m_widgetClasses.end())
     {
         m_widgetClasses.erase(it);
-        m_styleTimestamp = 0;
+        setDirty(DIRTY_STYLE);
     }
 }
 
@@ -357,12 +357,7 @@ bool Widget::intersects(int x, int y) const
 
 void Widget::setDirty()
 {
-    callInit();
-    m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
-    if (m_parent != NULL)
-    {
-        m_parent->setDirty();
-    }
+    setDirty(DIRTY_SIZE | DIRTY_CONTENT | DIRTY_STYLE, false);
 }
 
 void Widget::setDirty(int dirty, bool children)
@@ -401,8 +396,7 @@ void Widget::clearDirty()
 void Widget::setActive()
 {
     getWindow()->setActiveWidget(this);
-    m_styleTimestamp = 0;
-    setDirty(DIRTY_CONTENT);
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 bool Widget::isActive()
@@ -468,16 +462,14 @@ void Widget::onMouseEnter()
 {
     m_mouseOver = true;
     m_mouseEnterSignal.emit(true);
-    m_styleTimestamp = 0;
-    setDirty(DIRTY_CONTENT);
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 void Widget::onMouseLeave()
 {
     m_mouseOver = false;
     m_mouseEnterSignal.emit(false);
-    m_styleTimestamp = 0;
-    setDirty(DIRTY_CONTENT);
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 void Widget::dump(int level)
