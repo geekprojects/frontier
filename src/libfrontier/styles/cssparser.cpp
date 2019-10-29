@@ -218,7 +218,9 @@ int64_t RuleSetListener::getTermValue(css3Parser::TermContext* term0)
             hex = expandedHex.c_str();
         }
 
-        return strtol(hex.c_str(), NULL, 16);
+        uint64_t rgb = strtol(hex.c_str(), NULL, 16);
+        rgb |= 0xff000000; // Set alpha
+        return rgb;
     }
     if (term->String() != NULL)
     {
@@ -254,13 +256,14 @@ int64_t RuleSetListener::getTermValue(css3Parser::TermContext* term0)
 
         if (!strcmp("rgb(", functionName))
         {
-            int64_t rgb = 0;
+            uint64_t rgb = 0;
             unsigned int i;
             for (i = 0; i < 3 && i < funcValues.size(); i++)
             {
                 rgb <<= 8;
                 rgb |= funcValues.at(i);
             }
+            rgb |= 0xff000000; // Set alpha
             printf("RuleSetListener::getTermValue:   -> function: RGB: 0x%llx\n", rgb);
             return rgb;
         }
