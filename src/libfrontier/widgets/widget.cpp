@@ -130,14 +130,19 @@ Size Widget::getBorderSize()
     int marginBottom = getStyle("margin-bottom");
     int marginLeft = getStyle("margin-left");
 
+    int paddingTop = getStyle("padding-top");
+    int paddingRight = getStyle("padding-right");
+    int paddingBottom = getStyle("padding-bottom");
+    int paddingLeft = getStyle("padding-left");
+
     int borderTopWidth = getStyle("border-top-width");
     int borderRightWidth = getStyle("border-right-width");
     int borderBottomWidth = getStyle("border-bottom-width");
     int borderLeftWidth = getStyle("border-left-width");
 
     return Size(
-        marginLeft + marginRight + borderLeftWidth + borderRightWidth,
-        marginTop + marginBottom + borderTopWidth + borderBottomWidth);
+        marginLeft + marginRight + borderLeftWidth + borderRightWidth + paddingLeft + paddingRight,
+        marginTop + marginBottom + borderTopWidth + borderBottomWidth + paddingTop + paddingBottom);
 }
 
 bool Widget::drawBorder(Surface* surface)
