@@ -51,7 +51,8 @@ void Grid::clearChildren()
 
 void Grid::put(int x, int y, Widget* widget)
 {
-    put(x, y, widget, m_app->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND));
+    uint32_t colour = getStyle("background-color");
+    put(x, y, widget, colour);
 }
 
 void Grid::put(int x, int y, Widget* widget, uint32_t background)
@@ -188,18 +189,16 @@ void Grid::calculateSize()
         m_maxSize.height += m_rowMinSizes[row];
     }
 
-int paddingTop = getStyle("padding-top");
-int paddingLeft = getStyle("padding-left");
-    m_minSize.width += paddingLeft * (gridSize.width - 1);
-    m_minSize.height += paddingTop * (gridSize.height - 1);
-    m_maxSize.width += paddingLeft * (gridSize.width - 1);
-    m_maxSize.height += paddingTop * (gridSize.height - 1);
+    BoxModel boxModel = getBoxModel();
+    m_minSize.width += boxModel.paddingLeft * (gridSize.width - 1);
+    m_minSize.height += boxModel.paddingTop * (gridSize.height - 1);
+    m_maxSize.width += boxModel.paddingLeft * (gridSize.width - 1);
+    m_maxSize.height += boxModel.paddingTop * (gridSize.height - 1);
 
-    Size borderSize = getBorderSize();
-    m_minSize.width += borderSize.width;
-    m_minSize.height += borderSize.height;
-    m_maxSize.width += borderSize.width;
-    m_maxSize.height += borderSize.height;
+    m_minSize.width += boxModel.getWidth();
+    m_minSize.height += boxModel.getHeight();
+    m_maxSize.width += boxModel.getWidth();
+    m_maxSize.height += boxModel.getHeight();
 }
 
 void Grid::layout()
@@ -214,18 +213,13 @@ void Grid::layout()
     int width = m_setSize.width;
     int height = m_setSize.height;
 
-    int marginTop = getStyle("margin-top");
-    int marginRight = getStyle("margin-right");
-    int marginBottom = getStyle("margin-bottom");
-    int marginLeft = getStyle("margin-left");
-    int paddingTop = getStyle("padding-top");
-    int paddingLeft = getStyle("padding-left");
+    BoxModel boxModel = getBoxModel();
 
-    width -= marginLeft + marginRight;
-    height -= marginTop + marginBottom;
+    width -= boxModel.getWidth();
+    height -= boxModel.getHeight();
 
-    width -= paddingLeft * (gridSize.width - 1);
-    height -= paddingTop * (gridSize.height - 1);
+    width -= boxModel.paddingLeft * (gridSize.width - 1);
+    height -= boxModel.paddingTop * (gridSize.height - 1);
 
     int widthq = width / gridSize.width;
     int heightq = height / gridSize.height;
@@ -318,10 +312,10 @@ void Grid::layout()
 #endif
     }
 
-    int y = marginTop;
+    int y = boxModel.marginTop;
     for (row = 0; row < gridSize.height; row++)
     {
-        int x = marginLeft;
+        int x = boxModel.marginLeft;
         for (col = 0; col < gridSize.width; col++)
         {
             GridItem* item = getGridItem(col, row);
@@ -337,15 +331,15 @@ void Grid::layout()
             log(DEBUG, "layout: Set Item: %d, %d, size=%d,%d (%p)", col, row, colSizes[col], rowSizes[row], item);
 #endif
 
-            x += colSizes[col] + paddingLeft;
+            x += colSizes[col] + boxModel.paddingLeft;
         }
-        y += rowSizes[row] + paddingTop;
+        y += rowSizes[row] + boxModel.paddingTop;
     }
 }
 
 bool Grid::draw(Geek::Gfx::Surface* surface)
 {
-    surface->clear(m_app->getTheme()->getColour(COLOUR_WINDOW_BACKGROUND));
+    drawBorder(surface);
     for (GridItem* item : m_grid)
     {
         Widget* child = item->widget;

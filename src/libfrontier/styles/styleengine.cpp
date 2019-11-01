@@ -11,6 +11,8 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek;
 
+#undef DEBUG_STYLE_PROPERTIES
+
 #define STRINGIFY(x) XSTRINGIFY(x)
 #define XSTRINGIFY(x) #x
 
@@ -71,7 +73,7 @@ map<string, int64_t> StyleEngine::getProperties(Widget* widget)
     log(DEBUG, "getProperties: Widget: type=%ls, classes=%ls, id=%ls", widget->getWidgetName().c_str(), classes.c_str(), widget->getWidgetId().c_str());
 #endif
 
-map<StyleRule*, int> matchedRules;
+    map<StyleRule*, int> matchedRules;
     for (StyleRule* rule : m_styleRules)
     {
 
@@ -97,14 +99,7 @@ map<StyleRule*, int> matchedRules;
         if (rule->getState().length() > 0)
         {
             matchState = true;
-            if (rule->getState() == "hover")
-            {
-                if (!widget->isMouseOver())
-                {
-                    continue;
-                }
-            }
-            else if (rule->getState() == "active")
+            if (rule->getState() == "active")
             {
                 if (!widget->isActive())
                 {
@@ -114,6 +109,13 @@ map<StyleRule*, int> matchedRules;
             else if (rule->getState() == "selected")
             {
                 if (!widget->isSelected())
+                {
+                    continue;
+                }
+            }
+            else if (rule->getState() == "hover")
+            {
+                if (!widget->isMouseOver())
                 {
                     continue;
                 }
@@ -153,8 +155,16 @@ map<StyleRule*, int> matchedRules;
 
     matchedRules.insert(make_pair(widget->getWidgetStyle(), 10000));
 
+    typedef std::function<bool(std::pair<StyleRule*, int>, std::pair<StyleRule*, int>)> Comparator;
+    Comparator compFunctor = [](std::pair<StyleRule*, int> elem1 ,std::pair<StyleRule*, int> elem2)
+    {
+        return elem1.second < elem2.second;
+    };
+
+    std::set<std::pair<StyleRule*, int>, Comparator> orderedRules(matchedRules.begin(), matchedRules.end(), compFunctor);
+
     map<string, int64_t> results;
-    for (auto matchedRule : matchedRules)
+    for (auto matchedRule : orderedRules)
     {
         StyleRule* rule = matchedRule.first;
 #ifdef DEBUG_STYLE_PROPERTIES

@@ -43,8 +43,10 @@ Button::~Button()
 
 void Button::calculateSize()
 {
-    m_minSize.width = m_app->getTheme()->getTextWidth(m_text) + (5 * 2);
-    m_minSize.height = m_app->getTheme()->getTextHeight() + (5 * 2);
+    FontHandle* font = getTextFont();
+
+    m_minSize.width = font->getPixelWidth(m_text);
+    m_minSize.height = font->getPixelHeight();
 
     Size borderSize = getBorderSize();
     m_minSize.width += borderSize.width;
@@ -56,14 +58,15 @@ void Button::calculateSize()
 
 bool Button::draw(Surface* surface)
 {
-    int w = m_app->getTheme()->getTextWidth(m_text);
-    int x = (m_setSize.width / 2) - (w / 2);
+    FontHandle* font = getTextFont();
 
-    int y = (m_setSize.height / 2) - (m_app->getTheme()->getTextHeight() / 2);
+    int w = font->getPixelWidth(m_text);
+    int x = (m_setSize.width / 2) - (w / 2);
+    int y = (m_setSize.height / 2) - (font->getPixelHeight() / 2);
 
     drawBorder(surface);
 
-    m_app->getTheme()->drawText(surface, x, y, m_text);
+    drawText(surface, x, y, m_text, font);
 
     return true;
 }

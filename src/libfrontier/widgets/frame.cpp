@@ -138,13 +138,7 @@ void Frame::calculateSize()
     m_minSize.set(0, 0);
     m_maxSize.set(0, 0);
 
-    Size borderSize = getBorderSize();
-
-int paddingTop = getStyle("padding-top");
-//int paddingRight = getStyle("padding-right");
-//int paddingBottom = getStyle("padding-bottom");
-int paddingLeft = getStyle("padding-left");
-
+    BoxModel boxModel = getBoxModel();
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
@@ -165,11 +159,11 @@ int paddingLeft = getStyle("padding-left");
 
             if (m_minSize.width > 0)
             {
-                m_minSize.width += paddingLeft;
+                m_minSize.width += boxModel.paddingLeft;
             }
             if (m_maxSize.width > 0)
             {
-                m_maxSize.width += paddingLeft;
+                m_maxSize.width += boxModel.paddingLeft;
             }
             m_minSize.width += childMin.width;
             m_maxSize.width += childMax.width;
@@ -181,11 +175,11 @@ int paddingLeft = getStyle("padding-left");
 
             if (m_minSize.height > 0)
             {
-                m_minSize.height += paddingTop;
+                m_minSize.height += boxModel.paddingTop;
             }
             if (m_maxSize.height > 0)
             {
-                m_maxSize.height += paddingTop;
+                m_maxSize.height += boxModel.paddingTop;
             }
             m_minSize.height += childMin.height;
             m_maxSize.height += childMax.height;
@@ -207,10 +201,10 @@ int paddingLeft = getStyle("padding-left");
     }
 */
 
-    m_minSize.width += borderSize.width;
-    m_minSize.height += borderSize.height;
-    m_maxSize.width += borderSize.width;
-    m_maxSize.height += borderSize.height;
+    m_minSize.width += boxModel.getWidth();
+    m_minSize.height += boxModel.getHeight();
+    m_maxSize.width += boxModel.getWidth();
+    m_maxSize.height += boxModel.getHeight();
 
     if (getStyle("expand-horizontal") == 1)
     {
@@ -240,29 +234,25 @@ void Frame::layout()
     int major;
     int minor;
 
-Size borderSize = getBorderSize();
-int paddingTop = getStyle("padding-top");
-//int paddingRight = getStyle("padding-right");
-//int paddingBottom = getStyle("padding-bottom");
-//int paddingLeft = getStyle("padding-left");
+    BoxModel boxModel = getBoxModel();
 
     if (m_horizontal)
     {
         major = m_setSize.width;
         minor = m_setSize.height;
 
-    major -= borderSize.width;
-    minor -= borderSize.height;
+        major -= boxModel.getWidth();
+        minor -= boxModel.getHeight();
     }
     else
     {
         major = m_setSize.height;
         minor = m_setSize.width;
-    major -= borderSize.height;
-    minor -= borderSize.width;
+        major -= boxModel.getHeight();
+        minor -= boxModel.getWidth();
     }
 
-    major -= (m_children.size() - 1) * paddingTop;
+    major -= (m_children.size() - 1) * boxModel.paddingTop;
 
 #if 0
     log(DEBUG, "layout: major=%d, minor=%d", major, minor);
@@ -300,21 +290,20 @@ int paddingTop = getStyle("padding-top");
     int majorPos = 0;
     int minorPos = 0;
 
-if (m_horizontal)
-{
-majorPos = getStyle("margin-left");
-minorPos = getStyle("margin-top");
-}
-else
-{
-majorPos = getStyle("margin-top");
-minorPos = getStyle("margin-left");
-}
+    if (m_horizontal)
+    {
+        majorPos = boxModel.marginLeft;
+        minorPos = boxModel.marginTop;
+    }
+    else
+    {
+        majorPos = boxModel.marginTop;
+        minorPos = boxModel.marginLeft;
+    }
 
     for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
     {
         Widget* child = *it;
-
 
         Size childMinSize = child->getMinSize();
         Size childMaxSize = child->getMaxSize();
@@ -379,7 +368,7 @@ minorPos = getStyle("margin-left");
         }
         child->setSize(size);
 
-        majorPos += childMajor + paddingTop;
+        majorPos += childMajor + boxModel.paddingTop;
 
         child->layout();
     }

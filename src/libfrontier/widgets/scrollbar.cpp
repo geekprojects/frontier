@@ -27,8 +27,6 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-#define SCROLLBAR_BORDER 1
-
 ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui, L"ScrollBar")
 {
     m_pos = 0;
@@ -51,26 +49,19 @@ ScrollBar::~ScrollBar()
 
 void ScrollBar::calculateSize()
 {
-    m_minSize.set(10, 20);
-    m_maxSize.set(10, WIDGET_SIZE_UNLIMITED);
+    Size borderSize = getBorderSize();
+    int scrollbarWidth = getStyle("scrollbar-width");
+    m_minSize = borderSize;
+    m_minSize.width += scrollbarWidth;
+    m_minSize.height += scrollbarWidth;
+
+    m_maxSize.set(m_minSize.width, WIDGET_SIZE_UNLIMITED);
 }
 
 bool ScrollBar::draw(Surface* surface)
 {
-    int drawWidth = m_setSize.width - (SCROLLBAR_BORDER * 2);
-
-#if 0
-    int drawHeight = m_setSize.height - (SCROLLBAR_BORDER * 2);
-    log(DEBUG, "draw: drawWidth=%d, drawHeight=%d", drawWidth, drawHeight);
-#endif
-
-    //surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xffffff);
-    m_app->getTheme()->drawBorder(
-        surface,
-        BORDER_SCROLLBAR,
-        STATE_NONE,
-        0, 0,
-        m_setSize.width, m_setSize.height);
+    BoxModel boxModel = getBoxModel();
+    drawBorder(surface);
 
     int pos = getControlPos();
 #if 0
@@ -82,12 +73,12 @@ bool ScrollBar::draw(Surface* surface)
     log(DEBUG, "draw: sizePix=%d", sizePix);
 #endif
 
-    m_app->getTheme()->drawBorder(
-        surface,
-        BORDER_SCROLLBAR_CONTROL,
-        STATE_NONE,
-        SCROLLBAR_BORDER, pos + SCROLLBAR_BORDER,
-        drawWidth, sizePix);
+    int drawWidth = getStyle("scrollbar-width");
+    int x = (m_setSize.width / 2) - (drawWidth / 2);
+    int y = boxModel.paddingTop + boxModel.marginTop;
+
+    uint32_t controlColor = getStyle("scrollbar-color");
+    surface->drawRectFilled(x, y + pos, drawWidth, sizePix, controlColor);
 
     return true;
 }
@@ -105,8 +96,10 @@ Widget* ScrollBar::handleEvent(Event* event)
             int pos = getControlPos();
             int sizePix = getControlSize();
 
+            BoxModel boxModel = getBoxModel();
+
             int y = mouseButtonEvent->y - thisPos.y;
-            y -= SCROLLBAR_BORDER;
+            y -= (boxModel.getTop());
 
             if (mouseButtonEvent->direction)
             {
@@ -144,9 +137,11 @@ Widget* ScrollBar::handleEvent(Event* event)
 
                 int oldPos = m_pos;
 
-                int yMax = (m_setSize.height - (SCROLLBAR_BORDER * 2)) - getControlSize();
+                BoxModel boxModel = getBoxModel();
 
-                float r = (float)(y - SCROLLBAR_BORDER) / (float)(yMax);
+                int yMax = (m_setSize.height - (boxModel.getHeight())) - getControlSize();
+
+                float r = (float)(y - (boxModel.getTop())) / (float)(yMax);
                 m_pos = (int)((float)range * r) + m_min;
 
                 if (m_pos < m_min)
@@ -225,7 +220,8 @@ int ScrollBar::getControlPos()
         return 0;
     }
 
-    int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - (SCROLLBAR_BORDER * 2)));
+    BoxModel boxModel = getBoxModel();
+    int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - boxModel.getHeight()));
     return pos;
 }
 
@@ -236,8 +232,10 @@ int ScrollBar::getControlSize()
         return 0;
     }
 
+    BoxModel boxModel = getBoxModel();
+
     //int range = m_max - (m_min + m_size);
-    int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - (SCROLLBAR_BORDER * 2)));
+    int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - boxModel.getHeight()));
     return sizePix;
 }
 

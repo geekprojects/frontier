@@ -24,6 +24,7 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 using namespace Geek::Gfx;
 
 Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
@@ -69,7 +70,8 @@ void Label::setAlign(TextAlign align)
 
 void Label::calculateSize()
 {
-    m_lineHeight = m_app->getTheme()->getTextHeight();
+    FontHandle* font = getTextFont();
+    m_lineHeight = font->getPixelHeight();
 
     m_minSize.set(0, 0);
 
@@ -89,7 +91,7 @@ void Label::calculateSize()
                 lines++;
             }
 
-            int w = m_app->getTheme()->getTextWidth(line);
+            int w = font->width(line);
             if (w > m_minSize.width)
             {
                 m_minSize.width = w;
@@ -123,29 +125,16 @@ void Label::calculateSize()
     {
         m_maxSize.height = m_minSize.height;
     }
-
 }
 
 bool Label::draw(Surface* surface)
 {
     drawBorder(surface);
 
-    int y = getStyle("margin-top");
+    BoxModel boxModel = getBoxModel();
+    int y = boxModel.marginTop;
 
-
-/*
-    if (hasStyle("border-left") && getStyle(STYLE_BORDER))
-    {
-        if (!isActive())
-        {
-            surface->drawRect(0, 0, getWidth(), getHeight(), 0xff4b4b4b);
-        }
-        else
-        {
-            surface->drawRect(0, 0, getWidth(), getHeight(), 0xff4a7987);
-        }
-    }
-*/
+    FontHandle* font = getTextFont();
 
     int lines = 1;
     unsigned int pos = 0;
@@ -168,27 +157,28 @@ bool Label::draw(Surface* surface)
             {
                 line += m_text[pos];
             }
-            int w = m_app->getTheme()->getTextWidth(line);
+            int w = font->width(line);
             int x = 0;
 
             switch (m_align)
             {
                 case ALIGN_LEFT:
-                    x = getStyle("margin-left");
+                    x = boxModel.marginLeft;
                     break;
                 case ALIGN_CENTER:
                     x = (m_setSize.width / 2) - (w / 2);
                     break;
                 case ALIGN_RIGHT:
-                    x = (m_setSize.width - getStyle("margin-right")) - w;
+                    x = (m_setSize.width - boxModel.marginRight) - w;
                     break;
             }
 
-            m_app->getTheme()->drawText(
+            drawText(
                 surface,
                 x,
                 y,
-                line.c_str());
+                line.c_str(),
+                font);
  
             y += m_lineHeight;
             line = L"";
@@ -199,6 +189,6 @@ bool Label::draw(Surface* surface)
         }
     }
 
-   return true;
+    return true;
 }
 

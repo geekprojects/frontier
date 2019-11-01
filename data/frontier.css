@@ -1,9 +1,16 @@
 
 Widget {
     background-color: #3c3f41;
-    padding: 5px;
+    padding: 0px;
     margin: 5px;
     border: 0px none #000;
+    font-family: Lato;
+    font-size: 12px;
+    text-color: #fff;
+}
+
+Widget.MacOS {
+    font-family: "System Font";
 }
 
 Frame {
@@ -29,28 +36,45 @@ Button {
     border-left: 1px solid #4b4b4b;
     border-right: 1px solid #0F0F0F;
     border-bottom: 1px solid #0F0F0F;
+    padding: 2px;
 }
 
 Button.highlight {
     background-color: #fff;
 }
 
-Button:active {
-    background-color: #4a7987;
+Button:selected, IconButton:active {
+    /*background-color: #4a7987;*/
+
+    border-top: 1px solid #0F0F0F;
+    border-left: 1px solid #0F0F0F;
+    border-right: 1px solid #4b4b4b;
+    border-bottom: 1px solid #4b4b4b;
 }
 
 Button:hover {
-    background-color: #0f0;
-}
-
-Label:hover {
     background-color: #00f;
 }
 
-Button:selected {
-    background-color: #f00;
-    border-right: 1px solid #f00;
-    border-bottom: 1px solid #f00;
-    border-top: 1px solid #00f;
-    border-left: 1px solid #00f;
+Button:active, IconButton:active {
+    background-color: #4a7987;
 }
+
+TextInput {
+    background-color: #45494a;
+    border: 1px solid #646464;
+    padding: 2px;
+    /*font-family: Hack;*/
+}
+
+TextInput:active {
+    border-color: #ff0;
+}
+
+ScrollBar {
+    background-color: #000;
+    scrollbar-width: 8px;
+    scrollbar-color: #818181;
+    padding: 2px;
+}
+

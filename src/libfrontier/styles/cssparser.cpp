@@ -73,7 +73,9 @@ class RuleSetListener : public css3BaseListener
     }
 
     virtual void enterKnownRuleset(css3Parser::KnownRulesetContext * ctx) override;
-    int64_t getTermValue(css3Parser::TermContext* term0);
+    int64_t getTermValue(std::string property, css3Parser::TermContext* term0);
+
+    int64_t getFontFamilyValue(std::string fontFamily);
 };
 
 void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
@@ -81,16 +83,16 @@ void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
     printf("RuleSetListener::enterKnownRuleset: Ruleset\n");
 
     css3Parser::SelectorGroupContext* selectorGroup = ctx->selectorGroup();
-if (selectorGroup == NULL)
-{
-return;
-}
+    if (selectorGroup == NULL)
+    {
+        return;
+    }
 
     css3Parser::DeclarationListContext* declList = ctx->declarationList();
-if (declList == NULL)
-{
-return;
-}
+    if (declList == NULL)
+    {
+        return;
+    }
 
     vector<StyleRule*> rules;
 
@@ -121,9 +123,9 @@ return;
 
             for (css3Parser::ClassNameContext* className : sss->className())
             {
-string classStr = identString(className->ident());
+                string classStr = identString(className->ident());
                 printf("RuleSetListener::enterKnownRuleset:     -> className=%s\n", classStr.c_str());
-rule->setClassName(Utils::string2wstring(classStr.c_str()));
+                rule->setClassName(Utils::string2wstring(classStr.c_str()));
             }
 
             for (css3Parser::PseudoContext* pseudo : sss->pseudo())
@@ -161,7 +163,7 @@ rule->setClassName(Utils::string2wstring(classStr.c_str()));
         vector<int64_t> values;
         for (css3Parser::TermContext* term0 : decl->expr()->term())
         {
-            int64_t value = getTermValue(term0);
+            int64_t value = getTermValue(property, term0);
             printf("RuleSetListener::enterKnownRuleset:     -> Term: value=%llx\n", value);
             values.push_back(value);
         }
@@ -179,7 +181,7 @@ rule->setClassName(Utils::string2wstring(classStr.c_str()));
 }
 
 
-int64_t RuleSetListener::getTermValue(css3Parser::TermContext* term0)
+int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* term0)
 {
     if (typeid(*term0).hash_code() != typeid(css3Parser::KnownTermContext).hash_code())
     {
@@ -224,13 +226,23 @@ int64_t RuleSetListener::getTermValue(css3Parser::TermContext* term0)
     }
     if (term->String() != NULL)
     {
-        printf("RuleSetListener::getTermValue:   -> Term: String=%s\n", term->String()->getText().c_str());
+        string str = term->String()->getText();
+        printf("RuleSetListener::getTermValue:   -> Term: String=%s\n", str.c_str());
+        if (property == "font-family")
+        {
+            return getFontFamilyValue(str);
+        }
         return 0;
     }
     if (term->ident() != NULL)
     {
         string identStr = identString(term->ident());
         printf("RuleSetListener::getTermValue:   -> Term: ident=%s\n", identStr.c_str());
+
+        if (property == "font-family")
+        {
+            return getFontFamilyValue(identStr);
+        }
 
         for (auto val : g_identValues)
         {
@@ -249,7 +261,7 @@ int64_t RuleSetListener::getTermValue(css3Parser::TermContext* term0)
         vector<uint32_t> funcValues;
         for (css3Parser::TermContext* funcTerm0 : term->function()->expr()->term())
         {
-            int64_t funcValue = getTermValue(funcTerm0);
+            int64_t funcValue = getTermValue(property, funcTerm0);
             printf("RuleSetListener::getTermValue:   -> function: funcValue=%lld\n", funcValue);
             funcValues.push_back(funcValue);
         }
@@ -275,6 +287,27 @@ int64_t RuleSetListener::getTermValue(css3Parser::TermContext* term0)
     }
 
     return 0;
+}
+
+int64_t RuleSetListener::getFontFamilyValue(std::string fontFamily)
+{
+    if (fontFamily.at(0) == '"')
+    {
+        fontFamily = fontFamily.substr(1);
+        int len = fontFamily.length();
+        if (len <= 0)
+        {
+            return 0;
+        }
+
+        if (fontFamily.at(len - 1) == '"')
+        {
+            fontFamily = fontFamily.substr(0, len - 1);
+        }
+    }
+
+    printf("RuleSetListener::getFontFamilyValue: fontFamily=%s\n", fontFamily.c_str());
+    return (int64_t)strdup(fontFamily.c_str());
 }
 
 ShortcutProperty* findShortcutProperty(string property)
@@ -360,7 +393,8 @@ void StyleRule::applyProperty(string property, vector<int64_t> values)
             {
                 break;
             }
-//printf("applyMultiProperty: Copying value %d to: %s\n", idx, childProperty);
+
+            //printf("applyMultiProperty: Copying value %d to: %s\n", idx, childProperty);
             if (idx >= values.size())
             {
                 //printf("applyMultiProperty:  NOT ENOUGH VALUES!\n");

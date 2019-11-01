@@ -310,6 +310,15 @@ void Tabs::layout()
     }
 }
 
+void Tabs::clearDirty()
+{
+    m_dirty = 0;
+    for (Tab* tab : m_tabs)
+    {
+        tab->clearDirty();
+    }
+}
+
 bool Tabs::draw(Surface* surface)
 {
     Rect tabsRect = getTabsRect();

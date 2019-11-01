@@ -73,44 +73,7 @@ bool IconButton::draw(Surface* surface)
     int y = (m_setSize.height / 2) - (iconSize.height / 2);
 
     drawBorder(surface);
-/*
-    int drawState;
-    if (m_state)
-    {
-        drawState = STATE_SELECTED;
-    }
-    else
-    {
-        drawState = STATE_HOVER;
-    }
 
-    bool active = isActive();
-    if (active)
-    {
-        drawState |= STATE_ACTIVE;
-    }
-
-    if (m_state || m_mouseOver)
-    {
-        m_app->getTheme()->drawBorder(
-            surface,
-            BORDER_BUTTON,
-            drawState,
-            0, 0,
-            m_setSize.width, m_setSize.height);
-    }
-    else if (active)
-    {
-        m_app->getTheme()->drawBorder(
-            surface,
-            BORDER_BUTTON,
-            drawState,
-            0, 0,
-            m_setSize.width, m_setSize.height);
-
-    }
-*/
-    //m_app->getTheme()->drawIcon(surface, x, y, m_icon);
     m_icon->draw(surface, x, y);
 
     return true;

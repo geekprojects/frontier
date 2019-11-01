@@ -49,6 +49,32 @@ enum DirtyFlag
     DIRTY_STYLE = 0x4 // States on which style rules may apply have changed
 };
 
+struct BoxModel
+{
+    int marginTop;
+    int marginRight;
+    int marginBottom;
+    int marginLeft;
+
+    int paddingTop;
+    int paddingRight;
+    int paddingBottom;
+    int paddingLeft;
+
+    int borderTopWidth;
+    int borderRightWidth;
+    int borderBottomWidth;
+    int borderLeftWidth;
+
+    int getTop() { return marginTop + paddingTop + borderTopWidth; }
+    int getRight() { return marginRight + paddingRight + borderRightWidth; }
+    int getBottom() { return marginBottom + paddingBottom + borderBottomWidth; }
+    int getLeft() { return marginLeft + paddingLeft + borderLeftWidth; }
+
+    int getWidth() { return getLeft() + getRight(); }
+    int getHeight() { return getTop() + getBottom(); }
+};
+
 class Widget : public FrontierObject, public Geek::Logger
 {
  protected:
@@ -79,6 +105,10 @@ class Widget : public FrontierObject, public Geek::Logger
     uint64_t m_styleTimestamp;
     StyleRule m_widgetStyleProperties;
     std::map<std::string, int64_t> m_cachedStyleProperties;
+    BoxModel m_cachedBoxModel;
+    uint64_t m_cachedBoxModelTimestamp;
+    Geek::FontHandle* m_cachedTextFont;
+    uint64_t m_cachedTextFontTimestamp;
 
     bool m_mouseOver;
     bool m_selected;
@@ -98,6 +128,9 @@ class Widget : public FrontierObject, public Geek::Logger
 
     Size getBorderSize();
     bool drawBorder(Geek::Gfx::Surface* surface);
+
+    Geek::FontHandle* getTextFont();
+    void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring str, Geek::FontHandle* font = NULL);
 
  protected:
     virtual void init();
@@ -129,6 +162,7 @@ class Widget : public FrontierObject, public Geek::Logger
     std::set<std::wstring> getWidgetClasses() { return m_widgetClasses; }
     StyleRule* getWidgetStyle() { return &m_widgetStyleProperties; }
     std::map<std::string, int64_t>& getStyleProperties();
+    BoxModel& getBoxModel();
 
     int getX() const { return m_x; }
     int getY() const { return m_y; }
@@ -158,7 +192,7 @@ class Widget : public FrontierObject, public Geek::Logger
     void setDirty(int flags, bool children = false);
     bool isDirty() const { return !!(m_dirty); }
     bool isDirty(DirtyFlag flag) const { return !!(m_dirty & flag); }
-    void clearDirty();
+    virtual void clearDirty();
 
     void setActive();
     bool isActive();

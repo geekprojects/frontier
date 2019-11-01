@@ -22,6 +22,8 @@ Tab::Tab(Tabs* tabs, wstring title, Icon* icon, Widget* content, bool closeable)
 
     m_content->setParent(m_tabs);
     m_content->incRefCount();
+
+    m_children.push_back(content);
 }
 
 Tab::Tab(FrontierApp* app, wstring title, Icon* icon, Widget* content, bool closeable)
@@ -36,11 +38,12 @@ Tab::Tab(FrontierApp* app, wstring title, Icon* icon, Widget* content, bool clos
     m_mouseDown = false;
 
     m_content->incRefCount();
+
+    m_children.push_back(content);
 }
 
 Tab::~Tab()
 {
-    m_content->decRefCount();
 }
 
 void Tab::calculateSize()

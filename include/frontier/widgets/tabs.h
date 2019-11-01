@@ -98,6 +98,7 @@ class Tabs : public Widget
 
     virtual void calculateSize();
     virtual void layout();
+    virtual void clearDirty();
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 
