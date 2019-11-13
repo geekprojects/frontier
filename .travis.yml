@@ -2,11 +2,16 @@
 
 language: cpp
 dist: xenial
+arch:
+  - amd64
+  - arm64
 
 matrix:
   exclude:
     - os: linux
       compiler: clang
+    - os: osx
+      arch: arm64
 
 addons:
   apt:
@@ -23,6 +28,8 @@ addons:
       - freetype
       - libsigc++@2
       - libtool
+      - antlr@4
+      - antlr4-cpp-runtime
     update: true
 
 before_script:
