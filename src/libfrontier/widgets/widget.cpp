@@ -192,7 +192,6 @@ bool Widget::drawBorder(Surface* surface)
     {
         uint32_t borderColour = getStyle("border-bottom-color");
         surface->drawLine(borderX + borderRadius, borderY + borderHeight , borderX + borderWidth - (borderRadius),  borderY + borderHeight , 0xff000000 | borderColour);
-//log(DEBUG, "drawBorder: Bottom: color=0x%x", borderColour);
     }
 
     // Left
@@ -261,7 +260,9 @@ map<string, int64_t>& Widget::getStyleProperties()
     {
         m_styleTimestamp = styleTS;
         m_cachedStyleProperties = m_app->getStyleEngine()->getProperties(this);
+
     }
+
     return m_cachedStyleProperties;
 }
 
@@ -317,15 +318,27 @@ Geek::FontHandle* Widget::getTextFont()
     uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
     if (m_cachedTextFont == NULL || (m_dirty & DIRTY_STYLE) || styleTS != m_cachedTextFontTimestamp)
     {
+        if (!hasStyle("font-family"))
+        {
+            log(WARN, "getTextFont: No font-family specified");
+            return NULL;
+        }
+
+        const char* fontFamily = (const char*)getStyle("font-family");
+        int fontSize = getStyle("font-size");
         if (m_cachedTextFont != NULL)
         {
+            if (m_cachedTextFont->getFontFace()->getFamily()->getName() == string(fontFamily) &&
+                m_cachedTextFont->getPointSize() == fontSize)
+            {
+                return m_cachedTextFont;
+            }
+
             delete m_cachedTextFont;
         }
 
         FontManager* fm = m_app->getFontManager();
-        const char* fontFamily = (const char*)getStyle("font-family");
-        int fontSize = getStyle("font-size");
-        log(DEBUG, "getTextFont: fontFamily: %s, fontSize: %d", fontFamily, fontSize);
+        log(DEBUG, "getTextFont: Opening fontFamily: %s, fontSize: %d", fontFamily, fontSize);
 
         m_cachedTextFont = fm->openFont(fontFamily, "Regular", fontSize);
         m_cachedTextFontTimestamp = m_app->getStyleEngine()->getTimestamp();
@@ -541,7 +554,5 @@ void Widget::dump(int level)
     {
         (*it)->dump(level + 1);
     }
-
 }
-
 

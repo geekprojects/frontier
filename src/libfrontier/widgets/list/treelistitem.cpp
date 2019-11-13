@@ -51,7 +51,7 @@ TreeListItem::TreeListItem(FrontierWindow* win, Icon* icon, std::wstring text) :
 
 TreeListItem::~TreeListItem()
 {
-    for (ListItem* item : m_items)
+    for (Widget* item : m_children)
     {
         item->decRefCount();
     }
@@ -59,7 +59,7 @@ TreeListItem::~TreeListItem()
 
 void TreeListItem::addItem(ListItem* item)
 {
-    m_items.push_back(item);
+    m_children.push_back(item);
     item->incRefCount();
     item->setParent(this);
     item->setList(m_list);
@@ -79,10 +79,10 @@ void TreeListItem::calculateSize()
     m_minSize.width += TREELISTITEM_INDENT;
     if (m_open)
     {
-        vector<ListItem*>::iterator it;
-        for (it = m_items.begin(); it != m_items.end(); it++)
+        vector<Widget*>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); it++)
         {
-            ListItem* item = *it;
+            Widget* item = *it;
             item->calculateSize();
 
             Size itemMin = item->getMinSize();
@@ -97,10 +97,10 @@ void TreeListItem::layout()
     int y = m_titleHeight;
     if (m_open)
     {
-        vector<ListItem*>::iterator it;
-        for (it = m_items.begin(); it != m_items.end(); it++)
+        vector<Widget*>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); it++)
         {
-            ListItem* item = *it;
+            Widget* item = *it;
             Size itemMin = item->getMinSize();
             Size itemMax = item->getMaxSize();
             Size itemSize = Size(m_setSize.width - (TREELISTITEM_INDENT * 1), itemMin.height);
@@ -124,7 +124,7 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
     SurfaceViewPort viewport(surface, TREELISTITEM_INDENT, 0, m_setSize.width - TREELISTITEM_INDENT, m_titleHeight);
     TextListItem::draw(&viewport);
 
-    if (!m_items.empty())
+    if (!m_children.empty())
     {
         uint32_t icon = FRONTIER_ICON_CARET_RIGHT;
         if (m_open)
@@ -136,10 +136,10 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
 
     if (m_open)
     {
-        vector<ListItem*>::iterator it;
-        for (it = m_items.begin(); it != m_items.end(); it++)
+        vector<Widget*>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); it++)
         {
-            ListItem* item = *it;
+            Widget* item = *it;
 #if 0
             log(DEBUG, "draw: item: %d, %d size=%d,%d", item->getX(), item->getY(), item->getWidth(), item->getHeight());
 #endif
@@ -187,10 +187,10 @@ Widget* TreeListItem::handleEvent(Frontier::Event* event)
             int x = mouseEvent->x;
             int y = mouseEvent->y;
 
-            vector<ListItem*>::iterator it;
-            for (it = m_items.begin(); it != m_items.end(); it++)
+            vector<Widget*>::iterator it;
+            for (it = m_children.begin(); it != m_children.end(); it++)
             {
-                ListItem* child = *it;
+                Widget* child = *it;
                 if (child->intersects(x, y))
                 {
                     return child->handleEvent(event);

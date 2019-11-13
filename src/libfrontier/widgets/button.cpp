@@ -37,6 +37,16 @@ Button::Button(FrontierWindow* window, wstring text) : Widget(window, L"Button")
     m_text = text;
 }
 
+Button::Button(FrontierApp* ui, wstring widgetType, wstring text) : Widget(ui, widgetType)
+{
+    m_text = text;
+}
+
+Button::Button(FrontierWindow* window, wstring widgetType, wstring text) : Widget(window, widgetType)
+{
+    m_text = text;
+}
+
 Button::~Button()
 {
 }

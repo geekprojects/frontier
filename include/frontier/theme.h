@@ -33,51 +33,6 @@ namespace Frontier
 
 class FrontierApp;
 
-enum UIBorderType
-{
-    BORDER_WIDGET,
-    BORDER_BUTTON,
-    BORDER_FRAME,
-    BORDER_WINDOW,
-    BORDER_SCROLLBAR,
-    BORDER_SCROLLBAR_CONTROL,
-    BORDER_LIST_BACKGROUND,
-    BORDER_LIST_ITEM_1,
-    BORDER_LIST_ITEM_2,
-    BORDER_TAB,
-    BORDER_INPUT,
-};
-
-enum UIState
-{
-    STATE_NONE       = 0x00,
-    STATE_SELECTED   = 0x01,
-    STATE_HOVER      = 0x02,
-    STATE_HORIZONTAL = 0x00,
-    STATE_VERTICAL   = 0x10,
-    STATE_ACTIVE     = 0x20,
-};
-
-enum ThemeColour
-{
-    COLOUR_WINDOW_BACKGROUND,
-    COLOUR_WIDGET_BORDER_1,
-    COLOUR_WIDGET_BORDER_2,
-    COLOUR_WIDGET_GRADIENT_1,
-    COLOUR_WIDGET_GRADIENT_2,
-
-    COLOUR_SCROLLBAR_BACKGROUND,
-    COLOUR_SCROLLBAR_CONTROL,
-
-    COLOUR_LIST_ITEM_1,
-    COLOUR_LIST_ITEM_2,
-    COLOUR_LIST_ITEM_SELECTED,
-
-    COLOUR_TAB_SELECTED_BACKGROUND,
-
-    COLOUR_INPUT_BACKGROUND
-};
-
 class UITheme : public Geek::Logger
 {
  protected:
@@ -89,29 +44,11 @@ class UITheme : public Geek::Logger
 
     std::map<uint32_t, Icon*> m_iconCache;
 
-    int m_margin;
-    int m_padding;
-
  public:
     UITheme(FrontierApp* video);
     virtual ~UITheme();
 
     virtual bool init();
-
-    virtual uint32_t getColour(ThemeColour colour);
-    virtual int getMargin() const { return m_margin; }
-    virtual int getPadding() const { return m_padding; }
-
-    virtual void setMargin(int margin) { m_margin = margin; }
-    virtual void setPadding(int padding) { m_padding = padding; }
-
-    virtual void drawBackground(Geek::Gfx::Surface* surface);
-    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, int state);
-    virtual void drawBorder(Geek::Gfx::Surface* surface, UIBorderType type, int state, int x, int y, int w, int h);
-
-    virtual void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, int maxWidth = -1, bool inverted = false, int rotate = 0);
-    virtual int getTextWidth(std::wstring text) const;
-    virtual int getTextHeight() const;
 
     Icon* getIcon(uint32_t icon);
 

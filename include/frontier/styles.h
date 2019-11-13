@@ -37,6 +37,7 @@ class StyleRule
     std::wstring getKey();
 
     void setProperty(std::string property, int64_t value);
+    void applyProperty(std::string property, int64_t value);
     void applyProperty(std::string property, std::vector<int64_t> values);
     void applyProperty(std::string property, int count, const int64_t* values);
     std::map<std::string, int64_t> getProperties() { return m_properties; }
@@ -44,12 +45,14 @@ class StyleRule
 
 class CssParser;
 
+typedef std::function<bool(std::pair<StyleRule*, int>, std::pair<StyleRule*, int>)> StyleComparator;
+
 class StyleEngine : public Geek::Logger
 {
  private:
     CssParser* m_parser;
     //std::map<std::string, StyleRule*> m_styleRules;
-    std::vector<StyleRule*> m_styleRules;
+    std::vector<std::pair<StyleRule*, int>> m_styleRules;
     uint64_t m_timestamp;
 
  public:

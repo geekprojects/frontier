@@ -26,28 +26,34 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek::Gfx;
 
-IconButton::IconButton(FrontierApp* ui, Icon* icon) : Button(ui, L"")
+IconButton::IconButton(FrontierApp* ui, Icon* icon) : Button(ui, L"IconButton", L"")
 {
     m_icon = icon;
 }
 
-IconButton::IconButton(FrontierWindow* window, Icon* icon) : Button(window, L"")
+IconButton::IconButton(FrontierWindow* window, Icon* icon) : Button(window, L"IconButton", L"")
 {
     m_icon = icon;
 }
 
-IconButton::IconButton(FrontierApp* ui, uint32_t iconId) : Button(ui, L"")
+IconButton::IconButton(FrontierApp* ui, uint32_t iconId) : Button(ui, L"IconButton", L"")
 {
     m_icon = ui->getTheme()->getIcon(iconId);
 }
 
-IconButton::IconButton(FrontierWindow* window, uint32_t iconId) : Button(window, L"")
+IconButton::IconButton(FrontierWindow* window, uint32_t iconId) : Button(window, L"IconButton", L"")
 {
     m_icon = window->getApp()->getTheme()->getIcon(iconId);
 }
 
 IconButton::~IconButton()
 {
+}
+
+void IconButton::setIcon(Icon* icon)
+{
+    m_icon = icon;
+    setDirty(DIRTY_SIZE | DIRTY_CONTENT);
 }
 
 void IconButton::calculateSize()

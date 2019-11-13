@@ -110,6 +110,12 @@ void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
                 rule->setWidgetType(Utils::string2wstring(elementName));
             }
 
+            if (sss->universal() != NULL)
+            {
+                printf("RuleSetListener::enterKnownRuleset:     -> universal (*)\n");
+                rule->setWidgetType(L"*");
+            }
+
             for (tree::TerminalNode* hash : sss->Hash())
             {
                 string hashStr = hash->getText();
@@ -341,6 +347,13 @@ void StyleRule::setProperty(string property, int64_t value)
     }
 
     m_properties.insert(make_pair(property, value));
+}
+
+void StyleRule::applyProperty(string property, int64_t value)
+{
+    vector<int64_t> values;
+    values.push_back(value);
+    applyProperty(property, values);
 }
 
 void StyleRule::applyProperty(string property, vector<int64_t> values)

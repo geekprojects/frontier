@@ -77,6 +77,7 @@ void Tabs::setup(bool collapsible, bool addButton, TabPlacement placement)
 
     m_activeTab = NULL;
     m_addButtonWidget = NULL;
+    m_collapseButtonWidget = NULL;
 }
 
 Tabs::~Tabs()
@@ -135,9 +136,18 @@ void Tabs::init()
         m_addButtonWidget = new IconButton(m_app, m_app->getTheme()->getIcon(FRONTIER_ICON_PLUS));
         m_addButtonWidget->incRefCount();
         m_addButtonWidget->setParent(this);
+        m_addButtonWidget->setDirty();
         m_addButtonWidget->clickSignal().connect(sigc::mem_fun(*this, &Tabs::onAddTab));
     }
 
+    if (m_collapsible)
+    {
+        m_collapseButtonWidget = new IconButton(m_app, m_closedIcon);
+        m_collapseButtonWidget->incRefCount();
+        m_collapseButtonWidget->setParent(this);
+        m_collapseButtonWidget->setDirty();
+        //m_collapseButtonWidget->clickSignal().connect(sigc::mem_fun(*this, &Tabs::onCollapseTabs));
+    }
 
     dragDropSignal().connect(sigc::mem_fun(*this, &Tabs::onDragDrop));
 }
@@ -148,27 +158,67 @@ void Tabs::calculateSize()
     {
         m_addButtonWidget->calculateSize();
     }
-
-    if (m_tabs.empty() || (m_collapsible && m_collapsed))
+    if (m_collapsible)
     {
+        m_collapseButtonWidget->calculateSize();
+    }
+
+    Size tabsSize;
+    for (Tab* tab : m_tabs)
+    {
+        tab->calculateSize();
+        Size tabMin = tab->getMinSize();
+
         if (isHorizontal())
         {
-            m_minSize.set(TAB_SIZE, TAB_SIZE);
-            m_maxSize.set(WIDGET_SIZE_UNLIMITED, TAB_SIZE);
-            if (m_addButton)
+            tabsSize.width += tabMin.width;
+            if (tabsSize.height < tabMin.height)
             {
-                m_minSize.width += m_addButtonWidget->getMinSize().width;
+                tabsSize.height = tabMin.height;
             }
         }
         else
         {
-            m_minSize.set(TAB_SIZE, TAB_SIZE);
-            m_maxSize.set(TAB_SIZE, WIDGET_SIZE_UNLIMITED);
-            if (m_addButton)
+            if (tabsSize.width < tabMin.width)
             {
-                m_minSize.width += m_addButtonWidget->getMinSize().height;
+                tabsSize.width = tabMin.width;
             }
+            tabsSize.height += tabMin.height;
         }
+    }
+
+    BoxModel boxModel = getBoxModel();
+    m_minSize.width = boxModel.getWidth();
+    m_minSize.height = boxModel.getHeight();
+    m_minSize += tabsSize;
+
+    if (isHorizontal())
+    {
+        m_maxSize.set(WIDGET_SIZE_UNLIMITED, TAB_SIZE);
+        if (m_addButton)
+        {
+            m_minSize.width += m_addButtonWidget->getMinSize().width;
+        }
+        if (m_collapsible)
+        {
+            m_minSize.width += m_collapseButtonWidget->getMinSize().width;
+        }
+    }
+    else
+    {
+        m_maxSize.set(TAB_SIZE, WIDGET_SIZE_UNLIMITED);
+        if (m_addButton)
+        {
+            m_minSize.height += m_addButtonWidget->getMinSize().height;
+        }
+        if (m_collapsible)
+        {
+            m_minSize.height += m_collapseButtonWidget->getMinSize().height;
+        }
+    }
+
+    if (m_tabs.empty() || (m_collapsible && m_collapsed))
+    {
         return;
     }
 
@@ -185,57 +235,16 @@ void Tabs::calculateSize()
 
         if (isHorizontal())
         {
-            activeMinSize.height += TAB_SIZE;
-
             activeMaxSize.width = WIDGET_SIZE_UNLIMITED;
-            activeMaxSize.height += TAB_SIZE;
         }
         else
         {
-            activeMinSize.width += TAB_SIZE;
-
-            activeMaxSize.width += TAB_SIZE;
             activeMaxSize.height = WIDGET_SIZE_UNLIMITED;
         }
     }
 
-    m_minSize = activeMinSize;
-    m_maxSize = activeMaxSize;
-
-    int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
-    int tabsWidth = 0;
-    for (Tab* tab : m_tabs)
-    {
-        tabsWidth += TAB_SIZE * 2;
-        if (tab->isCloseable())
-        {
-            tabsWidth += closeWidth;
-        }
-    }
-
-    if (m_collapsible)
-    {
-        tabsWidth += TAB_SIZE;
-    }
-    if (m_addButton)
-    {
-        tabsWidth += TAB_SIZE;
-    }
-
-    if (isHorizontal())
-    {
-        if (m_minSize.width < tabsWidth)
-        {
-            m_minSize.width = tabsWidth;
-        }
-    }
-    else
-    {
-        if (m_minSize.height < tabsWidth)
-        {
-            m_minSize.height = tabsWidth;
-        }
-    }
+    m_minSize += activeMinSize;
+    m_maxSize += activeMaxSize;
 }
 
 void Tabs::layout()
@@ -258,18 +267,18 @@ void Tabs::layout()
         m_addButtonWidget->setSize(m_addButtonWidget->getMinSize());
     }
 
-
     if (m_tabs.empty())
     {
         return;
     }
 
-    Size tabSize = getTabSize();
-
     int x = tabsRect.x;
     int y = tabsRect.y;
     if (m_collapsible)
     {
+        m_collapseButtonWidget->setPosition(x, y);
+        m_collapseButtonWidget->setSize(m_collapseButtonWidget->getMinSize());
+
         if (isHorizontal())
         {
             x += TAB_SIZE;
@@ -280,19 +289,29 @@ void Tabs::layout()
         }
     }
 
+    Size idealTabSize = getTabSize();
     for (Tab* tab : m_tabs)
     {
+        Size tabSize = tab->getMinSize();
         tab->setPosition(x, y);
-        tab->setSize(tabSize);
 
         if (isHorizontal())
         {
+            if (tabSize.width < idealTabSize.width)
+            {
+                tabSize.width = idealTabSize.width;
+            }
             x += tabSize.width;
         }
         else
         {
+            if (tabSize.height < idealTabSize.height)
+            {
+                tabSize.height = idealTabSize.height;
+            }
             y += tabSize.height;
         }
+        tab->setSize(tabSize);
     }
 
     if (!m_collapsible || !m_collapsed)
@@ -321,14 +340,6 @@ void Tabs::clearDirty()
 
 bool Tabs::draw(Surface* surface)
 {
-    Rect tabsRect = getTabsRect();
-
-#if 0
-    log(DEBUG, "draw: m_setSize: width=%d, height=%d", m_setSize.width, m_setSize.height);
-
-    log(DEBUG, "draw: tabsRect: x=%d, y=%d, width=%d, height=%d", tabsRect.x, tabsRect.y, tabsRect.width, tabsRect.height);
-#endif
-
     if (!m_tabs.empty() && m_activeTab == NULL)
     {
         log(ERROR, "draw: Invalid active tab: %d", m_activeTab);
@@ -337,24 +348,13 @@ bool Tabs::draw(Surface* surface)
 
     if (m_collapsible)
     {
-        Icon* icon;
-        if (m_collapsed)
-        {
-            icon = m_closedIcon;
-        }
-        else
-        {
-            icon = m_openIcon;
-        }
-
-        Size iconSize = icon->getSize();
-        int iconX = (TAB_SIZE / 2) - (iconSize.width / 2);
-        int iconY = (TAB_SIZE / 2) - (iconSize.height / 2);
-
-        icon->draw(
-            surface, 
-            tabsRect.x + iconX,
-            tabsRect.y + iconY);
+        SurfaceViewPort viewport(
+            surface,
+            m_collapseButtonWidget->getX(),
+            m_collapseButtonWidget->getY(),
+            m_collapseButtonWidget->getWidth(),
+            m_collapseButtonWidget->getHeight());
+        m_collapseButtonWidget->draw(&viewport);
     }
 
     unsigned int tabIdx;
@@ -376,7 +376,6 @@ bool Tabs::draw(Surface* surface)
             m_addButtonWidget->getHeight());
         m_addButtonWidget->draw(&viewport);
     }
-
 
     if (!m_tabs.empty() && (!m_collapsible || !m_collapsed))
     {
@@ -431,14 +430,23 @@ Widget* Tabs::handleEvent(Event* event)
 
                 if (m_collapsible)
                 {
-                    if (tabPos < TAB_SIZE)
+                    if (m_collapseButtonWidget->intersects(mouseEvent->x, mouseEvent->y))
                     {
                          if (mouseButtonEvent->direction)
                          {
                              m_collapsed = !m_collapsed;
                              setDirty();
                         }
-                        return this;
+                        if (m_collapsed)
+                        {
+                            m_collapseButtonWidget->setIcon(m_openIcon);
+                        }
+                        else
+                        {
+                            m_collapseButtonWidget->setIcon(m_closedIcon);
+                        }
+
+                        return m_collapseButtonWidget->handleEvent(event);
                     }
                     tabPos -= TAB_SIZE;
                 }
@@ -509,6 +517,22 @@ void Tabs::addTab(Tab* tab, vector<Tab*>::iterator pos)
     tab->dragCancelledSignal().clear();
     tab->dragCancelledSignal().connect(sigc::mem_fun(*this, &Tabs::onDragCancelled));
     m_tabs.insert(pos, tab);
+
+    switch (m_placement)
+    {
+        case TAB_TOP:
+            tab->setWidgetClass(L"tabTop");
+            break;
+        case TAB_RIGHT:
+            tab->setWidgetClass(L"tabRight");
+            break;
+        case TAB_BOTTOM:
+            tab->setWidgetClass(L"tabBottom");
+            break;
+        case TAB_LEFT:
+            tab->setWidgetClass(L"tabLeft");
+            break;
+    }
 
     if (m_activeTab == NULL)
     {
@@ -599,7 +623,13 @@ void Tabs::closeAllButActiveTab(MenuItem* item)
 
 void Tabs::setActiveTab(Tab* tab)
 {
+    if (m_activeTab != NULL)
+    {
+        m_activeTab->clearSelected();
+    }
+
     m_activeTab = tab;
+    m_activeTab->setSelected();
 
     m_changeTabSignal.emit(m_activeTab->getContent());
 
@@ -609,14 +639,19 @@ void Tabs::setActiveTab(Tab* tab)
 
 void Tabs::setActiveTab(Widget* tabContent)
 {
+    if (m_activeTab != NULL)
+    {
+        m_activeTab->clearSelected();
+    }
+
     int i = 0;
     for (Tab* tab : m_tabs)
     {
         if (tab->getContent() == tabContent)
         {
             m_activeTab = tab;
+            m_activeTab->setSelected();
 
-            layout();
             setDirty();
             return;
         }

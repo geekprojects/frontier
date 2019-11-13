@@ -48,16 +48,16 @@ List::~List()
 
 void List::calculateSize()
 {
-    vector<ListItem*>::iterator it;
-
     m_minSize.set(0, 0);
     m_maxSize.set(0, 0);
     //m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
     m_listMutex->lock();
-    for (it = m_list.begin(); it != m_list.end(); it++)
+
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(); it != m_children.end(); it++)
     {
-        ListItem* item = *it;
+        Widget* item = *it;
         item->calculateSize();
 
         Size itemMin = item->getMinSize();
@@ -99,8 +99,9 @@ void List::calculateSize()
     }
     m_listMutex->unlock();
 
-    m_minSize.width += 2 * 2;
-    m_minSize.height += 2 * 2;
+    Size borderSize = getBorderSize();
+    m_minSize += borderSize;
+    m_maxSize += borderSize;
 }
 
 void List::layout()
@@ -109,11 +110,11 @@ void List::layout()
     int y = 2;
 
     m_listMutex->lock();
-    vector<ListItem*>::iterator it;
     int idx;
-    for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(), idx = 0; it != m_children.end(); it++, idx++)
     {
-        ListItem* item = *it;
+        Widget* item = *it;
 
         Size itemMin = item->getMinSize();
         Size itemMax = item->getMaxSize();
@@ -160,14 +161,14 @@ void List::layout()
 
 bool List::draw(Surface* surface, Rect visible)
 {
-    m_app->getTheme()->drawBackground(surface);
+    drawBorder(surface);
 
     m_listMutex->lock();
     int idx;
-    vector<ListItem*>::iterator it;
-    for (it = m_list.begin(), idx = 0; it != m_list.end(); it++, idx++)
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(), idx = 0; it != m_children.end(); it++, idx++)
     {
-        ListItem* item = *it;
+        Widget* item = *it;
 #if 0
         log(DEBUG, "draw: %d,%d, itemSize: %d,%d", item->getX(), item->getY(), item->getWidth(), item->getHeight());
 #endif
@@ -202,11 +203,12 @@ Widget* List::handleEvent(Event* event)
     {
         MouseEvent* mouseEvent = (MouseEvent*)event;
 
-        vector<ListItem*>::iterator it;
         m_listMutex->lock();
-        for (it = m_list.begin(); it != m_list.end(); it++)
+
+        vector<Widget*>::iterator it;
+        for (it = m_children.begin(); it != m_children.end(); it++)
         {
-            ListItem* child = *it;
+            Widget* child = *it;
             if (child->intersects(mouseEvent->x, mouseEvent->y))
             {
                 m_listMutex->unlock();
@@ -227,12 +229,12 @@ Widget* List::handleEvent(Event* event)
 void List::clearItems(bool setDirty)
 {
     m_listMutex->lock();
-    for (ListItem* item : m_list)
+    for (Widget* item : m_children)
     {
         item->decRefCount();
     }
 
-    m_list.clear();
+    m_children.clear();
     m_listMutex->unlock();
 
     m_selected = NULL;
@@ -246,13 +248,13 @@ void List::clearItems(bool setDirty)
 void List::addItem(ListItem* item)
 {
     m_listMutex->lock();
-    m_list.push_back(item);
+    m_children.push_back(item);
     item->incRefCount();
     item->setParent(this);
     item->setList(this);
     m_listMutex->unlock();
 
-    setDirty();
+    setDirty(DIRTY_CONTENT);
 }
 
 void List::setSelected(ListItem* item)

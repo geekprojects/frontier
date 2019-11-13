@@ -2,10 +2,13 @@
 #include <string.h>
 #include <wchar.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include <frontier/styles.h>
 #include <frontier/widgets.h>
 #include "cssparser.h"
+
+#include <algorithm>
 
 using namespace std;
 using namespace Frontier;
@@ -31,6 +34,11 @@ bool StyleEngine::init()
     m_parser->parse(string(STRINGIFY(CSSDIR)) + "/frontier.css");
 #endif
 
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    m_timestamp = tv.tv_sec * 1000l;
+    m_timestamp += tv.tv_usec / 1000l;
+
     return true;
 }
 
@@ -49,7 +57,45 @@ StyleRule* StyleEngine::findByKey(std::string key)
 
 void StyleEngine::addRule(StyleRule* rule)
 {
-    m_styleRules.push_back(rule);
+    int specificity = 0;
+
+    if (rule->getId().length() > 0)
+    {
+        specificity += 1000;
+    }
+
+    if (rule->getState().length() > 0)
+    {
+        specificity += 100;
+    }
+
+    if (rule->getClassName().length() > 0)
+    {
+        specificity += 10;
+    }
+
+    if (rule->getWidgetType().length() > 0)
+    {
+        if (rule->getWidgetType() == L"*")
+        {
+            specificity += 1;
+        }
+        else
+        {
+            specificity += 2;
+        }
+    }
+
+    m_styleRules.push_back(make_pair(rule, specificity));
+
+    StyleComparator compFunctor = [](std::pair<StyleRule*, int> elem1 ,std::pair<StyleRule*, int> elem2)
+    {
+        return elem1.second < elem2.second;
+    };
+
+    std::sort(m_styleRules.begin(), m_styleRules.end(), compFunctor);
+
+    //m_styleRules = orderedRules;
 }
 
 map<string, int64_t> StyleEngine::getProperties(Widget* widget)
@@ -73,24 +119,28 @@ map<string, int64_t> StyleEngine::getProperties(Widget* widget)
     log(DEBUG, "getProperties: Widget: type=%ls, classes=%ls, id=%ls", widget->getWidgetName().c_str(), classes.c_str(), widget->getWidgetId().c_str());
 #endif
 
-    map<StyleRule*, int> matchedRules;
-    for (StyleRule* rule : m_styleRules)
+    vector<StyleRule*> matchedRules;
+    for (pair<StyleRule*, int> rulePair : m_styleRules)
     {
+        StyleRule* rule = rulePair.first;
 
-        bool matchId = (rule->getId().length() > 0 && rule->getId() == widget->getWidgetId());
-        if (rule->getId().length() > 0 && !matchId)
+        bool hasId = (rule->getId().length() > 0);
+        bool matchId = (hasId && rule->getId() == widget->getWidgetId());
+        if (hasId && !matchId)
         {
             continue;
         }
 
-        bool matchType = (rule->getWidgetType().length() > 0 && (rule->getWidgetType() == L"Widget" || rule->getWidgetType() == widget->getWidgetName()));
-        if (rule->getWidgetType().length() > 0 && !matchType)
+        bool hasType = (rule->getWidgetType().length() > 0);
+        bool matchType = (hasType && (rule->getWidgetType() == L"*" || rule->getWidgetType() == widget->getWidgetName()));
+        if (hasType && !matchType)
         {
             continue;
         }
 
-        bool matchClass = (rule->getClassName().length() > 0 && widget->hasWidgetClass(rule->getClassName()));
-        if (rule->getClassName().length() > 0 && !matchClass)
+        bool hasClass = (rule->getClassName().length() > 0);
+        bool matchClass = (hasClass && widget->hasWidgetClass(rule->getClassName()));
+        if (hasClass && !matchClass)
         {
             continue;
         }
@@ -126,50 +176,17 @@ map<string, int64_t> StyleEngine::getProperties(Widget* widget)
             }
         }
 
-        int specificity = 0;
-        if (matchId)
-        {
-            specificity += 1000;
-        }
-        if (matchState)
-        {
-            specificity += 100;
-        }
-        if (matchClass)
-        {
-            specificity += 10;
-        }
-        if (matchType)
-        {
-            if (rule->getWidgetType() == L"Widget")
-            {
-                specificity += 1;
-            }
-            else
-            {
-                specificity += 2;
-            }
-        }
-        matchedRules.insert(make_pair(rule, specificity));
+        matchedRules.push_back(rule);
     }
 
-    matchedRules.insert(make_pair(widget->getWidgetStyle(), 10000));
-
-    typedef std::function<bool(std::pair<StyleRule*, int>, std::pair<StyleRule*, int>)> Comparator;
-    Comparator compFunctor = [](std::pair<StyleRule*, int> elem1 ,std::pair<StyleRule*, int> elem2)
-    {
-        return elem1.second < elem2.second;
-    };
-
-    std::set<std::pair<StyleRule*, int>, Comparator> orderedRules(matchedRules.begin(), matchedRules.end(), compFunctor);
+    matchedRules.push_back(widget->getWidgetStyle());
 
     map<string, int64_t> results;
-    for (auto matchedRule : orderedRules)
+    for (auto rule : matchedRules)
     {
-        StyleRule* rule = matchedRule.first;
 #ifdef DEBUG_STYLE_PROPERTIES
-        int specificity = matchedRule.second;
-        log(DEBUG, "getProperties: %d: %ls", specificity, rule->getKey().c_str());
+        //int specificity = matchedRule.second;
+        //log(DEBUG, "getProperties: %d: %ls", specificity, rule->getKey().c_str());
 #endif
 
         for (auto prop : rule->getProperties())
@@ -187,7 +204,7 @@ map<string, int64_t> StyleEngine::getProperties(Widget* widget)
 #ifdef DEBUG_STYLE_PROPERTIES
     for (auto prop : results)
     {
-        log(DEBUG, "getProperties: %s -> %lld (0x%llx)", prop.first.c_str(), prop.second, prop.second);
+        log(DEBUG, "getProperties:     %s -> %lld (0x%llx)", prop.first.c_str(), prop.second, prop.second);
     }
 #endif
 

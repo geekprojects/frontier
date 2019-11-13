@@ -14,6 +14,8 @@ class Button : public Widget
  public:
     Button(FrontierApp* ui, std::wstring text);
     Button(FrontierWindow* ui, std::wstring text);
+    Button(FrontierApp* ui, std::wstring widgetType, std::wstring text);
+    Button(FrontierWindow* ui, std::wstring widgetType, std::wstring text);
     virtual ~Button();
 
     virtual void calculateSize();

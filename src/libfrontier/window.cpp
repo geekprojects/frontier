@@ -390,7 +390,8 @@ void FrontierWindow::update(bool force)
 
     if (m_root->isDirty() || force)
     {
-        m_app->getTheme()->drawBackground(m_surface);
+        uint32_t colour = m_root->getStyle("background-color");
+        m_surface->clear(colour);
 
         m_root->draw(m_surface);
 

@@ -1,5 +1,5 @@
 
-Widget {
+* {
     background-color: #3c3f41;
     padding: 0px;
     margin: 5px;
@@ -9,7 +9,7 @@ Widget {
     text-color: #fff;
 }
 
-Widget.MacOS {
+*.MacOS {
     font-family: "System Font";
 }
 
@@ -24,6 +24,20 @@ ResizeableFrame {
     padding: 3px;
 }
 
+Tab {
+    border: 1px solid #4b4b4b;
+    margin: 0px;
+    padding: 3px;
+}
+
+Tab.tabTop:selected {
+    border-bottom: 1px solid #4a7987;
+}
+
+Tab:selected {
+    background-color: #515658;
+}
+
 Label {
     expand-horizontal: true;
     expand-vertical: false;
@@ -31,7 +45,7 @@ Label {
 
 Button {
     /*background-color: #4a7987; */
-    border-radius: 3px;
+    /*border-radius: 3px;*/
     border-top: 1px solid #4b4b4b;
     border-left: 1px solid #4b4b4b;
     border-right: 1px solid #0F0F0F;
@@ -71,10 +85,41 @@ TextInput:active {
     border-color: #ff0;
 }
 
+Scroller {
+    border-top: 1px solid #0F0F0F;
+    border-left: 1px solid #0F0F0F;
+    border-right: 1px solid #4b4b4b;
+    border-bottom: 1px solid #4b4b4b;
+
+    padding: 0px;
+    margin: 0px;
+}
+
+List {
+    border: 1px solid #f00;
+    padding: 0px;
+    margin: 0px;
+}
+
+ListItem {
+    padding: 0px;
+    margin: 0px;
+}
+
+ListItem:hover {
+    background-color: #0ff;
+}
+
+ListItem:selected {
+    background-color: #f0f;
+}
+
 ScrollBar {
+    margin: 0px;
     background-color: #000;
     scrollbar-width: 8px;
     scrollbar-color: #818181;
     padding: 2px;
 }
+
 

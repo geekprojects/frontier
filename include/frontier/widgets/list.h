@@ -16,7 +16,6 @@ class ListItem : public Widget
 {
  protected:
     List* m_list;
-    bool m_selected;
 
  public:
     ListItem(FrontierApp* ui);
@@ -53,7 +52,6 @@ class TextListItem : public ListItem
 class TreeListItem : public TextListItem
 {
  private:
-    std::vector<ListItem*> m_items;
     int m_titleHeight;
     bool m_open;
     sigc::signal<void, ListItem*> m_expandSignal;
@@ -82,7 +80,6 @@ class List : public Widget
 {
  private:
     Geek::Mutex* m_listMutex;
-    std::vector<ListItem*> m_list;
     ListItem* m_selected;
     bool m_horizontal;
 
@@ -107,7 +104,7 @@ class List : public Widget
     void setSelected(ListItem* item);
     void clearSelected(ListItem* item);
     ListItem* getSelected() { return m_selected; }
-    ListItem* getItem(int i) { return m_list.at(i); }
+    ListItem* getItem(int i) { return (ListItem*)m_children.at(i); }
 
     virtual sigc::signal<void, ListItem*> selectSignal() { return m_selectSignal; }
     virtual sigc::signal<void, ListItem*, Geek::Vector2D> contextMenuSignal() { return m_contextMenuSignal; }

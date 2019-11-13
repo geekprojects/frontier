@@ -83,6 +83,7 @@ FrontierApp::~FrontierApp()
     {
         log(Geek::DEBUG, "~FrontierApp: Leaked object %p: type=%s references=%d", obj, typeid(*obj).name(), obj->getRefCount());
     }
+
 }
 
 void FrontierApp::setEngine(FrontierEngine* engine)

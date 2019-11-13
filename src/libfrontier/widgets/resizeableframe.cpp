@@ -387,7 +387,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
 #endif
                 m_sizes[m_dragWidget] -= pc;
                 m_sizes[m_dragWidget + 1] += pc;
-                setDirty();
+                setDirty(DIRTY_CONTENT | DIRTY_SIZE);
 
                 m_dragPos = pos;
             }
