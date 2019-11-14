@@ -1,7 +1,7 @@
 ---
 
 language: cpp
-dist: xenial
+dist: bionic
 arch:
   - amd64
   - arm64
@@ -17,7 +17,7 @@ addons:
   apt:
     packages:
       - libxml2-dev
-      - libpng12-dev
+      - libpng-dev
       - libjpeg-dev
       - libjpeg-turbo8
       - libsdl2-dev
