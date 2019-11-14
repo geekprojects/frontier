@@ -33,15 +33,17 @@ addons:
       - antlr4-cpp-runtime
     update: true
 
-before_script:
+install:
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install; else sudo make install; sudo ldconfig; fi; cd -
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then git clone https://github.com/antlr/antlr4.git; mkdir antlr4/runtime/Cpp/build; cd antlr4/runtime/Cpp/build; cmake ..; make; sudo make install; sudo ldconfig; cd -; fi
+  - nm /usr/local/lib/libantlr4-runtime.* |grep RuntimeVersion
+
+before_script
   - ./autogen.sh --verbose
   - ./configure --enable-tests
 
 script:
-  - make
-  - make test
+  - make && make test
 
 compiler:
   - clang
