@@ -38,7 +38,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then git clone https://github.com/antlr/antlr4.git; mkdir antlr4/runtime/Cpp/build; cd antlr4/runtime/Cpp/build; cmake ..; make; sudo make install; sudo ldconfig; cd -; fi
   - nm /usr/local/lib/libantlr4-runtime.* |grep RuntimeVersion
 
-before_script
+before_script:
   - ./autogen.sh --verbose
   - ./configure --enable-tests
 
