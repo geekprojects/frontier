@@ -62,6 +62,8 @@ i
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h sys/time.h])
 
+CPPFLAGS="$CPPFLAGS -std=c++11"
+
 AX_CXX_CHECK_LIB(antlr4-runtime, [antlr4::RuntimeMetaData::getRuntimeVersion()], [
     has_libantlr4=yes
     LIBS="$LIBS -lantlr4-runtime"
