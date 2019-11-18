@@ -338,7 +338,9 @@ void StyleRule::setProperty(string property, int64_t value)
         return;
     }
 
+#if 0
     printf("setProperty: %s -> %llu (0x%llx)\n", property.c_str(), value, value);
+#endif
 
     auto it = m_properties.find(property);
     if (it != m_properties.end())

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 #include <geek/core-logger.h>
 
@@ -19,7 +20,7 @@ class StyleRule
     std::wstring m_id;
     std::string m_state;
 
-    std::map<std::string, int64_t> m_properties;
+    std::unordered_map<std::string, int64_t> m_properties;
 
  public:
     StyleRule() {}
@@ -40,7 +41,7 @@ class StyleRule
     void applyProperty(std::string property, int64_t value);
     void applyProperty(std::string property, std::vector<int64_t> values);
     void applyProperty(std::string property, int count, const int64_t* values);
-    std::map<std::string, int64_t> getProperties() { return m_properties; }
+    std::unordered_map<std::string, int64_t> getProperties() { return m_properties; }
 };
 
 class CssParser;
@@ -51,7 +52,6 @@ class StyleEngine : public Geek::Logger
 {
  private:
     CssParser* m_parser;
-    //std::map<std::string, StyleRule*> m_styleRules;
     std::vector<std::pair<StyleRule*, int>> m_styleRules;
     uint64_t m_timestamp;
 
@@ -66,7 +66,7 @@ class StyleEngine : public Geek::Logger
     void addRule(StyleRule* rule);
     StyleRule* findByKey(std::string key);
 
-    std::map<std::string, int64_t> getProperties(Widget* widget);
+    std::unordered_map<std::string, int64_t> getProperties(Widget* widget);
     uint64_t getTimestamp() { return m_timestamp; }
 };
 

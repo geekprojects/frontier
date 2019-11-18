@@ -46,7 +46,9 @@ enum DirtyFlag
 {
     DIRTY_SIZE = 0x1,   // The size of the widget or its children have changed
     DIRTY_CONTENT = 0x2, // Just the contents of the widget needs redrawing
-    DIRTY_STYLE = 0x4 // States on which style rules may apply have changed
+    DIRTY_STYLE = 0x4, // States on which style rules may apply have changed
+
+    DIRTY_ALL = 0xff // States on which style rules may apply have changed
 };
 
 struct BoxModel
@@ -104,7 +106,7 @@ class Widget : public FrontierObject, public Geek::Logger
 
     uint64_t m_styleTimestamp;
     StyleRule m_widgetStyleProperties;
-    std::map<std::string, int64_t> m_cachedStyleProperties;
+    std::unordered_map<std::string, int64_t> m_cachedStyleProperties;
     BoxModel m_cachedBoxModel;
     uint64_t m_cachedBoxModelTimestamp;
     Geek::FontHandle* m_cachedTextFont;
@@ -131,6 +133,10 @@ class Widget : public FrontierObject, public Geek::Logger
 
     Geek::FontHandle* getTextFont();
     void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring str, Geek::FontHandle* font = NULL);
+
+    BoxModel& getBoxModel(std::unordered_map<std::string, int64_t>& properties);
+    int64_t getStyle(std::string style, std::unordered_map<std::string, int64_t>& properties);
+    bool hasStyle(std::string style, std::unordered_map<std::string, int64_t>& properties);
 
  protected:
     virtual void init();
@@ -161,7 +167,7 @@ class Widget : public FrontierObject, public Geek::Logger
     void clearWidgetClass(std::wstring className);
     std::set<std::wstring> getWidgetClasses() { return m_widgetClasses; }
     StyleRule* getWidgetStyle() { return &m_widgetStyleProperties; }
-    std::map<std::string, int64_t>& getStyleProperties();
+    std::unordered_map<std::string, int64_t>& getStyleProperties();
     BoxModel& getBoxModel();
 
     int getX() const { return m_x; }

@@ -98,7 +98,7 @@ void StyleEngine::addRule(StyleRule* rule)
     //m_styleRules = orderedRules;
 }
 
-map<string, int64_t> StyleEngine::getProperties(Widget* widget)
+unordered_map<string, int64_t> StyleEngine::getProperties(Widget* widget)
 {
 
 #if 0
@@ -181,7 +181,7 @@ map<string, int64_t> StyleEngine::getProperties(Widget* widget)
 
     matchedRules.push_back(widget->getWidgetStyle());
 
-    map<string, int64_t> results;
+    unordered_map<string, int64_t> results;
     for (auto rule : matchedRules)
     {
 #ifdef DEBUG_STYLE_PROPERTIES

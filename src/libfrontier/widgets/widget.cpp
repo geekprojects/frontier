@@ -100,8 +100,6 @@ void Widget::layout()
 
 Size Widget::setSize(Size size)
 {
-    calculateSize();
-
     // Clip the specified size to our min/max
     size.setMax(m_minSize);
     size.setMin(m_maxSize);
@@ -139,12 +137,13 @@ Size Widget::getBorderSize()
 
 bool Widget::drawBorder(Surface* surface)
 {
-    BoxModel boxModel = getBoxModel();
+    auto props = getStyleProperties();
+    BoxModel boxModel = getBoxModel(props);
 
     int borderRadius = 0;
-    if (hasStyle("border-radius"))
+    if (hasStyle("border-radius", props))
     {
-        borderRadius = getStyle("border-radius");
+        borderRadius = getStyle("border-radius", props);
     }
 
     int surfaceWidth = surface->getWidth();
@@ -160,9 +159,9 @@ bool Widget::drawBorder(Surface* surface)
     int borderWidth = surfaceWidth - (boxModel.marginLeft + boxModel.marginRight);
     int borderHeight = surfaceHeight - (boxModel.marginTop + boxModel.marginBottom);
 
-    if (hasStyle("background-color"))
+    if (hasStyle("background-color", props))
     {
-        uint32_t backgroundColour = getStyle("background-color");
+        uint32_t backgroundColour = getStyle("background-color", props);
         if (borderRadius > 0)
         {
             surface->drawRectFilledRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, backgroundColour);
@@ -176,28 +175,28 @@ bool Widget::drawBorder(Surface* surface)
     // Top
     if (boxModel.borderTopWidth > 0)
     {
-        uint32_t borderColour = getStyle("border-top-color");
+        uint32_t borderColour = getStyle("border-top-color", props);
         surface->drawLine(borderX, borderY, borderX + borderWidth - (borderRadius), borderY, 0xff000000 | borderColour);
     }
 
     // Right
     if (boxModel.borderRightWidth > 0)
     {
-        uint32_t borderColour = getStyle("border-right-color");
+        uint32_t borderColour = getStyle("border-right-color", props);
         surface->drawLine(borderX + borderWidth, borderY + borderRadius, borderX + borderWidth, borderY + borderHeight - (borderRadius), 0xff000000 | borderColour);
     }
 
     // Bottom
     if (boxModel.borderBottomWidth > 0)
     {
-        uint32_t borderColour = getStyle("border-bottom-color");
+        uint32_t borderColour = getStyle("border-bottom-color", props);
         surface->drawLine(borderX + borderRadius, borderY + borderHeight , borderX + borderWidth - (borderRadius),  borderY + borderHeight , 0xff000000 | borderColour);
     }
 
     // Left
     if (boxModel.borderLeftWidth > 0)
     {
-        uint32_t borderColour = getStyle("border-left-color");
+        uint32_t borderColour = getStyle("border-left-color", props);
         surface->drawLine(borderX, borderY + borderRadius, borderX, borderY + borderHeight - (borderRadius), 0xff000000 | borderColour);
     }
 
@@ -205,24 +204,24 @@ bool Widget::drawBorder(Surface* surface)
     {
         if (boxModel.borderTopWidth > 0 && boxModel.borderRightWidth > 0)
         {
-            uint32_t borderColour = 0xff000000 | getStyle("border-top-color");
+            uint32_t borderColour = 0xff000000 | getStyle("border-top-color", props);
             surface->drawCorner(borderX + borderWidth, borderY, TOP_RIGHT, borderRadius, borderColour);
         }
         if (boxModel.borderBottomWidth > 0 && boxModel.borderRightWidth > 0)
         {
-            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color");
+            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color", props);
             surface->drawCorner(borderX + borderWidth, borderY + borderHeight, BOTTOM_RIGHT, borderRadius, borderColour);
         }
 
         if (boxModel.borderBottomWidth > 0 && boxModel.borderLeftWidth > 0)
         {
-            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color");
+            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color", props);
             surface->drawCorner(borderX, borderY + borderHeight, BOTTOM_LEFT, borderRadius, borderColour);
         }
 
         if (boxModel.borderBottomWidth > 0 && boxModel.borderLeftWidth > 0)
         {
-            uint32_t borderColour = 0xff000000 | getStyle("border-top-color");
+            uint32_t borderColour = 0xff000000 | getStyle("border-top-color", props);
             surface->drawCorner(borderX, borderY, TOP_LEFT, borderRadius, borderColour);
         }
     }
@@ -233,19 +232,30 @@ bool Widget::drawBorder(Surface* surface)
 bool Widget::hasStyle(string style)
 {
     auto props = getStyleProperties();
-    return (props.find(style) != props.end());
+    return hasStyle(style, props);
+}
+
+bool Widget::hasStyle(string style, unordered_map<string, int64_t>& properties)
+{
+    return (properties.find(style) != properties.end());
 }
 
 int64_t Widget::getStyle(string style)
 {
     auto props = getStyleProperties();
-    auto it = props.find(style);
-    if (it != props.end())
+    return getStyle(style, props);
+}
+
+int64_t Widget::getStyle(std::string style, unordered_map<string, int64_t>& properties)
+{
+    auto it = properties.find(style);
+    if (it != properties.end())
     {
         return it->second;
     }
     return (uint64_t)-1ll;
 }
+
 
 void Widget::setStyle(string style, int64_t value)
 {
@@ -253,7 +263,7 @@ void Widget::setStyle(string style, int64_t value)
     setDirty(DIRTY_STYLE);
 }
 
-map<string, int64_t>& Widget::getStyleProperties()
+unordered_map<string, int64_t>& Widget::getStyleProperties()
 {
     uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
     if ((m_dirty & DIRTY_STYLE) || styleTS != m_styleTimestamp)
@@ -271,20 +281,33 @@ BoxModel& Widget::getBoxModel()
     uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
     if ((m_dirty & DIRTY_STYLE) || styleTS != m_cachedBoxModelTimestamp)
     {
-        m_cachedBoxModel.marginTop = getStyle("margin-top");
-        m_cachedBoxModel.marginRight = getStyle("margin-right");
-        m_cachedBoxModel.marginBottom = getStyle("margin-bottom");
-        m_cachedBoxModel.marginLeft = getStyle("margin-left");
+        auto props = getStyleProperties();
+        return getBoxModel(props);
+    }
 
-        m_cachedBoxModel.paddingTop = getStyle("padding-top");
-        m_cachedBoxModel.paddingRight = getStyle("padding-right");
-        m_cachedBoxModel.paddingBottom = getStyle("padding-bottom");
-        m_cachedBoxModel.paddingLeft = getStyle("padding-left");
+    return m_cachedBoxModel;
+}
 
-        m_cachedBoxModel.borderTopWidth = getStyle("border-top-width");
-        m_cachedBoxModel.borderRightWidth = getStyle("border-right-width");
-        m_cachedBoxModel.borderBottomWidth = getStyle("border-bottom-width");
-        m_cachedBoxModel.borderLeftWidth = getStyle("border-left-width");
+BoxModel& Widget::getBoxModel(std::unordered_map<std::string, int64_t>& props)
+{
+    uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
+    if ((m_dirty & DIRTY_STYLE) || styleTS != m_cachedBoxModelTimestamp)
+    {
+        m_cachedBoxModel.marginTop = getStyle("margin-top", props);
+        m_cachedBoxModel.marginRight = getStyle("margin-right", props);
+        m_cachedBoxModel.marginBottom = getStyle("margin-bottom", props);
+        m_cachedBoxModel.marginLeft = getStyle("margin-left", props);
+
+        m_cachedBoxModel.paddingTop = getStyle("padding-top", props);
+        m_cachedBoxModel.paddingRight = getStyle("padding-right", props);
+        m_cachedBoxModel.paddingBottom = getStyle("padding-bottom", props);
+        m_cachedBoxModel.paddingLeft = getStyle("padding-left", props);
+
+        m_cachedBoxModel.borderTopWidth = getStyle("border-top-width", props);
+        m_cachedBoxModel.borderRightWidth = getStyle("border-right-width", props);
+        m_cachedBoxModel.borderBottomWidth = getStyle("border-bottom-width", props);
+        m_cachedBoxModel.borderLeftWidth = getStyle("border-left-width", props);
+
         m_cachedBoxModelTimestamp = m_styleTimestamp;
     }
 
@@ -318,14 +341,15 @@ Geek::FontHandle* Widget::getTextFont()
     uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
     if (m_cachedTextFont == NULL || (m_dirty & DIRTY_STYLE) || styleTS != m_cachedTextFontTimestamp)
     {
-        if (!hasStyle("font-family"))
+        auto props = getStyleProperties();
+        if (!hasStyle("font-family", props))
         {
             log(WARN, "getTextFont: No font-family specified");
             return NULL;
         }
 
-        const char* fontFamily = (const char*)getStyle("font-family");
-        int fontSize = getStyle("font-size");
+        const char* fontFamily = (const char*)getStyle("font-family", props);
+        int fontSize = getStyle("font-size", props);
         if (m_cachedTextFont != NULL)
         {
             if (m_cachedTextFont->getFontFace()->getFamily()->getName() == string(fontFamily) &&
