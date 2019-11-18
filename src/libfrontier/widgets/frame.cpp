@@ -133,8 +133,6 @@ void Frame::calculateSize()
         }
     }
 
-/*Size borderSize =*/ getBorderSize();
-
     m_minSize.set(0, 0);
     m_maxSize.set(0, 0);
 
@@ -143,7 +141,10 @@ void Frame::calculateSize()
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
         Widget* child = *it;
-        child->calculateSize();
+        if (child->isDirty())
+        {
+            child->calculateSize();
+        }
 
         Size childMin = child->getMinSize();
         Size childMax = child->getMaxSize();
@@ -185,21 +186,6 @@ void Frame::calculateSize()
             m_maxSize.height += childMax.height;
         }
     }
-
-/*
-    for (it = m_children.begin(); it != m_children.end(); it++)
-    {
-
-        if (m_horizontal)
-        {
-            (*it)->setHeight(m_height);
-        }
-        else
-        {
-            (*it)->setWidth(m_width);
-        }
-    }
-*/
 
     m_minSize.width += boxModel.getWidth();
     m_minSize.height += boxModel.getHeight();

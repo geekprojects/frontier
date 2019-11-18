@@ -16,8 +16,8 @@ class ScrollBar : public Widget
     bool m_dragging;
     int m_dragOffset;
 
-    int getControlPos();
-    int getControlSize();
+    int getControlPos(BoxModel& boxModel);
+    int getControlSize(BoxModel& boxModel);
     int range() { return m_max - (m_min + m_size); }
 
     sigc::signal<void, int> m_changedPositionSignal;

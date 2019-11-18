@@ -63,12 +63,12 @@ bool ScrollBar::draw(Surface* surface)
     BoxModel boxModel = getBoxModel();
     drawBorder(surface);
 
-    int pos = getControlPos();
+    int pos = getControlPos(boxModel);
 #if 0
     log(DEBUG, "draw: m_pos=%d, pos=%d", m_pos, pos);
 #endif
 
-    int sizePix = getControlSize();
+    int sizePix = getControlSize(boxModel);
 #if 0
     log(DEBUG, "draw: sizePix=%d", sizePix);
 #endif
@@ -93,10 +93,9 @@ Widget* ScrollBar::handleEvent(Event* event)
             FrontierWindow* window = getWindow();
             Vector2D thisPos = getAbsolutePosition();
 
-            int pos = getControlPos();
-            int sizePix = getControlSize();
-
             BoxModel boxModel = getBoxModel();
+            int pos = getControlPos(boxModel);
+            int sizePix = getControlSize(boxModel);
 
             int y = mouseButtonEvent->y - thisPos.y;
             y -= (boxModel.getTop());
@@ -139,7 +138,7 @@ Widget* ScrollBar::handleEvent(Event* event)
 
                 BoxModel boxModel = getBoxModel();
 
-                int yMax = (m_setSize.height - (boxModel.getHeight())) - getControlSize();
+                int yMax = (m_setSize.height - (boxModel.getHeight())) - getControlSize(boxModel);
 
                 float r = (float)(y - (boxModel.getTop())) / (float)(yMax);
                 m_pos = (int)((float)range * r) + m_min;
@@ -213,26 +212,23 @@ int ScrollBar::getPos()
     return m_pos;
 }
 
-int ScrollBar::getControlPos()
+int ScrollBar::getControlPos(BoxModel& boxModel)
 {
     if (m_max == 0)
     {
         return 0;
     }
 
-    BoxModel boxModel = getBoxModel();
     int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - boxModel.getHeight()));
     return pos;
 }
 
-int ScrollBar::getControlSize()
+int ScrollBar::getControlSize(BoxModel& boxModel)
 {
     if (m_max == 0)
     {
         return 0;
     }
-
-    BoxModel boxModel = getBoxModel();
 
     //int range = m_max - (m_min + m_size);
     int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - boxModel.getHeight()));

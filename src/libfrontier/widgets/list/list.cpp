@@ -58,7 +58,10 @@ void List::calculateSize()
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
         Widget* item = *it;
-        item->calculateSize();
+        if (item->isDirty(DIRTY_SIZE))
+        {
+            item->calculateSize();
+        }
 
         Size itemMin = item->getMinSize();
         Size itemMax = item->getMaxSize();

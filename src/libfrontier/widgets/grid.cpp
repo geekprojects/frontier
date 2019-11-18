@@ -145,7 +145,11 @@ void Grid::calculateSize()
 
     for (GridItem* item : m_grid)
     {
-        item->widget->calculateSize();
+        if (item->widget->isDirty(DIRTY_SIZE) || item->widget->isDirty(DIRTY_STYLE))
+        {
+            item->widget->calculateSize();
+        }
+
         int col = item->x;
         int row = item->y;
         Size minSize = item->widget->getMinSize();
