@@ -61,9 +61,10 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_root = new Frame(app, false);
     m_root->incRefCount();
     m_root->setWindow(this);
+    m_root->setWidgetClass(L"root");
 
-    m_root->setStyle(STYLE_PADDING, 2);
-    m_root->setStyle(STYLE_MARGIN, 0);
+    //m_root->setStyle(STYLE_PADDING, 2);
+    //m_root->setStyle(STYLE_MARGIN, 0);
 
     if (hasBorder() && !m_app->getEngine()->providesMenus())
     {
@@ -171,6 +172,7 @@ void FrontierWindow::setActiveWidget(Widget* widget)
 
     if (m_activeWidget != NULL)
     {
+        m_activeWidget->setDirty();
         m_activeWidget->signalInactive().emit();
         m_activeWidget->decRefCount();
     }
@@ -388,7 +390,8 @@ void FrontierWindow::update(bool force)
 
     if (m_root->isDirty() || force)
     {
-        m_app->getTheme()->drawBackground(m_surface);
+        uint32_t colour = m_root->getStyle("background-color");
+        m_surface->clear(colour);
 
         m_root->draw(m_surface);
 
@@ -402,7 +405,6 @@ void FrontierWindow::update(bool force)
     }
 
     m_root->clearDirty();
-
 }
 
 void FrontierWindow::requestUpdate()

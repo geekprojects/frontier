@@ -15,16 +15,12 @@ ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, L
 {
     m_dragging = false;
     m_dragWidget = 0;
-
-    setStyle(STYLE_PADDING, 3);
 }
 
 ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Frame(window, L"ResizeableFrame", horizontal)
 {
     m_dragging = false;
     m_dragWidget = 0;
-
-    setStyle(STYLE_PADDING, 3);
 }
 
 ResizeableFrame::~ResizeableFrame()
@@ -66,28 +62,33 @@ void ResizeableFrame::layout()
 {
     int major;
     int minor;
+    int majorPos;
+    int minorPos;
+    int padding;
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
+    BoxModel boxModel = getBoxModel();
 
     if (m_horizontal)
     {
-        major = m_setSize.width;
-        minor = m_setSize.height;
+        major = m_setSize.width - boxModel.getWidth();
+        minor = m_setSize.height - boxModel.getHeight();
+        majorPos = boxModel.getLeft();
+        minorPos = boxModel.getTop();
+        padding = boxModel.paddingLeft;
     }
     else
     {
-        major = m_setSize.height;
-        minor = m_setSize.width;
+        major = m_setSize.height - boxModel.getHeight();
+        minor = m_setSize.width - boxModel.getWidth();
+        majorPos = boxModel.getTop();
+        minorPos = boxModel.getLeft();
+        padding = boxModel.paddingTop;
     }
 
-    major -= (2 * margin);
-    minor -= 2 * margin;
     if (!m_children.empty())
     {
         major -= (m_children.size() - 1) * padding;
     }
-
 
     vector<Widget*>::iterator it;
     int i;
@@ -155,9 +156,6 @@ void ResizeableFrame::layout()
             }
         }
     }
-
-    int majorPos = margin;
-    int minorPos = margin;
 
     // Actually set the child sizes and positions
     for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
@@ -314,7 +312,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 }
             }
 
-            int padding = (int)getStyle(STYLE_PADDING);
+            int padding = (int)getStyle("padding-left");
 
             // Is the mouse pointer between children?
             int pos;
@@ -389,7 +387,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
 #endif
                 m_sizes[m_dragWidget] -= pc;
                 m_sizes[m_dragWidget + 1] += pc;
-                setDirty();
+                setDirty(DIRTY_CONTENT | DIRTY_SIZE);
 
                 m_dragPos = pos;
             }

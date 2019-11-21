@@ -87,10 +87,7 @@ void Frame::remove(Widget* widget)
 
 bool Frame::draw(Surface* surface)
 {
-    if (m_border)
-    {
-        surface->drawRect(0, 0, m_setSize.width, m_setSize.height, 0xff888888);
-    }
+    drawBorder(surface);
 
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
@@ -116,7 +113,7 @@ void Frame::calculateSize()
     {
         if (m_parent == NULL)
         {
-            setStyle(STYLE_MARGIN, 0);
+            setWidgetClass(L"root");
         }
         else
         {
@@ -129,7 +126,8 @@ void Frame::calculateSize()
                 //if (parentFrame->getMargin() > 0)
 #endif
                 {
-                    setStyle(STYLE_MARGIN, 0);
+                    // TODO: Fancier CSS rules!
+                    setWidgetClass(L"nested");
                 }
             }
         }
@@ -138,14 +136,15 @@ void Frame::calculateSize()
     m_minSize.set(0, 0);
     m_maxSize.set(0, 0);
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
-
+    BoxModel boxModel = getBoxModel();
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
         Widget* child = *it;
-        child->calculateSize();
+        if (child->isDirty())
+        {
+            child->calculateSize();
+        }
 
         Size childMin = child->getMinSize();
         Size childMax = child->getMaxSize();
@@ -161,11 +160,11 @@ void Frame::calculateSize()
 
             if (m_minSize.width > 0)
             {
-                m_minSize.width += padding;
+                m_minSize.width += boxModel.paddingLeft;
             }
             if (m_maxSize.width > 0)
             {
-                m_maxSize.width += padding;
+                m_maxSize.width += boxModel.paddingLeft;
             }
             m_minSize.width += childMin.width;
             m_maxSize.width += childMax.width;
@@ -177,42 +176,27 @@ void Frame::calculateSize()
 
             if (m_minSize.height > 0)
             {
-                m_minSize.height += padding;
+                m_minSize.height += boxModel.paddingTop;
             }
             if (m_maxSize.height > 0)
             {
-                m_maxSize.height += padding;
+                m_maxSize.height += boxModel.paddingTop;
             }
             m_minSize.height += childMin.height;
             m_maxSize.height += childMax.height;
         }
     }
 
-/*
-    for (it = m_children.begin(); it != m_children.end(); it++)
-    {
+    m_minSize.width += boxModel.getWidth();
+    m_minSize.height += boxModel.getHeight();
+    m_maxSize.width += boxModel.getWidth();
+    m_maxSize.height += boxModel.getHeight();
 
-        if (m_horizontal)
-        {
-            (*it)->setHeight(m_height);
-        }
-        else
-        {
-            (*it)->setWidth(m_width);
-        }
-    }
-*/
-
-    m_minSize.width += 2 * margin;
-    m_minSize.height += 2 * margin;
-    m_maxSize.width += 2 * margin;
-    m_maxSize.height += 2 * margin;
-
-    if (hasStyle(STYLE_EXPAND_HORIZONTAL) && getStyle(STYLE_EXPAND_HORIZONTAL) == 1)
+    if (getStyle("expand-horizontal") == 1)
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
-    if (hasStyle(STYLE_EXPAND_VERTICAL) && getStyle(STYLE_EXPAND_VERTICAL) == 1)
+    if (getStyle("expand-horizontal") == 1)
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
@@ -236,23 +220,25 @@ void Frame::layout()
     int major;
     int minor;
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int padding = (int)getStyle(STYLE_PADDING);
+    BoxModel boxModel = getBoxModel();
 
     if (m_horizontal)
     {
         major = m_setSize.width;
         minor = m_setSize.height;
+
+        major -= boxModel.getWidth();
+        minor -= boxModel.getHeight();
     }
     else
     {
         major = m_setSize.height;
         minor = m_setSize.width;
+        major -= boxModel.getHeight();
+        minor -= boxModel.getWidth();
     }
 
-    major -= (2 * margin);
-    minor -= 2 * margin;
-    major -= (m_children.size() - 1) * padding;
+    major -= (m_children.size() - 1) * boxModel.paddingTop;
 
 #if 0
     log(DEBUG, "layout: major=%d, minor=%d", major, minor);
@@ -287,13 +273,23 @@ void Frame::layout()
 
     int i;
 
-    int majorPos = margin;
-    int minorPos = margin;
+    int majorPos = 0;
+    int minorPos = 0;
+
+    if (m_horizontal)
+    {
+        majorPos = boxModel.marginLeft;
+        minorPos = boxModel.marginTop;
+    }
+    else
+    {
+        majorPos = boxModel.marginTop;
+        minorPos = boxModel.marginLeft;
+    }
 
     for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
     {
         Widget* child = *it;
-
 
         Size childMinSize = child->getMinSize();
         Size childMaxSize = child->getMaxSize();
@@ -358,7 +354,7 @@ void Frame::layout()
         }
         child->setSize(size);
 
-        majorPos += childMajor + padding;
+        majorPos += childMajor + boxModel.paddingTop;
 
         child->layout();
     }

@@ -66,10 +66,13 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
     m_maxSize = Size(0, 0);
     m_setSize = Size(0, 0);
 
-    setStyle(STYLE_MARGIN, m_app->getTheme()->getMargin());
-    setStyle(STYLE_PADDING, m_app->getTheme()->getPadding());
+    m_styleTimestamp = 0;
+    m_cachedBoxModelTimestamp = 0;
+    m_cachedTextFont = NULL;
+    m_cachedTextFontTimestamp = 0;
 
     m_mouseOver = false;
+    m_selected = false;
 
     m_initialised = false;
 
@@ -77,6 +80,10 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
     {
         m_app->registerObject(this);
     }
+
+#if FRONTIER_ENGINE_COCOA
+    m_widgetClasses.insert(L"MacOS");
+#endif
 }
 
 void Widget::init()
@@ -93,8 +100,6 @@ void Widget::layout()
 
 Size Widget::setSize(Size size)
 {
-    calculateSize();
-
     // Clip the specified size to our min/max
     size.setMax(m_minSize);
     size.setMin(m_maxSize);
@@ -123,29 +128,258 @@ void Widget::callInit()
     }
 }
 
-bool Widget::hasStyle(StyleAttribute style)
+Size Widget::getBorderSize()
 {
-    return (m_styles.find(style) != m_styles.end());
+    BoxModel boxModel = getBoxModel();
+
+    return Size(boxModel.getLeft() + boxModel.getRight(), boxModel.getTop() + boxModel.getBottom());
 }
 
-uint64_t Widget::getStyle(StyleAttribute style)
+bool Widget::drawBorder(Surface* surface)
 {
-    auto it = m_styles.find(style);
-    if (it != m_styles.end())
+    auto props = getStyleProperties();
+    BoxModel boxModel = getBoxModel(props);
+
+    int borderRadius = 0;
+    if (hasStyle("border-radius", props))
+    {
+        borderRadius = getStyle("border-radius", props);
+    }
+
+    int surfaceWidth = surface->getWidth();
+    int surfaceHeight = surface->getHeight();
+
+    if (borderRadius < 0 || (borderRadius > 0 && ((int)surfaceWidth < borderRadius * 2 || (int)surfaceHeight < borderRadius * 2)))
+    {
+        borderRadius = 0;
+    }
+
+    int borderX = boxModel.marginLeft;
+    int borderY = boxModel.marginTop;
+    int borderWidth = surfaceWidth - (boxModel.marginLeft + boxModel.marginRight);
+    int borderHeight = surfaceHeight - (boxModel.marginTop + boxModel.marginBottom);
+
+    if (hasStyle("background-color", props))
+    {
+        uint32_t backgroundColour = getStyle("background-color", props);
+        if (borderRadius > 0)
+        {
+            surface->drawRectFilledRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, backgroundColour);
+        }
+        else
+        {
+            surface->drawRectFilled(borderX, borderY, borderWidth, borderHeight, backgroundColour);
+        }
+    }
+
+    // Top
+    if (boxModel.borderTopWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-top-color", props);
+        surface->drawLine(borderX, borderY, borderX + borderWidth - (borderRadius), borderY, 0xff000000 | borderColour);
+    }
+
+    // Right
+    if (boxModel.borderRightWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-right-color", props);
+        surface->drawLine(borderX + borderWidth, borderY + borderRadius, borderX + borderWidth, borderY + borderHeight - (borderRadius), 0xff000000 | borderColour);
+    }
+
+    // Bottom
+    if (boxModel.borderBottomWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-bottom-color", props);
+        surface->drawLine(borderX + borderRadius, borderY + borderHeight , borderX + borderWidth - (borderRadius),  borderY + borderHeight , 0xff000000 | borderColour);
+    }
+
+    // Left
+    if (boxModel.borderLeftWidth > 0)
+    {
+        uint32_t borderColour = getStyle("border-left-color", props);
+        surface->drawLine(borderX, borderY + borderRadius, borderX, borderY + borderHeight - (borderRadius), 0xff000000 | borderColour);
+    }
+
+    if (borderRadius > 0)
+    {
+        if (boxModel.borderTopWidth > 0 && boxModel.borderRightWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-top-color", props);
+            surface->drawCorner(borderX + borderWidth, borderY, TOP_RIGHT, borderRadius, borderColour);
+        }
+        if (boxModel.borderBottomWidth > 0 && boxModel.borderRightWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color", props);
+            surface->drawCorner(borderX + borderWidth, borderY + borderHeight, BOTTOM_RIGHT, borderRadius, borderColour);
+        }
+
+        if (boxModel.borderBottomWidth > 0 && boxModel.borderLeftWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-bottom-color", props);
+            surface->drawCorner(borderX, borderY + borderHeight, BOTTOM_LEFT, borderRadius, borderColour);
+        }
+
+        if (boxModel.borderBottomWidth > 0 && boxModel.borderLeftWidth > 0)
+        {
+            uint32_t borderColour = 0xff000000 | getStyle("border-top-color", props);
+            surface->drawCorner(borderX, borderY, TOP_LEFT, borderRadius, borderColour);
+        }
+    }
+
+    return true;
+}
+
+bool Widget::hasStyle(string style)
+{
+    auto props = getStyleProperties();
+    return hasStyle(style, props);
+}
+
+bool Widget::hasStyle(string style, unordered_map<string, int64_t>& properties)
+{
+    return (properties.find(style) != properties.end());
+}
+
+int64_t Widget::getStyle(string style)
+{
+    auto props = getStyleProperties();
+    return getStyle(style, props);
+}
+
+int64_t Widget::getStyle(std::string style, unordered_map<string, int64_t>& properties)
+{
+    auto it = properties.find(style);
+    if (it != properties.end())
     {
         return it->second;
     }
     return (uint64_t)-1ll;
 }
 
-void Widget::setStyle(StyleAttribute style, uint64_t value)
+
+void Widget::setStyle(string style, int64_t value)
 {
-    auto it = m_styles.find(style);
-    if (it != m_styles.end())
+    m_widgetStyleProperties.setProperty(style, value);
+    setDirty(DIRTY_STYLE);
+}
+
+unordered_map<string, int64_t>& Widget::getStyleProperties()
+{
+    uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
+    if ((m_dirty & DIRTY_STYLE) || styleTS != m_styleTimestamp)
     {
-        m_styles.erase(it);
+        m_styleTimestamp = styleTS;
+        m_cachedStyleProperties = m_app->getStyleEngine()->getProperties(this);
+
     }
-    m_styles.insert(make_pair(style, value));
+
+    return m_cachedStyleProperties;
+}
+
+BoxModel& Widget::getBoxModel()
+{
+    uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
+    if ((m_dirty & DIRTY_STYLE) || styleTS != m_cachedBoxModelTimestamp)
+    {
+        auto props = getStyleProperties();
+        return getBoxModel(props);
+    }
+
+    return m_cachedBoxModel;
+}
+
+BoxModel& Widget::getBoxModel(std::unordered_map<std::string, int64_t>& props)
+{
+    uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
+    if ((m_dirty & DIRTY_STYLE) || styleTS != m_cachedBoxModelTimestamp)
+    {
+        m_cachedBoxModel.marginTop = getStyle("margin-top", props);
+        m_cachedBoxModel.marginRight = getStyle("margin-right", props);
+        m_cachedBoxModel.marginBottom = getStyle("margin-bottom", props);
+        m_cachedBoxModel.marginLeft = getStyle("margin-left", props);
+
+        m_cachedBoxModel.paddingTop = getStyle("padding-top", props);
+        m_cachedBoxModel.paddingRight = getStyle("padding-right", props);
+        m_cachedBoxModel.paddingBottom = getStyle("padding-bottom", props);
+        m_cachedBoxModel.paddingLeft = getStyle("padding-left", props);
+
+        m_cachedBoxModel.borderTopWidth = getStyle("border-top-width", props);
+        m_cachedBoxModel.borderRightWidth = getStyle("border-right-width", props);
+        m_cachedBoxModel.borderBottomWidth = getStyle("border-bottom-width", props);
+        m_cachedBoxModel.borderLeftWidth = getStyle("border-left-width", props);
+
+        m_cachedBoxModelTimestamp = m_styleTimestamp;
+    }
+
+    return m_cachedBoxModel;
+}
+
+bool Widget::hasWidgetClass(std::wstring className)
+{
+    auto it = m_widgetClasses.find(className);
+    return (it != m_widgetClasses.end());
+}
+
+void Widget::setWidgetClass(std::wstring className)
+{
+    m_widgetClasses.insert(className);
+    setDirty(DIRTY_STYLE);
+}
+
+void Widget::clearWidgetClass(std::wstring className)
+{
+    auto it = m_widgetClasses.find(className);
+    if (it != m_widgetClasses.end())
+    {
+        m_widgetClasses.erase(it);
+        setDirty(DIRTY_STYLE);
+    }
+}
+
+Geek::FontHandle* Widget::getTextFont()
+{
+    uint64_t styleTS = m_app->getStyleEngine()->getTimestamp();
+    if (m_cachedTextFont == NULL || (m_dirty & DIRTY_STYLE) || styleTS != m_cachedTextFontTimestamp)
+    {
+        auto props = getStyleProperties();
+        if (!hasStyle("font-family", props))
+        {
+            log(WARN, "getTextFont: No font-family specified");
+            return NULL;
+        }
+
+        const char* fontFamily = (const char*)getStyle("font-family", props);
+        int fontSize = getStyle("font-size", props);
+        if (m_cachedTextFont != NULL)
+        {
+            if (m_cachedTextFont->getFontFace()->getFamily()->getName() == string(fontFamily) &&
+                m_cachedTextFont->getPointSize() == fontSize)
+            {
+                return m_cachedTextFont;
+            }
+
+            delete m_cachedTextFont;
+        }
+
+        FontManager* fm = m_app->getFontManager();
+        log(DEBUG, "getTextFont: Opening fontFamily: %s, fontSize: %d", fontFamily, fontSize);
+
+        m_cachedTextFont = fm->openFont(fontFamily, "Regular", fontSize);
+        m_cachedTextFontTimestamp = m_app->getStyleEngine()->getTimestamp();
+    }
+
+    return m_cachedTextFont;
+}
+
+void Widget::drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring text, Geek::FontHandle* font)
+{
+    if (font == NULL)
+    {
+        font = getTextFont();
+    }
+
+    int colour = getStyle("text-color");
+    font->write(surface, x, y, text, colour);
 }
 
 void Widget::setParent(Widget* widget)
@@ -211,12 +445,7 @@ bool Widget::intersects(int x, int y) const
 
 void Widget::setDirty()
 {
-    callInit();
-    m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
-    if (m_parent != NULL)
-    {
-        m_parent->setDirty();
-    }
+    setDirty(DIRTY_SIZE | DIRTY_CONTENT | DIRTY_STYLE, false);
 }
 
 void Widget::setDirty(int dirty, bool children)
@@ -234,7 +463,8 @@ void Widget::setDirty(int dirty, bool children)
     }
     else
     {
-        if (m_parent != NULL)
+        int parentDirty = dirty & ~DIRTY_STYLE; // Dirty flags doesn't propogate upwards
+        if (m_parent != NULL && parentDirty != 0)
         {
             m_parent->setDirty(dirty);
         }
@@ -243,13 +473,19 @@ void Widget::setDirty(int dirty, bool children)
 
 void Widget::clearDirty()
 {
-    m_dirty = false;
+    m_dirty = 0;
 
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)
     {
         (*it)->clearDirty();
     }
+}
+
+void Widget::setActive()
+{
+    getWindow()->setActiveWidget(this);
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 bool Widget::isActive()
@@ -303,6 +539,7 @@ Widget* Widget::handleEvent(Event* event)
                     m_clickSignal.emit(this);
                 }
             }
+            return this;
         } break;
 
         default:
@@ -315,14 +552,14 @@ void Widget::onMouseEnter()
 {
     m_mouseOver = true;
     m_mouseEnterSignal.emit(true);
-    setDirty(DIRTY_CONTENT);
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 void Widget::onMouseLeave()
 {
     m_mouseOver = false;
     m_mouseEnterSignal.emit(false);
-    setDirty(DIRTY_CONTENT);
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 void Widget::dump(int level)
@@ -341,7 +578,5 @@ void Widget::dump(int level)
     {
         (*it)->dump(level + 1);
     }
-
 }
-
 

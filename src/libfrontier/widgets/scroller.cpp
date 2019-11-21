@@ -48,14 +48,6 @@ Scroller::Scroller(FrontierWindow* window, Widget* child) : Widget(window, L"Scr
 
 Scroller::~Scroller()
 {
-    if (m_scrollBar != NULL)
-    {
-        m_scrollBar->decRefCount();
-    }
-    if (m_child != NULL)
-    {
-        m_child->decRefCount();
-    }
     if (m_childSurface != NULL)
     {
         delete m_childSurface;
@@ -69,6 +61,7 @@ void Scroller::initScroller(Widget* child)
     m_scrollBar = new ScrollBar(m_app);
     m_scrollBar->incRefCount();
     m_scrollBar->setParent(this);
+    m_children.push_back(m_scrollBar);
 
     m_child = child;
     if (child != NULL)
@@ -149,12 +142,9 @@ void Scroller::checkSurfaceSize(bool highDPI)
 
 bool Scroller::draw(Surface* surface)
 {
-    m_app->getTheme()->drawBorder(
-        surface,
-        BORDER_WIDGET,
-        STATE_NONE,
-        0, 0,
-        m_setSize.width - (m_scrollBar->getWidth() + 1), m_setSize.height);
+
+    SurfaceViewPort mainVP(surface, 0, 0, surface->getWidth() - (m_scrollBar->getWidth() + 1), surface->getHeight());
+    drawBorder(&mainVP);
 
     if (m_child != NULL)
     {
@@ -167,22 +157,23 @@ bool Scroller::draw(Surface* surface)
         checkSurfaceSize(surface->isHighDPI());
         int childY = m_scrollBar->getPos();
 
-        Size size = m_setSize;
-        size.width -= 2;
-        size.height -= 2;
+        BoxModel boxModel = getBoxModel();
+        Size drawSize = m_setSize;
+        drawSize.width -= boxModel.getWidth() + m_scrollBar->getWidth() + 1;
+        drawSize.height -= boxModel.getHeight();;
 
         m_childSurface->clear(0);
-        m_child->draw(m_childSurface, Rect(0, childY, m_child->getWidth(), size.height));
+        m_child->draw(m_childSurface, Rect(0, childY, m_child->getWidth(), drawSize.height));
 
-        size.setMin(childSize);
+        drawSize.setMin(childSize);
         if (surface->isHighDPI())
         {
             childY *= 2;
-            size.width *= 2;
-            size.height *= 2;
+            drawSize.width *= 2;
+            drawSize.height *= 2;
         }
 
-        surface->blit(1, 1, m_childSurface, 0, childY, size.width, size.height);
+        surface->blit(boxModel.getLeft(), boxModel.getTop(), m_childSurface, 0, childY, drawSize.width, drawSize.height);
     }
 
     // TODO: Make this only show if necessary
@@ -252,6 +243,10 @@ void Scroller::setChild(Widget* child)
     m_child = child;
     m_child->incRefCount();
     m_child->setParent(this);
+
+    m_children.clear();
+    m_children.push_back(child);
+    m_children.push_back(m_scrollBar);
 }
 
 void Scroller::dump(int level)

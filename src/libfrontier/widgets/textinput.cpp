@@ -85,51 +85,40 @@ void TextInput::setText(std::wstring text)
         m_textSurface = NULL;
     }
 
-    setDirty();
+    setDirty(DIRTY_CONTENT);
 }
 
 void TextInput::calculateSize()
 {
-    int lineHeight = m_app->getTheme()->getTextHeight();
+    FontHandle* font = getTextFont();
+    int lineHeight = font->getPixelHeight();
 
-    int margin = (int)getStyle(STYLE_MARGIN);
+    Size borderSize = getBorderSize();
 
-    m_minSize.set(50, lineHeight + (margin * 2));
+    m_minSize.set(50, lineHeight + borderSize.height);
     if (m_maxLength == 0)
     {
-        m_maxSize.set(WIDGET_SIZE_UNLIMITED, lineHeight + (margin * 2));
+        m_maxSize.set(WIDGET_SIZE_UNLIMITED, lineHeight + borderSize.height);
     }
     else
     {
-        int width = m_app->getTheme()->getTextWidth(L"M");
+        int width = font->width(L"M");
         width *= m_maxLength;
-        m_maxSize.set(width + (margin * 2), lineHeight + (margin * 2));
+        m_maxSize.set(width + borderSize.width, lineHeight + borderSize.height);
     }
 }
 
 bool TextInput::draw(Surface* surface)
 {
-    int lineHeight = m_app->getTheme()->getTextHeight();
-    int margin = (int)getStyle(STYLE_MARGIN);
+    BoxModel boxModel = getBoxModel();
 
-    FontManager* fm = m_app->getFontManager();
-    FontHandle* font = m_app->getTheme()->getFont(surface->isHighDPI());
+    FontHandle* font = getTextFont();
 
-    UIState state = STATE_NONE;
-    if (isActive())
-    {
-        state = STATE_SELECTED;
-    }
+    drawBorder(surface);
 
-    m_app->getTheme()->drawBorder(
-        surface,
-        BORDER_INPUT,
-        state,
-        0, 0,
-        m_setSize.width, m_setSize.height);
-
-    unsigned int textWidth = m_app->getTheme()->getTextWidth(m_text) + 4;
-    unsigned int textHeight = lineHeight + 4;
+    int lineHeight = font->getPixelHeight(72);
+    unsigned int textWidth = font->width(m_text) + 4;
+    unsigned int textHeight = lineHeight + 2;
 
     int selectStart = MIN(m_selectStart, m_selectEnd);
     int selectEnd = MAX(m_selectStart, m_selectEnd);
@@ -160,7 +149,11 @@ bool TextInput::draw(Surface* surface)
         }
     }
 
-    m_textSurface->clear(m_app->getTheme()->getColour(COLOUR_INPUT_BACKGROUND));
+    if (hasStyle("background-color"))
+    {
+        uint32_t backgroundColour = getStyle("background-color");
+        m_textSurface->clear(backgroundColour);
+    }
  
     int x = 2;
     int y = 2;
@@ -176,7 +169,7 @@ bool TextInput::draw(Surface* surface)
         t[0] = m_text.at(pos);
         wstring cstr = wstring(t);
 
-        int width = m_app->getTheme()->getTextWidth(cstr);
+        unsigned int width = font->width(cstr);
 
         if (hasSelection())
         {
@@ -186,15 +179,7 @@ bool TextInput::draw(Surface* surface)
             }
         }
 
-        fm->write(font,
-            m_textSurface,
-            x,
-            y,
-            cstr,
-            0xffffffff,
-            true,
-            NULL);
-
+        drawText(m_textSurface, x, y, cstr, font);
 
         if (pos == m_column)
         {
@@ -210,9 +195,9 @@ bool TextInput::draw(Surface* surface)
         cursorX = x;
     }
 
-    drawCursor(m_textSurface, cursorX, y);
+    drawCursor(m_textSurface, font, cursorX, y);
 
-    unsigned int drawWidth = m_setSize.width - (margin * 2);
+    unsigned int drawWidth = m_setSize.width - (boxModel.getWidth());
     if (drawWidth > textWidth)
     {
         m_offsetX = 0;
@@ -243,16 +228,16 @@ bool TextInput::draw(Surface* surface)
         drawWidth *= 2;
         textHeight *= 2;
     }
-    surface->blit(margin, margin, m_textSurface, offsetX, 0, drawWidth, textHeight);
+    surface->blit(boxModel.getLeft(), boxModel.getTop(), m_textSurface, offsetX, 0, drawWidth, textHeight);
 
-   return true;
+    return true;
 }
 
-void TextInput::drawCursor(Surface* surface, int x, int y)
+void TextInput::drawCursor(Surface* surface, FontHandle* font, int x, int y)
 {
     if (isActive())
     {
-        int lineHeight = m_app->getTheme()->getTextHeight();
+        int lineHeight = font->getPixelHeight(72);
         surface->drawLine(x, y - 1, x, y + lineHeight, 0xffffffff);
     }
 }
@@ -340,7 +325,7 @@ Widget* TextInput::handleEvent(Event* event)
                         }
                         break;
                 }
-                setDirty();
+                setDirty(DIRTY_CONTENT);
             }
             return this;
         }
@@ -471,7 +456,7 @@ void TextInput::activateNext(Widget* activeChild)
 {
     if (activeChild == NULL)
     {
-        getWindow()->setActiveWidget(this);
+        setActive();
     }
 }
 

@@ -166,7 +166,7 @@ bool DatePickerWindow::update()
 
                 if (day == m_selectedDay && m_currentMonth == m_selectedMonth && m_currentYear == m_selectedYear)
                 {
-                    button->setHighlight(true);
+                    button->setWidgetClass(L"highlight");
                 }
                 m_dayGrid->put(x, y + 1, button);
             }

@@ -20,7 +20,7 @@ class TextInput : public Widget
     int m_selectStart;
     int m_selectEnd;
 
-    void drawCursor(Geek::Gfx::Surface* surface, int x, int y);
+    void drawCursor(Geek::Gfx::Surface* surface, Geek::FontHandle* font, int x, int y);
 
     int charAt(int x);
 

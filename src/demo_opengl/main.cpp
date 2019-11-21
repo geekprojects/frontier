@@ -21,8 +21,8 @@ class DemoWindow : public Frontier::OpenGLWindow
 
     bool init();
 
-    void faster();
-    void slower();
+    void faster(Frontier::Widget* widget);
+    void slower(Frontier::Widget* widget);
 };
 
 using namespace std;
@@ -74,12 +74,12 @@ bool DemoWindow::init()
     return true;
 }
 
-void DemoWindow::faster()
+void DemoWindow::faster(Widget* widget)
 {
     g_speed *= 1.5;
 }
 
-void DemoWindow::slower()
+void DemoWindow::slower(Widget* widget)
 {
     g_speed *= 0.5;
 }

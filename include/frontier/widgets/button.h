@@ -10,16 +10,13 @@ class Button : public Widget
 {
  protected:
     std::wstring m_text;
-    bool m_state;
-    bool m_highlight;
 
  public:
     Button(FrontierApp* ui, std::wstring text);
     Button(FrontierWindow* ui, std::wstring text);
+    Button(FrontierApp* ui, std::wstring widgetType, std::wstring text);
+    Button(FrontierWindow* ui, std::wstring widgetType, std::wstring text);
     virtual ~Button();
-
-    void setHighlight(bool highlight);
-    bool getHighlight() { return m_highlight; }
 
     virtual void calculateSize();
     virtual bool draw(Geek::Gfx::Surface* surface);

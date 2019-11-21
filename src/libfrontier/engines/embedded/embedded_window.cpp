@@ -32,3 +32,8 @@ bool EmbeddedWindow::update()
     return true;
 }
 
+float EmbeddedWindow::getScaleFactor()
+{
+    return ((EmbeddedEngine*)m_engine)->getScaleFactor();
+}
+

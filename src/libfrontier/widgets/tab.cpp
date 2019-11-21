@@ -22,6 +22,8 @@ Tab::Tab(Tabs* tabs, wstring title, Icon* icon, Widget* content, bool closeable)
 
     m_content->setParent(m_tabs);
     m_content->incRefCount();
+
+    m_children.push_back(content);
 }
 
 Tab::Tab(FrontierApp* app, wstring title, Icon* icon, Widget* content, bool closeable)
@@ -36,16 +38,22 @@ Tab::Tab(FrontierApp* app, wstring title, Icon* icon, Widget* content, bool clos
     m_mouseDown = false;
 
     m_content->incRefCount();
+
+    m_children.push_back(content);
 }
 
 Tab::~Tab()
 {
-    m_content->decRefCount();
 }
 
 void Tab::calculateSize()
 {
-    m_minSize.set(TAB_SIZE, TAB_SIZE);
+    BoxModel boxModel = getBoxModel();
+
+    m_minSize.width = boxModel.getWidth();
+    m_minSize.height = boxModel.getHeight();
+    
+    FontHandle* font = getTextFont();
 
     bool horizontal = true;
     if (m_tabs != NULL)
@@ -58,7 +66,8 @@ void Tab::calculateSize()
         {
             m_minSize.width += TAB_SIZE;
         }
-        m_maxSize.set(MAX_TAB_SIZE, TAB_SIZE);
+        m_minSize.height += font->getPixelHeight();
+        m_maxSize.set(MAX_TAB_SIZE, m_minSize.height);
     }
     else
     {
@@ -66,7 +75,8 @@ void Tab::calculateSize()
         {
             m_minSize.height += TAB_SIZE;
         }
-        m_maxSize.set(TAB_SIZE, MAX_TAB_SIZE);
+        m_minSize.width += font->getPixelHeight();
+        m_maxSize.set(m_minSize.width, MAX_TAB_SIZE);
     }
 }
 
@@ -77,6 +87,7 @@ void Tab::layout()
 
 bool Tab::draw(Geek::Gfx::Surface* surface)
 {
+    BoxModel boxModel = getBoxModel();
     bool horizontal = true;
     int rotate = 0;
     if (m_tabs != NULL)
@@ -93,31 +104,16 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
         }
     }
 
-    int state = STATE_NONE;
-    if (m_tabs != NULL && m_tabs->getActiveTab() == m_content)
-    {
-        state = STATE_SELECTED;
-    }
-    if (!horizontal)
-    {
-        state |= STATE_VERTICAL;
-    }
-
-    m_app->getTheme()->drawBorder(
-        surface,
-        BORDER_TAB,
-        state,
-        0, 0,
-        m_setSize.width, m_setSize.height);
+    drawBorder(surface);
 
     int titleWidth;
     if (horizontal)
     {
-        titleWidth = m_setSize.width - 10;
+        titleWidth = m_setSize.width - boxModel.getWidth();
     }
     else
     {
-        titleWidth = m_setSize.height - 10;
+        titleWidth = m_setSize.height - boxModel.getHeight();
     }
 
 
@@ -135,50 +131,53 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
         titleWidth -= closeSize + 5;
     }
 
-    int textOffsetX = 0;
-    int textOffsetY = 0;
+    int textOffsetX = boxModel.getLeft();
+    int textOffsetY = boxModel.getTop();
     Size iconSize;
     if (m_icon != NULL)
     {
         iconSize = m_icon->getSize();
-        int iconX = 5;
-        int iconY = 5;
+        int iconX = boxModel.getLeft();
+        int iconY = boxModel.getTop();
         if (horizontal)
         {
             titleWidth -= iconSize.width + iconX;
-            textOffsetX = iconSize.width + iconX;
+            textOffsetX += iconSize.width;
             iconY = (m_setSize.height / 2) - (iconSize.height / 2);
         }
         else
         {
             titleWidth -= iconSize.height + iconY;
-            textOffsetY = iconSize.height + iconY;
+            textOffsetY += iconSize.height;
             iconX = (m_setSize.width / 2) - (iconSize.width / 2);
         }
 
         m_icon->draw(surface, iconX, iconY);
     }
 
-    int labelHeight = m_app->getTheme()->getTextHeight();
-    int labelMid = ((TAB_SIZE / 2) - (labelHeight / 2));
+    FontHandle* font = getTextFont();
+    int labelHeight = font->getPixelHeight();
 
     if (horizontal)
     {
-        textOffsetX += 5;
-        textOffsetY += labelMid;
+        textOffsetY = ((m_setSize.height / 2) - (labelHeight / 2));
     }
     else
     {
-        textOffsetX += labelMid;
-        textOffsetY += 5;
+        textOffsetX = ((m_setSize.width / 2) - (labelHeight / 2));
     }
 
-    m_app->getTheme()->drawText(
+    int colour = getStyle("text-color");
+    font->write(
         surface,
         textOffsetX,
         textOffsetY,
         m_title.c_str(),
-        titleWidth, false, rotate);
+        colour,
+        true,
+        NULL,
+        titleWidth,
+        rotate);
 
     if (m_closeable)
     {
@@ -186,13 +185,13 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
         int closeY;
         if (horizontal)
         {
-            closeX = m_setSize.width - (closeSize + 5);
-            closeY = labelMid;
+            closeX = m_setSize.width - (closeSize + boxModel.getRight());
+            closeY = ((m_setSize.height / 2) - (closeSize / 2));
         }
         else
         {
-            closeX = labelMid;
-            closeY = m_setSize.height - (closeSize + 5);
+            closeX = ((m_setSize.width / 2) - (closeSize / 2));
+            closeY = m_setSize.height - (closeSize + boxModel.getBottom());
         }
 
         m_app->getTheme()->drawIcon(

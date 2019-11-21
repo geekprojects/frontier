@@ -46,9 +46,6 @@ ComboBox::~ComboBox()
 
 void ComboBox::initComboBox()
 {
-    setStyle(STYLE_MARGIN, 0);
-    setStyle(STYLE_PADDING, 0);
-
     m_textInput = new TextInput(m_app, L"");
     m_button = new IconButton(m_app, m_app->getTheme()->getIcon(FRONTIER_ICON_ARROW_DOWN));
 

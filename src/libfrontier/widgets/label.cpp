@@ -24,38 +24,31 @@
 
 using namespace std;
 using namespace Frontier;
+using namespace Geek;
 using namespace Geek::Gfx;
 
 Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = align;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierWindow* window, wstring text) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = align;
-    setStyle(STYLE_EXPAND_HORIZONTAL, true);
-    setStyle(STYLE_EXPAND_VERTICAL, false);
 }
 
 
@@ -77,7 +70,8 @@ void Label::setAlign(TextAlign align)
 
 void Label::calculateSize()
 {
-    m_lineHeight = m_app->getTheme()->getTextHeight();
+    FontHandle* font = getTextFont();
+    m_lineHeight = font->getPixelHeight();
 
     m_minSize.set(0, 0);
 
@@ -97,7 +91,7 @@ void Label::calculateSize()
                 lines++;
             }
 
-            int w = m_app->getTheme()->getTextWidth(line);
+            int w = font->width(line);
             if (w > m_minSize.width)
             {
                 m_minSize.width = w;
@@ -110,11 +104,11 @@ void Label::calculateSize()
         }
     }
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    m_minSize.width += (margin * 2);
-    m_minSize.height = (m_lineHeight * lines) + (margin * 2);
+    Size borderSize = getBorderSize();
+    m_minSize.width += borderSize.width;
+    m_minSize.height = (m_lineHeight * lines) + borderSize.height;
 
-    if (getStyle(STYLE_EXPAND_HORIZONTAL))
+    if (getStyle("expand-horizontal"))
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
@@ -123,7 +117,7 @@ void Label::calculateSize()
         m_maxSize.width = m_minSize.width;
     }
 
-    if (getStyle(STYLE_EXPAND_VERTICAL))
+    if (getStyle("expand-vertical"))
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
@@ -131,32 +125,16 @@ void Label::calculateSize()
     {
         m_maxSize.height = m_minSize.height;
     }
-
 }
 
 bool Label::draw(Surface* surface)
 {
-    Widget::draw(surface);
+    drawBorder(surface);
 
-    int margin = (int)getStyle(STYLE_MARGIN);
-    int y = margin;
+    BoxModel boxModel = getBoxModel();
+    int y = boxModel.marginTop;
 
-    if (hasStyle(STYLE_BACKGROUND_COLOUR))
-    {
-        surface->drawRectFilled(0, 0, getWidth(), getHeight(), getStyle(STYLE_BACKGROUND_COLOUR));
-    }
-
-    if (hasStyle(STYLE_BORDER) && getStyle(STYLE_BORDER))
-    {
-        if (!isActive())
-        {
-            surface->drawRect(0, 0, getWidth(), getHeight(), 0xff4b4b4b);
-        }
-        else
-        {
-            surface->drawRect(0, 0, getWidth(), getHeight(), 0xff4a7987);
-        }
-    }
+    FontHandle* font = getTextFont();
 
     int lines = 1;
     unsigned int pos = 0;
@@ -179,27 +157,28 @@ bool Label::draw(Surface* surface)
             {
                 line += m_text[pos];
             }
-            int w = m_app->getTheme()->getTextWidth(line);
+            int w = font->width(line);
             int x = 0;
 
             switch (m_align)
             {
                 case ALIGN_LEFT:
-                    x = margin;
+                    x = boxModel.marginLeft;
                     break;
                 case ALIGN_CENTER:
                     x = (m_setSize.width / 2) - (w / 2);
                     break;
                 case ALIGN_RIGHT:
-                    x = (m_setSize.width - margin) - w;
+                    x = (m_setSize.width - boxModel.marginRight) - w;
                     break;
             }
 
-            m_app->getTheme()->drawText(
+            drawText(
                 surface,
                 x,
                 y,
-                line.c_str());
+                line.c_str(),
+                font);
  
             y += m_lineHeight;
             line = L"";
@@ -210,6 +189,6 @@ bool Label::draw(Surface* surface)
         }
     }
 
-   return true;
+    return true;
 }
 

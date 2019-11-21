@@ -30,75 +30,53 @@ using namespace Geek::Gfx;
 Button::Button(FrontierApp* ui, wstring text) : Widget(ui, L"Button")
 {
     m_text = text;
-    m_state = false;
-    m_highlight = false;
 }
 
 Button::Button(FrontierWindow* window, wstring text) : Widget(window, L"Button")
 {
     m_text = text;
-    m_state = false;
-    m_highlight = false;
+}
+
+Button::Button(FrontierApp* ui, wstring widgetType, wstring text) : Widget(ui, widgetType)
+{
+    m_text = text;
+}
+
+Button::Button(FrontierWindow* window, wstring widgetType, wstring text) : Widget(window, widgetType)
+{
+    m_text = text;
 }
 
 Button::~Button()
 {
 }
 
-void Button::setHighlight(bool highlight)
-{
-    m_highlight = highlight;
-    setDirty(DIRTY_CONTENT);
-}
-
 void Button::calculateSize()
 {
-    m_minSize.width = m_app->getTheme()->getTextWidth(m_text) + (5 * 2);
-    m_minSize.height = m_app->getTheme()->getTextHeight() + (5 * 2);
+    FontHandle* font = getTextFont();
+
+    m_minSize.width = font->getPixelWidth(m_text);
+    m_minSize.height = font->getPixelHeight();
+
+    Size borderSize = getBorderSize();
+    m_minSize.width += borderSize.width;
+    m_minSize.height += borderSize.height;
 
     m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     m_maxSize.height = m_minSize.height;
-    //m_maxSize.height = WIDGET_SIZE_UNLIMITED;
 }
 
 bool Button::draw(Surface* surface)
 {
-    if (m_highlight)
-    {
-        surface->clear(0xff0000);
-    }
+    FontHandle* font = getTextFont();
 
-    int w = m_app->getTheme()->getTextWidth(m_text);
+    int w = font->getPixelWidth(m_text);
     int x = (m_setSize.width / 2) - (w / 2);
+    int y = (m_setSize.height / 2) - (font->getPixelHeight() / 2);
 
-    int y = (m_setSize.height / 2) - (m_app->getTheme()->getTextHeight() / 2);
+    drawBorder(surface);
 
-    int state;
-    if (m_state)
-    {
-        state = STATE_SELECTED;
-    }
-    else if (m_mouseOver)
-    {
-        state = STATE_HOVER;
-    }
-    else
-    {
-        state = STATE_NONE;
-    }
-
-    if (m_highlight || isActive())
-    {
-        state |= STATE_ACTIVE;
-    }
-
-    m_app->getTheme()->drawBorder(
-        surface,
-        BORDER_BUTTON,
-        state,
-        0, 0,
-        m_setSize.width, m_setSize.height);
-    m_app->getTheme()->drawText(surface, x, y, m_text);
+    drawText(surface, x, y, m_text, font);
 
     return true;
 }
@@ -111,12 +89,13 @@ Widget* Button::handleEvent(Event* event)
         {
             MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
             log(DEBUG, "handleEvent: Message! text=%ls", m_text.c_str());
-            if (m_state != mouseButtonEvent->direction)
+            if (m_selected != mouseButtonEvent->direction)
             {
-                setDirty(DIRTY_CONTENT);
+                setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 
-                m_state = mouseButtonEvent->direction;
-                if (!m_state)
+                m_selected = mouseButtonEvent->direction;
+
+                if (!m_selected)
                 {
                     m_clickSignal.emit(this);
                 }
@@ -134,19 +113,18 @@ Widget* Button::handleEvent(Event* event)
                 }
             }
             else if (keyEvent->key == KC_SPACE)
-{
-            if (m_state != keyEvent->direction)
             {
-                setDirty(DIRTY_CONTENT);
-
-                m_state = keyEvent->direction;
-                if (!m_state)
+                if (m_selected != keyEvent->direction)
                 {
-                    m_clickSignal.emit(this);
+                    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+
+                    m_selected = keyEvent->direction;
+                    if (!m_selected)
+                    {
+                        m_clickSignal.emit(this);
+                    }
                 }
             }
-
-}
         } break;
 
         default:
@@ -159,7 +137,7 @@ void Button::activateNext(Widget* activeChild)
 {
     if (activeChild == NULL)
     {
-        getWindow()->setActiveWidget(this);
+        setActive();
     }
 }
 

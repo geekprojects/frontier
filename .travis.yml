@@ -1,38 +1,49 @@
 ---
 
 language: cpp
-dist: xenial
+dist: bionic
+arch:
+  - amd64
+  - arm64
 
 matrix:
   exclude:
     - os: linux
       compiler: clang
+    - os: osx
+      arch: arm64
 
 addons:
   apt:
     packages:
       - libxml2-dev
-      - libpng12-dev
+      - libpng-dev
       - libjpeg-dev
       - libjpeg-turbo8
       - libsdl2-dev
       - libfreetype6-dev
       - libsigc++-2.0-dev
+      - uuid-dev
   homebrew:
     packages:
       - freetype
       - libsigc++@2
       - libtool
+      - antlr@4
+      - antlr4-cpp-runtime
     update: true
 
+install:
+  - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install; else sudo make install; sudo ldconfig; fi; cd -
+#  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then git clone https://github.com/antlr/antlr4.git; mkdir antlr4/runtime/Cpp/build; cd antlr4/runtime/Cpp/build; cmake ..; make; sudo make install; sudo ldconfig; cd -; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget http://mirrors.kernel.org/ubuntu/pool/universe/a/antlr4-cpp-runtime/libantlr4-runtime4.7.2_4.7.2+dfsg-1_amd64.deb; wget http://mirrors.kernel.org/ubuntu/pool/universe/a/antlr4-cpp-runtime/libantlr4-runtime-dev_4.7.2+dfsg-1_amd64.deb; sudo dpkg -i libantlr4-runtime*.deb; fi
+
 before_script:
-  - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [$TRAVIS_OS_NAME == osx]; then make install; else sudo make install; sudo ldconfig; fi; cd -
   - ./autogen.sh --verbose
   - ./configure --enable-tests
 
 script:
-  - make
-  - make test
+  - make && make test
 
 compiler:
   - clang

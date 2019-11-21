@@ -65,38 +65,41 @@ void TextListItem::setText(std::wstring text)
 
 void TextListItem::calculateSize()
 {
-    int lineHeight = m_app->getTheme()->getTextHeight();
+    BoxModel boxModel = getBoxModel();
+
+    FontHandle* font = getTextFont();
+    if (font == NULL)
+    {
+        return;
+    }
+    int lineHeight = font->getPixelHeight();
 
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 
-    m_minSize.width = 1 + m_app->getTheme()->getTextWidth(m_text);
+    m_minSize.width = 1 + font->width(m_text);
 
     if (m_icon != NULL)
     {
         Size iconSize = m_icon->getSize();
-        //m_minSize.width += m_app->getTheme()->getIconWidth(m_icon);
         m_minSize.width += iconSize.width;
     }
+    m_minSize.height = lineHeight;
 
-    m_minSize.width += (getStyle(STYLE_MARGIN) * 2);
-    m_minSize.height = lineHeight + (1 * 2);
+    m_minSize.width += boxModel.getWidth();
+    m_minSize.height += boxModel.getHeight();
 }
 
 bool TextListItem::draw(Geek::Gfx::Surface* surface)
 {
-    UIState state = STATE_NONE;
-    if (m_selected)
+    drawBorder(surface);
+
+    FontHandle* font = getTextFont();
+    if (font == NULL)
     {
-        state = STATE_SELECTED;
-    }
-    else if (m_mouseOver)
-    {
-        state = STATE_HOVER;
+        return false;
     }
 
-    m_app->getTheme()->drawBorder(surface, BORDER_LIST_ITEM_1, state, 0, 0, surface->getWidth() - 2, surface->getHeight() - 2);
-
-    int lineHeight = m_app->getTheme()->getTextHeight();
+    int lineHeight = font->getPixelHeight();
     int x = 1;
     int y = (surface->getHeight() / 2) - (lineHeight) / 2;
 
@@ -104,18 +107,11 @@ bool TextListItem::draw(Geek::Gfx::Surface* surface)
     {
         Size iconSize = m_icon->getSize();
         int iconX = (ICON_WIDTH / 2) - (iconSize.width / 2);
-        //m_app->getTheme()->drawIcon(surface, x + iconX, y, m_icon, m_selected);
         m_icon->draw(surface, x + iconX, y);
         x += ICON_WIDTH;
     }
 
-    m_app->getTheme()->drawText(
-        surface,
-        x,
-        y,
-        m_text.c_str(),
-        -1,
-        m_selected);
+    drawText(surface, x, y, m_text);
 
     return true;
 }

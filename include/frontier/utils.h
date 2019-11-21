@@ -110,6 +110,12 @@ struct Size
             return height;
         }
     }
+
+    void operator+= (const Size& rhs)
+    {
+        this->width += rhs.width;
+        this->height += rhs.height;
+    }
 };
 
 struct Rect

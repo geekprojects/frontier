@@ -4,10 +4,12 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_CONFIG_SRCDIR([include/frontier/frontier.h])
 AC_CONFIG_HEADER([include/frontier/config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_PROG_AR
 AC_PROG_CXX
 AC_PROG_CC
+AC_LANG([C++])
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_PROG_RANLIB
@@ -59,6 +61,20 @@ i
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h sys/time.h])
+
+CPPFLAGS="$CPPFLAGS -std=c++11"
+
+AX_CXX_CHECK_LIB(antlr4-runtime, [antlr4::RuntimeMetaData::getRuntimeVersion()], [
+    has_libantlr4=yes
+    LIBS="$LIBS -lantlr4-runtime"
+    CPPFLAGS="$CPPFLAGS -I/usr/local/include/antlr4-runtime -I/usr/include/antlr4-runtime"
+])
+
+if test "$has_libantlr4" != "yes"
+then
+    AC_MSG_ERROR([Antlr4 C++ runtime is required])
+fi
+
 
 PKG_CHECK_MODULES(libgeek, libgeek >= 1)
 CPPFLAGS="$CPPFLAGS $libgeek_CFLAGS"
@@ -130,8 +146,8 @@ else
     AM_CONDITIONAL([BUILD_TESTS], false, [tests])
 fi
 
-#CPPFLAGS="$CPPFLAGS -g -O0 -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer"
-#LDFLAGSS="$LDFLAGS -fsanitize=address"
+CPPFLAGS="$CPPFLAGS -g -O0 -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer"
+LDFLAGSS="$LDFLAGS -fsanitize=address"
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
@@ -144,9 +160,11 @@ AC_CONFIG_FILES([Makefile
                  src/libfrontier/engines/embedded/Makefile
                  src/libfrontier/engines/sdl/Makefile
                  src/libfrontier/engines/cocoa/Makefile
+                 src/libfrontier/styles/Makefile
                  src/libfrontier-opengl/Makefile
                  src/demo/Makefile
-                 fonts/Makefile
+                 data/Makefile
+                 data/fonts/Makefile
                  tests/Makefile
                  include/Makefile
                  include/frontier/Makefile

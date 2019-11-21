@@ -83,6 +83,7 @@ FrontierApp::~FrontierApp()
     {
         log(Geek::DEBUG, "~FrontierApp: Leaked object %p: type=%s references=%d", obj, typeid(*obj).name(), obj->getRefCount());
     }
+
 }
 
 void FrontierApp::setEngine(FrontierEngine* engine)
@@ -140,6 +141,13 @@ bool FrontierApp::init()
 
     m_theme = new UITheme(this);
     res = m_theme->init();
+    if (!res)
+    {
+        return false;
+    }
+
+    m_styleEngine = new StyleEngine();
+    res = m_styleEngine->init();
     if (!res)
     {
         return false;

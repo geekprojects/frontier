@@ -50,6 +50,9 @@ class Tab : public Widget
     Icon* getIcon() { return m_icon; }
     Widget* getContent() { return m_content; }
     bool isCloseable() { return m_closeable; }
+
+    void setSelected() { m_selected = true; setDirty(DIRTY_STYLE); }
+    void clearSelected() { m_selected = false; setDirty(DIRTY_STYLE); }
 };
 
 class Tabs : public Widget
@@ -98,6 +101,7 @@ class Tabs : public Widget
 
     virtual void calculateSize();
     virtual void layout();
+    virtual void clearDirty();
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 

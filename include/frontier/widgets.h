@@ -25,6 +25,7 @@
 #include <map>
 
 #include <frontier/frontier.h>
+#include <frontier/styles.h>
 
 #include <sigc++/sigc++.h>
 
@@ -44,18 +45,36 @@ enum TextAlign
 enum DirtyFlag
 {
     DIRTY_SIZE = 0x1,   // The size of the widget or its children have changed
-    DIRTY_CONTENT = 0x2 // Just the contents of the widget needs redrawing
+    DIRTY_CONTENT = 0x2, // Just the contents of the widget needs redrawing
+    DIRTY_STYLE = 0x4, // States on which style rules may apply have changed
+
+    DIRTY_ALL = 0xff // States on which style rules may apply have changed
 };
 
-enum StyleAttribute
+struct BoxModel
 {
-    STYLE_BORDER,
-    STYLE_MARGIN,
-    STYLE_PADDING,
-    STYLE_BACKGROUND_COLOUR,
-    STYLE_BORDER_COLOUR,
-    STYLE_EXPAND_HORIZONTAL,
-    STYLE_EXPAND_VERTICAL,
+    int marginTop;
+    int marginRight;
+    int marginBottom;
+    int marginLeft;
+
+    int paddingTop;
+    int paddingRight;
+    int paddingBottom;
+    int paddingLeft;
+
+    int borderTopWidth;
+    int borderRightWidth;
+    int borderBottomWidth;
+    int borderLeftWidth;
+
+    int getTop() { return marginTop + paddingTop + borderTopWidth; }
+    int getRight() { return marginRight + paddingRight + borderRightWidth; }
+    int getBottom() { return marginBottom + paddingBottom + borderBottomWidth; }
+    int getLeft() { return marginLeft + paddingLeft + borderLeftWidth; }
+
+    int getWidth() { return getLeft() + getRight(); }
+    int getHeight() { return getTop() + getBottom(); }
 };
 
 class Widget : public FrontierObject, public Geek::Logger
@@ -63,6 +82,8 @@ class Widget : public FrontierObject, public Geek::Logger
  protected:
     FrontierApp* m_app;
     std::wstring m_widgetName;
+    std::wstring m_widgetId;
+    std::set<std::wstring> m_widgetClasses;
 
     FrontierWindow* m_window;
 
@@ -83,9 +104,16 @@ class Widget : public FrontierObject, public Geek::Logger
 
     int m_dirty;
 
-    std::map<StyleAttribute, uint64_t> m_styles;
+    uint64_t m_styleTimestamp;
+    StyleRule m_widgetStyleProperties;
+    std::unordered_map<std::string, int64_t> m_cachedStyleProperties;
+    BoxModel m_cachedBoxModel;
+    uint64_t m_cachedBoxModelTimestamp;
+    Geek::FontHandle* m_cachedTextFont;
+    uint64_t m_cachedTextFontTimestamp;
 
     bool m_mouseOver;
+    bool m_selected;
 
     sigc::signal<void, bool> m_mouseEnterSignal;
     sigc::signal<void> m_activeSignal;
@@ -99,6 +127,16 @@ class Widget : public FrontierObject, public Geek::Logger
 
     void initWidget(FrontierApp* app, std::wstring widgetName);
     void callInit();
+
+    Size getBorderSize();
+    bool drawBorder(Geek::Gfx::Surface* surface);
+
+    Geek::FontHandle* getTextFont();
+    void drawText(Geek::Gfx::Surface* surface, int x, int y, std::wstring str, Geek::FontHandle* font = NULL);
+
+    BoxModel& getBoxModel(std::unordered_map<std::string, int64_t>& properties);
+    int64_t getStyle(std::string style, std::unordered_map<std::string, int64_t>& properties);
+    bool hasStyle(std::string style, std::unordered_map<std::string, int64_t>& properties);
 
  protected:
     virtual void init();
@@ -119,9 +157,18 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual bool draw(Geek::Gfx::Surface* surface);
     virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
 
-    bool hasStyle(StyleAttribute style);
-    uint64_t getStyle(StyleAttribute style);
-    void setStyle(StyleAttribute style, uint64_t value);
+    bool hasStyle(std::string style);
+    int64_t getStyle(std::string style);
+    void setStyle(std::string style, int64_t value);
+    void setWidgetId(std::wstring id) { m_widgetId = id; }
+    std::wstring getWidgetId() { return m_widgetId; }
+    bool hasWidgetClass(std::wstring className);
+    void setWidgetClass(std::wstring className);
+    void clearWidgetClass(std::wstring className);
+    std::set<std::wstring> getWidgetClasses() { return m_widgetClasses; }
+    StyleRule* getWidgetStyle() { return &m_widgetStyleProperties; }
+    std::unordered_map<std::string, int64_t>& getStyleProperties();
+    BoxModel& getBoxModel();
 
     int getX() const { return m_x; }
     int getY() const { return m_y; }
@@ -135,13 +182,6 @@ class Widget : public FrontierObject, public Geek::Logger
     Frontier::Size getMaxSize() const { return m_maxSize; }
     virtual int getWidth() const { return m_setSize.width; }
     virtual int getHeight() const { return m_setSize.height; }
-
-/*
-    virtual void setMargin(int margin) { m_margin = margin; }
-    virtual int getMargin() const { return m_margin; }
-    virtual void setPadding(int padding) { m_padding = padding; }
-    virtual int getPadding() const { return m_padding; }
-*/
 
     void setParent(Widget* w);
     Widget* getParent() const { return m_parent; }
@@ -158,10 +198,14 @@ class Widget : public FrontierObject, public Geek::Logger
     void setDirty(int flags, bool children = false);
     bool isDirty() const { return !!(m_dirty); }
     bool isDirty(DirtyFlag flag) const { return !!(m_dirty & flag); }
-    void clearDirty();
+    virtual void clearDirty();
 
+    void setActive();
     bool isActive();
     virtual void activateNext(Widget* activeChild = NULL);
+
+    bool isMouseOver() { return m_mouseOver; }
+    bool isSelected() { return m_selected; }
 
     void setContextMenu(Menu* menu) { m_contextMenu = menu; }
     Menu* getContextMenu() const { return m_contextMenu; }
