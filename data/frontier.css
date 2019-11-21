@@ -96,7 +96,6 @@ Scroller {
 }
 
 List {
-    border: 1px solid #f00;
     padding: 0px;
     margin: 0px;
 }
