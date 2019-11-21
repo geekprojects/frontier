@@ -148,10 +148,10 @@ bool FrontierApp::init()
 
     m_styleEngine = new StyleEngine();
     res = m_styleEngine->init();
-if (!res)
-{
-return false;
-}
+    if (!res)
+    {
+        return false;
+    }
 
     return true;
 }
