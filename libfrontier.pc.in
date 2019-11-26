@@ -11,5 +11,5 @@ Description: Frontier Engine
 Version: 1.0.0
 Requires:
 Conflicts:
-Libs: -L${libdir} -lfrontier
-Cflags: -I${includedir} @CPPFLAGS@
+Libs: @PKGCONFIG_LDFLAGS@
+Cflags: @PKGCONFIG_CFLAGS@

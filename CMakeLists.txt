@@ -12,7 +12,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(PkgConfig REQUIRED)
 
-
 # Common requirements
 pkg_check_modules(libgeek REQUIRED libgeek)
 pkg_check_modules(freetype2 REQUIRED freetype2)
@@ -69,6 +68,10 @@ if(OPENGL_FOUND)
         add_subdirectory(src/demo_opengl)
     endif()
 endif()
+
+set(PKGCONFIG_CFLAGS_LIST -I${CMAKE_INSTALL_PREFIX}/include ${libgeek_CFLAGS})
+string(REPLACE ";" " " PKGCONFIG_CFLAGS "${PKGCONFIG_CFLAGS_LIST}")
+set(PKGCONFIG_LDFLAGS "-L${CMAKE_INSTALL_PREFIX}/lib -lfrontier")
 
 configure_file(libfrontier.pc.in libfrontier.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/libfrontier.pc DESTINATION "lib${LIB_SUFFIX}/pkgconfig")
