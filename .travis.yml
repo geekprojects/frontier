@@ -33,6 +33,10 @@ addons:
       - antlr@4
       - antlr4-cpp-runtime
     update: true
+  sonarcloud:
+    organization: "geekprojects"
+    token:
+      secure: "b/qu2nlAHQtlZ/rcy54Z5BvYzxN0C26c2HL3M/hdNXVTOnsje/nimd9duk202eU5ZdBYUsblZSqNrMOVZdCYhAqwzwZ/KZZEevHcvLI96dmMiH+k85lwEslZyCscHK2qRx2fXjMkdT1zw00XDAzLUb+5XTKQjfyg/7mwKzWZIzpOhf6u3SkzXGz1DQLwH5/TmrnWg5YheARKGMg3A709gU6O+ZCR3Won5mPfjMyUXrpsY1WgiWVsb/SOcQTyZC5MRuM/0BwbNM9CpA5eCW0bJ+yOi7weFIvLLtM16+2amJequNPAHY1+3JSTASPn7juQD4Bj0OaCCgAyyaaDQopYsq3T7zv51PVA//sFtkHbMGGwkzTgn9XCjXirylJNsQQKTr54Os7mlqN+SN5uCLcL+EJaPKajc8EmhBGFzgGOfD2qURWukc1dHw5U66LuW8OZAm4AMcpuBA5rrYCF0ebQFmwhlJ6aznM3HJhEqXFHIfXS90uLiYhooQaJz6hRvLfGVbzSuKdyxPoXJSUtHUerpQ5ulaYj2Bcq4H0+suusmIyPG84FpiRCISx0PJ3n0byVm5a59fglKBSupOfGUrFDyRvyZs0KDJPYOKeFYb4Nnlx+BD+sIZLE9ykHp7JhUy7fYRVgINgts2yachS+wGXRf7Cdu3Hd+C8BEEWIQXWHc78="
 
 install:
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; mkdir build; cd build; cmake ..; make; if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install; else sudo make install; sudo ldconfig; fi; cd -
@@ -44,6 +48,7 @@ before_script:
 script:
   - make
 # && make test
+  - sonar-scanner
 
 compiler:
   - clang
