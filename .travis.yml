@@ -24,6 +24,7 @@ addons:
       - libfreetype6-dev
       - libsigc++-2.0-dev
       - uuid-dev
+      - freeglut3-dev
   homebrew:
     packages:
       - freetype
