@@ -1,8 +1,10 @@
 
-#include <stdio.h>
 #include "css3Lexer.h"
 #include "css3Parser.h"
 #include "css3BaseListener.h"
+
+#include <stdio.h>
+#include <string.h>
 
 #include <string>
 #include <vector>
