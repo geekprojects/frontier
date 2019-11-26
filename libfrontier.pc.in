@@ -1,15 +1,15 @@
 # Frontier pkg-config source file
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@
-bindir=@bindir@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+bindir=${prefix}/bin
 
 Name: Frontier
 Description: Frontier Engine
 Version: 1.0.0
 Requires:
 Conflicts:
-Libs: -L@libdir@ -lfrontier @LIBS@
-Cflags: -I@includedir@ @CPPFLAGS@
+Libs: -L${libdir} -lfrontier
+Cflags: -I${includedir} @CPPFLAGS@
