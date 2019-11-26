@@ -20,7 +20,6 @@
 
 
 #include <frontier/frontier.h>
-#include <frontier/config.h>
 #include <frontier/contextmenu.h>
 #include <sys/time.h>
 
