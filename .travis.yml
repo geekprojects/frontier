@@ -58,7 +58,7 @@ os:
   - linux
   - osx
 
-cache:
-  directories:
-    - '$HOME/.sonar/cache'
+#cache:
+#  directories:
+#    - '$HOME/.sonar/cache'
 
