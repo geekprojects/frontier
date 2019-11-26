@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <functional>
 
 #include <geek/core-logger.h>
 
