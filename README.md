@@ -7,6 +7,9 @@ Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch
 
 
 #### Features
+* Very simple to use
+* Small
+* Styling and customisation using CSS
 * SDL, native MacOS (Cocoa) and OpenGL engines
 * sigc++ event handlers
 * High DPI support
@@ -14,11 +17,19 @@ Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch
 
 
 ##### Requirements
-* [libgeek] (https://github.com/geekprojects/libgeek)
+* [libgeek](https://github.com/geekprojects/libgeek)
+* Antlr4 C++ runtime (For CSS parsing)
 * freetype 2
 * libsigc++ 2.0
 * SDL (For the SDL engine)
 * OpenGL (For OpenGL embedding)
+
+##### Ubuntu
+* libxml2-dev libpng-dev libjpeg-dev libjpeg-turbo8 libsdl2-dev libfreetype6-dev libsigc++-2.0-dev uuid-dev
+* Optional: freeglut3-dev
+
+##### MacOS
+* homebrew: freetype libsigc++@2 libtool antlr@4 antlr4-cpp-runtime
 
 
 Documentation
@@ -31,11 +42,13 @@ Installation
 ------------
 
 ```
-./autogen.sh (If cloned from git)
-./configure
+mkdir build
+cd build
+cmake ..
 make
 sudo make install
 ```
+
 
 License
 -------

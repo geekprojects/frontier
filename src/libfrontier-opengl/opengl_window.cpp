@@ -12,7 +12,7 @@ OpenGLWindow::OpenGLWindow(FrontierApp* app) : FrontierWindow(app, L"OpenGL", WI
     m_textureValid = false;
 
     glGenTextures(1, &m_texture);
-    glGenSamplers(1, &m_sampler);
+    //glGenSamplers(1, &m_sampler);
 
     setSize(Size(100, 100));
 }

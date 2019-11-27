@@ -24,6 +24,7 @@ addons:
       - libfreetype6-dev
       - libsigc++-2.0-dev
       - uuid-dev
+      - freeglut3-dev
   homebrew:
     packages:
       - freetype
@@ -34,16 +35,15 @@ addons:
     update: true
 
 install:
-  - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; ./autogen.sh; ./configure; make; if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install; else sudo make install; sudo ldconfig; fi; cd -
-#  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then git clone https://github.com/antlr/antlr4.git; mkdir antlr4/runtime/Cpp/build; cd antlr4/runtime/Cpp/build; cmake ..; make; sudo make install; sudo ldconfig; cd -; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget http://mirrors.kernel.org/ubuntu/pool/universe/a/antlr4-cpp-runtime/libantlr4-runtime4.7.2_4.7.2+dfsg-1_amd64.deb; wget http://mirrors.kernel.org/ubuntu/pool/universe/a/antlr4-cpp-runtime/libantlr4-runtime-dev_4.7.2+dfsg-1_amd64.deb; sudo dpkg -i libantlr4-runtime*.deb; fi
+  - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; mkdir build; cd build; cmake ..; make; if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install; else sudo make install; sudo ldconfig; fi; cd -
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then git clone https://github.com/antlr/antlr4.git; mkdir antlr4/runtime/Cpp/build; cd antlr4/runtime/Cpp/build; cmake ..; make; sudo make install; sudo ldconfig; cd -; fi
 
 before_script:
-  - ./autogen.sh --verbose
-  - ./configure --enable-tests
+  - mkdir build; cmake ..
 
 script:
-  - make && make test
+  - make
+# && make test
 
 compiler:
   - clang
@@ -52,3 +52,4 @@ compiler:
 os:
   - linux
   - osx
+
