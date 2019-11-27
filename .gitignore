@@ -13,35 +13,9 @@
 # Backup files
 *~
 
-# Output Makefiles
-Makefile
-Makefile.in
+# CMake build
+build/
 
-# Configure/auto* output
-config.h
-config.h.in
-config.log
-config.status
-config.sub
-configure
-libtool
-stamp-h1
-aclocal.m4
-.libs/
-autom4te.cache/
-ar-lib
-compile
-config.guess
-depcomp
-install-sh
-ltmain.sh
-missing
-autoscan.log
-configure.scan
-output/
-
-libfrontier.pc
-
-src/demo/demo
-tests/test
+# Sonar
+.scannerwork/
 
