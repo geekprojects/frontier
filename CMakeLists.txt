@@ -71,7 +71,8 @@ endif()
 
 set(PKGCONFIG_CFLAGS_LIST -I${CMAKE_INSTALL_PREFIX}/include ${libgeek_CFLAGS})
 string(REPLACE ";" " " PKGCONFIG_CFLAGS "${PKGCONFIG_CFLAGS_LIST}")
-set(PKGCONFIG_LDFLAGS "-L${CMAKE_INSTALL_PREFIX}/lib -lfrontier")
+set(PKGCONFIG_LDFLAGS_LIST -L${CMAKE_INSTALL_PREFIX}/lib -lfrontier ${libgeek_LDFLAGS})
+string(REPLACE ";" " " PKGCONFIG_LDFLAGS "${PKGCONFIG_LDFLAGS_LIST}")
 
 configure_file(libfrontier.pc.in libfrontier.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/libfrontier.pc DESTINATION "lib${LIB_SUFFIX}/pkgconfig")
