@@ -9,6 +9,7 @@ namespace Frontier
 class ScrollBar : public Widget
 {
  private:
+    bool m_horizontal;
     int m_min;
     int m_max;
     int m_pos;
@@ -16,6 +17,7 @@ class ScrollBar : public Widget
     bool m_dragging;
     int m_dragOffset;
 
+    int getScaledValue(BoxModel& boxModel, int v);
     int getControlPos(BoxModel& boxModel);
     int getControlSize(BoxModel& boxModel);
     int range() { return m_max - (m_min + m_size); }
@@ -23,8 +25,8 @@ class ScrollBar : public Widget
     sigc::signal<void, int> m_changedPositionSignal;
 
  public:
-    ScrollBar(FrontierApp* ui);
-    ScrollBar(FrontierWindow* window);
+    ScrollBar(FrontierApp* ui, bool horizontal);
+    ScrollBar(FrontierWindow* window, bool horizontal);
     virtual ~ScrollBar();
 
     virtual void calculateSize();

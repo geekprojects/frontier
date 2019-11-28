@@ -27,16 +27,18 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-ScrollBar::ScrollBar(FrontierApp* ui) : Widget(ui, L"ScrollBar")
+ScrollBar::ScrollBar(FrontierApp* ui, bool horizontal) : Widget(ui, L"ScrollBar")
 {
+    m_horizontal = horizontal;
     m_pos = 0;
     m_size = 10;
     m_dragging = false;
     m_dragOffset = 0;
 }
 
-ScrollBar::ScrollBar(FrontierWindow* window) : Widget(window, L"ScrollBar")
+ScrollBar::ScrollBar(FrontierWindow* window, bool horizontal) : Widget(window, L"ScrollBar")
 {
+    m_horizontal = horizontal;
     m_pos = 0;
     m_size = 10;
     m_dragging = false;
@@ -55,7 +57,14 @@ void ScrollBar::calculateSize()
     m_minSize.width += scrollbarWidth;
     m_minSize.height += scrollbarWidth;
 
-    m_maxSize.set(m_minSize.width, WIDGET_SIZE_UNLIMITED);
+    if (m_horizontal)
+    {
+        m_maxSize.set(WIDGET_SIZE_UNLIMITED, m_minSize.height);
+    }
+    else
+    {
+        m_maxSize.set(m_minSize.width, WIDGET_SIZE_UNLIMITED);
+    }
 }
 
 bool ScrollBar::draw(Surface* surface)
@@ -64,21 +73,23 @@ bool ScrollBar::draw(Surface* surface)
     drawBorder(surface);
 
     int pos = getControlPos(boxModel);
-#if 0
-    log(DEBUG, "draw: m_pos=%d, pos=%d", m_pos, pos);
-#endif
-
     int sizePix = getControlSize(boxModel);
-#if 0
-    log(DEBUG, "draw: sizePix=%d", sizePix);
-#endif
 
-    int drawWidth = getStyle("scrollbar-width");
-    int x = (m_setSize.width / 2) - (drawWidth / 2);
-    int y = boxModel.paddingTop + boxModel.marginTop;
-
+    int drawSize = getStyle("scrollbar-width");
     uint32_t controlColor = getStyle("scrollbar-color");
-    surface->drawRectFilled(x, y + pos, drawWidth, sizePix, controlColor);
+
+    if (m_horizontal)
+    {
+        int x = boxModel.paddingLeft + boxModel.marginLeft;
+        int y = (m_setSize.height / 2) - (drawSize / 2);
+        surface->drawRectFilled(x + pos, y, sizePix, drawSize, controlColor);
+    }
+    else
+    {
+        int x = (m_setSize.width / 2) - (drawSize / 2);
+        int y = boxModel.paddingTop + boxModel.marginTop;
+        surface->drawRectFilled(x, y + pos, drawSize, sizePix, controlColor);
+    }
 
     return true;
 }
@@ -97,15 +108,24 @@ Widget* ScrollBar::handleEvent(Event* event)
             int pos = getControlPos(boxModel);
             int sizePix = getControlSize(boxModel);
 
-            int y = mouseButtonEvent->y - thisPos.y;
-            y -= (boxModel.getTop());
+            int mousePos;
+            if (m_horizontal)
+            {
+                mousePos = mouseButtonEvent->x - thisPos.x;
+                mousePos -= (boxModel.getLeft());
+            }
+            else
+            {
+                mousePos = mouseButtonEvent->y - thisPos.y;
+                mousePos -= (boxModel.getTop());
+            }
 
             if (mouseButtonEvent->direction)
             {
-                if (y >= pos && y < pos + sizePix)
+                if (mousePos >= pos && mousePos < pos + sizePix)
                 {
                     m_dragging = true;
-                    m_dragOffset = y - pos;
+                    m_dragOffset = mousePos - pos;
                     if (window != NULL)
                     {
                         window->setMotionWidget(this);
@@ -130,17 +150,27 @@ Widget* ScrollBar::handleEvent(Event* event)
                 Vector2D thisPos = getAbsolutePosition();
 
                 int range = m_max - (m_min + m_size);
-
-                int y = mouseMotionEvent->y - thisPos.y;
-                y -= m_dragOffset;
+                BoxModel boxModel = getBoxModel();
 
                 int oldPos = m_pos;
 
-                BoxModel boxModel = getBoxModel();
+                int mousePos;
+                int max;
+                if (m_horizontal)
+                {
+                    mousePos = mouseMotionEvent->x - thisPos.x;
+                    mousePos -= (boxModel.getLeft());
+                    max = (m_setSize.width - (boxModel.getWidth())) - getControlSize(boxModel);
+                }
+                else
+                {
+                    mousePos = mouseMotionEvent->y - thisPos.y;
+                    mousePos -= (boxModel.getTop());
+                    max = (m_setSize.height - (boxModel.getHeight())) - getControlSize(boxModel);
+                }
 
-                int yMax = (m_setSize.height - (boxModel.getHeight())) - getControlSize(boxModel);
-
-                float r = (float)(y - (boxModel.getTop())) / (float)(yMax);
+                mousePos -= m_dragOffset;
+                float r = (float)(mousePos) / (float)(max);
                 m_pos = (int)((float)range * r) + m_min;
 
                 if (m_pos < m_min)
@@ -164,7 +194,14 @@ Widget* ScrollBar::handleEvent(Event* event)
         {
             MouseScrollEvent* mouseScrollEvent = (MouseScrollEvent*)event;
             int scrollPos = getPos();
-            scrollPos -= mouseScrollEvent->scrollY;
+            if (m_horizontal)
+            {
+                scrollPos -= mouseScrollEvent->scrollX;
+            }
+            else
+            {
+                scrollPos -= mouseScrollEvent->scrollY;
+            }
             setPos(scrollPos);
         } break;
 
@@ -212,26 +249,33 @@ int ScrollBar::getPos()
     return m_pos;
 }
 
-int ScrollBar::getControlPos(BoxModel& boxModel)
+int ScrollBar::getScaledValue(BoxModel& boxModel, int v)
 {
     if (m_max == 0)
     {
         return 0;
     }
 
-    int pos = (int)(((float)(m_pos) / (float)m_max) * (float)(m_setSize.height - boxModel.getHeight()));
-    return pos;
+    int s;
+    if (m_horizontal)
+    {
+        s = (int)(((float)(v) / (float)m_max) * (float)(m_setSize.width - boxModel.getWidth()));
+    }
+    else
+    {
+        s = (int)(((float)(v) / (float)m_max) * (float)(m_setSize.height - boxModel.getHeight()));
+    }
+
+    return s;
+}
+
+int ScrollBar::getControlPos(BoxModel& boxModel)
+{
+    return getScaledValue(boxModel, m_pos);
 }
 
 int ScrollBar::getControlSize(BoxModel& boxModel)
 {
-    if (m_max == 0)
-    {
-        return 0;
-    }
-
-    //int range = m_max - (m_min + m_size);
-    int sizePix = (int)(((float)m_size / (float)m_max) * (float)(m_setSize.height - boxModel.getHeight()));
-    return sizePix;
+    return getScaledValue(boxModel, m_size);
 }
 

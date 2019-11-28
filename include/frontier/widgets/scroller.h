@@ -10,13 +10,14 @@ namespace Frontier
 class Scroller : public Widget
 {
  private:
-
-    ScrollBar* m_scrollBar;
+    ScrollBar* m_hScrollBar;
+    ScrollBar* m_vScrollBar;
     Widget* m_child;
     Geek::Gfx::Surface* m_childSurface;
+    Size m_drawSize;
 
     void checkSurfaceSize(bool highDPI);
-    int getWidthOverhead() { return (m_scrollBar->getWidth() - 2); }
+    int getWidthOverhead() { return (m_vScrollBar->getWidth() - 2); }
 
     void initScroller(Widget* child);
 
@@ -31,7 +32,7 @@ class Scroller : public Widget
     virtual void layout();
     //virtual void setWidth(int width);
 
-    int getPos() { return m_scrollBar->getPos(); }
+    int getPos() { return m_vScrollBar->getPos(); }
 
     virtual bool draw(Geek::Gfx::Surface* surface);
 

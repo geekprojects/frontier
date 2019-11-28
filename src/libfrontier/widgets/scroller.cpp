@@ -58,10 +58,15 @@ void Scroller::initScroller(Widget* child)
 {
     m_childSurface = NULL;
 
-    m_scrollBar = new ScrollBar(m_app);
-    m_scrollBar->incRefCount();
-    m_scrollBar->setParent(this);
-    m_children.push_back(m_scrollBar);
+    m_vScrollBar = new ScrollBar(m_app, false);
+    m_vScrollBar->incRefCount();
+    m_vScrollBar->setParent(this);
+    m_children.push_back(m_vScrollBar);
+
+    m_hScrollBar = new ScrollBar(m_app, true);
+    m_hScrollBar->incRefCount();
+    m_hScrollBar->setParent(this);
+    m_children.push_back(m_hScrollBar);
 
     m_child = child;
     if (child != NULL)
@@ -70,10 +75,10 @@ void Scroller::initScroller(Widget* child)
     }
 }
 
-
 void Scroller::calculateSize()
 {
-    m_scrollBar->calculateSize();
+    m_vScrollBar->calculateSize();
+    m_hScrollBar->calculateSize();
 
     m_minSize.width = 50;
     m_minSize.height = 50;
@@ -87,28 +92,37 @@ void Scroller::calculateSize()
         m_minSize.setMin(childMax);
     }
 
-    m_minSize.width += m_scrollBar->getMinSize().width;
+    m_minSize.width += m_vScrollBar->getMinSize().width;
+    m_minSize.height += m_hScrollBar->getMinSize().height;
 }
 
 void Scroller::layout()
 {
-    m_child->setPosition(0, 0);
+    BoxModel boxModel = getBoxModel();
 
     Size childMin = m_child->getMinSize();
     Size childMax = m_child->getMaxSize();
 
-    Size childSize;
-    childSize.width = m_setSize.width - m_scrollBar->getMinSize().width;
-    childSize.height = m_setSize.height;
+    m_drawSize.width = m_setSize.width - (boxModel.getWidth() + m_vScrollBar->getMinSize().width);
+    m_drawSize.height = m_setSize.height - (boxModel.getHeight() + m_hScrollBar->getMinSize().height);
+
+    Size childSize = m_drawSize;
     childSize.setMin(childMax);
     childSize.setMax(childMin);
+
+    m_child->setPosition(0, 0);
     m_child->setSize(childSize);
     m_child->layout();
 
-    m_scrollBar->setPosition(m_setSize.width - m_scrollBar->getMinSize().width, 0);
-    m_scrollBar->setSize(Size(m_scrollBar->getMinSize().width, m_setSize.height));
+    m_vScrollBar->setPosition(m_setSize.width - m_hScrollBar->getMinSize().width, 0);
+    m_vScrollBar->setSize(Size(m_vScrollBar->getMinSize().width, m_drawSize.height));
+    m_vScrollBar->set(0, childSize.height, m_drawSize.height);
 
-    m_scrollBar->set(0, m_child->getHeight(), (m_setSize.height - 2));
+    m_hScrollBar->setPosition(0, m_setSize.height - m_vScrollBar->getMinSize().height);
+    m_hScrollBar->setSize(Size(m_drawSize.width, m_hScrollBar->getMinSize().height));
+    m_hScrollBar->set(0, childSize.width, m_drawSize.width);
+
+    m_drawSize.setMin(childSize);
 }
 
 void Scroller::checkSurfaceSize(bool highDPI)
@@ -143,42 +157,57 @@ void Scroller::checkSurfaceSize(bool highDPI)
 bool Scroller::draw(Surface* surface)
 {
 
-    SurfaceViewPort mainVP(surface, 0, 0, surface->getWidth() - (m_scrollBar->getWidth() + 1), surface->getHeight());
+    SurfaceViewPort mainVP(
+        surface,
+        0,
+        0,
+        surface->getWidth() - (m_vScrollBar->getWidth() + 1),
+        surface->getHeight() - (m_hScrollBar->getHeight() + 1));
     drawBorder(&mainVP);
 
     if (m_child != NULL)
     {
-        Size childSize = m_child->getSize();
 #ifdef DEBUG_UI_SCROLLER
         log(DEBUG, "draw: scroller width=%d, height=%d", m_setSize.width, m_setSize.height);
         log(DEBUG, "draw: child width=%d, height=%d", m_child->getWidth(), m_child->getHeight());
 #endif
 
         checkSurfaceSize(surface->isHighDPI());
-        int childY = m_scrollBar->getPos();
-
-        BoxModel boxModel = getBoxModel();
-        Size drawSize = m_setSize;
-        drawSize.width -= boxModel.getWidth() + m_scrollBar->getWidth() + 1;
-        drawSize.height -= boxModel.getHeight();;
+        int childY = m_vScrollBar->getPos();
+        int childX = m_hScrollBar->getPos();
 
         m_childSurface->clear(0);
-        m_child->draw(m_childSurface, Rect(0, childY, m_child->getWidth(), drawSize.height));
+        m_child->draw(m_childSurface, Rect(childX, childY, m_child->getWidth(), m_drawSize.height));
 
-        drawSize.setMin(childSize);
+        Size scaledDrawSize = m_drawSize;
         if (surface->isHighDPI())
         {
+            childX *= 2;
             childY *= 2;
-            drawSize.width *= 2;
-            drawSize.height *= 2;
+            scaledDrawSize.width *= 2;
+            scaledDrawSize.height *= 2;
         }
 
-        surface->blit(boxModel.getLeft(), boxModel.getTop(), m_childSurface, 0, childY, drawSize.width, drawSize.height);
+        BoxModel boxModel = getBoxModel();
+        surface->blit(
+            boxModel.getLeft(), boxModel.getTop(),
+            m_childSurface,
+            childX, childY,
+            scaledDrawSize.width, scaledDrawSize.height);
     }
 
     // TODO: Make this only show if necessary
-    SurfaceViewPort scrollbarVP(surface, m_scrollBar->getX(), m_scrollBar->getY(), m_scrollBar->getWidth(), m_scrollBar->getHeight());
-    ((Widget*)m_scrollBar)->draw(&scrollbarVP, Rect(0, 0, m_scrollBar->getWidth(), m_scrollBar->getHeight()));
+    SurfaceViewPort scrollbarVP(
+        surface,
+        m_vScrollBar->getX(), m_vScrollBar->getY(),
+        m_vScrollBar->getWidth(), m_vScrollBar->getHeight());
+    ((Widget*)m_vScrollBar)->draw(&scrollbarVP, Rect(0, 0, m_vScrollBar->getWidth(), m_vScrollBar->getHeight()));
+
+    SurfaceViewPort scrollbarVPH(
+        surface,
+        m_hScrollBar->getX(), m_hScrollBar->getY(),
+        m_hScrollBar->getWidth(), m_hScrollBar->getHeight());
+    ((Widget*)m_hScrollBar)->draw(&scrollbarVPH, Rect(0, 0, m_hScrollBar->getWidth(), m_hScrollBar->getHeight()));
 
     return true;
 }
@@ -193,33 +222,30 @@ Widget* Scroller::handleEvent(Event* event)
             MouseEvent* mouseEvent = (MouseEvent*)event;
 #if 0
             Vector2D thisPos = Widget::getAbsolutePosition();
-            log(DEBUG, "handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_scrollBar->getPos());
+            log(DEBUG, "handleMessage: Mouse: pos=%d,%d, absPos=%d,%d, scrollPos=%d", imsg->event.button.x, imsg->event.button.y, thisPos.x, thisPos.y, m_vScrollBar->getPos());
 #endif
 
             int x = mouseEvent->x;
             int y = mouseEvent->y;
 
-            if (m_scrollBar->intersects(x, y))
+            if (m_vScrollBar->intersects(x, y))
             {
-                return m_scrollBar->handleEvent(event);
+                return m_vScrollBar->handleEvent(event);
+            }
+            else if (m_hScrollBar->intersects(x, y))
+            {
+                return m_hScrollBar->handleEvent(event);
             }
             else
             {
                 switch (event->eventType)
                 {
                     case FRONTIER_EVENT_MOUSE_BUTTON:
-                    {
-                        MouseButtonEvent mouseButtonEvent = *((MouseButtonEvent*)event);
-                        mouseButtonEvent.y += m_scrollBar->getPos();
-                        return m_child->handleEvent(&mouseButtonEvent);
-                    }
-
-
                     case FRONTIER_EVENT_MOUSE_MOTION:
                     {
-                        MouseMotionEvent mouseMotionEvent = *((MouseMotionEvent*)event);
-                        mouseMotionEvent.y += m_scrollBar->getPos();
-                        return m_child->handleEvent(&mouseMotionEvent);
+                        mouseEvent->x += m_hScrollBar->getPos();
+                        mouseEvent->y += m_vScrollBar->getPos();
+                        return m_child->handleEvent(mouseEvent);
                     }
 
                     default:
@@ -229,7 +255,9 @@ Widget* Scroller::handleEvent(Event* event)
         } break;
 
         case FRONTIER_EVENT_MOUSE_SCROLL:
-            return m_scrollBar->handleEvent(event);
+            m_vScrollBar->handleEvent(event);
+            m_hScrollBar->handleEvent(event);
+            return this;
 
         default:
             break;
@@ -246,7 +274,7 @@ void Scroller::setChild(Widget* child)
 
     m_children.clear();
     m_children.push_back(child);
-    m_children.push_back(m_scrollBar);
+    m_children.push_back(m_vScrollBar);
 }
 
 void Scroller::dump(int level)
@@ -258,6 +286,6 @@ void Scroller::dump(int level)
         m_child->dump(level + 1);
     }
 
-    m_scrollBar->dump(level + 1);
+    m_vScrollBar->dump(level + 1);
 }
 
