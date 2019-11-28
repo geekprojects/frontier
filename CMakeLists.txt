@@ -69,6 +69,8 @@ if(OPENGL_FOUND)
     endif()
 endif()
 
+install(DIRECTORY include/frontier DESTINATION include FILES_MATCHING PATTERN "*.h" )
+
 set(PKGCONFIG_CFLAGS_LIST -I${CMAKE_INSTALL_PREFIX}/include ${libgeek_CFLAGS})
 string(REPLACE ";" " " PKGCONFIG_CFLAGS "${PKGCONFIG_CFLAGS_LIST}")
 set(PKGCONFIG_LDFLAGS_LIST -L${CMAKE_INSTALL_PREFIX}/lib -lfrontier ${libgeek_LDFLAGS})
