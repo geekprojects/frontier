@@ -80,15 +80,21 @@ void TreeListItem::calculateSize()
     if (m_open)
     {
         vector<Widget*>::iterator it;
+
+        int childWidthMax = 0;
         for (it = m_children.begin(); it != m_children.end(); it++)
         {
             Widget* item = *it;
             item->calculateSize();
 
             Size itemMin = item->getMinSize();
-            //Size itemMax = item->getMaxSize();
             m_minSize.height += itemMin.height;
+            if (itemMin.width > childWidthMax)
+            {
+                childWidthMax = itemMin.width;
+            }
         }
+        m_minSize.width += childWidthMax;
     }
 }
 
