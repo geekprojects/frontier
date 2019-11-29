@@ -421,9 +421,7 @@ FrontierWindow* Widget::getWindow()
 
 Geek::Vector2D Widget::getAbsolutePosition() const
 {
-    Vector2D pos;
-    pos.x = m_x;
-    pos.y = m_y;
+    Vector2D pos = m_position;
 
     if (m_parent != NULL)
     {
@@ -571,7 +569,7 @@ void Widget::dump(int level)
         spaces += "    ";
     }
 
-    log(Geek::DEBUG, "%s%s(%p): x=%d, y=%d, size=%s", spaces.c_str(), m_widgetName.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
+    log(Geek::DEBUG, "%s%s(%p): x=%d, y=%d, size=%s", spaces.c_str(), m_widgetName.c_str(), this, m_position.x, m_position.y, m_setSize.toString().c_str());
 
     vector<Widget*>::iterator it;
     for (it = m_children.begin(); it != m_children.end(); it++)

@@ -296,11 +296,6 @@ void FrontierApp::update()
     gc();
 }
 
-void FrontierApp::postEvent(Event* event)
-{
-    handleEvent(event);
-}
-
 void FrontierApp::handleEvent(Event* event)
 {
 }

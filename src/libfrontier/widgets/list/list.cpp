@@ -341,7 +341,7 @@ Widget* ListItem::handleEvent(Frontier::Event* event)
                 // Ignore
                 if (mouseButtonEvent->doubleClick)
                 {
-                    m_doubleClickSignal.emit(this);
+                    doubleClickSignal().emit(this);
                 }
             }
             else
@@ -350,11 +350,11 @@ Widget* ListItem::handleEvent(Frontier::Event* event)
 
                 if (mouseButtonEvent->doubleClick)
                 {
-                    m_doubleClickSignal.emit(this);
+                    doubleClickSignal().emit(this);
                 }
                 else
                 {
-                    m_clickSignal.emit(this);
+                    clickSignal().emit(this);
                 }
                 if (m_list != NULL)
                 {

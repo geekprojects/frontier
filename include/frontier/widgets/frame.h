@@ -6,6 +6,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief Groups widgets together vertically or horizontally
+ *
+ * \ingroup widgets
+ */
 class Frame : public Widget
 {
  protected:
@@ -34,6 +39,11 @@ class Frame : public Widget
     virtual void activateNext(Widget* activeChild = NULL);
 };
 
+/**
+ * \brief Groups widgets together horizontally
+ *
+ * \ingroup widgets
+ */
 class HFrame : public Frame
 {
  public:
@@ -42,6 +52,11 @@ class HFrame : public Frame
     virtual ~HFrame();
 };
 
+/**
+ * \brief Groups widgets together vertically
+ *
+ * \ingroup widgets
+ */
 class VFrame : public Frame
 {
  public:

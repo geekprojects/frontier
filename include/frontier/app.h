@@ -79,54 +79,98 @@ class FrontierApp : public Geek::Logger
     sigc::signal<void, FrontierWindow*> m_activeWindowChangedSignal;
 
  protected:
+    /// Override the backend engine. Used to provide embedded engines
     void setEngine(FrontierEngine* m_engine);
+
+    /// Return all windows that have been opened for this App
     std::vector<FrontierWindow*>& getWindows() { return m_windows; }
 
  public:
     FrontierApp(std::wstring name);
     virtual ~FrontierApp();
 
+    /// Return the name of the application
     std::wstring getName() { return m_name; }
 
+    /// Register object with the Apps garbage collection
     void registerObject(FrontierObject* object);
+
+    /// Perform garbage collection
     void gc();
+
+    /// Return the number of objects that this application is currently tracking
     unsigned int getObjectCount() { return m_objects.size(); }
 
+    /// Get the current back end engine
     FrontierEngine* getEngine() { return m_engine; }
+
+    /// Return the current FontManager
     Geek::FontManager* getFontManager() const { return m_fontManager; }
+
+    /// Return the current theme \deprecared
     UITheme* getTheme() const { return m_theme; }
+
+    /// Return the current StyleEngine
     StyleEngine* getStyleEngine() { return m_styleEngine; }
 
+    /// Get the current ContextMenu
     ContextMenu* getContextMenuWindow();
 
+    /// Return the directory that application specific config should be stored
     std::string getConfigDir();
 
+    /// Set the application-wide menu. This will be the default for all windows
     void setAppMenu(Menu* menu) { m_appMenu = menu; }
+
+    /// Return the application menu
     Menu* getAppMenu() { return m_appMenu; }
 
+    /// Add a new Window
     void addWindow(FrontierWindow* window);
+
+    /// Remove and close a Window
     void removeWindow(FrontierWindow* window);
+
+    /// Activate the specified Window
     void setActiveWindow(FrontierWindow* activeWindow);
+
+    /// Return the currently active Window
     FrontierWindow* getActiveWindow();
 
+    /// Application specific initialisation. Apps should override this
     virtual bool init();
+
+    /// Application main loop. Apps should only override this if really necessary
     virtual bool main();
+
+    /// Request that the app should quit
     virtual bool quit();
 
+    /// Cause all Windows to be updated and redrawn
     void update();
 
-    void postEvent(Frontier::Event* event);
+    /// Handle an event from a user
     virtual void handleEvent(Frontier::Event* event);
 
+    /// Create a message box to display a message to the user
     virtual void message(std::string title, std::string message);
+
+    /// Create a box to request the user's confirmation
     virtual bool confirmBox(std::string title, std::string message);
+
+    /// Request a file dialog
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 
+    /// Return the current system timestamp in milliseconds
     uint64_t getTimestamp() const;
 
-    void onAboutMenu(MenuItem* item);
-    void onQuitMenu(MenuItem* item);
+    /// Handle requests to the About menu
+    virtual void onAboutMenu(MenuItem* item);
 
+    /// Handle requests to the Quit menu
+    virtual void onQuitMenu(MenuItem* item);
+
+    /// Signal that fires when the active window changes
     virtual sigc::signal<void, FrontierWindow*> activeWindowChangedSignal() { return m_activeWindowChangedSignal; }
 };
 

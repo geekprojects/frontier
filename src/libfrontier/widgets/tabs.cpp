@@ -750,7 +750,7 @@ void Tabs::dump(int level)
     {
         spaces += "    ";
     }
-    log(DEBUG, "%sTabs(%p): x=%d, y=%d, size=%s", spaces.c_str(), this, m_x, m_y, m_setSize.toString().c_str());
+    log(DEBUG, "%sTabs(%p): x=%d, y=%d, size=%s", spaces.c_str(), this, m_position.x, m_position.y, m_setSize.toString().c_str());
 
     for (Tab* tab : m_tabs)
     {

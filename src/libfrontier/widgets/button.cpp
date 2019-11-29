@@ -97,7 +97,7 @@ Widget* Button::handleEvent(Event* event)
 
                 if (!m_selected)
                 {
-                    m_clickSignal.emit(this);
+                    clickSignal().emit(this);
                 }
             }
         } break;
@@ -121,7 +121,7 @@ Widget* Button::handleEvent(Event* event)
                     m_selected = keyEvent->direction;
                     if (!m_selected)
                     {
-                        m_clickSignal.emit(this);
+                        clickSignal().emit(this);
                     }
                 }
             }

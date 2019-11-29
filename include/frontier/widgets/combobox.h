@@ -12,6 +12,11 @@ namespace Frontier
 
 class ComboBoxDropDown;
 
+/**
+ * \brief Combo box which consists of a text input and a drop down to select from a list of options.
+ *
+ * \ingroup widgets
+ */
 class ComboBox : public Frame
 {
  protected:

@@ -1,6 +1,6 @@
 /*
  * Frontier - A toolkit for creating simple OS-independent user interfaces
- * Copyright (C) 2018 Ian Parker <ian@geekprojects.com>
+ * Copyright (C) 2018,2019 Ian Parker <ian@geekprojects.com>
  *
  * This file is part of Frontier.
  *
@@ -16,6 +16,12 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Frontier.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \mainpage Frontier
+ *
+ * Welcome to the Frontier SDK!
  */
 
 #ifndef __FRONTIER_FRONTIER_H_

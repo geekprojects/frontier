@@ -6,6 +6,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief Simple button object that response to mouse clicks
+ *
+ * \ingroup widgets
+ */
 class Button : public Widget
 {
  protected:

@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(PkgConfig REQUIRED)
+find_package(Doxygen COMPONENTS dot)
 
 # Common requirements
 pkg_check_modules(libgeek REQUIRED libgeek)
@@ -78,6 +79,19 @@ string(REPLACE ";" " " PKGCONFIG_LDFLAGS "${PKGCONFIG_LDFLAGS_LIST}")
 
 configure_file(libfrontier.pc.in libfrontier.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/libfrontier.pc DESTINATION "lib${LIB_SUFFIX}/pkgconfig")
+
+if (DOXYGEN_FOUND)
+    set(DOXYGEN_GENERATE_HTML YES)
+    set(DOXYGEN_GENERATE_MAN NO)
+    set(DOXYGEN_EXTRACT_ALL YES)
+
+    doxygen_add_docs(
+        doxygen
+        ${PROJECT_SOURCE_DIR}/include
+        COMMENT "Generate man pages"
+    )
+endif()
+
 
 include(InstallRequiredSystemLibraries)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
