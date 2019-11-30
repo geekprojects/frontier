@@ -236,7 +236,7 @@ Widget* Tab::handleEvent(Event* event)
 
                 if (close)
                 {
-                    if (!mouseButtonEvent->direction)
+                    if (!mouseButtonEvent->direction && m_tabs != NULL)
                     {
                         m_tabs->closeTabSignal().emit(m_content);
                     }

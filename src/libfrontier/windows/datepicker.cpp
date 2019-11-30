@@ -7,6 +7,7 @@
 #include <frontier/fontawesome.h>
 
 #include <chrono>
+#include <time.h>
 
 using namespace Geek;
 using namespace Frontier;
@@ -138,9 +139,10 @@ bool DatePickerWindow::update()
     std::tm time_in = { 0, 0, 0, 1, m_currentMonth - 1, m_currentYear - 1900 };
 
     std::time_t time_temp = std::mktime(&time_in);
-    const std::tm * time_out = std::localtime(&time_temp);
+    std::tm time_out;
+    localtime_r(&time_temp, &time_out);
 
-    int firstwday = time_out->tm_wday;
+    int firstwday = time_out.tm_wday;
     if (firstwday == 0)
     {
         firstwday = 6;

@@ -48,7 +48,6 @@ void Grid::clearChildren()
     m_grid.clear();
 }
 
-
 void Grid::put(int x, int y, Widget* widget)
 {
     uint32_t colour = getStyle("background-color");
@@ -267,9 +266,13 @@ void Grid::layout()
 
         if (colSizes[col] < m_colMaxSizes[col])
         {
-            int s = slackX / slackableX;
-            slackX -= s;
-            slackableX--;
+            int s = 0;
+            if (slackableX != 0)
+            {
+               s = slackX / slackableX;
+               slackX -= s;
+               slackableX--;
+            }
 
             colSizes[col] += s;
             if (colSizes[col] > m_colMaxSizes[col])
@@ -299,9 +302,13 @@ void Grid::layout()
 
         if (rowSizes[row] < m_rowMaxSizes[row])
         {
-            int s = slackY / slackableY;
-            slackY -= s;
-            slackableY--;
+            int s = 0;
+            if (slackableY != 0)
+            {
+                s = slackY / slackableY;
+                slackY -= s;
+                slackableY--;
+            }
 
             rowSizes[row] += s;
             if (rowSizes[row] > m_rowMaxSizes[row])

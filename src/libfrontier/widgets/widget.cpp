@@ -538,7 +538,7 @@ Widget* Widget::handleEvent(Event* event)
                 }
             }
             return this;
-        } break;
+        }
 
         default:
             break;

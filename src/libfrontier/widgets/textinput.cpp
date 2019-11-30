@@ -354,7 +354,7 @@ Widget* TextInput::handleEvent(Event* event)
             }
 
             return this;
-        } break;
+        }
 
         case FRONTIER_EVENT_MOUSE_MOTION:
         {

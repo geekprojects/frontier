@@ -288,8 +288,6 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
         }
         return -shrink;
     }
-
-    return 0.0;
 }
 
 Widget* ResizeableFrame::handleEvent(Event* event)

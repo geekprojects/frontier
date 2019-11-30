@@ -164,6 +164,7 @@ bool Terminal::draw(Surface* surface)
                     // No more to draw on this line!
                     break;
                 }
+                c.c = ' ';
             }
 
             bool isCursor = (row + m_offsetRow == m_row && col == m_col);
@@ -189,7 +190,7 @@ bool Terminal::draw(Surface* surface)
 
             if (col < line.chars.size())
             {
-                fm->write(font, surface, x, y, wstring(L"") + c.c, fg, true, NULL);
+                fm->write(font, surface, x, y, wstring(1, c.c), fg, true, NULL);
             }
         }
     }
@@ -217,7 +218,7 @@ Widget* Terminal::handleEvent(Event* event)
                     m_process->typeChar(c);
                 }
             }
-        }
+        } break;
 
         default:
             break;
