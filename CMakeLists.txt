@@ -4,7 +4,7 @@ include(CheckSymbolExists)
 include(CheckIncludeFile)
 
 # set the project name
-project(frontier VERSION 1.0)
+project(frontier VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
