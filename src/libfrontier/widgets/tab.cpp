@@ -142,13 +142,13 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
         if (horizontal)
         {
             titleWidth -= iconSize.width + iconX;
-            textOffsetX += iconSize.width;
+            textOffsetX += iconSize.width + 2;;
             iconY = (m_setSize.height / 2) - (iconSize.height / 2);
         }
         else
         {
             titleWidth -= iconSize.height + iconY;
-            textOffsetY += iconSize.height;
+            textOffsetY += iconSize.height + 2;;
             iconX = (m_setSize.width / 2) - (iconSize.width / 2);
         }
 
@@ -300,6 +300,12 @@ Widget* Tab::handleEvent(Event* event)
 void Tab::setTitle(wstring title)
 {
     m_title = title;
-    setDirty();
+    setDirty(DIRTY_CONTENT);
+}
+
+void Tab::setIcon(Icon* icon)
+{
+    m_icon = icon;
+    setDirty(DIRTY_CONTENT);
 }
 

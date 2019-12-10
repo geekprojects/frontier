@@ -381,7 +381,7 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual sigc::signal<void, Widget*> doubleClickSignal() { return m_doubleClickSignal; }
 
     /// Returns the current mouse cursor shape. Override this to display different cursors
-    virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_POINTER; }
+    virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_ARROW; }
 
     /// For debug. Dump this widget to stdout
     virtual void dump(int level);

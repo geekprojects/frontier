@@ -47,6 +47,7 @@ class Tab : public Widget
 
     void setTitle(std::wstring title);
     std::wstring getTitle() { return m_title; }
+    void setIcon(Icon* icon);
     Icon* getIcon() { return m_icon; }
     Widget* getContent() { return m_content; }
     bool isCloseable() { return m_closeable; }

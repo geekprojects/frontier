@@ -42,7 +42,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_title = title;
     m_flags = flags;
     m_visible = false;
-    m_currentCursor = CURSOR_POINTER;
+    m_currentCursor = CURSOR_ARROW;
 
     m_content = NULL;
     m_mouseOverWidget = NULL;
@@ -422,7 +422,7 @@ void FrontierWindow::updateCursor()
         return;
     }
 
-    WindowCursor cursor = CURSOR_POINTER;
+    WindowCursor cursor = CURSOR_ARROW;
     if (m_mouseOverWidget != NULL)
     {
         cursor = m_mouseOverWidget->getCursor();
@@ -433,7 +433,7 @@ void FrontierWindow::updateCursor()
         m_engineWindow->resetCursor();
 
         log(DEBUG, "updateCursor: Updating cursor: %u", cursor);
-        if (cursor != CURSOR_POINTER && m_mouseOverWidget != NULL)
+        if (cursor != CURSOR_ARROW && m_mouseOverWidget != NULL)
         {
             Vector2D pos = m_mouseOverWidget->getAbsolutePosition();
             Size size = m_mouseOverWidget->getSize();

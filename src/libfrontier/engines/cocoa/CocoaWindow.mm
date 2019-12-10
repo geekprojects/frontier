@@ -663,8 +663,11 @@ void CocoaWindow::updateCursor(WindowCursor cursor, int x, int y, int w, int h)
 
     switch (cursor)
     {
-        case CURSOR_POINTER:
+        case CURSOR_ARROW:
             nscursor = NSCursor.arrowCursor;
+            break;
+        case CURSOR_POINTING:
+            nscursor = NSCursor.pointingHandCursor;
             break;
         case CURSOR_EDIT:
             nscursor = NSCursor.IBeamCursor;
