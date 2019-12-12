@@ -30,6 +30,9 @@ class CocoaWindow : public FrontierEngineWindow
 
     void* m_cocoaWindow;
     void* m_cocoaView;
+    Geek::Gfx::Surface* m_cocoaDataProviderSurface;
+    void* m_cocoaDataProvider;
+    void* m_cocoaColourSpace;
 
     bool createCocoaWindow();
     bool drawSurface(Geek::Gfx::Surface* surface);

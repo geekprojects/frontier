@@ -64,7 +64,7 @@ using namespace Geek;
 
 - (void)windowDidResignKey: (NSNotification *)notification
 {
-printf("windowDidResignKey: this=%p\n", self);
+    printf("windowDidResignKey: this=%p\n", self);
 }
 
 @end
@@ -392,6 +392,7 @@ printf("windowDidResignKey: this=%p\n", self);
 
 CocoaWindow::CocoaWindow(FrontierEngine* engine, FrontierWindow* window) : FrontierEngineWindow(engine, window)
 {
+    m_cocoaDataProvider = NULL;
 }
 
 CocoaWindow::~CocoaWindow()
@@ -399,7 +400,6 @@ CocoaWindow::~CocoaWindow()
     [(CocoaNSWindow*)m_cocoaWindow release];
     [(FrontierView*)m_cocoaView release];
 }
-
 
 bool CocoaWindow::init()
 {
@@ -539,6 +539,11 @@ void CocoaWindow::setSize(Frontier::Size size)
     [(FrontierView*)m_cocoaView setFrameSize: nssize];
 }
 
+void releaseCGData(void *info, const void *data, size_t size)
+{
+    printf("releaseCGData: info=%p, data=%p, size=%ld\n", info, data, size);
+}
+
 bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
 {
     int width = surface->getWidth();
@@ -551,8 +556,26 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
     int len = width * height * 4;
 
     // Create a CGImage with the pixel data
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, surface->getData(), len, NULL);
-    CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
+    CGDataProviderRef provider = (CGDataProviderRef)m_cocoaDataProvider;
+    CGColorSpaceRef colorspace = (CGColorSpaceRef)m_cocoaColourSpace;
+    if (m_cocoaDataProvider == NULL || m_cocoaDataProviderSurface != surface)
+    {
+        if (m_cocoaDataProvider != NULL)
+        {
+            CGDataProviderRelease(provider);
+            CGColorSpaceRelease(colorspace);
+        }
+
+        provider = CGDataProviderCreateWithData(NULL, surface->getData(), len, releaseCGData);
+        m_cocoaDataProvider = provider;
+        CGDataProviderRetain(provider);
+
+        colorspace = CGColorSpaceCreateDeviceRGB();
+        m_cocoaColourSpace = colorspace;
+
+        m_cocoaDataProviderSurface = surface;
+    }
+
     CGImageRef image = CGImageCreate(
         width,
         height,
@@ -571,10 +594,6 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
 
     // Tell Cocoa to redraw the window
     [view setNeedsDisplay:YES];
-
-    //Clean up
-    CGColorSpaceRelease(colorspace);
-    CGDataProviderRelease(provider);
 
     return true;
 }
