@@ -34,6 +34,8 @@ TextInput::TextInput(FrontierApp* ui) : Widget(ui, L"TextInput")
     m_textSurface = NULL;
     m_maxLength = 0;
 
+    m_surfaceMutex = Thread::createMutex();
+
     setText(L"");
 }
 
@@ -41,6 +43,8 @@ TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
     m_maxLength = 0;
+
+    m_surfaceMutex = Thread::createMutex();
 
     setText(text);
 }
@@ -50,6 +54,8 @@ TextInput::TextInput(FrontierWindow* window) : Widget(window, L"TextInput")
     m_textSurface = NULL;
     m_maxLength = 0;
 
+    m_surfaceMutex = Thread::createMutex();
+
     setText(L"");
 }
 
@@ -57,6 +63,8 @@ TextInput::TextInput(FrontierWindow* window, wstring text) : Widget(window, L"Te
 {
     m_textSurface = NULL;
     m_maxLength = 0;
+
+    m_surfaceMutex = Thread::createMutex();
 
     setText(text);
 }
@@ -79,11 +87,13 @@ void TextInput::setText(std::wstring text)
     m_selectStart = -1;
     m_selectEnd = -1;
 
+    m_surfaceMutex->lock();
     if (m_textSurface != NULL)
     {
         delete m_textSurface;
         m_textSurface = NULL;
     }
+    m_surfaceMutex->unlock();
 
     setDirty(DIRTY_CONTENT);
 }
@@ -123,6 +133,7 @@ bool TextInput::draw(Surface* surface)
     int selectStart = MIN(m_selectStart, m_selectEnd);
     int selectEnd = MAX(m_selectStart, m_selectEnd);
 
+    m_surfaceMutex->lock();
     if (m_textSurface != NULL)
     {
         unsigned int surfaceWidth = m_textSurface->getWidth();
@@ -196,6 +207,8 @@ bool TextInput::draw(Surface* surface)
     }
 
     drawCursor(m_textSurface, font, cursorX, y);
+
+    m_surfaceMutex->unlock();
 
     unsigned int drawWidth = m_setSize.width - (boxModel.getWidth());
     if (drawWidth > textWidth)

@@ -24,6 +24,7 @@ class TextInput : public Widget
 
     int charAt(int x);
 
+    Geek::Mutex* m_surfaceMutex;
     Geek::Gfx::Surface* m_textSurface;
 
     sigc::signal<void, TextInput*> m_signalEditingEnd;
