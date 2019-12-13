@@ -216,6 +216,7 @@ void Tabs::calculateSize()
             m_minSize.height += m_collapseButtonWidget->getMinSize().height;
         }
     }
+    m_maxSize = m_minSize;
 
     if (m_tabs.empty() || (m_collapsible && m_collapsed))
     {
@@ -432,10 +433,10 @@ Widget* Tabs::handleEvent(Event* event)
                 {
                     if (m_collapseButtonWidget->intersects(mouseEvent->x, mouseEvent->y))
                     {
-                         if (mouseButtonEvent->direction)
-                         {
-                             m_collapsed = !m_collapsed;
-                             setDirty();
+                        if (mouseButtonEvent->direction)
+                        {
+                            m_collapsed = !m_collapsed;
+                            setDirty();
                         }
                         if (m_collapsed)
                         {
@@ -459,6 +460,16 @@ Widget* Tabs::handleEvent(Event* event)
                         {
                             m_collapsed = false;
                         }
+                        return tab->handleEvent(event);
+                    }
+                }
+            }
+            else if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
+            {
+                for (Tab* tab : m_tabs)
+                {
+                    if (tab->intersects(mouseEvent->x, mouseEvent->y))
+                    {
                         return tab->handleEvent(event);
                     }
                 }
@@ -536,7 +547,7 @@ void Tabs::addTab(Tab* tab, vector<Tab*>::iterator pos)
 
     if (m_activeTab == NULL)
     {
-        m_activeTab = tab;
+        setActiveTab(tab);
     }
 
     setDirty();
