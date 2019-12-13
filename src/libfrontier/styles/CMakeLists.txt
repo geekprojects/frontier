@@ -9,5 +9,5 @@ ADD_LIBRARY(styles STATIC
 )
 
 add_definitions(-DCSSDIR=${DATADIR})
-add_definitions(-Wno-unknown-warning-option -Wno-defaulted-function-deleted)
+add_definitions(-Wno-error -Wno-unknown-warning-option -Wno-defaulted-function-deleted)
 
