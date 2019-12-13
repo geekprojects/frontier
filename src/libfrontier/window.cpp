@@ -332,7 +332,7 @@ void FrontierWindow::update(bool force)
         }
     }
 
-    if (m_root->isDirty(DIRTY_SIZE))
+    if (m_root->isDirty(DIRTY_SIZE) || m_root->isDirty(DIRTY_STYLE))
     {
         m_root->calculateSize();
 
