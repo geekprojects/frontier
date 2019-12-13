@@ -288,13 +288,9 @@ Widget* Tab::handleEvent(Event* event)
                 }
             }
         }
-        else
-        {
-            return this;
-        }
     }
 
-    return NULL;
+    return this;
 }
 
 void Tab::setTitle(wstring title)
