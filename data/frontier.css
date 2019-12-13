@@ -34,9 +34,17 @@ Tab.tabTop:selected {
     border-bottom: 1px solid #4a7987;
 }
 
+Tab.tabLeft:selected {
+    border-right: 1px solid #4a7987;
+}
+
 Tab:selected {
     background-color: #515658;
 }
+Tab:hover {
+    background-color: #43494b;
+}
+
 
 Label {
     expand-horizontal: true;
@@ -57,7 +65,7 @@ Button.highlight {
     background-color: #fff;
 }
 
-Button:selected, IconButton:active {
+Button:selected, IconButton:selected {
     /*background-color: #4a7987;*/
 
     border-top: 1px solid #0F0F0F;
@@ -66,8 +74,8 @@ Button:selected, IconButton:active {
     border-bottom: 1px solid #4b4b4b;
 }
 
-Button:hover {
-    background-color: #00f;
+Button:hover, IconButton:hover {
+    background-color: #4c4f51;
 }
 
 Button:active, IconButton:active {
