@@ -1,4 +1,4 @@
-Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch=develop)](https://travis-ci.org/geekprojects/frontier) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=geekprojects_frontier&metric=alert_status)](https://sonarcloud.io/dashboard?id=geekprojects_frontier)
+Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch=develop)](https://travis-ci.org/geekprojects/frontier) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=geekprojects_frontier&metric=alert_status)](https://sonarcloud.io/dashboard?id=geekprojects_frontier) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/fd89c5a557c24f3eb9a17565cb6e9dfb)](https://www.codacy.com/gh/geekprojects/frontier?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=geekprojects/frontier&amp;utm_campaign=Badge_Grade)
 
 --------
 
