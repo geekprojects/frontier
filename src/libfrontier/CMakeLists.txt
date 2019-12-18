@@ -16,6 +16,7 @@ list(APPEND libfrontier_srcs
     engines/embedded/embedded_engine.cpp
     widgets/button.cpp
     widgets/iconbutton.cpp
+    widgets/checkbox.cpp
     widgets/scrollbar.cpp
     widgets/terminal.cpp
     widgets/combobox.cpp

@@ -51,7 +51,7 @@ Label {
     expand-vertical: false;
 }
 
-Button {
+Button, CheckBox {
     /*background-color: #4a7987; */
     /*border-radius: 3px;*/
     border-top: 1px solid #4b4b4b;
@@ -65,7 +65,7 @@ Button.highlight {
     background-color: #fff;
 }
 
-Button:selected, IconButton:selected {
+Button:selected, IconButton:selected, CheckBox:selected {
     /*background-color: #4a7987;*/
 
     border-top: 1px solid #0F0F0F;
@@ -74,11 +74,11 @@ Button:selected, IconButton:selected {
     border-bottom: 1px solid #4b4b4b;
 }
 
-Button:hover, IconButton:hover {
+Button:hover, IconButton:hover, CheckBox:hover {
     background-color: #4c4f51;
 }
 
-Button:active, IconButton:active {
+Button:active, IconButton:active, CheckBox:active {
     background-color: #4a7987;
 }
 

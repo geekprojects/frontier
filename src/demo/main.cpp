@@ -35,6 +35,7 @@
 #include <frontier/widgets/combobox.h>
 #include <frontier/widgets/terminal.h>
 #include <frontier/widgets/numberinput.h>
+#include <frontier/widgets/checkbox.h>
 #include <frontier/windows/datepicker.h>
 
 using namespace std;
@@ -103,6 +104,7 @@ bool TooltipWindow::init()
 
 DemoApp::DemoApp() : FrontierApp(L"Demo")
 {
+    m_tooltipWindow = NULL;
 }
 
 DemoApp::~DemoApp()
@@ -206,6 +208,8 @@ bool DemoApp::init()
         buttonFrame1->add(new Label(this, L"Button:"));
         buttonFrame1->add(m_textButton1 = new Button(this, L"Click me!"));
         buttonFrame1->add(m_textButton2 = new Button(this, L"But not me!"));
+        buttonFrame1->add(new Button(this, L"Toggle Button!", BUTTON_TOGGLE));
+        buttonFrame1->add(new CheckBox(this));
         buttonTab->add(buttonFrame1);
         m_tabs->addTab(L"Buttons", buttonTab);
 
