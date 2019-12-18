@@ -51,10 +51,6 @@ TreeListItem::TreeListItem(FrontierWindow* win, Icon* icon, std::wstring text) :
 
 TreeListItem::~TreeListItem()
 {
-    for (Widget* item : m_children)
-    {
-        item->decRefCount();
-    }
 }
 
 void TreeListItem::addItem(ListItem* item)

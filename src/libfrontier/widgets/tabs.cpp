@@ -87,6 +87,15 @@ Tabs::~Tabs()
         tab->decRefCount();
     }
     m_tabs.clear();
+
+    if (m_addButtonWidget != NULL)
+    {
+        m_addButtonWidget->decRefCount();
+    }
+    if (m_collapseButtonWidget != NULL)
+    {
+        m_collapseButtonWidget->decRefCount();
+    }
 }
 
 void Tabs::init()

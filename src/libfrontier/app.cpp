@@ -177,7 +177,7 @@ void FrontierApp::gc()
                 //log(DEBUG, "gc: %p: references=%d", obj, obj->getRefCount());
                 if (count < 0)
                 {
-                    log(Geek::WARN, "gc: %p: Reference Count is less than zero??", obj);
+                    log(Geek::WARN, "gc: %p: RefCount is less than zero: %s", obj, typeid(*obj).name());
                 }
                 delete obj;
                 m_objects.erase(obj);

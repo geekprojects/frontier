@@ -275,6 +275,7 @@ void Scroller::setChild(Widget* child)
     m_children.clear();
     m_children.push_back(child);
     m_children.push_back(m_vScrollBar);
+    m_children.push_back(m_hScrollBar);
 }
 
 void Scroller::dump(int level)
