@@ -27,24 +27,28 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-Button::Button(FrontierApp* ui, wstring text) : Widget(ui, L"Button")
+Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Widget(ui, L"Button")
 {
     m_text = text;
+    m_type = type;
 }
 
-Button::Button(FrontierWindow* window, wstring text) : Widget(window, L"Button")
+Button::Button(FrontierWindow* window, wstring text, ButtonType type) : Widget(window, L"Button")
 {
     m_text = text;
+    m_type = type;
 }
 
-Button::Button(FrontierApp* ui, wstring widgetType, wstring text) : Widget(ui, widgetType)
+Button::Button(FrontierApp* ui, wstring widgetType, wstring text, ButtonType type) : Widget(ui, widgetType)
 {
     m_text = text;
+    m_type = type;
 }
 
-Button::Button(FrontierWindow* window, wstring widgetType, wstring text) : Widget(window, widgetType)
+Button::Button(FrontierWindow* window, wstring widgetType, wstring text, ButtonType type) : Widget(window, widgetType)
 {
     m_text = text;
+    m_type = type;
 }
 
 Button::~Button()
@@ -89,16 +93,30 @@ Widget* Button::handleEvent(Event* event)
         {
             MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
             log(DEBUG, "handleEvent: Message! text=%ls", m_text.c_str());
-            if (m_selected != mouseButtonEvent->direction)
+            switch (m_type)
             {
-                setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+                case BUTTON_NORMAL:
+                    if (m_selected != mouseButtonEvent->direction)
+                    {
+                        setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 
-                m_selected = mouseButtonEvent->direction;
+                        m_selected = mouseButtonEvent->direction;
 
-                if (!m_selected)
-                {
-                    clickSignal().emit(this);
-                }
+                        if (!m_selected)
+                        {
+                            clickSignal().emit(this);
+                        }
+                    }
+                    break;
+
+                case BUTTON_TOGGLE:
+                    if (!mouseButtonEvent->direction)
+                    {
+                        m_selected = !m_selected;
+                        setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+                        clickSignal().emit(this);
+                    }
+                    break;
             }
         } break;
 
@@ -114,15 +132,28 @@ Widget* Button::handleEvent(Event* event)
             }
             else if (keyEvent->key == KC_SPACE)
             {
-                if (m_selected != keyEvent->direction)
+                switch (m_type)
                 {
-                    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+                    case BUTTON_NORMAL:
+                        if (m_selected != keyEvent->direction)
+                        {
+                            setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 
-                    m_selected = keyEvent->direction;
-                    if (!m_selected)
-                    {
-                        clickSignal().emit(this);
-                    }
+                            m_selected = keyEvent->direction;
+                            if (!m_selected)
+                            {
+                                clickSignal().emit(this);
+                            }
+                        }
+                        break;
+                    case BUTTON_TOGGLE:
+                        if (!keyEvent->direction)
+                        {
+                            m_selected = !m_selected;
+                            setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+                            clickSignal().emit(this);
+                        }
+                        break;
                 }
             }
         } break;

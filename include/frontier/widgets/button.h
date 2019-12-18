@@ -6,6 +6,12 @@
 namespace Frontier
 {
 
+enum ButtonType
+{
+    BUTTON_NORMAL,
+    BUTTON_TOGGLE
+};
+
 /**
  * \brief Simple button object that response to mouse clicks
  *
@@ -14,13 +20,14 @@ namespace Frontier
 class Button : public Widget
 {
  protected:
+    ButtonType m_type;
     std::wstring m_text;
 
  public:
-    Button(FrontierApp* ui, std::wstring text);
-    Button(FrontierWindow* ui, std::wstring text);
-    Button(FrontierApp* ui, std::wstring widgetType, std::wstring text);
-    Button(FrontierWindow* ui, std::wstring widgetType, std::wstring text);
+    Button(FrontierApp* ui, std::wstring text, ButtonType type = BUTTON_NORMAL);
+    Button(FrontierWindow* ui, std::wstring text, ButtonType type = BUTTON_NORMAL);
+    Button(FrontierApp* ui, std::wstring widgetType, std::wstring text, ButtonType type = BUTTON_NORMAL);
+    Button(FrontierWindow* ui, std::wstring widgetType, std::wstring text, ButtonType type = BUTTON_NORMAL);
     virtual ~Button();
 
     virtual void calculateSize();
