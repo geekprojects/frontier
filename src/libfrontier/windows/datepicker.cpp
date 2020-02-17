@@ -145,7 +145,7 @@ bool DatePickerWindow::update()
     int firstwday = time_out.tm_wday;
     if (firstwday == 0)
     {
-        firstwday = 6;
+        firstwday = 7;
     }
 
     int daysInMonth = getDaysInMonth(m_currentMonth, m_currentYear);
