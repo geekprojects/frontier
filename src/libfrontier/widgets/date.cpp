@@ -40,6 +40,12 @@ void Date::setup()
     m_dateLabel->setWidgetClass(L"dateInput");
     add(m_dateLabel);
 
+    /*
+    IconButton* dateButton = new IconButton(getApp(), FRONTIER_ICON_CALENDAR);
+    dateButton->setStyle("expand-vertical", true);
+    add(dateButton);
+    */
+
     if (m_hasTime)
     {
         m_hourInput = new NumberInput(getApp());
@@ -89,7 +95,7 @@ bool Date::onDateSelect(int year, int month, int day)
     tm tm;
     gmtime_r(&t, &tm);
     tm.tm_year = year - 1900;
-    tm.tm_mon = month;
+    tm.tm_mon = month - 1;
     tm.tm_mday = day;
 
     t = mktime(&tm);
@@ -114,8 +120,6 @@ void Date::onTimeChanged(Frontier::TextInput* w)
     t = mktime(&tm);
 
     m_value = std::chrono::seconds(t);
-
-    //updateDateTime();
 }
 
 void Date::updateDateTime()
@@ -128,7 +132,10 @@ void Date::updateDateTime()
     strftime(buf, 50, "%d/%m/%Y", &tm);
     m_dateLabel->setText(Utils::string2wstring(buf));
 
-    m_hourInput->setNumber(tm.tm_hour);
-    m_minuteInput->setNumber(tm.tm_min);
+    if (m_hasTime)
+    {
+        m_hourInput->setNumber(tm.tm_hour);
+        m_minuteInput->setNumber(tm.tm_min);
+    }
 }
 
