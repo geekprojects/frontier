@@ -30,6 +30,7 @@ list(APPEND libfrontier_srcs
     widgets/grid.cpp
     widgets/resizeableframe.cpp
     widgets/tabs.cpp
+    widgets/date.cpp
     widgets/list/textlistitem.cpp
     widgets/list/list.cpp
     widgets/list/menulist.cpp

@@ -66,16 +66,22 @@ bool NumberInput::isValid(std::wstring wstr)
 {
     string str = Utils::wstring2string(wstr);
 
+    if (str.length() == 0)
+    {
+        return true;
+    }
+
     const char* start = str.c_str();
     char* end;
     if (m_integerOnly)
     {
         int i = strtol(start, &end, 10);
         int e = errno;
-        if (e != 0)
+        if (i == 0 && e != 0)
         {
             return false;
         }
+
         unsigned int len = end - start;
         if (wstr.length() != len)
         {
@@ -87,7 +93,7 @@ bool NumberInput::isValid(std::wstring wstr)
     {
         double d = strtod(start, &end);
         int e = errno;
-        if (e != 0)
+        if (d == 0 && e != 0)
         {
             return false;
         }

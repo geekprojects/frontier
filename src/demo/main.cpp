@@ -36,6 +36,7 @@
 #include <frontier/widgets/terminal.h>
 #include <frontier/widgets/numberinput.h>
 #include <frontier/widgets/checkbox.h>
+#include <frontier/widgets/date.h>
 #include <frontier/windows/datepicker.h>
 
 using namespace std;
@@ -52,7 +53,7 @@ class DemoApp : public FrontierApp
     Button* m_textButton1;
     Button* m_textButton2;
     Label* m_dateLabel;
-    Button* m_dateButton;
+    Date* m_date;
 
     TooltipWindow* m_tooltipWindow;
 
@@ -251,14 +252,11 @@ numberInput->setIntegerOnly(false);
 numberInput->setNumber(3.14);
         inputTab->add(numberFrame);
 
-
         Frame* inputFrame3 = new Frame(this, true);
         inputFrame3->add(new Label(this, L"Date:"));
         inputFrame3->add(m_dateLabel = new Label(this, L"Choose Date"));
-        m_dateLabel->setStyle("border-width", 1);
-        m_dateLabel->setStyle("border-color", 0xff0000);
-        inputFrame3->add(m_dateButton = new IconButton(this, getTheme()->getIcon(FRONTIER_ICON_CALENDAR)));
-        m_dateButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onDateButton));
+        inputFrame3->add(m_date = new Date(this, true));
+        //m_dateButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onDateButton));
         inputTab->add(inputFrame3);
 
         m_tabs->addTab(L"Inputs", inputTab);

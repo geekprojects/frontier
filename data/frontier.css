@@ -82,7 +82,7 @@ Button:active, IconButton:active, CheckBox:active {
     background-color: #4a7987;
 }
 
-TextInput {
+TextInput, .dateInput {
     background-color: #45494a;
     border: 1px solid #646464;
     padding: 2px;
