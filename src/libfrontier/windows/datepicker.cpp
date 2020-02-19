@@ -81,10 +81,10 @@ bool DatePickerWindow::init()
     Frame* dateFrame = new Frame(this, true);
     IconButton* prevButton;
     IconButton* nextButton;
-    dateFrame->add(prevButton = new IconButton(this, getApp()->getTheme()->getIcon(FRONTIER_ICON_ANGLE_LEFT)));
-    dateFrame->add(m_monthInput = new ComboBox(this));
-    dateFrame->add(m_yearInput = new TextInput(this, L"2019"));
-    dateFrame->add(nextButton = new IconButton(this, getApp()->getTheme()->getIcon(FRONTIER_ICON_ANGLE_RIGHT)));
+    dateFrame->add(prevButton = new IconButton(getApp(), getApp()->getTheme()->getIcon(FRONTIER_ICON_ANGLE_LEFT)));
+    dateFrame->add(m_monthInput = new ComboBox(getApp()));
+    dateFrame->add(m_yearInput = new TextInput(getApp(), L"2019"));
+    dateFrame->add(nextButton = new IconButton(getApp(), getApp()->getTheme()->getIcon(FRONTIER_ICON_ANGLE_RIGHT)));
     root->add(dateFrame);
 
     m_monthInput->addOption(L"January", (void*)1);
@@ -128,13 +128,13 @@ bool DatePickerWindow::update()
 
     m_dayGrid->clear();
 
-    m_dayGrid->put(0, 0, new Label(this, L"Mon"));
-    m_dayGrid->put(1, 0, new Label(this, L"Tue"));
-    m_dayGrid->put(2, 0, new Label(this, L"Wed"));
-    m_dayGrid->put(3, 0, new Label(this, L"Thu"));
-    m_dayGrid->put(4, 0, new Label(this, L"Fri"));
-    m_dayGrid->put(5, 0, new Label(this, L"Sat"));
-    m_dayGrid->put(6, 0, new Label(this, L"Sun"));
+    m_dayGrid->put(0, 0, new Label(getApp(), L"Mon"));
+    m_dayGrid->put(1, 0, new Label(getApp(), L"Tue"));
+    m_dayGrid->put(2, 0, new Label(getApp(), L"Wed"));
+    m_dayGrid->put(3, 0, new Label(getApp(), L"Thu"));
+    m_dayGrid->put(4, 0, new Label(getApp(), L"Fri"));
+    m_dayGrid->put(5, 0, new Label(getApp(), L"Sat"));
+    m_dayGrid->put(6, 0, new Label(getApp(), L"Sun"));
     // second, minute, hour 1-based day, 0-based month, year since 1900
     std::tm time_in = { 0, 0, 0, 1, m_currentMonth - 1, m_currentYear - 1900 };
 
@@ -162,7 +162,7 @@ bool DatePickerWindow::update()
             {
                 swprintf(buf, 5, L"%d", day);
 
-                Button* button = new Button(this, buf);
+                Button* button = new Button(getApp(), buf);
                 button->setPrivateData((void*)(uint64_t)((day << 24) | (m_currentMonth << 16) | (m_currentYear)));
                 button->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onDateSelected));
 

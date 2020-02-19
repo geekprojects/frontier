@@ -13,8 +13,7 @@ class CheckBox : public Button
     Icon* m_icon;
 
  public:
-    CheckBox(FrontierApp* ui);
-    CheckBox(FrontierWindow* ui);
+    CheckBox(FrontierApp* app);
     virtual ~CheckBox();
 
     virtual void calculateSize();

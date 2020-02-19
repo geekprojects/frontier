@@ -27,62 +27,18 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Widget(ui, L"Button")
+Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Label(ui, L"Button", text)
 {
-    m_text = text;
     m_type = type;
 }
 
-Button::Button(FrontierWindow* window, wstring text, ButtonType type) : Widget(window, L"Button")
+Button::Button(FrontierApp* ui, wstring widgetType, wstring text, ButtonType type) : Label(ui, widgetType, text)
 {
-    m_text = text;
-    m_type = type;
-}
-
-Button::Button(FrontierApp* ui, wstring widgetType, wstring text, ButtonType type) : Widget(ui, widgetType)
-{
-    m_text = text;
-    m_type = type;
-}
-
-Button::Button(FrontierWindow* window, wstring widgetType, wstring text, ButtonType type) : Widget(window, widgetType)
-{
-    m_text = text;
     m_type = type;
 }
 
 Button::~Button()
 {
-}
-
-void Button::calculateSize()
-{
-    FontHandle* font = getTextFont();
-
-    m_minSize.width = font->getPixelWidth(m_text);
-    m_minSize.height = font->getPixelHeight();
-
-    Size borderSize = getBorderSize();
-    m_minSize.width += borderSize.width;
-    m_minSize.height += borderSize.height;
-
-    m_maxSize.width = WIDGET_SIZE_UNLIMITED;
-    m_maxSize.height = m_minSize.height;
-}
-
-bool Button::draw(Surface* surface)
-{
-    FontHandle* font = getTextFont();
-
-    int w = font->getPixelWidth(m_text);
-    int x = (m_setSize.width / 2) - (w / 2);
-    int y = (m_setSize.height / 2) - (font->getPixelHeight() / 2);
-
-    drawBorder(surface);
-
-    drawText(surface, x, y, m_text, font);
-
-    return true;
 }
 
 Widget* Button::handleEvent(Event* event)
@@ -92,7 +48,7 @@ Widget* Button::handleEvent(Event* event)
         case FRONTIER_EVENT_MOUSE_BUTTON:
         {
             MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
-            log(DEBUG, "handleEvent: Message! text=%ls", m_text.c_str());
+            log(DEBUG, "handleEvent: Message! text=%ls", getText().c_str());
             switch (m_type)
             {
                 case BUTTON_NORMAL:

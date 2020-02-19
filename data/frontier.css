@@ -46,7 +46,7 @@ Tab:hover {
 }
 
 
-Label {
+Label, Button {
     expand-horizontal: true;
     expand-vertical: false;
 }

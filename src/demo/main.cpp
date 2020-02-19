@@ -100,7 +100,7 @@ TooltipWindow::~TooltipWindow()
 
 bool TooltipWindow::init()
 {
-    setContent(new Label(this, L"Tool tip!"));
+    setContent(new Label(getApp(), L"Tool tip!"));
     return true;
 }
 

@@ -27,6 +27,14 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+Label::Label(FrontierApp* ui, wstring widgetName, wstring text) : Widget(ui, widgetName)
+{
+    m_text = text;
+    m_align = ALIGN_CENTER;
+    m_icon = NULL;
+}
+
+
 Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {
     m_text = text;
@@ -54,22 +62,6 @@ Label::Label(FrontierApp* ui, wstring text, TextAlign align, Icon* icon) : Widge
     m_align = align;
     m_icon = NULL;
 }
-
-
-Label::Label(FrontierWindow* window, wstring text) : Widget(window, L"Label")
-{
-    m_text = text;
-    m_align = ALIGN_CENTER;
-    m_icon = NULL;
-}
-
-Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window, L"Label")
-{
-    m_text = text;
-    m_align = align;
-    m_icon = NULL;
-}
-
 
 Label::~Label()
 {

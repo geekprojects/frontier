@@ -43,29 +43,29 @@ DemoWindow::~DemoWindow()
 
 bool DemoWindow::init()
 {
-    Tabs* tabs = new Tabs(this, true, TAB_TOP);
+    Tabs* tabs = new Tabs(getApp(), true, TAB_TOP);
 
-    Frame* speedFrame = new Frame(this, false);
-    Button* faster = new Button(this, L"Faster!");
+    Frame* speedFrame = new Frame(getApp(), false);
+    Button* faster = new Button(getApp(), L"Faster!");
     faster->clickSignal().connect(sigc::mem_fun(*this, &DemoWindow::faster));
-    Button* slower = new Button(this, L"Slower!");
+    Button* slower = new Button(getApp(), L"Slower!");
     slower->clickSignal().connect(sigc::mem_fun(*this, &DemoWindow::slower));
     speedFrame->add(faster);
     speedFrame->add(slower);
     tabs->addTab(L"Speed", speedFrame);
 
-    Frame* colourFrame = new Frame(this, false);
-    colourFrame->add(new Button(this, L"Red!"));
-    colourFrame->add(new Button(this, L"Blue!"));
-    colourFrame->add(new Button(this, L"Green!"));
+    Frame* colourFrame = new Frame(getApp(), false);
+    colourFrame->add(new Button(getApp(), L"Red!"));
+    colourFrame->add(new Button(getApp(), L"Blue!"));
+    colourFrame->add(new Button(getApp(), L"Green!"));
     tabs->addTab(L"Colour", colourFrame);
 
-    Frame* sizeFrame = new Frame(this, false);
-    sizeFrame->add(new Button(this, L"Smaller!"));
-    sizeFrame->add(new Button(this, L"Bigger!"));
+    Frame* sizeFrame = new Frame(getApp(), false);
+    sizeFrame->add(new Button(getApp(), L"Smaller!"));
+    sizeFrame->add(new Button(getApp(), L"Bigger!"));
     tabs->addTab(L"Size", sizeFrame);
 
-    Terminal* terminal = new Terminal(this);
+    Terminal* terminal = new Terminal(getApp());
     terminal->run("/usr/bin/top");
     tabs->addTab(L"Terminal", terminal);
 

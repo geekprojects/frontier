@@ -16,15 +16,15 @@ class Label : public Widget
     int m_lineHeight;
 
  public:
+    Label(FrontierApp* ui, std::wstring widgetName, std::wstring text);
     Label(FrontierApp* ui, std::wstring text);
     Label(FrontierApp* ui, std::wstring text, TextAlign align);
     Label(FrontierApp* ui, std::wstring text, Icon* icon);
     Label(FrontierApp* ui, std::wstring text, TextAlign align, Icon* icon);
-    Label(FrontierWindow* ui, std::wstring text);
-    Label(FrontierWindow* ui, std::wstring text, TextAlign align);
     virtual ~Label();
 
     void setText(std::wstring wtext);
+    std::wstring getText() { return m_text; }
     void setAlign(TextAlign align);
     void setIcon(Icon* icon);
 
