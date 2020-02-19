@@ -31,6 +31,7 @@ list(APPEND libfrontier_srcs
     widgets/resizeableframe.cpp
     widgets/tabs.cpp
     widgets/date.cpp
+    widgets/hsvwheel.cpp
     widgets/list/textlistitem.cpp
     widgets/list/list.cpp
     widgets/list/menulist.cpp

@@ -93,6 +93,10 @@ TextInput:active {
     border-color: #ff0;
 }
 
+.dateInput {
+    expand-horizontal: false;
+}
+
 Scroller {
     border-top: 1px solid #0F0F0F;
     border-left: 1px solid #0F0F0F;
@@ -129,4 +133,7 @@ ScrollBar {
     padding: 2px;
 }
 
+HSVWheel {
+    background-color: #000;
+}
 

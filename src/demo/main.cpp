@@ -37,6 +37,7 @@
 #include <frontier/widgets/numberinput.h>
 #include <frontier/widgets/checkbox.h>
 #include <frontier/widgets/date.h>
+#include <frontier/widgets/hsvwheel.h>
 #include <frontier/windows/datepicker.h>
 
 using namespace std;
@@ -293,6 +294,12 @@ numberInput->setNumber(3.14);
         comboBoxTab->add(comboBoxFrame1);
         m_tabs->addTab(L"ComboBox", comboBoxTab);
     }
+
+{
+Frame* colourTab = new Frame(this, false);
+colourTab->add(new HSVWheel(this));
+        m_tabs->addTab(L"Colours", colourTab);
+}
 
     {
         Frame* terminalTab = new Frame(this, false);
