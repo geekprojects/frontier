@@ -10,6 +10,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A special Window that displays a Menu
+ *
+ * \ingroup windows
+ */
 class ContextMenu : public FrontierWindow
 {
  private:

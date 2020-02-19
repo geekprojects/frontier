@@ -42,11 +42,18 @@ class Frame;
 
 class FrontierEngineWindow;
 
+/**
+ * \defgroup windows Windows
+ */
+
+/**
+ * \brief Window flags
+ */
 enum WindowFlags
 {
-    WINDOW_BORDER = 1,
-    WINDOW_RESIZEABLE = 2,
-    WINDOW_TOOL_TIP = 4,
+    WINDOW_BORDER = 1, /// Window should have a border
+    WINDOW_RESIZEABLE = 2,  /// Window should be resizeable by the user
+    WINDOW_TOOL_TIP = 4, /// Window will be used as a tool tip
 
     WINDOW_NORMAL = WINDOW_BORDER | WINDOW_RESIZEABLE,
 };
@@ -60,6 +67,11 @@ enum WindowCursor
     CURSOR_RESIZE_VERTICAL,
 };
 
+/**
+ * \brief A representation of a Window on the screen
+ *
+ * \ingroup windows
+ */
 class FrontierWindow : public FrontierObject, public Geek::Logger
 {
  private:
@@ -70,7 +82,6 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
 
     std::wstring m_title;
     int m_flags;
-    //bool m_isMain;
     bool m_visible;
     Frontier::Size m_size;
 
@@ -121,7 +132,6 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     void setMotionWidget(Widget* widget);
 
     void dragWidget(Widget* widget);
-
 
     void show();
     void hide();

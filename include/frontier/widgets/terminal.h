@@ -57,6 +57,11 @@ struct TermLine
     std::vector<TermChar> chars;
 };
 
+/**
+ * \inbrief A very simple terminal emulator Widget
+ *
+ * \ingroup widgets
+ */
 class Terminal : public Widget
 {
  private:

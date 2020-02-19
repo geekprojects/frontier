@@ -37,6 +37,11 @@ class OpenGLWindow : public Frontier::FrontierWindow
     virtual bool draw();
 };
 
+/**
+ * \brief An Engine designed for embedding Frontier UIs in to OpenGL applications
+ *
+ * \ingroup engines
+ */
 class OpenGLApp : public Frontier::FrontierApp
 {
  protected:

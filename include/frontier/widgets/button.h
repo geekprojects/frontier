@@ -13,7 +13,7 @@ enum ButtonType
 };
 
 /**
- * \brief Simple button object that response to mouse clicks
+ * \brief Simple Button object that response to mouse clicks
  *
  * \ingroup widgets
  */

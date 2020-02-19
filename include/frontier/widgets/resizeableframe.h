@@ -6,6 +6,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A layout Widget that allows a user to control the size of its children
+ *
+ * \ingroup widgets
+ */
 class ResizeableFrame : public Frame
 {
  protected:

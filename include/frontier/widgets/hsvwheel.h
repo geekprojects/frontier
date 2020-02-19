@@ -7,6 +7,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief Displays an HSV colour wheel allowing the user to select colours
+ *
+ * \ingroup widgets
+ */
 class HSVWheel : public Widget
 {
  private:

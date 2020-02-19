@@ -31,6 +31,10 @@
 namespace Frontier
 {
 
+/**
+ * \defgroup menus Menus
+ */
+
 enum MenuType
 {
     MENU_TYPE_ABOUT,
@@ -38,6 +42,11 @@ enum MenuType
     MENU_TYPE_HELP,
 };
 
+/**
+ * \brief An item within a menu providing a user with an action
+ * 
+ * \ingroup menus
+ */
 class MenuItem : public FrontierObject
 {
  private:
@@ -78,6 +87,11 @@ class MenuItem : public FrontierObject
     void* getEnginePrivate() { return m_enginePrivate; }
 };
 
+/**
+ * \brief A MenuItem for providing a visible separator between other items
+ * 
+ * \ingroup menus
+ */
 class MenuSeparator : public MenuItem
 {
  private:
@@ -87,6 +101,11 @@ class MenuSeparator : public MenuItem
     virtual ~MenuSeparator();
 };
 
+/**
+ * \brief A collection of MenuItems
+ * 
+ * \ingroup menus
+ */
 class Menu : public FrontierObject
 {
  private:

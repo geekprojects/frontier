@@ -6,6 +6,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief Base class for all Frontier classes, providing basic reference counting
+ *
+ * This class is used by the FrontierApp garbage collection.
+ */
 class FrontierObject
 {
  private:

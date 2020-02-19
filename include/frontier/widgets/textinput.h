@@ -6,6 +6,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A Widget that allows a user to enter and edit text
+ *
+ * \ingroup widgets
+ */
 class TextInput : public Widget
 {
  private:

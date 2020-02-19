@@ -13,6 +13,15 @@ namespace Frontier {
 
 class Widget;
 
+/**
+ * \defgroup styles CSS Engine
+ */
+
+/**
+ * \brief An individual CSS rule
+ *
+ * \ingroup styles
+ */
 class StyleRule
 {
  private:
@@ -49,6 +58,11 @@ class CssParser;
 
 typedef std::function<bool(std::pair<StyleRule*, int>, std::pair<StyleRule*, int>)> StyleComparator;
 
+/**
+ * \brief A CSS rules engine
+ *
+ * \ingroup styles
+ */
 class StyleEngine : public Geek::Logger
 {
  private:

@@ -12,6 +12,9 @@ namespace Frontier
 class List;
 class Menu;
 
+/**
+ * \brief An item in a List Widget
+ */
 class ListItem : public Widget
 {
  protected:
@@ -29,6 +32,9 @@ class ListItem : public Widget
     virtual Widget* handleEvent(Frontier::Event* event);
 };
 
+/**
+ * \brief A List item that displays text
+ */
 class TextListItem : public ListItem
 {
  private:
@@ -49,6 +55,9 @@ class TextListItem : public ListItem
     virtual bool draw(Geek::Gfx::Surface* surface);
 };
 
+/**
+ * \brief A List item that allows nested ListItems to display a hierarchy
+ */
 class TreeListItem : public TextListItem
 {
  private:
@@ -76,6 +85,11 @@ class TreeListItem : public TextListItem
     sigc::signal<void, ListItem*> expandSignal() { return m_expandSignal; }
 };
 
+/**
+ * \brief A widget that shows a List of child ListItems
+ *
+ * \ingroup widgets
+ */
 class List : public Widget
 {
  private:

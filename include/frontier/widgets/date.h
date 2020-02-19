@@ -10,6 +10,13 @@
 namespace Frontier
 {
 
+/**
+ * \brief Displays a date and (optionally) time
+ *
+ * Clicking this Widget will open a DatePicker window
+ *
+ * \ingroup widgets
+ */
 class Date : public Frame
 {
  private:

@@ -6,6 +6,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A simple scroll bar Widget
+ *
+ * \ingroup widgets
+ */
 class ScrollBar : public Widget
 {
  private:

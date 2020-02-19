@@ -6,6 +6,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A TextInput widget that only allows numbers
+ *
+ * \ingroup widgets
+ */
 class NumberInput : public TextInput
 {
  private:

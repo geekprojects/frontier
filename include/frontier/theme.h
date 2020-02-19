@@ -33,6 +33,9 @@ namespace Frontier
 
 class FrontierApp;
 
+/**
+ * \deprecated This should be merged in to FrontierApp
+ */
 class UITheme : public Geek::Logger
 {
  protected:

@@ -26,6 +26,11 @@ class EmbeddedWindow : public Frontier::FrontierEngineWindow
     virtual float getScaleFactor();
 };
 
+/**
+ * \brief An Engine designed for embedding Frontier UIs in to other applications
+ *
+ * \ingroup engines
+ */
 class EmbeddedEngine : public FrontierEngine
 {
  protected:

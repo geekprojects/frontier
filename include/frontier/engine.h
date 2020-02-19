@@ -29,6 +29,15 @@
 
 namespace Frontier {
 
+/**
+ * \defgroup engines Engines
+ */
+
+/**
+ * \brief An Engine provides the interface with the OS
+ *
+ * \ingroup engines
+ */
 class FrontierEngine : public Geek::Logger
 {
  protected:
@@ -54,6 +63,7 @@ class FrontierEngine : public Geek::Logger
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
 
     // Features
+    /// Returns whether the OS provides it's own native Menus (e.g. MacOS)
     virtual bool providesMenus();
 };
 

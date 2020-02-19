@@ -58,6 +58,13 @@ enum ChooseFileFlags
     DIRECTORIES_ONLY = 0x1
 };
 
+/**
+ * \brief Main class that represents the application
+ *
+ * Applications should extend this class to implement their applications, or
+ * at least the UI side of it.
+ *
+ */
 class FrontierApp : public Geek::Logger
 {
  private:

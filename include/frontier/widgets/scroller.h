@@ -7,6 +7,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A Widget that provides a view of a larger Widget hierarchy
+ *
+ * \ingroup widgets
+ */
 class Scroller : public Widget
 {
  private:

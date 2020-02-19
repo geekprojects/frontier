@@ -12,6 +12,15 @@ namespace Frontier
 
 class UITheme;
 
+/**
+ * \defgroup icons Graphical icons
+ */
+
+/**
+ * \brief A base class for graphical icons
+ *
+ * \ingroup icons
+ */
 class Icon : public FrontierObject
 {
  protected:
@@ -25,6 +34,11 @@ class Icon : public FrontierObject
     virtual void draw(Geek::Gfx::Surface* surface, int x, int y) = 0;
 };
 
+/**
+ * \brief An Icon implemented with FontAwesome
+ *
+ * \ingroup icons
+ */
 class TextIcon : public Icon
 {
  private:
@@ -38,6 +52,11 @@ class TextIcon : public Icon
     virtual void draw(Geek::Gfx::Surface* surface, int x, int y);
 };
 
+/**
+ * \brief An Icon implemented with a libgeek Surface
+ *
+ * \ingroup icons
+ */
 class SurfaceIcon : public Icon
 {
  private:

@@ -8,6 +8,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A simple Button widget that displays an Icon
+ *
+ * \ingroup widgets
+ */
 class IconButton : public Button
 {
  private:

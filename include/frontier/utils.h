@@ -25,6 +25,9 @@
 
 namespace Frontier {
 
+/**
+ * \brief Simple representation of width and height
+ */
 struct Size
 {
     int width;
@@ -118,6 +121,9 @@ struct Size
     }
 };
 
+/**
+ * \brief Represents a rectangle
+ */
 struct Rect
 {
     int x;
@@ -147,6 +153,9 @@ struct Rect
     }
 };
 
+/**
+ * \brief Various utility functions
+ */
 class Utils
 {
  public:

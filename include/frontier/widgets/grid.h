@@ -13,6 +13,11 @@ struct GridItem
     Widget* widget;
 };
 
+/**
+ * \brief A layout Widget that displays Widgets in a Grid
+ *
+ * \ingroup widgets
+ */
 class Grid : public Frontier::Widget
 {
  protected:

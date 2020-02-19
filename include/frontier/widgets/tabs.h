@@ -18,6 +18,11 @@ enum TabPlacement
     TAB_RIGHT
 };
 
+/**
+ * \brief A single Tab title representing a page within a Tabs Widget
+ *
+ * \ingroup widgets
+ */
 class Tab : public Widget
 {
  protected:
@@ -56,6 +61,11 @@ class Tab : public Widget
     void clearSelected() { m_selected = false; setDirty(DIRTY_STYLE); }
 };
 
+/**
+ * \brief A Widget that allows access to multiple pages of child Widgets
+ *
+ * \ingroup widgets
+ */
 class Tabs : public Widget
 {
  protected:

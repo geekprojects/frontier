@@ -9,6 +9,14 @@
 namespace Frontier
 {
 
+
+/**
+ * \brief Date Picker Window
+ *
+ * Allows a user to select a date
+ *
+ * \ingroup windows
+ */
 class DatePickerWindow : public Frontier::FrontierWindow
 {
  private:

@@ -7,6 +7,11 @@
 namespace Frontier
 {
 
+/**
+ * \brief A Button Widget that displays a Tick/Check when selected
+ *
+ * \ingroup widgets
+ */
 class CheckBox : public Button
 {
  private:

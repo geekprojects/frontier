@@ -6,6 +6,14 @@
 namespace Frontier
 {
 
+/**
+ * \brief Simple Widget for displaying text with optional Icon
+ *
+ * Other Widgets can inherit from Label to provide basic text formatting.
+ *
+ * \ingroup widgets
+ *
+ */
 class Label : public Widget
 {
  private:
