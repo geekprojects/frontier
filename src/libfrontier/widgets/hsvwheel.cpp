@@ -112,37 +112,22 @@ bool HSVWheel::draw(Geek::Gfx::Surface* surface)
 
 Widget* HSVWheel::handleEvent(Frontier::Event* event)
 {
-    BoxModel boxModel = getBoxModel();
-
-int cx = (m_setSize.width - boxModel.getWidth()) / 2;
-int cy = (m_setSize.height - boxModel.getHeight()) / 2;
-    int radius = cx;
-    if (cy < radius)
-    {
-        radius = cy;
-    }
-
     switch (event->eventType)
     {
         case FRONTIER_EVENT_MOUSE_BUTTON:
         {
             MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
-            Vector2D thisPos = getAbsolutePosition();
-            int x = mouseButtonEvent->x - thisPos.x;
-            int y = mouseButtonEvent->y - thisPos.y;
-            x -= boxModel.getLeft();
-            y -= boxModel.getRight();
+            updateFromMouse(mouseButtonEvent);
 
-            double hsb[3];
-            bool inside = hsvFromPosition(hsb, x, y, cx, cy, radius);
-            if (inside)
-            {
-                m_colour = Colour::fromHSB(hsb[0], hsb[1], hsb[2]);
-                log(DEBUG, "handleEvent: colour: %d, %d, %d", m_colour.r, m_colour.g, m_colour.b);
-                setDirty(DIRTY_CONTENT);
-            }
-
+            m_selected = mouseButtonEvent->direction;
         } break;
+
+        case FRONTIER_EVENT_MOUSE_MOTION:
+            if (m_selected)
+            {
+                updateFromMouse((MouseEvent*)event);
+            }
+            break;
 
         default:
             // Ignore
@@ -151,6 +136,34 @@ int cy = (m_setSize.height - boxModel.getHeight()) / 2;
 
 
     return this;
+}
+
+void HSVWheel::updateFromMouse(MouseEvent* mouseEvent)
+{
+    BoxModel boxModel = getBoxModel();
+
+    int cx = (m_setSize.width - boxModel.getWidth()) / 2;
+    int cy = (m_setSize.height - boxModel.getHeight()) / 2;
+    int radius = cx;
+    if (cy < radius)
+    {
+        radius = cy;
+    }
+
+    Vector2D thisPos = getAbsolutePosition();
+    int x = mouseEvent->x - thisPos.x;
+    int y = mouseEvent->y - thisPos.y;
+    x -= boxModel.getLeft();
+    y -= boxModel.getRight();
+
+    double hsb[3];
+    bool inside = hsvFromPosition(hsb, x, y, cx, cy, radius);
+    if (inside)
+    {
+        m_colour = Colour::fromHSB(hsb[0], hsb[1], hsb[2]);
+        log(DEBUG, "handleEvent: colour: %d, %d, %d", m_colour.r, m_colour.g, m_colour.b);
+        setDirty(DIRTY_CONTENT);
+    }
 }
 
 bool HSVWheel::hsvFromPosition(double* hsv, int x, int y, int cx, int cy, int radius)

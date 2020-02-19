@@ -12,9 +12,10 @@ class HSVWheel : public Widget
  private:
     Geek::Gfx::Colour m_colour;
 
-    sigc::signal<void, Colour> m_signalColourChanged;
+    sigc::signal<void, Geek::Gfx::Colour> m_signalColourChanged;
 
     bool hsvFromPosition(double* hsv, int x, int y, int cx, int cy, int radius);
+    void updateFromMouse(MouseEvent* mouseEvent);
 
  public:
     HSVWheel(Frontier::FrontierApp* app);
@@ -25,7 +26,7 @@ class HSVWheel : public Widget
 
     virtual Widget* handleEvent(Frontier::Event* event);
 
-    sigc::signal<void, Colour> signalColourChanged() { return m_signalColourChanged; };
+    sigc::signal<void, Geek::Gfx::Colour> signalColourChanged() { return m_signalColourChanged; };
 };
 
 };
