@@ -183,7 +183,7 @@ bool DemoApp::init()
 
         Frame* labelFrame1 = new Frame(this, true);
         labelFrame1->add(new Label(this, L"Label:"));
-        labelFrame1->add(new Label(this, L"I'm a label!"));
+        labelFrame1->add(new Label(this, L"I'm a label!", getTheme()->getIcon(FRONTIER_ICON_EXCLAMATION_TRIANGLE)));
         labelTab->add(labelFrame1);
 
         Frame* labelFrame2 = new Frame(this, true);

@@ -31,24 +31,43 @@ Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
+    m_icon = NULL;
 }
 
 Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = align;
+    m_icon = NULL;
 }
+
+Label::Label(FrontierApp* ui, wstring text, Icon* icon) : Widget(ui, L"Label")
+{
+    m_text = text;
+    m_align = ALIGN_CENTER;
+    m_icon = icon;
+}
+
+Label::Label(FrontierApp* ui, wstring text, TextAlign align, Icon* icon) : Widget(ui, L"Label")
+{
+    m_text = text;
+    m_align = align;
+    m_icon = NULL;
+}
+
 
 Label::Label(FrontierWindow* window, wstring text) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = ALIGN_CENTER;
+    m_icon = NULL;
 }
 
 Label::Label(FrontierWindow* window, wstring text, TextAlign align) : Widget(window, L"Label")
 {
     m_text = text;
     m_align = align;
+    m_icon = NULL;
 }
 
 
@@ -70,6 +89,7 @@ void Label::setAlign(TextAlign align)
 
 void Label::calculateSize()
 {
+    BoxModel boxModel = getBoxModel();
     FontHandle* font = getTextFont();
     m_lineHeight = font->getPixelHeight();
 
@@ -104,9 +124,18 @@ void Label::calculateSize()
         }
     }
 
-    Size borderSize = getBorderSize();
-    m_minSize.width += borderSize.width;
-    m_minSize.height = (m_lineHeight * lines) + borderSize.height;
+    if (m_icon != NULL)
+    {
+        Size iconSize = m_icon->getSize();
+        m_minSize.width += iconSize.width + boxModel.marginLeft;
+        if (m_lineHeight < iconSize.height)
+        {
+            m_lineHeight = iconSize.height;
+        }
+    }
+
+    m_minSize.width += boxModel.getWidth();
+    m_minSize.height = (m_lineHeight * lines) + boxModel.getHeight();
 
     if (getStyle("expand-horizontal"))
     {
@@ -148,6 +177,7 @@ bool Label::draw(Surface* surface)
 
     y = (m_setSize.height / 2) - (lines * m_lineHeight) / 2;
  
+    int maxX = 0;
     wstring line = L"";
     for (pos = 0; pos < m_text.length(); pos++)
     {
@@ -159,6 +189,12 @@ bool Label::draw(Surface* surface)
             }
             int w = font->width(line);
             int x = 0;
+
+            if (m_icon != NULL)
+            {
+                Size iconSize = m_icon->getSize();
+                w += iconSize.width;
+            }
 
             switch (m_align)
             {
@@ -173,10 +209,15 @@ bool Label::draw(Surface* surface)
                     break;
             }
 
+            if (x + w > maxX)
+            {
+                maxX = x + w;
+            }
+
             drawText(
                 surface,
                 x,
-                y,
+                y + 1,
                 line.c_str(),
                 font);
  
@@ -187,6 +228,13 @@ bool Label::draw(Surface* surface)
         {
             line += m_text[pos];
         }
+    }
+
+    if (m_icon != NULL)
+    {
+        Size iconSize = m_icon->getSize();
+        int iconY = (m_setSize.height / 2) - (iconSize.height / 2);
+        m_icon->draw(surface, maxX - iconSize.width, iconY);
     }
 
     return true;

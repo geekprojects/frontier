@@ -35,16 +35,12 @@ void Date::setup()
 {
     getWidgetStyle()->applyProperty("margin", 0);
 
-    m_dateLabel = new Label(getApp(), L"");
+    Icon* calendarIcon = getApp()->getTheme()->getIcon(FRONTIER_ICON_CALENDAR);
+
+    m_dateLabel = new Label(getApp(), L"", calendarIcon);
     m_dateLabel->clickSignal().connect(sigc::mem_fun(*this, &Date::onDateClick));
     m_dateLabel->setWidgetClass(L"dateInput");
     add(m_dateLabel);
-
-    /*
-    IconButton* dateButton = new IconButton(getApp(), FRONTIER_ICON_CALENDAR);
-    dateButton->setStyle("expand-vertical", true);
-    add(dateButton);
-    */
 
     if (m_hasTime)
     {
