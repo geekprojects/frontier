@@ -42,8 +42,7 @@ before_script:
   - mkdir build; cmake ..
 
 script:
-  - make
-  - tests/tests
+  - make && sudo make install && tests/tests
 
 compiler:
   - clang
