@@ -70,6 +70,7 @@ set(DATADIR ${CMAKE_INSTALL_PREFIX}/share/libfrontier)
 add_subdirectory(src/libfrontier)
 add_subdirectory(src/demo)
 add_subdirectory(data)
+add_subdirectory(tests)
 
 if(OPENGL_FOUND)
     add_subdirectory(src/libfrontier-opengl)
@@ -99,7 +100,6 @@ if (DOXYGEN_FOUND)
         COMMENT "Generate man pages"
     )
 endif()
-
 
 include(InstallRequiredSystemLibraries)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
