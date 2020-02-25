@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <string>
 #include <vector>
@@ -82,7 +83,9 @@ class RuleSetListener : public css3BaseListener
 
 void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
 {
+#ifdef DEBUG_CSS_PARSER
     printf("RuleSetListener::enterKnownRuleset: Ruleset\n");
+#endif
 
     css3Parser::SelectorGroupContext* selectorGroup = ctx->selectorGroup();
     if (selectorGroup == NULL)
@@ -101,21 +104,29 @@ void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
     for (css3Parser::SelectorContext* selector : selectorGroup->selector())
     {
         StyleRule* rule = new StyleRule();
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::enterKnownRuleset:  -> Selector:\n");
+#endif
         for (css3Parser::SimpleSelectorSequenceContext* sss : selector->simpleSelectorSequence())
         {
+            StyleSelector selector;
+
             css3Parser::TypeSelectorContext* typeSelector = sss->typeSelector();
             if (typeSelector != NULL)
             {
                 std::string elementName = typeSelector->elementName()->ident()->Ident()->getText();
+#ifdef DEBUG_CSS_PARSER
                 printf("RuleSetListener::enterKnownRuleset:     -> elementName=%s\n", elementName.c_str());
-                rule->setWidgetType(Utils::string2wstring(elementName));
+#endif
+                selector.widgetType = Utils::string2wstring(elementName);
             }
 
             if (sss->universal() != NULL)
             {
+#ifdef DEBUG_CSS_PARSER
                 printf("RuleSetListener::enterKnownRuleset:     -> universal (*)\n");
-                rule->setWidgetType(L"*");
+#endif
+                selector.widgetType = L"*";
             }
 
             for (tree::TerminalNode* hash : sss->Hash())
@@ -125,33 +136,45 @@ void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
                 {
                     hashStr = hashStr.substr(1);
                 }
+#ifdef DEBUG_CSS_PARSER
                 printf("RuleSetListener::enterKnownRuleset:     -> hash=%s\n", hashStr.c_str());
-                rule->setId(Utils::string2wstring(hashStr));
+#endif
+                selector.id = Utils::string2wstring(hashStr);
             }
 
             for (css3Parser::ClassNameContext* className : sss->className())
             {
                 string classStr = identString(className->ident());
+#ifdef DEBUG_CSS_PARSER
                 printf("RuleSetListener::enterKnownRuleset:     -> className=%s\n", classStr.c_str());
-                rule->setClassName(Utils::string2wstring(classStr.c_str()));
+#endif
+                selector.className = Utils::string2wstring(classStr.c_str());
             }
 
             for (css3Parser::PseudoContext* pseudo : sss->pseudo())
             {
                 string pseudoClass = identString(pseudo->ident());
+#ifdef DEBUG_CSS_PARSER
                 printf("RuleSetListener::enterKnownRuleset:     -> pseudo=%s\n", pseudoClass.c_str());
-                rule->setState(pseudoClass);
+#endif
+                selector.state = pseudoClass;
             }
+
+            rule->addSelector(selector);
         }
         rules.push_back(rule);
     }
 
+#ifdef DEBUG_CSS_PARSER
     printf("RuleSetListener::enterKnownRuleset:  -> Declarations:\n");
+#endif
     for (css3Parser::DeclarationContext* decl0 : declList->declaration())
     {
         if (typeid(*decl0).hash_code() != typeid(css3Parser::KnownDeclarationContext).hash_code())
         {
+#ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::enterKnownRuleset:   -> Declaration is not a KnownDeclarationContext\n");
+#endif
             continue;
         }
         css3Parser::KnownDeclarationContext* decl = (css3Parser::KnownDeclarationContext*)decl0;
@@ -159,20 +182,26 @@ void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
         css3Parser::PropertyContext* property0 = decl->property();
         if (typeid(*property0).hash_code() != typeid(css3Parser::GoodPropertyContext).hash_code())
         {
+#ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::enterKnownRuleset:   -> Declaration: Not a GoodProperty! property=%s\n", typeid(*property0).name());
+#endif
             continue;
         }
 
         css3Parser::GoodPropertyContext* propertyCtx = (css3Parser::GoodPropertyContext*)property0;
         string property = identString(propertyCtx->ident());
 
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::enterKnownRuleset:   -> property=%s\n", property.c_str());
+#endif
 
         vector<int64_t> values;
         for (css3Parser::TermContext* term0 : decl->expr()->term())
         {
             int64_t value = getTermValue(property, term0);
+#ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::enterKnownRuleset:     -> Term: value=%llx\n", value);
+#endif
             values.push_back(value);
         }
 
@@ -193,7 +222,9 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
 {
     if (typeid(*term0).hash_code() != typeid(css3Parser::KnownTermContext).hash_code())
     {
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term is not a KnownTerm: %s\n", typeid(*term0).name());
+#endif
         return 0;
     }
 
@@ -201,19 +232,25 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
     if (term->number() != NULL)
     {
         string numberStr = term->number()->Number()->getText();
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term: number=%s\n", numberStr.c_str());
+#endif
         return atoi(numberStr.c_str());
     }
     if (term->dimension() != NULL)
     {
         std::string dimStr = term->dimension()->Dimension()->getText();
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term: dimension=%s\n", dimStr.c_str());
+#endif
         return atoi(dimStr.c_str());
     }
     if (term->hexcolor() != NULL)
     {
         string hex = term->hexcolor()->Hash()->getText();
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term: hexcolor=%s\n", hex.c_str());
+#endif
         hex = hex.substr(1);
 
         if (hex.length() == 3)
@@ -235,7 +272,9 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
     if (term->String() != NULL)
     {
         string str = term->String()->getText();
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term: String=%s\n", str.c_str());
+#endif
         if (property == "font-family")
         {
             return getFontFamilyValue(str);
@@ -245,7 +284,9 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
     if (term->ident() != NULL)
     {
         string identStr = identString(term->ident());
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term: ident=%s\n", identStr.c_str());
+#endif
 
         if (property == "font-family")
         {
@@ -256,21 +297,29 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
         {
             if (!strcmp(val.ident, identStr.c_str()))
             {
+#ifdef DEBUG_CSS_PARSER
                 printf("RuleSetListener::getTermValue:   -> Term: ident MAPPED to %lld\n", val.value);
+#endif
                 return val.value;
             }
         }
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:     -> Term: %s is UNKNOWN\n", identStr.c_str());
+#endif
     }
     if (term->function())
     {
         const char* functionName = term->function()->Function()->getText().c_str();
+#ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> function: Function=%s\n", functionName);
+#endif
         vector<uint32_t> funcValues;
         for (css3Parser::TermContext* funcTerm0 : term->function()->expr()->term())
         {
             int64_t funcValue = getTermValue(property, funcTerm0);
+#ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::getTermValue:   -> function: funcValue=%lld\n", funcValue);
+#endif
             funcValues.push_back(funcValue);
         }
 
@@ -284,12 +333,16 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
                 rgb |= funcValues.at(i);
             }
             rgb |= 0xff000000; // Set alpha
+#ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::getTermValue:   -> function: RGB: 0x%llx\n", rgb);
+#endif
             return rgb;
         }
         else
         {
+#ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::getTermValue:   -> function: Unknown function: %s\n", functionName);
+#endif
         }
         return 0;
     }
@@ -314,7 +367,9 @@ int64_t RuleSetListener::getFontFamilyValue(std::string fontFamily)
         }
     }
 
+#ifdef DEBUG_CSS_PARSER
     printf("RuleSetListener::getFontFamilyValue: fontFamily=%s\n", fontFamily.c_str());
+#endif
     return (int64_t)strdup(fontFamily.c_str());
 }
 
@@ -437,9 +492,16 @@ CssParser::~CssParser()
 {
 }
 
-void CssParser::parse(std::string path)
+bool CssParser::parse(std::string path)
 {
     log(DEBUG, "Parsing file: %s", path.c_str());
+
+    int res = access(path.c_str(), R_OK);
+    if (res != 0)
+    {
+        log(ERROR, "parse: Failed to find CSS file: %s", path.c_str());
+        return false;
+    }
 
     ANTLRFileStream* stream = new ANTLRFileStream(path.c_str());
 
@@ -450,5 +512,7 @@ void CssParser::parse(std::string path)
     tree::ParseTree *tree = parser.stylesheet();
     RuleSetListener listener(m_styleEngine);
     tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+
+    return true;
 }
 

@@ -31,7 +31,12 @@ StyleEngine::~StyleEngine()
 bool StyleEngine::init()
 {
 #ifdef CSSDIR
-    m_parser->parse(string(STRINGIFY(CSSDIR)) + "/frontier.css");
+    bool res;
+    res = m_parser->parse(string(STRINGIFY(CSSDIR)) + "/frontier.css");
+    if (!res)
+    {
+        return false;
+    }
 #endif
 
     timeval tv;
@@ -44,9 +49,18 @@ bool StyleEngine::init()
 
 bool StyleEngine::parse(std::string path)
 {
-    m_parser->parse(path);
+    bool res;
+    res = m_parser->parse(path);
+    if (!res)
+    {
+        return false;
+    }
 
-    m_timestamp = time(NULL);
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    m_timestamp = tv.tv_sec * 1000l;
+    m_timestamp += tv.tv_usec / 1000l;
+
     return true;
 }
 
@@ -59,30 +73,34 @@ void StyleEngine::addRule(StyleRule* rule)
 {
     int specificity = 0;
 
-    if (rule->getId().length() > 0)
+    // https://www.w3.org/TR/CSS2/cascade.html#specificity
+    for (StyleSelector selector : rule->getSelectors())
     {
-        specificity += 1000;
-    }
-
-    if (rule->getState().length() > 0)
-    {
-        specificity += 100;
-    }
-
-    if (rule->getClassName().length() > 0)
-    {
-        specificity += 10;
-    }
-
-    if (rule->getWidgetType().length() > 0)
-    {
-        if (rule->getWidgetType() == L"*")
+        if (selector.id.length() > 0)
         {
-            specificity += 1;
+            specificity += 1000;
         }
-        else
+
+        if (selector.state.length() > 0)
         {
-            specificity += 2;
+            specificity += 100;
+        }
+
+        if (selector.className.length() > 0)
+        {
+            specificity += 10;
+        }
+
+        if (selector.widgetType.length() > 0)
+        {
+            if (selector.widgetType == L"*")
+            {
+                specificity += 1;
+            }
+            else
+            {
+                specificity += 2;
+            }
         }
     }
 
@@ -100,83 +118,14 @@ void StyleEngine::addRule(StyleRule* rule)
 
 unordered_map<string, int64_t> StyleEngine::getProperties(Widget* widget)
 {
-
-#if 0
-    wstring classes = L"";
-    bool comma = false;
-    for (wstring clazz : widget->getWidgetClasses())
-    {
-        if (comma)
-        {
-            classes += L",";
-        }
-        comma = true;
-
-        classes += clazz;
-
-    }
-
-    log(DEBUG, "getProperties: Widget: type=%ls, classes=%ls, id=%ls", widget->getWidgetName().c_str(), classes.c_str(), widget->getWidgetId().c_str());
-#endif
-
     vector<StyleRule*> matchedRules;
     for (pair<StyleRule*, int> rulePair : m_styleRules)
     {
         StyleRule* rule = rulePair.first;
-
-        bool hasId = (rule->getId().length() > 0);
-        bool matchId = (hasId && rule->getId() == widget->getWidgetId());
-        if (hasId && !matchId)
+        if (rule->matches(widget))
         {
-            continue;
+            matchedRules.push_back(rule);
         }
-
-        bool hasType = (rule->getWidgetType().length() > 0);
-        bool matchType = (hasType && (rule->getWidgetType() == L"*" || rule->getWidgetType() == widget->getWidgetName()));
-        if (hasType && !matchType)
-        {
-            continue;
-        }
-
-        bool hasClass = (rule->getClassName().length() > 0);
-        bool matchClass = (hasClass && widget->hasWidgetClass(rule->getClassName()));
-        if (hasClass && !matchClass)
-        {
-            continue;
-        }
-
-        bool matchState = false;
-        if (rule->getState().length() > 0)
-        {
-            matchState = true;
-            if (rule->getState() == "active")
-            {
-                if (!widget->isActive())
-                {
-                    continue;
-                }
-            }
-            else if (rule->getState() == "selected")
-            {
-                if (!widget->isSelected())
-                {
-                    continue;
-                }
-            }
-            else if (rule->getState() == "hover")
-            {
-                if (!widget->isMouseOver())
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                continue;
-            }
-        }
-
-        matchedRules.push_back(rule);
     }
 
     matchedRules.push_back(widget->getWidgetStyle());
@@ -198,7 +147,6 @@ unordered_map<string, int64_t> StyleEngine::getProperties(Widget* widget)
             }
             results.insert(make_pair(prop.first, prop.second));
         }
-
     }
 
 #ifdef DEBUG_STYLE_PROPERTIES
@@ -211,20 +159,138 @@ unordered_map<string, int64_t> StyleEngine::getProperties(Widget* widget)
     return results;
 }
 
+void StyleRule::addSelector(StyleSelector selector)
+{
+    m_selectors.push_back(selector);
+}
+
+bool StyleRule::matches(Widget* widget)
+{
+    Widget* currentWidget = widget;
+
+    bool matches = true;
+    bool first = true;
+    for (auto it = m_selectors.rbegin(); matches && it != m_selectors.rend(); it++)
+    {
+        StyleSelector selector = *it;
+
+        matches = false;
+        while (!matches && currentWidget != NULL)
+        {
+            if (currentWidget == NULL)
+            {
+                break;
+            }
+
+            matches = selector.matches(currentWidget);
+            currentWidget = currentWidget->getParent();
+
+            if (first)
+            {
+                // The first (last?) item must match the first (last?) selector
+                break;
+            }
+        }
+        first = false;
+    }
+
+    return matches;
+}
+
 wstring StyleRule::getKey()
 {
     wstring key = L"";
-    if (m_widgetType.length() > 0)
+    bool space = false;
+
+    for (auto selector : m_selectors)
     {
-        key += m_widgetType;
+        if (space)
+        {
+            key += L" ";
+        }
+        space = true;
+        key += selector.getKey();
     }
-    if (m_className.length() > 0)
+
+    return key;
+}
+
+bool StyleSelector::matches(Widget* widget)
+{
+    bool hasId = (id.length() > 0);
+    bool matchId = (hasId && id == widget->getWidgetId());
+    if (hasId && !matchId)
     {
-        key += L"." + m_className;
+        return false;
     }
-    if (m_id.length() > 0)
+
+    bool hasType = (widgetType.length() > 0);
+    bool matchType = (hasType && (widgetType == L"*" || widgetType == widget->getWidgetName()));
+    if (hasType && !matchType)
     {
-        key += L"#" + m_id;
+        return false;
+    }
+
+    bool hasClass = (className.length() > 0);
+    bool matchClass = (hasClass && widget->hasWidgetClass(className));
+    if (hasClass && !matchClass)
+    {
+        return false;
+    }
+
+    bool matchState = false;
+    if (state.length() > 0)
+    {
+        matchState = true;
+        if (state == "active")
+        {
+            if (!widget->isActive())
+            {
+                return false;
+            }
+        }
+        else if (state == "selected")
+        {
+            if (!widget->isSelected())
+            {
+                return false;
+            }
+        }
+        else if (state == "hover")
+        {
+            if (!widget->isMouseOver())
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+wstring StyleSelector::getKey()
+{
+    wstring key = L"";
+
+    if (widgetType.length() > 0)
+    {
+        key += widgetType;
+    }
+    if (className.length() > 0)
+    {
+        key += L"." + className;
+    }
+    if (id.length() > 0)
+    {
+        key += L"#" + id;
+    }
+    if (state.length() > 0)
+    {
+        key += L":" + Utils::string2wstring(state);
     }
 
     return key;

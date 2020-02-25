@@ -19,7 +19,7 @@ class CssParser : public Geek::Logger
     CssParser(StyleEngine* styleEngine);
     virtual ~CssParser();
 
-    void parse(std::string path);
+    bool parse(std::string path);
 };
 
 };

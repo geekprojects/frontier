@@ -17,6 +17,17 @@ class Widget;
  * \defgroup styles CSS Engine
  */
 
+struct StyleSelector
+{
+    std::wstring widgetType;
+    std::wstring className;
+    std::wstring id;
+    std::string state;
+
+    bool matches(Frontier::Widget* widget);
+    std::wstring getKey();
+};
+
 /**
  * \brief An individual CSS rule
  *
@@ -25,25 +36,17 @@ class Widget;
 class StyleRule
 {
  private:
-    std::wstring m_widgetType;
-    std::wstring m_className;
-    std::wstring m_id;
-    std::string m_state;
-
+    std::vector<StyleSelector> m_selectors;
     std::unordered_map<std::string, int64_t> m_properties;
 
  public:
     StyleRule() {}
     virtual ~StyleRule() {}
 
-    void setWidgetType(std::wstring type) { m_widgetType = type; }
-    std::wstring getWidgetType() { return m_widgetType; }
-    void setClassName(std::wstring name) { m_className = name; }
-    std::wstring getClassName() { return m_className; }
-    void setId(std::wstring id) { m_id = id; }
-    std::wstring getId() { return m_id; }
-    void setState(std::string state) { m_state = state; }
-    std::string getState() { return m_state; }
+    const std::vector<StyleSelector>& getSelectors() { return  m_selectors; }
+    void addSelector(StyleSelector selector);
+
+    bool matches(Frontier::Widget* widget);
 
     std::wstring getKey();
 
