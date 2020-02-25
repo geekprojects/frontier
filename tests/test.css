@@ -1,0 +1,12 @@
+
+WidgetA {
+    expand-horizontal: true;
+    expand-vertical: false;
+}
+
+.group1 WidgetA
+{
+    expand-horizontal: false;
+    expand-vertical: true;
+}
+
