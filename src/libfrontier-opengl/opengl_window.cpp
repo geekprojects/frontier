@@ -6,22 +6,20 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
-OpenGLWindow::OpenGLWindow(FrontierApp* app) : FrontierWindow(app, L"OpenGL", WINDOW_NORMAL)
+OpenGLEngineWindow::OpenGLEngineWindow(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window)
+    : EmbeddedWindow(engine, window)
 {
     m_textureSurface = NULL;
     m_textureValid = false;
 
     glGenTextures(1, &m_texture);
-    //glGenSamplers(1, &m_sampler);
-
-    setSize(Size(100, 100));
 }
 
-OpenGLWindow::~OpenGLWindow()
+OpenGLEngineWindow::~OpenGLEngineWindow()
 {
 }
 
-bool OpenGLWindow::init()
+bool OpenGLEngineWindow::init()
 {
     return true;
 }
@@ -37,11 +35,9 @@ static int powerOfTwo(int input)
     return value;
 }
 
-bool OpenGLWindow::draw()
+bool OpenGLEngineWindow::update()
 {
-    update();
-
-    Size size = getSize();
+    Size size = getWindow()->getSize();
 //log(DEBUG, "draw: width=%d, height=%d", size.width, size.height);
 
     unsigned int textureWidth = powerOfTwo(size.width);
@@ -51,10 +47,10 @@ bool OpenGLWindow::draw()
 
     if (m_textureSurface == NULL || m_textureSurface->getWidth() != textureWidth || m_textureSurface->getHeight() != textureHeight)
     {
-            m_textureSurface = new Surface(textureWidth, textureHeight, 4);
+            m_textureSurface = new HighDPISurface(textureWidth, textureHeight, 4);
     }
 
-    Geek::Gfx::Surface* surface = getSurface();
+    Geek::Gfx::Surface* surface = getWindow()->getSurface();
     m_textureSurface->blit(0, 0, surface);
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -81,13 +77,13 @@ bool OpenGLWindow::draw()
     glVertex2i(position.x, position.y);
 
     glTexCoord2f(m_textureCoordX, 0);
-    glVertex2i(position.x + size.width, position.y);
+    glVertex2i(position.x + (size.width * 2), position.y);
 
     glTexCoord2f(0, m_textureCoordY);
-    glVertex2i(position.x, position.y + size.height);
+    glVertex2i(position.x, position.y + (size.height * 2));
 
     glTexCoord2f(m_textureCoordX, m_textureCoordY);
-    glVertex2i(position.x + size.width, position.y + size.height);
+    glVertex2i(position.x + (size.width * 2), position.y + (size.height * 2));
 
     glEnd();
 

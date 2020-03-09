@@ -18,7 +18,7 @@
 namespace Frontier
 {
 
-class OpenGLWindow : public Frontier::FrontierWindow
+class OpenGLEngineWindow : public Frontier::EmbeddedWindow
 {
  protected:
     unsigned int m_texture;
@@ -29,12 +29,12 @@ class OpenGLWindow : public Frontier::FrontierWindow
     Geek::Gfx::Surface* m_textureSurface;
 
  public:
-    OpenGLWindow(Frontier::FrontierApp* app);
-    virtual ~OpenGLWindow();
+    OpenGLEngineWindow(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window);
+    virtual ~OpenGLEngineWindow();
 
     virtual bool init();
 
-    virtual bool draw();
+    virtual bool update();
 };
 
 /**
@@ -59,6 +59,17 @@ class OpenGLApp : public Frontier::FrontierApp
     void mouseButton(Frontier::FrontierWindow* window, int x, int y, int button, bool direction);
 
     virtual void draw();
+};
+
+class OpenGLEngine : public EmbeddedEngine
+{
+ protected:
+
+ public:
+    OpenGLEngine(FrontierApp* app);
+    virtual ~OpenGLEngine();
+
+    virtual bool initWindow(FrontierWindow* window);
 };
 
 };

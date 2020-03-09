@@ -1,7 +1,7 @@
 
 add_definitions(-Wno-deprecated-declarations)
 
-add_library(frontier-opengl SHARED opengl_app.cpp opengl_window.cpp)
+add_library(frontier-opengl SHARED opengl_engine.cpp opengl_app.cpp opengl_window.cpp)
 
 include_directories(${OPENGL_INCLUDE_DIR})
 

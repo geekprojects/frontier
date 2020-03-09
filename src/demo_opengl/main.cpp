@@ -4,6 +4,7 @@
 #include <frontier/widgets/button.h>
 #include <frontier/widgets/tabs.h>
 #include <frontier/widgets/terminal.h>
+#include <frontier/widgets/colourbutton.h>
 
 GLfloat g_xRotated = 0.0;
 GLfloat g_yRotated = 0.0;
@@ -11,7 +12,7 @@ GLfloat g_zRotated = 0.0;
 GLdouble g_size = 1;
 GLdouble g_speed = 0.01;
 
-class DemoWindow : public Frontier::OpenGLWindow
+class DemoWindow : public Frontier::FrontierWindow
 {
  protected:
 
@@ -33,8 +34,9 @@ using namespace Geek::Gfx;
 OpenGLApp* g_app = NULL;
 DemoWindow* g_mainWindow = NULL;
 
-DemoWindow::DemoWindow(FrontierApp* app) : OpenGLWindow(app)
+DemoWindow::DemoWindow(FrontierApp* app) : FrontierWindow(app, L"OpenGL Demo", WINDOW_NORMAL)
 {
+    setSize(Size(100, 100));
 }
 
 DemoWindow::~DemoWindow()
@@ -55,6 +57,7 @@ bool DemoWindow::init()
     tabs->addTab(L"Speed", speedFrame);
 
     Frame* colourFrame = new Frame(getApp(), false);
+    colourFrame->add(new ColourButton(getApp(), Colour(255, 0, 0)));
     colourFrame->add(new Button(getApp(), L"Red!"));
     colourFrame->add(new Button(getApp(), L"Blue!"));
     colourFrame->add(new Button(getApp(), L"Green!"));
@@ -64,11 +67,11 @@ bool DemoWindow::init()
     sizeFrame->add(new Button(getApp(), L"Smaller!"));
     sizeFrame->add(new Button(getApp(), L"Bigger!"));
     tabs->addTab(L"Size", sizeFrame);
-
+/*
     Terminal* terminal = new Terminal(getApp());
     terminal->run("/usr/bin/top");
     tabs->addTab(L"Terminal", terminal);
-
+*/
     setContent(tabs);
     
     return true;
@@ -178,6 +181,7 @@ int main(int argc, char** argv)
 
     g_mainWindow = new DemoWindow(g_app);
     g_mainWindow->show();
+    g_mainWindow->setPosition(Vector2D(0, 0));
 
     g_xRotated = 33;
     g_yRotated = 40;

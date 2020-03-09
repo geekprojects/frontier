@@ -12,7 +12,8 @@ using namespace Geek::Gfx;
 
 OpenGLApp::OpenGLApp() : FrontierApp(L"OpenGL App")
 {
-    EmbeddedEngine* engine = new EmbeddedEngine(this);
+    OpenGLEngine* engine = new OpenGLEngine(this);
+    engine->setScaleFactor(2);
     setEngine(engine);
 }
 
@@ -49,13 +50,15 @@ void OpenGLApp::draw()
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
 
-    glViewport(0, 0, m_screenSize.width, m_screenSize.height);
+    float scale = 2.0;
+
+    glViewport(0, 0, m_screenSize.width * scale, m_screenSize.height * scale);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
 
-    glOrtho(0.0, (double)m_screenSize.width, (double)m_screenSize.height, 0.0, 0.0, 1.0);
+    glOrtho(0.0, (double)m_screenSize.width * scale, (double)m_screenSize.height * scale, 0.0, 0.0, 1.0);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
     glMatrixMode(GL_MODELVIEW);
@@ -65,10 +68,11 @@ void OpenGLApp::draw()
     vector<FrontierWindow*> windows = getWindows();
     for (FrontierWindow* window : windows)
     {
-        OpenGLWindow* engineWindow = (OpenGLWindow*)window;
+        window->update();
+        OpenGLEngineWindow* engineWindow = (OpenGLEngineWindow*)window->getEngineWindow();
         if (engineWindow != NULL)
         {
-            engineWindow->draw();
+            engineWindow->update();
         }
     }
 
@@ -85,8 +89,10 @@ void OpenGLApp::mouseMotion(FrontierWindow* window, int x, int y)
 {
     MouseMotionEvent* mouseMotionEvent = new MouseMotionEvent();
     mouseMotionEvent->eventType = FRONTIER_EVENT_MOUSE_MOTION;
-    mouseMotionEvent->x = x;
-    mouseMotionEvent->y = y;
+
+    Vector2D position = window->getPosition();
+    mouseMotionEvent->x = x - position.x;
+    mouseMotionEvent->y = y - position.y;
     window->handleEvent(mouseMotionEvent);
 }
 
