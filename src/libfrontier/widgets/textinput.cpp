@@ -29,6 +29,14 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+static wstring wchar2wstring(wchar_t c)
+{
+    wchar_t t[2];
+    t[0] = c;
+    t[1] = 0;
+    return wstring(t);
+}
+
 TextInput::TextInput(FrontierApp* ui) : Widget(ui, L"TextInput")
 {
     m_textSurface = NULL;
@@ -127,7 +135,7 @@ bool TextInput::draw(Surface* surface)
     drawBorder(surface);
 
     int lineHeight = font->getPixelHeight(72);
-    unsigned int textWidth = font->width(m_text) + 4;
+    unsigned int textWidth = getTextWidth(font, m_text) + 4;
     unsigned int textHeight = lineHeight + 2;
 
     int selectStart = MIN(m_selectStart, m_selectEnd);
@@ -165,21 +173,17 @@ bool TextInput::draw(Surface* surface)
         uint32_t backgroundColour = getStyle("background-color");
         m_textSurface->clear(backgroundColour);
     }
- 
-    int x = 2;
+
+    int x = 1;
     int y = 2;
 
     m_charX.clear();
 
     unsigned int cursorX = 0;
     unsigned int pos = 0;
-    wchar_t t[2];
-    t[1] = 0;
     for (pos = 0; pos < m_text.length(); pos++)
     {
-        t[0] = m_text.at(pos);
-        wstring cstr = wstring(t);
-
+        wstring cstr = wchar2wstring(m_text.at(pos));
         unsigned int width = font->width(cstr);
 
         if (hasSelection())
@@ -211,6 +215,9 @@ bool TextInput::draw(Surface* surface)
     m_surfaceMutex->unlock();
 
     unsigned int drawWidth = m_setSize.width - (boxModel.getWidth());
+#if 0
+    log(DEBUG, "draw: text=%ls, drawWidth=%d, textWidth=%d (%d), cursorX=%d", m_text.c_str(), drawWidth, textWidth, m_textSurface->getWidth(), cursorX);
+#endif
     if (drawWidth > textWidth)
     {
         m_offsetX = 0;
@@ -242,6 +249,21 @@ bool TextInput::draw(Surface* surface)
         textHeight *= 2;
     }
     surface->blit(boxModel.getLeft(), boxModel.getTop(), m_textSurface, offsetX, 0, drawWidth, textHeight);
+
+#if 0
+    string filename = "text_";
+    for (pos = 0; pos < m_text.length(); pos++)
+    {
+        wchar_t c = m_text.at(pos);
+        if (iswalnum(c))
+        {
+            filename += (char)c;
+        }
+    }
+    filename += ".jpg";
+
+    m_textSurface->saveJPEG(filename.c_str());
+#endif
 
     return true;
 }
@@ -471,5 +493,17 @@ void TextInput::activateNext(Widget* activeChild)
     {
         setActive();
     }
+}
+
+int TextInput::getTextWidth(FontHandle* font, wstring text)
+{
+    unsigned int pos = 0;
+    int textWidth = 0;
+    for (pos = 0; pos < m_text.length(); pos++)
+    {
+        int cw = font->width(wchar2wstring(text.at(pos)));
+        textWidth += cw;
+    }
+    return textWidth;
 }
 

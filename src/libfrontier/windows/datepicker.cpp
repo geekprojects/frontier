@@ -77,6 +77,7 @@ DatePickerWindow::~DatePickerWindow()
 bool DatePickerWindow::init()
 {
     Frame* root = new Frame(this, false);
+    root->setWidgetClass(L"datePicker");
 
     Frame* dateFrame = new Frame(this, true);
     IconButton* prevButton;
@@ -163,6 +164,7 @@ bool DatePickerWindow::update()
                 swprintf(buf, 5, L"%d", day);
 
                 Button* button = new Button(getApp(), buf);
+                button->setWidgetClass(L"dayButton");
                 button->setPrivateData((void*)(uint64_t)((day << 24) | (m_currentMonth << 16) | (m_currentYear)));
                 button->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onDateSelected));
 

@@ -119,7 +119,11 @@ void Label::calculateSize()
     if (m_icon != NULL)
     {
         Size iconSize = m_icon->getSize();
-        m_minSize.width += iconSize.width + boxModel.marginLeft;
+        if (m_minSize.width > 0)
+        {
+            m_minSize.width += boxModel.marginLeft;
+        }
+        m_minSize.width += iconSize.width;
         if (m_lineHeight < iconSize.height)
         {
             m_lineHeight = iconSize.height;
@@ -191,7 +195,7 @@ bool Label::draw(Surface* surface)
             switch (m_align)
             {
                 case ALIGN_LEFT:
-                    x = boxModel.marginLeft;
+                    x = boxModel.getLeft();
                     break;
                 case ALIGN_CENTER:
                     x = (m_setSize.width / 2) - (w / 2);
@@ -225,8 +229,17 @@ bool Label::draw(Surface* surface)
     if (m_icon != NULL)
     {
         Size iconSize = m_icon->getSize();
+        int iconX;
+        if (maxX > 0)
+        {
+            iconX = (maxX - iconSize.width) + (boxModel.marginLeft / 2);
+        }
+        else
+        {
+            iconX = boxModel.getLeft();
+        }
         int iconY = (m_setSize.height / 2) - (iconSize.height / 2);
-        m_icon->draw(surface, maxX - iconSize.width, iconY);
+        m_icon->draw(surface, iconX, iconY);
     }
 
     return true;

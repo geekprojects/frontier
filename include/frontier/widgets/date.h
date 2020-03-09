@@ -20,12 +20,15 @@ namespace Frontier
 class Date : public Frame
 {
  private:
+    bool m_hasValue;
     bool m_hasTime;
     std::chrono::seconds m_value;
 
     Label* m_dateLabel;
     Frontier::NumberInput* m_hourInput;
     Frontier::NumberInput* m_minuteInput;
+
+    sigc::signal<void, std::chrono::seconds> m_signalValueChanged;
 
     void onDateClick(Widget* widget);
     void onTimeChanged(Frontier::TextInput* w);
@@ -39,6 +42,13 @@ class Date : public Frame
     ~Date();
 
     void setup();
+
+    void setHasValue(bool hasValue);
+    bool getHasValue() { return m_hasValue; }
+    void setValue(std::chrono::seconds value);
+    std::chrono::seconds getValue() { return m_value; }
+
+    sigc::signal<void, std::chrono::seconds> signalValueChanged() { return m_signalValueChanged; }
 };
 
 };

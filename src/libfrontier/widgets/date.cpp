@@ -15,6 +15,7 @@ Date::Date(FrontierApp* app, bool hasTime) : Frame(app, L"Date", true)
     m_hasTime = hasTime;
     auto now = system_clock::now().time_since_epoch();
     m_value = std::chrono::duration_cast<std::chrono::seconds>(now);
+    m_hasValue = false;
 
     setup();
 }
@@ -23,6 +24,7 @@ Date::Date(FrontierApp* app, bool hasTime, std::chrono::seconds value) : Frame(a
 {
     m_hasTime = hasTime;
     m_value = value;
+    m_hasValue = true;
 
     setup();
 }
@@ -71,6 +73,18 @@ void Date::setup()
     updateDateTime();
 }
 
+void Date::setHasValue(bool hasValue)
+{
+    m_hasValue = hasValue;
+    updateDateTime();
+}
+
+void Date::setValue(std::chrono::seconds value)
+{
+    m_value = value;
+    updateDateTime();
+}
+
 void Date::onDateClick(Widget* widget)
 {
 
@@ -97,8 +111,12 @@ bool Date::onDateSelect(int year, int month, int day)
     t = mktime(&tm);
 
     m_value = std::chrono::seconds(t);
+    m_hasValue = true;
 
     updateDateTime();
+
+    m_signalValueChanged.emit(m_value);
+
     return true;
 }
 
@@ -116,17 +134,27 @@ void Date::onTimeChanged(Frontier::TextInput* w)
     t = mktime(&tm);
 
     m_value = std::chrono::seconds(t);
+
+    m_signalValueChanged.emit(m_value);
 }
 
 void Date::updateDateTime()
 {
     time_t t = (time_t)m_value.count();
-    tm tm;
+    struct tm tm;
     gmtime_r(&t, &tm);
+
+    if (m_hasValue)
+    {
 
     char buf[50];
     strftime(buf, 50, "%d/%m/%Y", &tm);
     m_dateLabel->setText(Utils::string2wstring(buf));
+    }
+    else
+    {
+        m_dateLabel->setText(L"");
+    }
 
     if (m_hasTime)
     {

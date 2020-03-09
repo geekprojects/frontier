@@ -28,6 +28,7 @@ class TextInput : public Widget
     void drawCursor(Geek::Gfx::Surface* surface, Geek::FontHandle* font, int x, int y);
 
     int charAt(int x);
+    int getTextWidth(Geek::FontHandle* font, std::wstring text);
 
     Geek::Mutex* m_surfaceMutex;
     Geek::Gfx::Surface* m_textSurface;

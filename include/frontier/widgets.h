@@ -293,7 +293,7 @@ class Widget : public FrontierObject, public Geek::Logger
 
     void setWindow(FrontierWindow* window) { m_window = window; }
     FrontierWindow* getWindow();
-    FrontierApp* getApp() { return m_app; }
+    FrontierApp* getApp() const { return m_app; }
 
     /// Return the position of thiw Widget relative to the Window
     virtual Geek::Vector2D getAbsolutePosition() const;
