@@ -11,6 +11,13 @@ using namespace Geek::Gfx;
 HSVWheel::HSVWheel(FrontierApp* app) : Widget(app, L"HSVWheel")
 {
     m_colour = Colour(255, 255, 255);
+    m_brightness = 1.0;
+}
+
+HSVWheel::HSVWheel(FrontierApp* app, Geek::Gfx::Colour colour) : Widget(app, L"HSVWheel")
+{
+    m_colour = colour;
+    m_brightness = 1.0;
 }
 
 HSVWheel::~HSVWheel()
@@ -90,7 +97,6 @@ bool HSVWheel::draw(Geek::Gfx::Surface* surface)
 
     double angle = selectedHSV[0] * (2 * M_PI); // Convert to radians
     double distr = (double)radius * selectedHSV[1];
-    log(DEBUG, "draw: angle=%0.2f, distr=%0.2f", angle, distr);
 
     int selectedX = (int)(distr * cos(angle)) + cx;
     int selectedY = cy - (int)(distr * sin(angle));
@@ -161,7 +167,6 @@ void HSVWheel::updateFromMouse(MouseEvent* mouseEvent)
     if (inside)
     {
         m_colour = Colour::fromHSB(hsb[0], hsb[1], hsb[2]);
-        log(DEBUG, "handleEvent: colour: %d, %d, %d", m_colour.r, m_colour.g, m_colour.b);
         setDirty(DIRTY_CONTENT);
     }
 }
@@ -179,7 +184,7 @@ bool HSVWheel::hsvFromPosition(double* hsv, int x, int y, int cx, int cy, int ra
 
         hsv[0] = angle / (2 * M_PI);
         hsv[1] = distr;
-        hsv[2] = 1.0;
+        hsv[2] = m_brightness;
 
         return true;
     }

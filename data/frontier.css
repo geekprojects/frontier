@@ -46,12 +46,12 @@ Tab:hover {
 }
 
 
-Label, Button {
+Label, Button, ColourButton {
     expand-horizontal: true;
     expand-vertical: false;
 }
 
-Button, CheckBox {
+Button, CheckBox, ColourButton {
     /*background-color: #4a7987; */
     /*border-radius: 3px;*/
     border-top: 1px solid #4b4b4b;
@@ -61,11 +61,11 @@ Button, CheckBox {
     padding: 2px;
 }
 
-Button.highlight {
+Button.highlight, ColourButton.highlight {
     background-color: #fff;
 }
 
-Button:selected, IconButton:selected, CheckBox:selected {
+Button:selected, IconButton:selected, CheckBox:selected, ColourButton:selected {
     /*background-color: #4a7987;*/
 
     border-top: 1px solid #0F0F0F;
@@ -74,11 +74,11 @@ Button:selected, IconButton:selected, CheckBox:selected {
     border-bottom: 1px solid #4b4b4b;
 }
 
-Button:hover, IconButton:hover, CheckBox:hover {
+Button:hover, IconButton:hover, CheckBox:hover, ColourButton:hover {
     background-color: #4c4f51;
 }
 
-Button:active, IconButton:active, CheckBox:active {
+Button:active, IconButton:active, CheckBox:active, ColourButton:active {
     background-color: #4a7987;
 }
 
@@ -135,5 +135,8 @@ ScrollBar {
 
 HSVWheel {
     background-color: #000;
+}
+
+.datePicker .dayButton {
 }
 

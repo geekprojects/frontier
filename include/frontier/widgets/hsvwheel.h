@@ -15,6 +15,7 @@ namespace Frontier
 class HSVWheel : public Widget
 {
  private:
+    double m_brightness;
     Geek::Gfx::Colour m_colour;
 
     sigc::signal<void, Geek::Gfx::Colour> m_signalColourChanged;
@@ -24,6 +25,7 @@ class HSVWheel : public Widget
 
  public:
     HSVWheel(Frontier::FrontierApp* app);
+    HSVWheel(Frontier::FrontierApp* app, Geek::Gfx::Colour colour);
     virtual ~HSVWheel();
 
     virtual void calculateSize();

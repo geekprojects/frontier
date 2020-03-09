@@ -315,6 +315,11 @@ string FrontierApp::chooseFile(int flags, string path, string pattern)
     return m_engine->chooseFile(flags, path, pattern);
 }
 
+ColourPickerWindow* FrontierApp::openColourPickerWindow(Geek::Gfx::Colour colour)
+{
+    return m_engine->openColourPickerWindow(colour);
+}
+
 uint64_t FrontierApp::getTimestamp() const
 {
     timeval tv;

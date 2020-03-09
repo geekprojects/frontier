@@ -2,6 +2,7 @@
 #define __LIBFRONTIER_ENGINES_COCOA_ENGINE_H_
 
 #include <frontier/engine.h>
+#include <frontier/windows/colourpicker.h>
 
 namespace Frontier {
 
@@ -39,12 +40,22 @@ class CocoaEngine : public FrontierEngine
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
+    virtual ColourPickerWindow* openColourPickerWindow(Geek::Gfx::Colour colour);
 
     bool providesMenus() { return true; }
 
     void updateMenu(FrontierWindow* window);
 
     void* getApplication() { return m_application; }
+};
+
+class CocoaColourPickerWindow : public ColourPickerWindow
+{
+ private:
+
+ public:
+    CocoaColourPickerWindow(Geek::Gfx::Colour colour);
+    virtual ~CocoaColourPickerWindow();
 };
 
 }

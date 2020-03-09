@@ -25,6 +25,7 @@
 #include <set>
 
 #include <geek/gfx-surface.h>
+#include <geek/gfx-colour.h>
 #include <geek/core-logger.h>
 #include <geek/fonts.h>
 
@@ -44,6 +45,7 @@ class FrontierApp;
 class Widget;
 class UITheme;
 class ContextMenu;
+class ColourPickerWindow;
 
 class FrontierEngineWindow;
 
@@ -167,6 +169,8 @@ class FrontierApp : public Geek::Logger
 
     /// Request a file dialog
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
+
+    virtual ColourPickerWindow* openColourPickerWindow(Geek::Gfx::Colour colour);
 
     /// Return the current system timestamp in milliseconds
     uint64_t getTimestamp() const;

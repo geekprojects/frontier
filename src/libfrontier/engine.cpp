@@ -20,6 +20,7 @@
 
 
 #include <frontier/engine.h>
+#include <frontier/windows/colourpicker.h>
 
 using namespace std;
 using namespace Frontier;
@@ -89,6 +90,15 @@ string FrontierEngine::chooseFile(int flags, std::string path, std::string patte
 {
     log(WARN, "chooseFile not implemented");
     return "";
+}
+
+ColourPickerWindow* FrontierEngine::openColourPickerWindow(Geek::Gfx::Colour colour)
+{
+    FrontierColourPickerWindow* cpw = new FrontierColourPickerWindow(m_app, colour);
+
+    cpw->show();
+
+    return cpw;
 }
 
 bool FrontierEngine::providesMenus()

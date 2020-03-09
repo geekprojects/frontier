@@ -9,6 +9,7 @@
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
+using namespace Geek::Gfx;
 
 @interface MenuTarget : NSObject
 {
@@ -325,6 +326,11 @@ else
     return "";
 }
 
+ColourPickerWindow* CocoaEngine::openColourPickerWindow(Geek::Gfx::Colour colour)
+{
+    return new CocoaColourPickerWindow(colour);
+}
+
 string CocoaEngine::getConfigDir()
 {
     NSError *error;
@@ -333,5 +339,55 @@ string CocoaEngine::getConfigDir()
     NSString* path = [appSupportDir path];
 
     return std::string([path UTF8String], [path lengthOfBytesUsingEncoding:NSUTF8StringEncoding]) + "/" + Utils::wstring2string(m_app->getName());
+}
+
+
+@interface ColourTarget : NSObject
+{
+    CocoaColourPickerWindow* m_window;
+}
+
+- (void)setWindow:(CocoaColourPickerWindow*)cocoaWindow;
+- (void)colourAction:(id)sender;
+
+@end
+
+@implementation ColourTarget
+
+- (void)setWindow:(CocoaColourPickerWindow*)window
+{
+    m_window = window;
+}
+
+- (void)colourAction:(id)sender
+{
+    float r = [[sender color] redComponent];
+    float g = [[sender color] greenComponent];
+    float b = [[sender color] blueComponent];
+    float a = [[sender color] alphaComponent];
+    Colour colour(a * 255.0, r * 255.0, g * 255.0, b * 255.0);
+    printf("ColourTarget::colourAction: r=%0.2f, g=%0.2f, b=%0.2f, a=%0.2f: %s\n", r, g, b, a, colour.toHexString().c_str());
+
+    m_window->colourSelectedSignal().emit(colour);
+}
+
+@end
+
+CocoaColourPickerWindow::CocoaColourPickerWindow(Colour colour) : ColourPickerWindow(colour)
+{
+    NSColorPanel *cpanel = [NSColorPanel sharedColorPanel];
+NSColor* nscolor = [NSColor colorWithSRGBRed:((float)colour.r / 255.0) green:((float)colour.g / 255.0) blue:((float)colour.b / 255.0) alpha:((float)colour.alpha / 255.0)];
+    //[cpanel color:nscolor];
+    cpanel.color = nscolor;
+
+    ColourTarget* target = [ColourTarget alloc];
+[target setWindow:this];
+    [cpanel setAction:@selector(colourAction:)];
+    [cpanel setTarget:target];
+    [cpanel makeKeyAndOrderFront:nil];
+}
+
+CocoaColourPickerWindow::~CocoaColourPickerWindow()
+{
 }
 

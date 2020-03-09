@@ -32,11 +32,13 @@ list(APPEND libfrontier_srcs
     widgets/tabs.cpp
     widgets/date.cpp
     widgets/hsvwheel.cpp
+    widgets/colourbutton.cpp
     widgets/list/textlistitem.cpp
     widgets/list/list.cpp
     widgets/list/menulist.cpp
     widgets/list/treelistitem.cpp
     windows/datepicker.cpp
+    windows/colourpicker.cpp
 )
 
 if (ENGINE MATCHES Cocoa)

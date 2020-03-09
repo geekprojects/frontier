@@ -38,11 +38,13 @@
 #include <frontier/widgets/checkbox.h>
 #include <frontier/widgets/date.h>
 #include <frontier/widgets/hsvwheel.h>
+#include <frontier/widgets/colourbutton.h>
 #include <frontier/windows/datepicker.h>
 
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
+using namespace Geek::Gfx;
 
 class TooltipWindow;
 
@@ -253,6 +255,18 @@ numberInput->setIntegerOnly(false);
 numberInput->setNumber(3.14);
         inputTab->add(numberFrame);
 
+        Frame* numberFrame2 = new Frame(this, true);
+        NumberInput* numberInput2;
+        numberFrame2->add(new Label(this, L"Number Text:"));
+        numberFrame2->add(numberInput2 = new NumberInput(this));
+numberInput2->setStyle("expand-horizontal", false);
+numberInput2->setIntegerOnly(true);
+numberInput2->setMax(99);
+numberInput2->setMaxLength(2);
+numberInput2->setNumber(99);
+        inputTab->add(numberFrame2);
+
+
         Frame* inputFrame3 = new Frame(this, true);
         inputFrame3->add(new Label(this, L"Date:"));
         inputFrame3->add(m_dateLabel = new Label(this, L"Choose Date"));
@@ -297,7 +311,8 @@ numberInput->setNumber(3.14);
 
 {
 Frame* colourTab = new Frame(this, false);
-colourTab->add(new HSVWheel(this));
+//colourTab->add(new HSVWheel(this));
+colourTab->add(new ColourButton(this, Colour(128, 255, 128)));
         m_tabs->addTab(L"Colours", colourTab);
 }
 

@@ -61,6 +61,7 @@ class FrontierEngine : public Geek::Logger
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
+    virtual ColourPickerWindow* openColourPickerWindow(Geek::Gfx::Colour colour);
 
     // Features
     /// Returns whether the OS provides it's own native Menus (e.g. MacOS)
