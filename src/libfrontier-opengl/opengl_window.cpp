@@ -1,5 +1,5 @@
 
-#include <frontier/opengl.h>
+#include <frontier/engines/opengl.h>
 
 using namespace std;
 using namespace Frontier;
@@ -7,7 +7,7 @@ using namespace Geek;
 using namespace Geek::Gfx;
 
 OpenGLEngineWindow::OpenGLEngineWindow(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window)
-    : EmbeddedWindow(engine, window)
+    : WindowingEngineWindow(engine, window)
 {
     m_textureSurface = NULL;
     m_textureValid = false;
@@ -21,7 +21,7 @@ OpenGLEngineWindow::~OpenGLEngineWindow()
 
 bool OpenGLEngineWindow::init()
 {
-    return true;
+    return WindowingEngineWindow::init();
 }
 
 static int powerOfTwo(int input)
@@ -66,7 +66,7 @@ bool OpenGLEngineWindow::update()
         GL_UNSIGNED_BYTE,
         m_textureSurface->getData());
 
-    glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
+    glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glBegin(GL_TRIANGLE_STRIP);

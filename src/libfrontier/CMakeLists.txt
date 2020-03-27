@@ -14,6 +14,8 @@ list(APPEND libfrontier_srcs
     engines/test/test_engine.cpp
     engines/embedded/embedded_window.cpp
     engines/embedded/embedded_engine.cpp
+    engines/windowing/windowing_engine.cpp
+    engines/windowing/windowing_window.cpp
     widgets/button.cpp
     widgets/iconbutton.cpp
     widgets/checkbox.cpp

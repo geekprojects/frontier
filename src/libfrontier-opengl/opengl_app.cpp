@@ -1,6 +1,5 @@
 
-#include <frontier/opengl.h>
-#include <frontier/embedded.h>
+#include <frontier/engines/opengl.h>
 #include <frontier/widgets/frame.h>
 #include <frontier/widgets/button.h>
 #include <frontier/widgets/tabs.h>
@@ -33,6 +32,11 @@ bool OpenGLApp::init()
     return true;
 }
 
+void OpenGLApp::setScreenSize(Size size)
+{
+    ((OpenGLEngine*)getEngine())->setScreenSize(size);
+}
+
 void OpenGLApp::draw()
 {
     // Enter 2D mode
@@ -47,27 +51,29 @@ void OpenGLApp::draw()
 
     /* This allows alpha blending of 2D textures with the scene */
     glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
 
     float scale = 2.0;
 
-    glViewport(0, 0, m_screenSize.width * scale, m_screenSize.height * scale);
+    Size screenSize = ((OpenGLEngine*)getEngine())->getScreenSize();
+    glViewport(0, 0, screenSize.width * scale, screenSize.height * scale);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
 
-    glOrtho(0.0, (double)m_screenSize.width * scale, (double)m_screenSize.height * scale, 0.0, 0.0, 1.0);
+    glOrtho(0.0, (double)screenSize.width * scale, (double)screenSize.height * scale, 0.0, 0.0, 1.0);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
 
-    vector<FrontierWindow*> windows = getWindows();
-    for (FrontierWindow* window : windows)
+    const std::deque<FrontierWindow*> windows = ((OpenGLEngine*)getEngine())->getWindowOrder();
+    for (auto it = windows.rbegin(); it != windows.rend(); it++)
     {
+        FrontierWindow* window = *it;
         window->update();
         OpenGLEngineWindow* engineWindow = (OpenGLEngineWindow*)window->getEngineWindow();
         if (engineWindow != NULL)
@@ -85,8 +91,10 @@ void OpenGLApp::draw()
     glPopAttrib();
 }
 
-void OpenGLApp::mouseMotion(FrontierWindow* window, int x, int y)
+void OpenGLApp::mouseMotion(int x, int y)
 {
+    ((OpenGLEngine*)getEngine())->mouseMotion(x, y);
+/*
     MouseMotionEvent* mouseMotionEvent = new MouseMotionEvent();
     mouseMotionEvent->eventType = FRONTIER_EVENT_MOUSE_MOTION;
 
@@ -94,10 +102,13 @@ void OpenGLApp::mouseMotion(FrontierWindow* window, int x, int y)
     mouseMotionEvent->x = x - position.x;
     mouseMotionEvent->y = y - position.y;
     window->handleEvent(mouseMotionEvent);
+*/
 }
 
-void OpenGLApp::mouseButton(Frontier::FrontierWindow* window, int x, int y, int button, bool direction)
+void OpenGLApp::mouseButton(int x, int y, int button, bool direction)
 {
+    ((OpenGLEngine*)getEngine())->mouseButton(x, y, button, direction);
+/*
     MouseButtonEvent* mouseButtonEvent = new MouseButtonEvent();
     mouseButtonEvent->eventType = FRONTIER_EVENT_MOUSE_BUTTON;
     mouseButtonEvent->direction = direction;
@@ -105,5 +116,6 @@ void OpenGLApp::mouseButton(Frontier::FrontierWindow* window, int x, int y, int 
     mouseButtonEvent->x = x;
     mouseButtonEvent->y = y;
     window->handleEvent(mouseButtonEvent);
+*/
 }
 

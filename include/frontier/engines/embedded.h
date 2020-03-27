@@ -35,6 +35,7 @@ class EmbeddedEngine : public FrontierEngine
 {
  protected:
     float m_scaleFactor;
+    Frontier::Size m_screenSize;
 
  public:
     EmbeddedEngine(FrontierApp* app);
@@ -52,6 +53,9 @@ class EmbeddedEngine : public FrontierEngine
     virtual void message(std::string title, std::string message);
     virtual bool confirmBox(std::string title, std::string message);
     virtual std::string chooseFile(int flags, std::string path, std::string pattern);
+
+    void setScreenSize(Frontier::Size size) { m_screenSize = size; }
+    Frontier::Size getScreenSize() { return m_screenSize; }
 
     void setScaleFactor(float factor) { m_scaleFactor = factor; }
     float getScaleFactor() { return m_scaleFactor; }

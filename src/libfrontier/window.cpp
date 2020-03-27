@@ -146,6 +146,12 @@ Geek::Vector2D FrontierWindow::getPosition()
     return m_engineWindow->getPosition();
 }
 
+Frontier::Rect FrontierWindow::getRect()
+{
+    Vector2D pos = getPosition();
+    return Rect(pos.x, pos.y, m_size.width, m_size.height);
+}
+
 void FrontierWindow::setContent(Widget* content)
 {
     if (m_content != NULL)

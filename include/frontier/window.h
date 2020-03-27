@@ -124,6 +124,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
 
     void setPosition(Geek::Vector2D position);
     Geek::Vector2D getPosition();
+    Frontier::Rect getRect();
 
     void setContent(Widget* widget);
     Widget* getContent() const { return m_content; }

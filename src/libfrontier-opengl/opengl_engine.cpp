@@ -1,9 +1,9 @@
 
-#include <frontier/opengl.h>
+#include <frontier/engines/opengl.h>
 
 using namespace Frontier;
 
-OpenGLEngine::OpenGLEngine(FrontierApp* app) : EmbeddedEngine(app)
+OpenGLEngine::OpenGLEngine(FrontierApp* app) : WindowingEngine(app)
 {
 }
 

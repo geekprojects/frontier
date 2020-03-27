@@ -13,12 +13,14 @@
 #endif
 
 #include <frontier/frontier.h>
-#include <frontier/embedded.h>
+#include <frontier/engines/windowing.h>
 
 namespace Frontier
 {
 
-class OpenGLEngineWindow : public Frontier::EmbeddedWindow
+class OpenGLEngine;
+
+class OpenGLEngineWindow : public Frontier::WindowingEngineWindow
 {
  protected:
     unsigned int m_texture;
@@ -45,7 +47,6 @@ class OpenGLEngineWindow : public Frontier::EmbeddedWindow
 class OpenGLApp : public Frontier::FrontierApp
 {
  protected:
-    Size m_screenSize;
 
  public:
     OpenGLApp();
@@ -53,15 +54,15 @@ class OpenGLApp : public Frontier::FrontierApp
 
     virtual bool init();
 
-    void setScreenSize(Size size) { m_screenSize = size; }
+    void setScreenSize(Size size);
 
-    void mouseMotion(Frontier::FrontierWindow* window, int x, int y);
-    void mouseButton(Frontier::FrontierWindow* window, int x, int y, int button, bool direction);
+    void mouseMotion(int x, int y);
+    void mouseButton(int x, int y, int button, bool direction);
 
     virtual void draw();
 };
 
-class OpenGLEngine : public EmbeddedEngine
+class OpenGLEngine : public WindowingEngine
 {
  protected:
 
