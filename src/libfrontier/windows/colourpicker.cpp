@@ -39,11 +39,18 @@ FrontierColourPickerWindow::~FrontierColourPickerWindow()
 
 bool FrontierColourPickerWindow::init()
 {
+    setSize(Size(100, 100));
+
     Frame* root = new Frame(this, false);
     root->setWidgetClass(L"colourPicker");
 
     m_hsvWheel = new HSVWheel(getApp(), m_colour);
+    m_hsvWheel->signalColourChanged().connect(sigc::mem_fun(*this, &FrontierColourPickerWindow::onHSVColourChange));
     root->add(m_hsvWheel);
+
+    Button* closeButton = new Button(getApp(), L"Close");
+    closeButton->clickSignal().connect(sigc::mem_fun(*this, &FrontierColourPickerWindow::onCloseButton));
+    root->add(closeButton);
 
     setContent(root);
 
@@ -57,4 +64,19 @@ bool FrontierColourPickerWindow::update()
     return true;
 }
 
+void FrontierColourPickerWindow::show()
+{
+    FrontierWindow::show();
+}
+
+void FrontierColourPickerWindow::onCloseButton(Widget* widget)
+{
+    hide();
+}
+
+void FrontierColourPickerWindow::onHSVColourChange(Geek::Gfx::Colour colour)
+{
+log(DEBUG, "onHSVColourChange: Here!!");
+    m_colourSelectedSignal.emit(colour);
+}
 

@@ -28,12 +28,17 @@ class ColourPickerWindow
     virtual ~ColourPickerWindow();
 
     sigc::signal<void, Geek::Gfx::Colour> colourSelectedSignal() { return m_colourSelectedSignal; }
+
+    virtual void show() {}
 };
 
 class FrontierColourPickerWindow : public ColourPickerWindow, public Frontier::FrontierWindow
 {
  private:
     HSVWheel* m_hsvWheel;
+
+    void onCloseButton(Widget* widget);
+    void onHSVColourChange(Geek::Gfx::Colour);
 
  public:
     FrontierColourPickerWindow(Frontier::FrontierApp* app);
@@ -42,6 +47,7 @@ class FrontierColourPickerWindow : public ColourPickerWindow, public Frontier::F
 
     bool init();
     bool update();
+    void show();
 };
 
 };

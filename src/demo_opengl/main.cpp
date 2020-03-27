@@ -1,5 +1,5 @@
 
-#include <frontier/opengl.h>
+#include <frontier/engines/opengl.h>
 #include <frontier/widgets/frame.h>
 #include <frontier/widgets/button.h>
 #include <frontier/widgets/tabs.h>
@@ -10,11 +10,14 @@ GLfloat g_xRotated = 0.0;
 GLfloat g_yRotated = 0.0;
 GLfloat g_zRotated = 0.0;
 GLdouble g_size = 1;
-GLdouble g_speed = 0.01;
+GLdouble g_speed = 0.10;
 
 class DemoWindow : public Frontier::FrontierWindow
 {
  protected:
+    Geek::Gfx::Colour m_colour;
+
+    void onColourSelected(Geek::Gfx::Colour colour);
 
  public:
     DemoWindow(Frontier::FrontierApp* app);
@@ -24,6 +27,8 @@ class DemoWindow : public Frontier::FrontierWindow
 
     void faster(Frontier::Widget* widget);
     void slower(Frontier::Widget* widget);
+
+     Geek::Gfx::Colour getColour() { return m_colour; }
 };
 
 using namespace std;
@@ -36,7 +41,9 @@ DemoWindow* g_mainWindow = NULL;
 
 DemoWindow::DemoWindow(FrontierApp* app) : FrontierWindow(app, L"OpenGL Demo", WINDOW_NORMAL)
 {
-    setSize(Size(100, 100));
+    setSize(Size(150, 100));
+
+    m_colour = Colour(255, 0, 0);
 }
 
 DemoWindow::~DemoWindow()
@@ -57,10 +64,10 @@ bool DemoWindow::init()
     tabs->addTab(L"Speed", speedFrame);
 
     Frame* colourFrame = new Frame(getApp(), false);
-    colourFrame->add(new ColourButton(getApp(), Colour(255, 0, 0)));
-    colourFrame->add(new Button(getApp(), L"Red!"));
-    colourFrame->add(new Button(getApp(), L"Blue!"));
-    colourFrame->add(new Button(getApp(), L"Green!"));
+    ColourButton* colourButton = new ColourButton(getApp(), m_colour);
+    colourButton->colourSelectedSignal().connect(sigc::mem_fun(*this, &DemoWindow::onColourSelected));
+
+    colourFrame->add(colourButton);
     tabs->addTab(L"Colour", colourFrame);
 
     Frame* sizeFrame = new Frame(getApp(), false);
@@ -87,6 +94,11 @@ void DemoWindow::slower(Widget* widget)
     g_speed *= 0.5;
 }
 
+void DemoWindow::onColourSelected(Geek::Gfx::Colour colour)
+{
+    m_colour = colour;
+}
+
 void display()
 {
     glMatrixMode(GL_MODELVIEW);
@@ -97,15 +109,13 @@ void display()
 
     glTranslatef(0.0, 0.0, -4.5);
 
-    // Red
-    glColor3f(0.8, 0.2, 0.1); 
+    Colour c = g_mainWindow->getColour();
+    glColor3f(c.redFloat(), c.greenFloat(), c.blueFloat());
 
     // Rotate
     glRotatef(g_xRotated, 1.0, 0.0, 0.0);
     glRotatef(g_yRotated, 0.0, 1.0, 0.0);
     glRotatef(g_zRotated, 0.0, 0.0, 1.0);
-
-    //glScalef(1.0, 1.0, 1.0);
 
     // Draw our teapot!
     glutSolidTeapot(g_size);
@@ -149,12 +159,12 @@ void mouseCallback(int button, int stat, int x, int y)
         frnButton = BUTTON_RIGHT;
     }
     bool direction = !stat;
-    g_app->mouseButton(g_mainWindow, x, y, frnButton, direction);
+    g_app->mouseButton(x, y, frnButton, direction);
 }
 
 void mouseMotionCallback(int x, int y)
 {
-    g_app->mouseMotion(g_mainWindow, x, y);
+    g_app->mouseMotion(x, y);
 }
 
 void idleFunc(void)

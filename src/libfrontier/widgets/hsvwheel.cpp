@@ -24,7 +24,6 @@ HSVWheel::~HSVWheel()
 {
 }
 
-
 void HSVWheel::calculateSize()
 {
     m_minSize.width = 100;
@@ -148,8 +147,9 @@ void HSVWheel::updateFromMouse(MouseEvent* mouseEvent)
 {
     BoxModel boxModel = getBoxModel();
 
+    int height = m_setSize.height - boxModel.getHeight();
     int cx = (m_setSize.width - boxModel.getWidth()) / 2;
-    int cy = (m_setSize.height - boxModel.getHeight()) / 2;
+    int cy = height / 2;
     int radius = cx;
     if (cy < radius)
     {
@@ -168,6 +168,8 @@ void HSVWheel::updateFromMouse(MouseEvent* mouseEvent)
     {
         m_colour = Colour::fromHSB(hsb[0], hsb[1], hsb[2]);
         setDirty(DIRTY_CONTENT);
+
+        m_signalColourChanged.emit(m_colour);
     }
 }
 

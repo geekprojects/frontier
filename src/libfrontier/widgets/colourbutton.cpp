@@ -66,17 +66,21 @@ void ColourButton::onClick(Widget* widget)
 {
     if (m_colourPicker != NULL)
     {
+        m_colourPicker->show();
         return;
     }
 
     m_colourPicker = getApp()->openColourPickerWindow(m_colour);
-m_colourPicker->colourSelectedSignal().connect(sigc::mem_fun(*this, &ColourButton::setColour));
+    m_colourPicker->colourSelectedSignal().connect(sigc::mem_fun(*this, &ColourButton::setColour));
 }
 
 void ColourButton::setColour(Colour colour)
 {
     m_colour = colour;
     setDirty(DIRTY_CONTENT);
+
+log(DEBUG, "setColour: colour: %s", colour.toHexString().c_str());
+    m_colourSelectedSignal.emit(m_colour);
 
     getWindow()->requestUpdate();
 }
