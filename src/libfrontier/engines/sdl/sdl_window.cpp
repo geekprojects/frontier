@@ -63,6 +63,11 @@ bool FrontierEngineWindowSDL::init()
 
     SDL_SetWindowData(m_sdlWindow, "FrontierWindow", this);
 
+    if (m_window->isFullScreen())
+    {
+        SDL_SetWindowFullscreen(m_sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+
     return true;
 }
 
