@@ -159,7 +159,23 @@ bool Widget::drawBorder(Surface* surface)
     int borderWidth = surfaceWidth - (boxModel.marginLeft + boxModel.marginRight);
     int borderHeight = surfaceHeight - (boxModel.marginTop + boxModel.marginBottom);
 
-    if (hasStyle("background-color", props))
+    if (hasStyle("background-image", props))
+    {
+        // We only support basic linear gradients for now
+        uint64_t backgroundColour = getStyle("background-image", props);
+        uint32_t g1 = backgroundColour >> 32;
+        uint32_t g2 = backgroundColour & 0xffffffff;
+        log(DEBUG, "drawBorder: g1=0x%x, g2=0x%x", g1, g2);
+        if (borderRadius > 0)
+        {
+            surface->drawGradRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, g1, g2);
+        }
+        else
+        {
+            surface->drawGrad(borderX, borderY, borderWidth, borderHeight, g1, g2);
+        }
+    }
+    else if (hasStyle("background-color", props))
     {
         uint32_t backgroundColour = getStyle("background-color", props);
         if (borderRadius > 0)
@@ -349,10 +365,17 @@ Geek::FontHandle* Widget::getTextFont()
         }
 
         const char* fontFamily = (const char*)getStyle("font-family", props);
+        const char* fontStyle = "Regular";
+
+        if (hasStyle("font-style"))
+        {
+            fontStyle = (const char*)getStyle("font-style", props);
+        }
         int fontSize = getStyle("font-size", props);
         if (m_cachedTextFont != NULL)
         {
             if (m_cachedTextFont->getFontFace()->getFamily()->getName() == string(fontFamily) &&
+                m_cachedTextFont->getFontFace()->getStyle() == fontStyle &&
                 m_cachedTextFont->getPointSize() == fontSize)
             {
                 return m_cachedTextFont;
@@ -362,9 +385,9 @@ Geek::FontHandle* Widget::getTextFont()
         }
 
         FontManager* fm = m_app->getFontManager();
-        log(DEBUG, "getTextFont: Opening fontFamily: %s, fontSize: %d", fontFamily, fontSize);
+        log(DEBUG, "getTextFont: Opening fontFamily: %s, style: %s fontSize: %d", fontFamily, fontStyle, fontSize);
 
-        m_cachedTextFont = fm->openFont(fontFamily, "Regular", fontSize);
+        m_cachedTextFont = fm->openFont(fontFamily, fontStyle, fontSize);
         m_cachedTextFontTimestamp = m_app->getStyleEngine()->getTimestamp();
     }
 
