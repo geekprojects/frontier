@@ -13,6 +13,17 @@ namespace Frontier {
 
 class Widget;
 
+union StyleValue
+{
+    uint64_t value;
+    const char* str;
+    union
+    {
+        uint32_t value1;
+        uint32_t value2;
+    };
+};
+
 /**
  * \defgroup styles CSS Engine
  */
@@ -36,11 +47,12 @@ struct StyleSelector
 class StyleRule
 {
  private:
+    uint64_t m_id;
     std::vector<StyleSelector> m_selectors;
     std::unordered_map<std::string, int64_t> m_properties;
 
  public:
-    StyleRule() {}
+    StyleRule() { m_id = 0; }
     virtual ~StyleRule() {}
 
     const std::vector<StyleSelector>& getSelectors() { return  m_selectors; }
@@ -48,6 +60,8 @@ class StyleRule
 
     bool matches(Frontier::Widget* widget);
 
+    void setId(uint64_t id) { m_id = id; }
+    uint64_t getId() { return m_id; }
     std::wstring getKey();
 
     void setProperty(std::string property, int64_t value);
@@ -72,6 +86,7 @@ class StyleEngine : public Geek::Logger
     CssParser* m_parser;
     std::vector<std::pair<StyleRule*, int>> m_styleRules;
     uint64_t m_timestamp;
+    uint64_t m_currentId;
 
  public:
     StyleEngine();

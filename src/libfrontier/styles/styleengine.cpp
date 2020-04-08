@@ -22,6 +22,8 @@ using namespace Geek;
 StyleEngine::StyleEngine() : Logger("StyleEngine")
 {
     m_parser = new CssParser(this);
+
+    m_currentId = 0;
 }
 
 StyleEngine::~StyleEngine()
@@ -71,6 +73,8 @@ StyleRule* StyleEngine::findByKey(std::string key)
 
 void StyleEngine::addRule(StyleRule* rule)
 {
+    rule->setId(++m_currentId);
+
     int specificity = 0;
 
     // https://www.w3.org/TR/CSS2/cascade.html#specificity
@@ -108,12 +112,17 @@ void StyleEngine::addRule(StyleRule* rule)
 
     StyleComparator compFunctor = [](std::pair<StyleRule*, int> elem1 ,std::pair<StyleRule*, int> elem2)
     {
-        return elem1.second < elem2.second;
+        if (elem1.second == elem2.second)
+        {
+            return elem1.first->getId() < elem2.first->getId();
+        }
+        else
+        {
+            return elem1.second < elem2.second;
+        }
     };
 
     std::sort(m_styleRules.begin(), m_styleRules.end(), compFunctor);
-
-    //m_styleRules = orderedRules;
 }
 
 unordered_map<string, int64_t> StyleEngine::getProperties(Widget* widget)

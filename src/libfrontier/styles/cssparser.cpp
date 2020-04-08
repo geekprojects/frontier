@@ -52,6 +52,8 @@ struct IdentValues
 
     {"black", 0x000000},
     {"white", 0xffffff},
+    {"red",   0xff0000},
+    {"yellow", 0xffff00},
 
     {"none", 0x0},
     {"solid", 0x1},
@@ -279,6 +281,10 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
         {
             return getFontFamilyValue(str);
         }
+        else if (property == "font-style")
+        {
+            return getFontFamilyValue(str);
+        }
         return 0;
     }
     if (term->ident() != NULL)
@@ -289,6 +295,10 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
 #endif
 
         if (property == "font-family")
+        {
+            return getFontFamilyValue(identStr);
+        }
+        else if (property == "font-style")
         {
             return getFontFamilyValue(identStr);
         }
@@ -309,9 +319,9 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
     }
     if (term->function())
     {
-        const char* functionName = term->function()->Function()->getText().c_str();
+        string functionName = term->function()->Function()->getText();
 #ifdef DEBUG_CSS_PARSER
-        printf("RuleSetListener::getTermValue:   -> function: Function=%s\n", functionName);
+        printf("RuleSetListener::getTermValue:   -> function: Function=%s\n", functionName.c_str());
 #endif
         vector<uint32_t> funcValues;
         for (css3Parser::TermContext* funcTerm0 : term->function()->expr()->term())
@@ -323,7 +333,7 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
             funcValues.push_back(funcValue);
         }
 
-        if (!strcmp("rgb(", functionName))
+        if (!strcmp("rgb(", functionName.c_str()))
         {
             uint64_t rgb = 0;
             unsigned int i;
@@ -338,10 +348,27 @@ int64_t RuleSetListener::getTermValue(string property, css3Parser::TermContext* 
 #endif
             return rgb;
         }
+        else if (!strcmp("linear-gradient(", functionName.c_str()))
+        {
+            uint64_t gradient = 0;
+            unsigned int i;
+            for (i = 0; i < 2 && i < funcValues.size(); i++)
+            {
+                uint32_t v = funcValues.at(i);;
+                v |= 0xff000000;
+                gradient <<= 32;
+                gradient |= v;
+            }
+            return gradient;
+        }
         else
         {
 #ifdef DEBUG_CSS_PARSER
-            printf("RuleSetListener::getTermValue:   -> function: Unknown function: %s\n", functionName);
+            printf("RuleSetListener::getTermValue:   -> function: Unknown function: %s\n", functionName.c_str());
+            for (int value : funcValues)
+            {
+                printf("RuleSetListener::getTermValue:     -> function: parameter: %d (0x%x)\n", value, value);
+            }
 #endif
         }
         return 0;

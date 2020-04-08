@@ -119,6 +119,17 @@ struct Size
         this->width += rhs.width;
         this->height += rhs.height;
     }
+
+    bool operator== (const Size& rhs)
+    {
+        return (this->width == rhs.width && this->height == rhs.height);
+    }
+
+    bool operator!= (const Size& rhs)
+    {
+        return (this->width != rhs.width || this->height != rhs.height);
+    }
+
 };
 
 /**
