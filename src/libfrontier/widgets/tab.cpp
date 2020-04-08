@@ -6,7 +6,6 @@ using namespace std;
 using namespace Geek;
 using namespace Frontier;
 
-#define MAX_TAB_SIZE 250
 #define TAB_SIZE 22
 
 Tab::Tab(Tabs* tabs, wstring title, Icon* icon, Widget* content, bool closeable)
@@ -49,6 +48,7 @@ Tab::~Tab()
 void Tab::calculateSize()
 {
     BoxModel boxModel = getBoxModel();
+    int maxTabSize = getStyle("max-width");
 
     m_minSize.width = boxModel.getWidth();
     m_minSize.height = boxModel.getHeight();
@@ -62,21 +62,23 @@ void Tab::calculateSize()
     }
     if (horizontal)
     {
+        m_minSize.width = TAB_SIZE;
         if (m_closeable)
         {
             m_minSize.width += TAB_SIZE;
         }
         m_minSize.height += font->getPixelHeight();
-        m_maxSize.set(MAX_TAB_SIZE, m_minSize.height);
+        m_maxSize.set(maxTabSize, m_minSize.height);
     }
     else
     {
+        m_minSize.height = TAB_SIZE;
         if (m_closeable)
         {
             m_minSize.height += TAB_SIZE;
         }
         m_minSize.width += font->getPixelHeight();
-        m_maxSize.set(m_minSize.width, MAX_TAB_SIZE);
+        m_maxSize.set(m_minSize.width, maxTabSize);
     }
 }
 

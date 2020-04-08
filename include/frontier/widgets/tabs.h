@@ -71,6 +71,7 @@ class Tabs : public Widget
  protected:
     Tab* m_activeTab;
     std::vector<Tab*> m_tabs;
+    Size m_tabsSize;
 
     TabPlacement m_placement;
     bool m_collapsible;

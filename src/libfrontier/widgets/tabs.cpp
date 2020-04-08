@@ -35,7 +35,6 @@ using namespace Geek::Gfx;
 
 #define TAB_SIZE 22
 #define MIN_TAB_SIZE (TAB_SIZE * 2)
-#define MAX_TAB_SIZE 250
 
 Tabs::Tabs(FrontierApp* ui) : Widget(ui, TABS_WIDGET_NAME)
 {
@@ -172,7 +171,7 @@ void Tabs::calculateSize()
         m_collapseButtonWidget->calculateSize();
     }
 
-    Size tabsSize;
+    m_tabsSize.set(0, 0);
     for (Tab* tab : m_tabs)
     {
         tab->calculateSize();
@@ -180,30 +179,30 @@ void Tabs::calculateSize()
 
         if (isHorizontal())
         {
-            tabsSize.width += tabMin.width;
-            if (tabsSize.height < tabMin.height)
+            m_tabsSize.width += tabMin.width;
+            if (m_tabsSize.height < tabMin.height)
             {
-                tabsSize.height = tabMin.height;
+                m_tabsSize.height = tabMin.height;
             }
         }
         else
         {
-            if (tabsSize.width < tabMin.width)
+            if (m_tabsSize.width < tabMin.width)
             {
-                tabsSize.width = tabMin.width;
+                m_tabsSize.width = tabMin.width;
             }
-            tabsSize.height += tabMin.height;
+            m_tabsSize.height += tabMin.height;
         }
     }
 
     BoxModel boxModel = getBoxModel();
     m_minSize.width = boxModel.getWidth();
     m_minSize.height = boxModel.getHeight();
-    m_minSize += tabsSize;
+    m_minSize += m_tabsSize;
 
     if (isHorizontal())
     {
-        m_maxSize.set(WIDGET_SIZE_UNLIMITED, TAB_SIZE);
+        m_maxSize.set(WIDGET_SIZE_UNLIMITED, m_tabsSize.height);
         if (m_addButton)
         {
             m_minSize.width += m_addButtonWidget->getMinSize().width;
@@ -215,7 +214,7 @@ void Tabs::calculateSize()
     }
     else
     {
-        m_maxSize.set(TAB_SIZE, WIDGET_SIZE_UNLIMITED);
+        m_maxSize.set(m_tabsSize.width, WIDGET_SIZE_UNLIMITED);
         if (m_addButton)
         {
             m_minSize.height += m_addButtonWidget->getMinSize().height;
@@ -255,6 +254,15 @@ void Tabs::calculateSize()
 
     m_minSize += activeMinSize;
     m_maxSize += activeMaxSize;
+
+    if (getStyle("expand-horizontal") == 1)
+    {
+        m_maxSize.width = WIDGET_SIZE_UNLIMITED;
+    }
+    if (getStyle("expand-vertical") == 1)
+    {
+        m_maxSize.height = WIDGET_SIZE_UNLIMITED;
+    }
 }
 
 void Tabs::layout()
@@ -805,26 +813,29 @@ Size Tabs::getTabSize()
     {
         major -= TAB_SIZE;
     }
+
     if (m_addButton)
     {
         major -= TAB_SIZE;
     }
 
     int tabMajor = major / m_tabs.size();
-    if (tabMajor > MAX_TAB_SIZE)
+
+    int maxTabSize = m_tabs.at(0)->getStyle("max-width");
+    if (tabMajor > maxTabSize)
     {
-        tabMajor = MAX_TAB_SIZE;
+        tabMajor = maxTabSize;
     }
 
     Size size;
     if (isHorizontal())
     {
         size.width = tabMajor;
-        size.height = TAB_SIZE;
+        size.height = m_tabsSize.height;
     }
     else
     {
-        size.width = TAB_SIZE;
+        size.width = m_tabsSize.width;
         size.height = tabMajor;
     }
 
@@ -841,11 +852,11 @@ Frontier::Rect Tabs::getTabsRect()
     if (isHorizontal())
     {
         r.width = m_setSize.width;
-        r.height = TAB_SIZE;
+        r.height = m_tabsSize.height;
     }
     else
     {
-        r.width = TAB_SIZE;
+        r.width = m_tabsSize.width;
         r.height = m_setSize.height;
     }
 
@@ -855,14 +866,14 @@ Frontier::Rect Tabs::getTabsRect()
             break;
 
         case TAB_BOTTOM:
-            r.y = m_setSize.height - TAB_SIZE;
+            r.y = m_setSize.height - m_tabsSize.height;
             break;
 
         case TAB_LEFT:
             break;
 
         case TAB_RIGHT:
-            r.x = m_setSize.width - TAB_SIZE;
+            r.x = m_setSize.width - m_tabsSize.width;
             break;
     }
 
@@ -879,25 +890,25 @@ Frontier::Rect Tabs::getContentRect()
     if (isHorizontal())
     {
         r.width = m_setSize.width;
-        r.height = m_setSize.height - TAB_SIZE;
+        r.height = m_setSize.height - m_tabsSize.height;
     }
     else
     {
-        r.width = m_setSize.width - TAB_SIZE;
+        r.width = m_setSize.width - m_tabsSize.width;
         r.height = m_setSize.height;
     }
 
     switch (m_placement)
     {
         case TAB_TOP:
-	    r.y = TAB_SIZE;
+	    r.y = m_tabsSize.height;
             break;
 
         case TAB_BOTTOM:
             break;
 
         case TAB_LEFT:
-	    r.x = TAB_SIZE;
+	    r.x = m_tabsSize.width;
             break;
 
         case TAB_RIGHT:

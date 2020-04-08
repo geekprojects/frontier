@@ -28,6 +28,8 @@ Tab {
     border: 1px solid #4b4b4b;
     margin: 0px;
     padding: 3px;
+
+    max-width: 250px;
 }
 
 Tab.tabTop:selected {
@@ -36,6 +38,10 @@ Tab.tabTop:selected {
 
 Tab.tabLeft:selected {
     border-right: 1px solid #4a7987;
+}
+
+Tab.tabBottom:selected {
+    border-top: 1px solid #4a7987;
 }
 
 Tab:selected {
