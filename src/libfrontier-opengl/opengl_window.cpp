@@ -87,6 +87,12 @@ bool OpenGLEngineWindow::update()
 
     glEnd();
 
+    for (OpenGLDirectWidget* widget: m_directWidgets)
+    {
+        widget->directDraw();
+    }
+    //glBindTexture(GL_TEXTURE_2D, m_texture);
+
     return true;
 }
 

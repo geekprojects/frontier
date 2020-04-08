@@ -20,6 +20,13 @@ namespace Frontier
 
 class OpenGLEngine;
 
+class OpenGLDirectWidget
+{
+ public:
+
+    virtual void directDraw() = 0;
+};
+
 class OpenGLEngineWindow : public Frontier::WindowingEngineWindow
 {
  protected:
@@ -30,6 +37,8 @@ class OpenGLEngineWindow : public Frontier::WindowingEngineWindow
     bool m_textureValid;
     Geek::Gfx::Surface* m_textureSurface;
 
+    std::vector<OpenGLDirectWidget*> m_directWidgets;
+
  public:
     OpenGLEngineWindow(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window);
     virtual ~OpenGLEngineWindow();
@@ -37,6 +46,8 @@ class OpenGLEngineWindow : public Frontier::WindowingEngineWindow
     virtual bool init();
 
     virtual bool update();
+
+    void addDirectWidget(OpenGLDirectWidget* widget) { m_directWidgets.push_back(widget); }
 };
 
 /**
@@ -50,6 +61,7 @@ class OpenGLApp : public Frontier::FrontierApp
 
  public:
     OpenGLApp();
+    OpenGLApp(std::wstring appName);
     virtual ~OpenGLApp();
 
     virtual bool init();

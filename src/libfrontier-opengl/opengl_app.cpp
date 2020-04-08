@@ -16,6 +16,13 @@ OpenGLApp::OpenGLApp() : FrontierApp(L"OpenGL App")
     setEngine(engine);
 }
 
+OpenGLApp::OpenGLApp(wstring appName) : FrontierApp(appName)
+{
+    OpenGLEngine* engine = new OpenGLEngine(this);
+    engine->setScaleFactor(2);
+    setEngine(engine);
+}
+
 OpenGLApp::~OpenGLApp()
 {
 }
@@ -34,6 +41,7 @@ bool OpenGLApp::init()
 
 void OpenGLApp::setScreenSize(Size size)
 {
+log(DEBUG, "setScreenSize: %d, %d", size.width, size.height);
     ((OpenGLEngine*)getEngine())->setScreenSize(size);
 }
 
