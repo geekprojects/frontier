@@ -292,6 +292,8 @@ void FrontierWindow::show()
 
     m_visible = true;
 
+    m_showSignal.emit();
+
     m_root->setDirty();
     update();
 }
@@ -345,10 +347,18 @@ void FrontierWindow::update(bool force)
         Size min = m_root->getMinSize();
         Size max = m_root->getMaxSize();
 
-        m_size.setMax(min);
-        m_size.setMin(max);
+        Size size = m_size;
+        size.setMax(min);
+        size.setMin(max);
 
-        m_size = m_root->setSize(m_size);
+        if (!(m_flags & WINDOW_FULL_SCREEN))
+        {
+            m_size = m_root->setSize(size);
+        }
+        else
+        {
+            m_root->setSize(size);
+        }
 
 #if 0
         log(DEBUG, "update: min=%s, max=%s", min.toString().c_str(), max.toString().c_str());

@@ -19,6 +19,12 @@ bool WindowingEngineWindow::init()
     Size screenSize = ((WindowingEngine*)getEngine())->getScreenSize();
     log(DEBUG, "init: windowSize=%d, %d", windowSize.width, windowSize.height);
     log(DEBUG, "init: screenSize=%d, %d", screenSize.width, screenSize.height);
+
+    if (getWindow()->isFullScreen())
+    {
+        getWindow()->setSize(screenSize);
+    }
+
     return true;
 }
 

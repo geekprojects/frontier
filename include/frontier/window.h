@@ -51,9 +51,10 @@ class FrontierEngineWindow;
  */
 enum WindowFlags
 {
-    WINDOW_BORDER = 1, /// Window should have a border
-    WINDOW_RESIZEABLE = 2,  /// Window should be resizeable by the user
-    WINDOW_TOOL_TIP = 4, /// Window will be used as a tool tip
+    WINDOW_BORDER      = 1, /// Window should have a border
+    WINDOW_RESIZEABLE  = 2, /// Window should be resizeable by the user
+    WINDOW_TOOL_TIP    = 4, /// Window will be used as a tool tip
+    WINDOW_FULL_SCREEN = 8, /// Window should be full screen
 
     WINDOW_NORMAL = WINDOW_BORDER | WINDOW_RESIZEABLE,
 };
@@ -103,6 +104,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     MenuList* m_menuBar;
 
     sigc::signal<void> m_closeSignal;
+    sigc::signal<void> m_showSignal;
     sigc::signal<bool> m_gainedFocusSignal;
     sigc::signal<bool> m_lostFocusSignal;
 
@@ -121,6 +123,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     std::wstring getTitle() const { return m_title; }
     bool hasBorder() const { return !!(m_flags & WINDOW_BORDER); }
     bool isResizeable() const { return !!(m_flags & WINDOW_RESIZEABLE); }
+    bool isFullScreen() const { return !!(m_flags & WINDOW_FULL_SCREEN); }
 
     void setPosition(Geek::Vector2D position);
     Geek::Vector2D getPosition();
@@ -154,6 +157,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     void postEvent(Frontier::Event* event);
     virtual bool handleEvent(Frontier::Event* event);
     sigc::signal<void> closeSignal() { return m_closeSignal; }
+    sigc::signal<void> showSignal() { return m_showSignal; }
 
     virtual void gainedFocus();
     virtual void lostFocus();
