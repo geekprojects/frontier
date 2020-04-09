@@ -93,6 +93,12 @@ bool FrontierEngineSDL::checkEvents()
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
         {
+            if (event.button.button == SDL_TOUCH_MOUSEID)
+            {
+                // Handled by SDL_FINGERx below
+                return true;
+            }
+
             FrontierEngineWindowSDL* few = getWindow(event.button.windowID);
             if (few == NULL)
             {
@@ -120,6 +126,30 @@ bool FrontierEngineSDL::checkEvents()
             log(DEBUG, "checkEvents: few=%p, x=%d, y=%d", few, mouseButtonEvent->x, mouseButtonEvent->y);
             few->getWindow()->handleEvent(mouseButtonEvent);
         } break;
+
+        case SDL_FINGERUP:
+        case SDL_FINGERDOWN:
+        {
+            FrontierEngineWindowSDL* few = getWindow(event.tfinger.windowID);
+            if (few == NULL)
+            {
+                return true;
+            }
+
+            MouseButtonEvent* mouseButtonEvent = new MouseButtonEvent();
+            mouseButtonEvent->eventType = FRONTIER_EVENT_MOUSE_BUTTON;
+            mouseButtonEvent->direction = (event.tfinger.type == SDL_FINGERDOWN);
+
+            mouseButtonEvent->buttons = BUTTON_LEFT;
+
+            mouseButtonEvent->x = (uint32_t)(event.tfinger.x * (float)m_window->getSize().width)
+            mouseButtonEvent->y = (uint32_t)(event.tfinger.y * (float)m_window->getSize().height);
+            log(DEBUG, "checkEvents: SDL_FINGERx: few=%p, %0.2f, %0.2f -> x=%d, y=%d", few, event.tfinger.x, event.tfinger.y, mouseButtonEvent->x, mouseButtonEvent->y);
+            few->getWindow()->handleEvent(mouseButtonEvent);
+        } break;
+
+
+
 
         case SDL_MOUSEMOTION:
         {
