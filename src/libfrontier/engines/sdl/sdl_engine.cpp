@@ -93,7 +93,7 @@ bool FrontierEngineSDL::checkEvents()
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
         {
-            if (event.button.button == SDL_TOUCH_MOUSEID)
+            if (event.button.button == (uint8_t)SDL_TOUCH_MOUSEID)
             {
                 // Handled by SDL_FINGERx below
                 return true;
@@ -142,8 +142,8 @@ bool FrontierEngineSDL::checkEvents()
 
             mouseButtonEvent->buttons = BUTTON_LEFT;
 
-            mouseButtonEvent->x = (uint32_t)(event.tfinger.x * (float)m_window->getSize().width)
-            mouseButtonEvent->y = (uint32_t)(event.tfinger.y * (float)m_window->getSize().height);
+            mouseButtonEvent->x = (uint32_t)(event.tfinger.x * (float)few->getWindow()->getSize().width);
+            mouseButtonEvent->y = (uint32_t)(event.tfinger.y * (float)few->getWindow()->getSize().height);
             log(DEBUG, "checkEvents: SDL_FINGERx: few=%p, %0.2f, %0.2f -> x=%d, y=%d", few, event.tfinger.x, event.tfinger.y, mouseButtonEvent->x, mouseButtonEvent->y);
             few->getWindow()->handleEvent(mouseButtonEvent);
         } break;
