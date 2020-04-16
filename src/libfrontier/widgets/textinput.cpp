@@ -373,7 +373,6 @@ Widget* TextInput::handleEvent(Event* event)
             Vector2D pos = getAbsolutePosition();
             int x = mouseButtonEvent->x - pos.x;
             x -= m_offsetX;
-            log(DEBUG, "handleMessage: FRONTIER_EVENT_MOUSE_BUTTON: x=%d", x);
 
             int at = charAt(x);
             if (mouseButtonEvent->direction)
@@ -400,7 +399,6 @@ Widget* TextInput::handleEvent(Event* event)
                 Vector2D pos = getAbsolutePosition();
                 int x = mouseMotionEvent->x - pos.x;
                 x -= m_offsetX;
-                log(DEBUG, "handleMessage: FRONTIER_EVENT_MOUSE_MOTION: x=%d", x);
 
                 int at = charAt(x);
 
@@ -419,22 +417,30 @@ Widget* TextInput::handleEvent(Event* event)
 
 int TextInput::charAt(int x)
 {
+#if 0
     log(DEBUG, "charAt: x=%d", x);
+#endif
     int selected = -1;
     int i = 0;
     for (int charX : m_charX)
     {
+#if 0
         log(DEBUG, "charAt: -> charX=%d", charX);
+#endif
         if (x < charX)
         {
+#if 0
             log(DEBUG, "charAt:   -> Gone beyond!");
+#endif
             selected = i;
             break;
         }
         i++;
     }
 
+#if 0
     log(DEBUG, "charAt: selected=%d", selected);
+#endif
 
     if (selected >= 0)
     {
