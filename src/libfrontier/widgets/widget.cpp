@@ -58,6 +58,7 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
 
     m_window = NULL;
     m_parent = NULL;
+    m_privateData = NULL;
     m_contextMenu = NULL;
 
     m_dirty = DIRTY_SIZE | DIRTY_CONTENT;
@@ -104,7 +105,11 @@ Size Widget::setSize(Size size)
     size.setMax(m_minSize);
     size.setMin(m_maxSize);
 
-    m_setSize = size;
+    if (size != m_setSize)
+    {
+        setDirty(DIRTY_SIZE);
+        m_setSize = size;
+    }
 
     return size;
 }
@@ -476,10 +481,9 @@ void Widget::setDirty(int dirty, bool children)
 
     if (children)
     {
-        vector<Widget*>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); it++)
+        for (Widget* child : getChildren())
         {
-            (*it)->setDirty(dirty, true);
+            child->setDirty(dirty, true);
         }
     }
     else

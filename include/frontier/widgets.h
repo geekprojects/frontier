@@ -213,6 +213,8 @@ class Widget : public FrontierObject, public Geek::Logger
     /// Return the child Widgets contained by this Widget
     virtual std::vector<Widget*> getChildren() { return m_children; }
 
+    /// Return whether this Widget contains any children
+    virtual bool hasChildren() { return !m_children.empty(); }
 
     /// Calculate the minimum and maximum size this Widget can be
     virtual void calculateSize();

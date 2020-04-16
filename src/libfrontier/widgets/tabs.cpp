@@ -358,6 +358,12 @@ void Tabs::clearDirty()
 
 bool Tabs::draw(Surface* surface)
 {
+    bool dirtySize = isDirty(DIRTY_SIZE);
+    if (dirtySize)
+    {
+        drawBorder(surface);
+    }
+
     if (!m_tabs.empty() && m_activeTab == NULL)
     {
         log(ERROR, "draw: Invalid active tab: %d", m_activeTab);
@@ -375,13 +381,13 @@ bool Tabs::draw(Surface* surface)
         m_collapseButtonWidget->draw(&viewport);
     }
 
-    unsigned int tabIdx;
-    vector<Tab*>::iterator it;
-    for (it = m_tabs.begin(), tabIdx = 0; it != m_tabs.end(); it++, tabIdx++)
+    for (Tab* tab : m_tabs)
     {
-        Tab* tab = *it;
-        SurfaceViewPort viewport(surface, tab->getX(), tab->getY(), tab->getWidth(), tab->getHeight());
-        tab->draw(&viewport);
+        if (dirtySize || tab->isDirty())
+        {
+            SurfaceViewPort viewport(surface, tab->getX(), tab->getY(), tab->getWidth(), tab->getHeight());
+            tab->draw(&viewport);
+        }
     }
 
     if (m_addButton)
@@ -398,7 +404,7 @@ bool Tabs::draw(Surface* surface)
     if (!m_tabs.empty() && (!m_collapsible || !m_collapsed))
     {
         Widget* activeWidget = m_activeTab->getContent();
-        if (activeWidget != NULL)
+        if (activeWidget != NULL && (dirtySize || activeWidget->isDirty() || activeWidget->hasChildren()))
         {
             SurfaceViewPort viewport(
                 surface,
@@ -680,6 +686,7 @@ void Tabs::setActiveTab(Widget* tabContent)
         {
             m_activeTab = tab;
             m_activeTab->setSelected();
+            m_activeTab->setDirty(DIRTY_ALL, true);
 
             setDirty();
             return;

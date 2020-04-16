@@ -87,18 +87,19 @@ void Frame::remove(Widget* widget)
 
 bool Frame::draw(Surface* surface)
 {
-    drawBorder(surface);
-
-    vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
+    bool dirtySize = isDirty(DIRTY_SIZE);
+    if (dirtySize)
     {
-        Widget* child = *it;
-        SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
-        child->draw(&viewport, Rect(0, 0, child->getWidth(), child->getHeight()));
+        drawBorder(surface);
+    }
 
-#if 0
-        viewport.drawRect(0, 0, child->getWidth(), child->getHeight(), 0x00ff00);
-#endif
+    for (Widget* child : m_children)
+    {
+        if (dirtySize || child->isDirty() || child->hasChildren())
+        {
+            SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
+            child->draw(&viewport, Rect(0, 0, child->getWidth(), child->getHeight()));
+        }
     }
     return true;
 }
@@ -420,7 +421,7 @@ log(DEBUG, "activateNext: %p:  -> found current!", this);
             }
             else if (foundCurrent)
             {
-log(DEBUG, "activateNext: %p:  -> Next=%p", this, child);
+                log(DEBUG, "activateNext: %p:  -> Next=%p", this, child);
                 child->activateNext(NULL);
                 return;
             }

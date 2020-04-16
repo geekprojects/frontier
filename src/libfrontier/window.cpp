@@ -178,7 +178,7 @@ void FrontierWindow::setActiveWidget(Widget* widget)
 
     if (m_activeWidget != NULL)
     {
-        m_activeWidget->setDirty();
+        m_activeWidget->setDirty(DIRTY_STYLE);
         m_activeWidget->signalInactive().emit();
         m_activeWidget->decRefCount();
     }
@@ -189,7 +189,7 @@ void FrontierWindow::setActiveWidget(Widget* widget)
     {
         log(DEBUG, "setActiveWidget: Active: %s (%p)", typeid(*widget).name(), widget);
         m_activeWidget->incRefCount();
-        m_activeWidget->setDirty();
+        m_activeWidget->setDirty(DIRTY_STYLE);
         m_activeWidget->signalActive().emit();
     }
     else
@@ -371,14 +371,8 @@ void FrontierWindow::update(bool force)
         // Make sure we redraw
         m_root->setDirty(DIRTY_CONTENT);
 
-        // Likely to be different?
-        //m_mouseOverWidget = NULL;
         //updateCursor();
     }
-
-#if 0
-    m_root->dump(1);
-#endif
 
     float scale = m_engineWindow->getScaleFactor();
 
@@ -398,21 +392,18 @@ void FrontierWindow::update(bool force)
             m_surface = new Surface(m_size.width, m_size.height, 4);
         }
 
-        m_root->setDirty(DIRTY_CONTENT);
+        m_root->setDirty(DIRTY_SIZE | DIRTY_CONTENT, true);
     }
-#if 0
-    log(DEBUG, "update: Window surface=%p", m_surface);
-#endif
 
     if (m_root->isDirty() || force)
     {
-        uint32_t colour = m_root->getStyle("background-color");
-        m_surface->clear(colour);
-
+        if (m_root->isDirty(DIRTY_SIZE))
+        {
+            m_root->setDirty(DIRTY_SIZE, true);
+        }
         m_root->draw(m_surface);
 
         m_engineWindow->update();
-
     }
 
     if (m_dragSurface != NULL)
