@@ -350,13 +350,20 @@ void Grid::layout()
 
 bool Grid::draw(Geek::Gfx::Surface* surface)
 {
-    drawBorder(surface);
+    bool dirtySize = isDirty(DIRTY_SIZE);
+    if (dirtySize)
+    {
+        drawBorder(surface);
+    }
     for (GridItem* item : m_grid)
     {
         Widget* child = item->widget;
-        SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
-        viewport.clear(item->background);
-        child->draw(&viewport, Rect(0, 0, child->getWidth(), child->getHeight()));
+        if (dirtySize || child->isDirty() || child->hasChildren())
+        {
+            SurfaceViewPort viewport(surface, child->getX(), child->getY(), child->getWidth(), child->getHeight());
+            //viewport.clear(item->background);
+            child->draw(&viewport, Rect(0, 0, child->getWidth(), child->getHeight()));
+        }
 
 #if 0
         viewport.drawRect(0, 0, child->getWidth(), child->getHeight(), 0x00ff00);
