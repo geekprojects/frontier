@@ -27,6 +27,7 @@
 #include <geek/gfx-surface.h>
 #include <geek/gfx-colour.h>
 #include <geek/core-logger.h>
+#include <geek/core-timers.h>
 #include <geek/fonts.h>
 
 #include <frontier/object.h>
@@ -78,6 +79,7 @@ class FrontierApp : public Geek::Logger
     Geek::FontManager* m_fontManager;
     UITheme* m_theme;
     StyleEngine* m_styleEngine;
+    Geek::Core::TimerManager* m_timerManager;
 
     Menu* m_appMenu;
     ContextMenu* m_contextMenuWindow;
@@ -121,6 +123,9 @@ class FrontierApp : public Geek::Logger
 
     /// Return the current StyleEngine
     StyleEngine* getStyleEngine() { return m_styleEngine; }
+
+    /// Return the Timer Manager
+    Geek::Core::TimerManager* getTimerManager() { return m_timerManager; }
 
     /// Get the current ContextMenu
     ContextMenu* getContextMenuWindow();

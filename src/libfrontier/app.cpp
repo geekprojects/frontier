@@ -39,6 +39,7 @@
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
+using namespace Geek::Core;
 
 FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
 {
@@ -151,6 +152,9 @@ bool FrontierApp::init()
     {
         return false;
     }
+
+    m_timerManager = new TimerManager();
+    m_timerManager->start();
 
     return true;
 }
