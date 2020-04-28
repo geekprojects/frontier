@@ -532,16 +532,18 @@ vector<Widget*> Tabs::getChildren()
     return children;
 }
 
-void Tabs::addTab(std::wstring title, Widget* content, bool closeable)
+Tab* Tabs::addTab(std::wstring title, Widget* content, bool closeable)
 {
-    addTab(title, NULL, content, closeable);
+    return addTab(title, NULL, content, closeable);
 }
 
-void Tabs::addTab(std::wstring title, Icon* icon, Widget* content, bool closeable)
+Tab* Tabs::addTab(std::wstring title, Icon* icon, Widget* content, bool closeable)
 {
     Tab* tab = new Tab(this, title, icon, content, closeable);
 
-     addTab(tab, m_tabs.end());
+    addTab(tab, m_tabs.end());
+
+    return tab;
 }
 
 void Tabs::addTab(Tab* tab, vector<Tab*>::iterator pos)

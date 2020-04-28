@@ -54,8 +54,9 @@ class Tab : public Widget
     std::wstring getTitle() { return m_title; }
     void setIcon(Icon* icon);
     Icon* getIcon() { return m_icon; }
-    Widget* getContent() { return m_content; }
     bool isCloseable() { return m_closeable; }
+    void setContent(Widget* content);
+    Widget* getContent() { return m_content; }
 
     void setSelected() { m_selected = true; setDirty(DIRTY_STYLE); }
     void clearSelected() { m_selected = false; setDirty(DIRTY_STYLE); }
@@ -127,8 +128,8 @@ class Tabs : public Widget
 
     virtual std::vector<Widget*> getChildren();
 
-    void addTab(std::wstring title, Widget* content, bool closeable = false);
-    void addTab(std::wstring title, Icon* icon, Widget* content, bool closeable = false);
+    Tab* addTab(std::wstring title, Widget* content, bool closeable = false);
+    Tab* addTab(std::wstring title, Icon* icon, Widget* content, bool closeable = false);
     void closeTab(Widget* tab, bool emitChangeSignal = true);
 
     void closeActiveTab(MenuItem* item);
