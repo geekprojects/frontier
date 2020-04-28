@@ -18,7 +18,7 @@ class Label : public Widget
 {
  private:
     std::wstring m_text;
-    TextAlign m_align;
+    HorizontalAlign m_align;
     Icon* m_icon;
 
     int m_lineHeight;
@@ -26,14 +26,14 @@ class Label : public Widget
  public:
     Label(FrontierApp* ui, std::wstring widgetName, std::wstring text);
     Label(FrontierApp* ui, std::wstring text);
-    Label(FrontierApp* ui, std::wstring text, TextAlign align);
+    Label(FrontierApp* ui, std::wstring text, HorizontalAlign align);
     Label(FrontierApp* ui, std::wstring text, Icon* icon);
-    Label(FrontierApp* ui, std::wstring text, TextAlign align, Icon* icon);
+    Label(FrontierApp* ui, std::wstring text, HorizontalAlign align, Icon* icon);
     virtual ~Label();
 
     void setText(std::wstring wtext);
     std::wstring getText() { return m_text; }
-    void setAlign(TextAlign align);
+    void setAlign(HorizontalAlign align);
     void setIcon(Icon* icon);
 
     virtual void calculateSize();

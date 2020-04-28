@@ -36,13 +36,23 @@ namespace Frontier {
 class Menu;
 
 /**
- * \brief Specifies how to align text
+ * \brief Specifies how to align text and objects horizontally
  */
-enum TextAlign
+enum HorizontalAlign
 {
     ALIGN_LEFT, ///< Align left
     ALIGN_CENTER, ///< Align centrally
     ALIGN_RIGHT ///< Align right
+};
+
+/**
+ * \brief Specifies how to align text and objects vertically
+ */
+enum VerticalAlign
+{
+    ALIGN_TOP, ///< Align top
+    ALIGN_MIDDLE, ///< Align middle vertically
+    ALIGN_BOTTOM ///< Align bottom
 };
 
 /**

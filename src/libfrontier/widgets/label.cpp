@@ -42,7 +42,7 @@ Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
     m_icon = NULL;
 }
 
-Label::Label(FrontierApp* ui, wstring text, TextAlign align) : Widget(ui, L"Label")
+Label::Label(FrontierApp* ui, wstring text, HorizontalAlign align) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = align;
@@ -56,7 +56,7 @@ Label::Label(FrontierApp* ui, wstring text, Icon* icon) : Widget(ui, L"Label")
     m_icon = icon;
 }
 
-Label::Label(FrontierApp* ui, wstring text, TextAlign align, Icon* icon) : Widget(ui, L"Label")
+Label::Label(FrontierApp* ui, wstring text, HorizontalAlign align, Icon* icon) : Widget(ui, L"Label")
 {
     m_text = text;
     m_align = align;
@@ -69,14 +69,20 @@ Label::~Label()
 
 void Label::setText(std::wstring text)
 {
-    m_text = text;
-    setDirty();
+    if (text != m_text)
+    {
+        m_text = text;
+        setDirty();
+    }
 }
 
-void Label::setAlign(TextAlign align)
+void Label::setAlign(HorizontalAlign align)
 {
-    m_align = align;
-    setDirty();
+    if (align != m_align)
+    {
+        m_align = align;
+        setDirty(DIRTY_CONTENT);
+    }
 }
 
 void Label::calculateSize()
