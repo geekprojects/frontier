@@ -197,7 +197,7 @@ void Frame::calculateSize()
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
-    if (getStyle("expand-horizontal") == 1)
+    if (getStyle("expand-vertical") == 1)
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
