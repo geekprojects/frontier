@@ -9,6 +9,8 @@
 
 #include <geek/core-logger.h>
 
+#define FRONTIER_COLOUR_TRANSPARENT 0xffffffff00000000ull
+
 namespace Frontier {
 
 class Widget;

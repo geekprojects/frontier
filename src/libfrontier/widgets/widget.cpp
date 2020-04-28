@@ -164,32 +164,35 @@ bool Widget::drawBorder(Surface* surface)
     int borderWidth = surfaceWidth - (boxModel.marginLeft + boxModel.marginRight);
     int borderHeight = surfaceHeight - (boxModel.marginTop + boxModel.marginBottom);
 
-    if (hasStyle("background-image", props))
+    uint64_t backgroundColour = getStyle("background-color", props);
+    if (backgroundColour != FRONTIER_COLOUR_TRANSPARENT)
     {
-        // We only support basic linear gradients for now
-        uint64_t backgroundColour = getStyle("background-image", props);
-        uint32_t g1 = backgroundColour >> 32;
-        uint32_t g2 = backgroundColour & 0xffffffff;
-        log(DEBUG, "drawBorder: g1=0x%x, g2=0x%x", g1, g2);
-        if (borderRadius > 0)
+        if (hasStyle("background-image", props))
         {
-            surface->drawGradRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, g1, g2);
+            // We only support basic linear gradients for now
+            uint64_t backgroundColour = getStyle("background-image", props);
+            uint32_t g1 = backgroundColour >> 32;
+            uint32_t g2 = backgroundColour & 0xffffffff;
+
+            if (borderRadius > 0)
+            {
+                surface->drawGradRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, g1, g2);
+            }
+            else
+            {
+                surface->drawGrad(borderX, borderY, borderWidth, borderHeight, g1, g2);
+            }
         }
-        else
+        else if (hasStyle("background-color", props))
         {
-            surface->drawGrad(borderX, borderY, borderWidth, borderHeight, g1, g2);
-        }
-    }
-    else if (hasStyle("background-color", props))
-    {
-        uint32_t backgroundColour = getStyle("background-color", props);
-        if (borderRadius > 0)
-        {
-            surface->drawRectFilledRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, backgroundColour);
-        }
-        else
-        {
-            surface->drawRectFilled(borderX, borderY, borderWidth, borderHeight, backgroundColour);
+            if (borderRadius > 0)
+            {
+                surface->drawRectFilledRounded(borderX, borderY, borderWidth, borderHeight, borderRadius, backgroundColour);
+            }
+            else
+            {
+                surface->drawRectFilled(borderX, borderY, borderWidth, borderHeight, backgroundColour);
+            }
         }
     }
 
@@ -390,7 +393,9 @@ Geek::FontHandle* Widget::getTextFont()
         }
 
         FontManager* fm = m_app->getFontManager();
+#if 0
         log(DEBUG, "getTextFont: Opening fontFamily: %s, style: %s fontSize: %d", fontFamily, fontStyle, fontSize);
+#endif
 
         m_cachedTextFont = fm->openFont(fontFamily, fontStyle, fontSize);
         m_cachedTextFontTimestamp = m_app->getStyleEngine()->getTimestamp();

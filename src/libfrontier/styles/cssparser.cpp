@@ -59,6 +59,8 @@ struct IdentValues
     {"solid", 0x1},
 
     {"disc", 0x1},
+
+    {"transparent", (int64_t)FRONTIER_COLOUR_TRANSPARENT},
 };
 
 static std::string identString(css3Parser::IdentContext* identCtx)
