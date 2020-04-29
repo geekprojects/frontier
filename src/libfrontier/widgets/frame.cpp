@@ -220,23 +220,25 @@ void Frame::layout()
 
     int major;
     int minor;
+    int majorWidgetSize;
+    int minorWidgetSize;
 
     BoxModel boxModel = getBoxModel();
 
     if (m_horizontal)
     {
-        major = m_setSize.width;
-        minor = m_setSize.height;
+        majorWidgetSize = m_setSize.width;
+        minorWidgetSize = m_setSize.height;
 
-        major -= boxModel.getWidth();
-        minor -= boxModel.getHeight();
+        major = majorWidgetSize - boxModel.getWidth();
+        minor = minorWidgetSize - boxModel.getHeight();
     }
     else
     {
-        major = m_setSize.height;
-        minor = m_setSize.width;
-        major -= boxModel.getHeight();
-        minor -= boxModel.getWidth();
+        majorWidgetSize = m_setSize.height;
+        minorWidgetSize = m_setSize.width;
+        major = majorWidgetSize - boxModel.getHeight();
+        minor = minorWidgetSize - boxModel.getWidth();
     }
 
     major -= (m_children.size() - 1) * boxModel.paddingTop;
@@ -274,20 +276,7 @@ void Frame::layout()
 
     int i;
 
-    int majorPos = 0;
-    int minorPos = 0;
-
-    if (m_horizontal)
-    {
-        majorPos = boxModel.marginLeft;
-        minorPos = boxModel.marginTop;
-    }
-    else
-    {
-        majorPos = boxModel.marginTop;
-        minorPos = boxModel.marginLeft;
-    }
-
+int majorTotal = 0;
     for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
     {
         Widget* child = *it;
@@ -346,14 +335,80 @@ void Frame::layout()
         if (m_horizontal)
         {
             size = Size(childMajor, childMinor);
-            child->setPosition(majorPos, minorPos);
         }
         else
         {
             size = Size(childMinor, childMajor);
-            child->setPosition(minorPos, majorPos);
         }
         child->setSize(size);
+
+        majorTotal += childMajor;
+        if (i > 0)
+        {
+            majorTotal += boxModel.paddingTop;
+        }
+    }
+
+    int majorPos = 0;
+    int minorPos = 0;
+
+    int horizontalAlign = FRONTIER_HORIZONTAL_ALIGN_LEFT;
+    if (hasStyle("align-horizontal"))
+    {
+        horizontalAlign = getStyle("align-horizontal");
+    }
+    int verticalAlign = FRONTIER_VERTICAL_ALIGN_TOP;
+    if (hasStyle("align-vertical"))
+    {
+        verticalAlign = getStyle("align-vertical");
+    }
+    int majorAlign;
+    int minorAlign;
+    if (m_horizontal)
+    {
+        majorPos = boxModel.marginLeft;
+        minorPos = boxModel.marginTop;
+        majorAlign = horizontalAlign;
+        minorAlign = verticalAlign;
+    }
+    else
+    {
+        majorPos = boxModel.marginTop;
+        minorPos = boxModel.marginLeft;
+        majorAlign = verticalAlign;
+        minorAlign = horizontalAlign;
+    }
+
+    if (majorAlign == FRONTIER_HORIZONTAL_ALIGN_CENTRE)
+    {
+        majorPos = (majorWidgetSize / 2) - (majorTotal / 2);
+    }
+
+    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    {
+        Widget* child = *it;
+        Size size = child->getSize();
+        int childMajor;
+        if (m_horizontal)
+        {
+            int childMinorPos = minorPos;
+            if (minorAlign == FRONTIER_HORIZONTAL_ALIGN_CENTRE)
+            {
+                childMinorPos = (minorWidgetSize / 2) - (size.height / 2);
+            }
+            child->setPosition(majorPos, childMinorPos);
+            childMajor = size.width;
+        }
+        else
+        {
+            int childMinorPos = minorPos;
+            if (minorAlign == FRONTIER_VERTICAL_ALIGN_MIDDLE)
+            {
+                childMinorPos = (minorWidgetSize / 2) - (size.width / 2);
+            }
+            child->setPosition(childMinorPos, majorPos);
+            childMajor = size.height;
+        }
 
         majorPos += childMajor + boxModel.paddingTop;
 

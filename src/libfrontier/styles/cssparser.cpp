@@ -61,6 +61,14 @@ struct IdentValues
     {"disc", 0x1},
 
     {"transparent", (int64_t)FRONTIER_COLOUR_TRANSPARENT},
+
+    // Alignment
+    {"left", 0},
+    {"center", 1},
+    {"right", 2},
+    {"top", 0},
+    {"middle", 1},
+    {"bottom", 2},
 };
 
 static std::string identString(css3Parser::IdentContext* identCtx)
