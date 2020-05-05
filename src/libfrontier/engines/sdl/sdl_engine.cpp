@@ -47,6 +47,8 @@ bool FrontierEngineSDL::init()
         log(ERROR, "Failed to initialise SDL!");
     }
 
+    m_redrawWindowEvent = SDL_RegisterEvents(1);
+
     return true;
 }
 
@@ -272,11 +274,32 @@ bool FrontierEngineSDL::checkEvents()
             }
         } break;
 
+
         default:
-            log(ERROR, "checkEvents: Unhandled event: %d", event.type);
+            if (event.type == m_redrawWindowEvent)
+            {
+                FrontierEngineWindowSDL* few = (FrontierEngineWindowSDL*)(event.user.data1);
+                few->getWindow()->update(true);
+            }
+            else
+            {
+                log(ERROR, "checkEvents: Unhandled event: %d", event.type);
+            }
             break;
     }
 
     return true;
+}
+
+void FrontierEngineSDL::requestUpdate(FrontierEngineWindowSDL* window)
+{
+    SDL_Event event;
+    memset(&event, 0, sizeof(event));
+    event.type = m_redrawWindowEvent;
+    event.user.code = 0;
+    event.user.data1 = window;
+    event.user.data2 = 0;
+
+    SDL_PushEvent(&event);
 }
 

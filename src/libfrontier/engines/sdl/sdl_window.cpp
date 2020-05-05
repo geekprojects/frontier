@@ -143,3 +143,9 @@ void FrontierEngineWindowSDL::setPosition(unsigned int x, unsigned int y)
     SDL_SetWindowPosition(m_sdlWindow, x, y);
 }
 
+void FrontierEngineWindowSDL::requestUpdate()
+{
+    ((FrontierEngineSDL*)getEngine())->requestUpdate(this);
+}
+
+

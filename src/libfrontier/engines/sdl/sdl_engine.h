@@ -43,6 +43,8 @@ class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
     virtual bool update();
 
     virtual void setPosition(unsigned int x, unsigned int y);
+
+    virtual void requestUpdate();
 };
 
 class FrontierEngineSDL : public Frontier::FrontierEngine
@@ -52,6 +54,8 @@ class FrontierEngineSDL : public Frontier::FrontierEngine
     
     Frontier::KeyEvent* m_keyDownEvent;
 
+    uint32_t m_redrawWindowEvent;
+
  public:
     FrontierEngineSDL(Frontier::FrontierApp* app);
     virtual ~FrontierEngineSDL();
@@ -60,6 +64,8 @@ class FrontierEngineSDL : public Frontier::FrontierEngine
     bool initWindow(Frontier::FrontierWindow* window);
 
     virtual bool checkEvents();
+
+    void requestUpdate(FrontierEngineWindowSDL* window);
 };
 
 #endif
