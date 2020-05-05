@@ -486,7 +486,10 @@ bool CocoaWindow::createCocoaWindow()
     {
         CocoaNSWindow* window = (CocoaNSWindow*)[event window];
         CocoaWindow* cwindow = [window getEngineWindow];
-        cwindow->getWindow()->update();
+        if (cwindow != NULL)
+        {
+            cwindow->getWindow()->update();
+        }
         return event;
     };
 
