@@ -52,6 +52,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_dragSurface = NULL;
 
     m_surface = NULL;
+    m_updateTimestamp = 0;
 
     m_menuBar = NULL;
     m_menu = NULL;
@@ -325,6 +326,17 @@ void FrontierWindow::update(bool force)
     {
         return;
     }
+
+    uint64_t now = m_app->getTimestamp();
+    if (force)
+    {
+        if ((now - m_updateTimestamp) < 10)
+        {
+            log(INFO, "update: Rate limiting forced updates!");
+            force = false;
+        }
+    }
+    m_updateTimestamp = now;
 
     initInternal();
 

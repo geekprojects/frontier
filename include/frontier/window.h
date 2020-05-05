@@ -95,6 +95,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     Frontier::WindowCursor m_currentCursor;
 
     Geek::Gfx::Surface* m_surface;
+    uint64_t m_updateTimestamp;
 
     Widget* m_dragWidget;
     Geek::Gfx::Surface* m_dragSurface;
