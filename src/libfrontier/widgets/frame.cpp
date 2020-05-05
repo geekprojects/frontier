@@ -34,25 +34,21 @@ using namespace Geek::Gfx;
 Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui, L"Frame")
 {
     m_horizontal = horizontal;
-    m_border = false;
 }
 
 Frame::Frame(FrontierApp* ui, wstring widgetName, bool horizontal) : Widget(ui, widgetName)
 {
     m_horizontal = horizontal;
-    m_border = false;
 }
 
 Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window, L"Frame")
 {
     m_horizontal = horizontal;
-    m_border = false;
 }
 
 Frame::Frame(FrontierWindow* window, wstring widgetName, bool horizontal) : Widget(window, widgetName)
 {
     m_horizontal = horizontal;
-    m_border = false;
 }
 
 Frame::~Frame()
@@ -109,30 +105,6 @@ void Frame::calculateSize()
 #ifdef DEBUG_UI_FRAME
     log(DEBUG, "calculateSize: %p: Calculating...", this);
 #endif
-
-    if (!m_border)
-    {
-        if (m_parent == NULL)
-        {
-            setWidgetClass(L"root");
-        }
-        else
-        {
-            // Parent is a frame
-            Frame* parentFrame = dynamic_cast<Frame*>(m_parent);
-            if (parentFrame != NULL)
-            {
-#ifdef DEBUG_UI_FRAME
-                log(DEBUG, "calculateSize: %p: Parent is Frame, margin=%d", this, parentFrame->getMargin());
-                //if (parentFrame->getMargin() > 0)
-#endif
-                {
-                    // TODO: Fancier CSS rules!
-                    setWidgetClass(L"nested");
-                }
-            }
-        }
-    }
 
     m_minSize.set(0, 0);
     m_maxSize.set(0, 0);

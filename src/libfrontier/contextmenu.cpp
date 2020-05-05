@@ -21,7 +21,6 @@ ContextMenu::~ContextMenu()
 bool ContextMenu::init()
 {
     Frame* frame = new Frame(this, false);
-    frame->setBorder(true);
 
     m_menuList = new MenuList(this, m_menu);
     m_menuList->selectSignal().connect(sigc::mem_fun(*this, &ContextMenu::itemSelected));

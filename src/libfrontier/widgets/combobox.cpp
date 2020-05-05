@@ -177,7 +177,6 @@ ComboBoxDropDown::ComboBoxDropDown(FrontierApp* app) : FrontierWindow(app, L"", 
     setSize(Size(20, 20));
 
     Frame* frame = new Frame(this, false);
-    frame->setBorder(true);
     m_list = new List(this);
     frame->add(m_list);
     setContent(frame);
