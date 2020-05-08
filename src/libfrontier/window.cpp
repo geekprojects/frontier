@@ -53,6 +53,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
 
     m_surface = NULL;
     m_updateTimestamp = 0;
+    m_drawMutex = Geek::Thread::createMutex();
 
     m_menuBar = NULL;
     m_menu = NULL;
@@ -155,6 +156,8 @@ Frontier::Rect FrontierWindow::getRect()
 
 void FrontierWindow::setContent(Widget* content)
 {
+    m_drawMutex->lock();
+
     if (m_content != NULL)
     {
         m_root->remove(m_content);
@@ -165,9 +168,11 @@ void FrontierWindow::setContent(Widget* content)
     m_content->incRefCount();
     m_content->setWindow(this);
     m_content->setPosition(0, 0);
-    m_content->setDirty();
 
     m_root->add(m_content);
+    m_root->setDirty(DIRTY_ALL, true);
+
+    m_drawMutex->unlock();
 }
 
 void FrontierWindow::setActiveWidget(Widget* widget)
@@ -352,6 +357,7 @@ void FrontierWindow::update(bool force)
         }
     }
 
+    m_drawMutex->lock();
     if (m_root->isDirty(DIRTY_SIZE) || m_root->isDirty(DIRTY_STYLE))
     {
         m_root->calculateSize();
@@ -424,6 +430,8 @@ void FrontierWindow::update(bool force)
     }
 
     m_root->clearDirty();
+
+    m_drawMutex->unlock();
 }
 
 void FrontierWindow::requestUpdate()

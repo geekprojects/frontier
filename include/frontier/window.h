@@ -96,6 +96,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
 
     Geek::Gfx::Surface* m_surface;
     uint64_t m_updateTimestamp;
+    Geek::Mutex* m_drawMutex;
 
     Widget* m_dragWidget;
     Geek::Gfx::Surface* m_dragSurface;
@@ -150,6 +151,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     void setSize(Frontier::Size size);
     Frontier::Size getSize() const { return m_size; }
     Geek::Gfx::Surface* getSurface() const { return m_surface; }
+    Geek::Mutex* getDrawMutex() { return m_drawMutex; }
 
     Menu* getMenu() { return m_menu; }
     void setMenu(Menu* menu);
