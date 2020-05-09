@@ -536,6 +536,16 @@ void Widget::activateNext(Widget* current)
     }
 }
 
+bool Widget::isVisible(Widget* child)
+{
+    if (m_parent != NULL)
+    {
+        return m_parent->isVisible(this);
+    }
+
+    return (getWindow() != NULL);
+}
+
 void Widget::openContextMenu()
 {
     openContextMenu(getAbsolutePosition());

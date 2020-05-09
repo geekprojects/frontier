@@ -779,6 +779,22 @@ int Tabs::getTabIndex(Tab* tab)
     return -1;
 }
 
+bool Tabs::isVisible(Widget* child)
+{
+    bool visible = Widget::isVisible();
+    if (child == NULL || !visible)
+    {
+        return visible;
+    }
+
+    if (m_collapsed)
+    {
+        return false;
+    }
+
+    return (child == getActiveTab());
+}
+
 void Tabs::dump(int level)
 {
     string spaces = "";

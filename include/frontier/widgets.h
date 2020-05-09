@@ -341,6 +341,8 @@ class Widget : public FrontierObject, public Geek::Logger
     /// Activate the next Widget. Used with tabbing through Widgets
     virtual void activateNext(Widget* activeChild = NULL);
 
+    virtual bool isVisible(Frontier::Widget* child = NULL);
+
     /// Return whether the mouse is currently over this Widget
     bool isMouseOver() { return m_mouseOver; }
 

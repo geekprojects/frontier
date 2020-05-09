@@ -154,6 +154,8 @@ class Tabs : public Widget
     void nextTab();
     void prevTab();
 
+    virtual bool isVisible(Frontier::Widget* child = NULL);
+
     virtual void dump(int level);
 
     virtual sigc::signal<void, Widget*> changeTabSignal() { return m_changeTabSignal; }
