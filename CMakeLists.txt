@@ -24,6 +24,7 @@ find_package(Doxygen COMPONENTS dot)
 # Common requirements
 pkg_check_modules(libgeek REQUIRED libgeek)
 pkg_check_modules(freetype2 REQUIRED freetype2)
+pkg_check_modules(mpv mpv)
 
 find_library(ANTLR4_LIBRARY NAMES antlr4-runtime )
 find_path(antlr4_INCLUDE_BASE NAMES antlr4-runtime/antlr4-runtime.h)
@@ -70,7 +71,7 @@ set(DATADIR ${CMAKE_INSTALL_PREFIX}/share/libfrontier)
 add_subdirectory(src/libfrontier)
 add_subdirectory(src/demo)
 add_subdirectory(data)
-add_subdirectory(tests)
+#add_subdirectory(tests)
 
 if(OPENGL_FOUND)
     add_subdirectory(src/libfrontier-opengl)

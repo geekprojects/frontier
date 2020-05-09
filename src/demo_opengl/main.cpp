@@ -6,6 +6,10 @@
 #include <frontier/widgets/terminal.h>
 #include <frontier/widgets/colourbutton.h>
 
+#ifdef MPV_FOUND
+#include <frontier/widgets/video.h>
+#endif
+
 GLfloat g_xRotated = 0.0;
 GLfloat g_yRotated = 0.0;
 GLfloat g_zRotated = 0.0;
@@ -74,11 +78,18 @@ bool DemoWindow::init()
     sizeFrame->add(new Button(getApp(), L"Smaller!"));
     sizeFrame->add(new Button(getApp(), L"Bigger!"));
     tabs->addTab(L"Size", sizeFrame);
-/*
-    Terminal* terminal = new Terminal(getApp());
-    terminal->run("/usr/bin/top");
-    tabs->addTab(L"Terminal", terminal);
-*/
+
+#ifdef MPV_FOUND
+    Frame* videoFrame = new Frame(getApp(), false);
+    videoFrame->add(new Label(getApp(), L"A video!"));
+    VideoWidget* video;
+    videoFrame->add(video = new VideoWidget(getApp()));
+    video->setFile("../src/demo_opengl/file_example_MP4_480_1_5MG.mp4");
+    video->play();
+    videoFrame->add(new Label(getApp(), L"Yay!"));
+    tabs->addTab(L"Video", videoFrame);
+#endif
+
     setContent(tabs);
     
     return true;
