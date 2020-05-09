@@ -23,7 +23,10 @@ class OpenGLEngine;
 class OpenGLDirectWidget
 {
  public:
+    OpenGLDirectWidget() {}
+    virtual ~OpenGLDirectWidget() {}
 
+    virtual void directBeforeDraw() = 0;
     virtual void directDraw() = 0;
 };
 
@@ -48,6 +51,7 @@ class OpenGLEngineWindow : public Frontier::WindowingEngineWindow
     virtual bool update();
 
     void addDirectWidget(OpenGLDirectWidget* widget) { m_directWidgets.push_back(widget); }
+    std::vector<OpenGLDirectWidget*> getDirectWidgets() { return m_directWidgets; }
 };
 
 /**

@@ -41,12 +41,29 @@ bool OpenGLApp::init()
 
 void OpenGLApp::setScreenSize(Size size)
 {
-log(DEBUG, "setScreenSize: %d, %d", size.width, size.height);
+    log(DEBUG, "setScreenSize: %d, %d", size.width, size.height);
     ((OpenGLEngine*)getEngine())->setScreenSize(size);
 }
 
 void OpenGLApp::draw()
 {
+    const std::deque<FrontierWindow*> windows = ((OpenGLEngine*)getEngine())->getWindowOrder();
+
+    for (FrontierWindow* window : windows)
+    {
+        OpenGLEngineWindow* engineWindow = (OpenGLEngineWindow*)window->getEngineWindow();
+        window->update();
+        for (OpenGLDirectWidget* widget : engineWindow->getDirectWidgets())
+        {
+            Widget* fwidget = dynamic_cast<Widget*>(widget);
+            if (fwidget->isVisible())
+            {
+                widget->directBeforeDraw();
+            }
+        }
+    }
+
+
     // Enter 2D mode
     glPushAttrib(GL_ENABLE_BIT | GL_POLYGON_BIT);
     glDisable(GL_DEPTH_TEST);
@@ -78,11 +95,9 @@ void OpenGLApp::draw()
     glPushMatrix();
     glLoadIdentity();
 
-    const std::deque<FrontierWindow*> windows = ((OpenGLEngine*)getEngine())->getWindowOrder();
     for (auto it = windows.rbegin(); it != windows.rend(); it++)
     {
         FrontierWindow* window = *it;
-        window->update();
         OpenGLEngineWindow* engineWindow = (OpenGLEngineWindow*)window->getEngineWindow();
         if (engineWindow != NULL)
         {

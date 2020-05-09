@@ -1,5 +1,6 @@
 
 #include <frontier/engines/opengl.h>
+#include <frontier/widgets.h>
 
 using namespace std;
 using namespace Frontier;
@@ -40,14 +41,21 @@ bool OpenGLEngineWindow::update()
     Size size = getWindow()->getSize();
 //log(DEBUG, "draw: width=%d, height=%d", size.width, size.height);
 
-    unsigned int textureWidth = powerOfTwo(size.width);
-    unsigned int textureHeight = powerOfTwo(size.height);
-    m_textureCoordX = (float)size.width / (float)textureWidth;
-    m_textureCoordY = (float)size.height / (float)textureHeight;
+    float scale = getScaleFactor();
 
-    if (m_textureSurface == NULL || m_textureSurface->getWidth() != textureWidth || m_textureSurface->getHeight() != textureHeight)
+    unsigned int textureWidth = powerOfTwo(size.width * scale);
+    unsigned int textureHeight = powerOfTwo(size.height * scale);
+    m_textureCoordX = (float)(size.width * scale) / (float)textureWidth;
+    m_textureCoordY = (float)(size.height * scale) / (float)textureHeight;
+
+    if (m_textureSurface == NULL || m_textureSurface->getWidth() != textureWidth || m_textureSurface->getHeight() != textureHeight )
     {
-            m_textureSurface = new HighDPISurface(textureWidth, textureHeight, 4);
+        if (m_textureSurface != NULL)
+        {
+            log(DEBUG, "update: Recreating surface: %d, %d != %d, %d",  m_textureSurface->getWidth(), m_textureSurface->getHeight(), textureWidth, textureHeight);
+            delete m_textureSurface;
+        }
+        m_textureSurface = new Surface(textureWidth, textureHeight, 4);
     }
 
     Geek::Gfx::Surface* surface = getWindow()->getSurface();
@@ -77,21 +85,26 @@ bool OpenGLEngineWindow::update()
     glVertex2i(position.x, position.y);
 
     glTexCoord2f(m_textureCoordX, 0);
-    glVertex2i(position.x + (size.width * 2), position.y);
+    glVertex2i(position.x + (size.width * scale), position.y);
 
     glTexCoord2f(0, m_textureCoordY);
-    glVertex2i(position.x, position.y + (size.height * 2));
+    glVertex2i(position.x, position.y + (size.height * scale));
 
     glTexCoord2f(m_textureCoordX, m_textureCoordY);
-    glVertex2i(position.x + (size.width * 2), position.y + (size.height * 2));
+    glVertex2i(position.x + (size.width * scale), position.y + (size.height * scale));
 
     glEnd();
 
     for (OpenGLDirectWidget* widget: m_directWidgets)
     {
-        widget->directDraw();
+        Widget* fwidget = dynamic_cast<Widget*>(widget);
+        log(DEBUG, "update: fwidget=%p, visible=%d", fwidget, fwidget->isVisible());
+        if (fwidget->isVisible())
+        {
+            widget->directDraw();
+        }
     }
-    //glBindTexture(GL_TEXTURE_2D, m_texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
 
     return true;
 }
