@@ -325,6 +325,15 @@ void FrontierWindow::setSize(Size size)
     }
 }
 
+float FrontierWindow::getScaleFactor()
+{
+    if (m_engineWindow != NULL)
+    {
+        return m_engineWindow->getScaleFactor();
+    }
+    return 1.0;
+}
+
 void FrontierWindow::update(bool force)
 {
     if (!m_visible)

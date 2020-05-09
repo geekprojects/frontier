@@ -151,6 +151,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     void setSize(Frontier::Size size);
     Frontier::Size getSize() const { return m_size; }
     Geek::Gfx::Surface* getSurface() const { return m_surface; }
+    float getScaleFactor();
     Geek::Mutex* getDrawMutex() { return m_drawMutex; }
 
     Menu* getMenu() { return m_menu; }
