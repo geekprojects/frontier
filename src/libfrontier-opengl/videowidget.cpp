@@ -41,6 +41,7 @@ class VideoWidgetRenderer : public Geek::Thread
 VideoWidget::VideoWidget(Frontier::FrontierApp* app) : Widget(app, L"Video")
 {
     m_mpv = mpv_create();
+    m_addedDirect = false;
 
     int res;
     res = mpv_initialize(m_mpv);
@@ -124,7 +125,12 @@ void VideoWidget::onShow()
 
 void VideoWidget::calculateSize()
 {
-    ((OpenGLEngineWindow*)(getWindow()->getEngineWindow()))->addDirectWidget(this);
+    if (!m_addedDirect)
+    {
+        ((OpenGLEngineWindow*)(getWindow()->getEngineWindow()))->addDirectWidget(this);
+        m_addedDirect = true;
+    }
+
     m_minSize.set(100, 100);
     m_maxSize.set(WIDGET_SIZE_UNLIMITED, WIDGET_SIZE_UNLIMITED);
 }
