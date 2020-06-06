@@ -54,6 +54,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_surface = NULL;
     m_updateTimestamp = 0;
     m_drawMutex = Geek::Thread::createMutex();
+    m_updating = false;
 
     m_menuBar = NULL;
     m_menu = NULL;
@@ -321,7 +322,7 @@ void FrontierWindow::setSize(Size size)
     {
         m_root->setDirty(DIRTY_SIZE, true);
 
-        update();
+        requestUpdate();
     }
 }
 
@@ -340,6 +341,12 @@ void FrontierWindow::update(bool force)
     {
         return;
     }
+
+    if (m_updating)
+    {
+        return;
+    }
+    m_updating = true;
 
     uint64_t now = m_app->getTimestamp();
     if (force)
@@ -367,6 +374,7 @@ void FrontierWindow::update(bool force)
     }
 
     m_drawMutex->lock();
+
     if (m_root->isDirty(DIRTY_SIZE) || m_root->isDirty(DIRTY_STYLE))
     {
         m_root->calculateSize();
@@ -440,6 +448,7 @@ void FrontierWindow::update(bool force)
 
     m_root->clearDirty();
 
+    m_updating = false;
     m_drawMutex->unlock();
 }
 
