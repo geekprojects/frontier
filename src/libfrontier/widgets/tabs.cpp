@@ -224,12 +224,13 @@ void Tabs::calculateSize()
             m_minSize.height += m_collapseButtonWidget->getMinSize().height;
         }
     }
-    m_maxSize = m_minSize;
 
     if (m_tabs.empty() || (m_collapsible && m_collapsed))
     {
         return;
     }
+
+    m_maxSize = m_minSize;
 
     Widget* activeWidget = getActiveTab();
     Size activeMinSize(0, 0);
