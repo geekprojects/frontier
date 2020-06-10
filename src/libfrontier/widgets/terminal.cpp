@@ -673,7 +673,7 @@ bool TerminalProcess::main()
         {
             int res;
             res = read(m_childOut, buffer, 4096);
-            if (res <= 0)
+            if (res <= 0 || res > 4096)
             {
                 break;
             }
