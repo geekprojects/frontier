@@ -33,9 +33,6 @@ using namespace Geek::Gfx;
 
 #define TABS_WIDGET_NAME L"Tabs"
 
-#define TAB_SIZE 22
-#define MIN_TAB_SIZE (TAB_SIZE * 2)
-
 Tabs::Tabs(FrontierApp* ui) : Widget(ui, TABS_WIDGET_NAME)
 {
     setup(false, false, TAB_TOP);
@@ -65,7 +62,6 @@ Tabs::Tabs(FrontierWindow* window, bool collapsible, bool addButton, TabPlacemen
 {
     setup(collapsible, addButton, placement);
 }
-
 
 void Tabs::setup(bool collapsible, bool addButton, TabPlacement placement)
 {
@@ -179,11 +175,11 @@ void Tabs::calculateSize()
 
         if (isHorizontal())
         {
-            m_tabsSize.width += tabMin.width;
             if (m_tabsSize.height < tabMin.height)
             {
                 m_tabsSize.height = tabMin.height;
             }
+            m_tabsSize.width += tabMin.width;
         }
         else
         {
@@ -194,6 +190,8 @@ void Tabs::calculateSize()
             m_tabsSize.height += tabMin.height;
         }
     }
+    m_tabsSize.width++;
+    m_tabsSize.height++;
 
     BoxModel boxModel = getBoxModel();
     m_minSize.width = boxModel.getWidth();
@@ -291,6 +289,16 @@ void Tabs::layout()
         return;
     }
 
+    int tabSize;
+    if (isHorizontal())
+    {
+        tabSize = tabsRect.height;
+    }
+    else
+    {
+        tabSize = tabsRect.width;
+    }
+
     int x = tabsRect.x;
     int y = tabsRect.y;
     if (m_collapsible)
@@ -300,11 +308,11 @@ void Tabs::layout()
 
         if (isHorizontal())
         {
-            x += TAB_SIZE;
+            x += tabSize;
         }
         else
         {
-            y += TAB_SIZE;
+            y += tabSize;
         }
     }
 
@@ -473,7 +481,14 @@ Widget* Tabs::handleEvent(Event* event)
 
                         return m_collapseButtonWidget->handleEvent(event);
                     }
-                    tabPos -= TAB_SIZE;
+                    if (isHorizontal())
+                    {
+                        tabPos -= tabsRect.height;
+                    }
+                    else
+                    {
+                        tabPos -= tabsRect.width;
+                    }
                 }
 
                 for (Tab* tab : m_tabs)
@@ -837,12 +852,12 @@ Size Tabs::getTabSize()
 
     if (m_collapsible)
     {
-        major -= TAB_SIZE;
+        major -= 25;
     }
 
     if (m_addButton)
     {
-        major -= TAB_SIZE;
+        major -= 25;
     }
 
     int tabMajor = major / m_tabs.size();

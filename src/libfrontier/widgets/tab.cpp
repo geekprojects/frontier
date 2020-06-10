@@ -62,7 +62,7 @@ void Tab::calculateSize()
     }
     if (horizontal)
     {
-        m_minSize.width = TAB_SIZE;
+        m_minSize.width += TAB_SIZE;
         if (m_closeable)
         {
             m_minSize.width += TAB_SIZE;
@@ -72,7 +72,7 @@ void Tab::calculateSize()
     }
     else
     {
-        m_minSize.height = TAB_SIZE;
+        m_minSize.height += TAB_SIZE;
         if (m_closeable)
         {
             m_minSize.height += TAB_SIZE;
