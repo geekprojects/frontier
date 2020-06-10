@@ -72,7 +72,7 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
     m_cachedTextFont = NULL;
     m_cachedTextFontTimestamp = 0;
 
-    m_mouseOver = false;
+    //m_mouseOver = false;
     m_selected = false;
 
     m_initialised = false;
@@ -590,16 +590,26 @@ Widget* Widget::handleEvent(Event* event)
 
 void Widget::onMouseEnter()
 {
-    m_mouseOver = true;
+    //m_mouseOver = true;
     m_mouseEnterSignal.emit(true);
     setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 void Widget::onMouseLeave()
 {
-    m_mouseOver = false;
+    //m_mouseOver = false;
     m_mouseEnterSignal.emit(false);
     setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+}
+
+bool Widget::isMouseOver()
+{
+    FrontierWindow* window = getWindow();
+    if (window != NULL)
+    {
+        return window->getMouseOverWidget() == this;
+    }
+    return false;
 }
 
 void Widget::dump(int level)

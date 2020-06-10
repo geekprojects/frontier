@@ -222,6 +222,31 @@ void FrontierWindow::setMotionWidget(Widget* widget)
     m_motionTime = m_app->getTimestamp();
 }
 
+void FrontierWindow::setMouseOver(Widget* widget)
+{
+    if (m_mouseOverWidget != widget)
+    {
+        if (widget != NULL)
+        {
+            widget->incRefCount();
+        }
+
+        if (m_mouseOverWidget != NULL)
+        {
+            m_mouseOverWidget->onMouseLeave();
+            m_mouseOverWidget->decRefCount();
+            m_mouseOverWidget->setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+        }
+
+        m_mouseOverWidget = widget;
+        if (m_mouseOverWidget != NULL)
+        {
+            m_mouseOverWidget->onMouseEnter();
+            m_mouseOverWidget->setDirty(DIRTY_CONTENT | DIRTY_STYLE);
+        }
+    }
+}
+
 void FrontierWindow::dragWidget(Widget* widget)
 {
     m_dragWidget = widget;
@@ -553,31 +578,13 @@ bool FrontierWindow::handleEvent(Event* event)
         case FRONTIER_EVENT_MOUSE_SCROLL:
             updateActive = true;
             destWidget = m_root->handleEvent(event);
+            setMouseOver(destWidget);
            break;
 
         case FRONTIER_EVENT_MOUSE_MOTION:
             destWidget = m_root->handleEvent(event);
 
-            if (m_mouseOverWidget != destWidget)
-            {
-                if (destWidget != NULL)
-                {
-                    destWidget->incRefCount();
-                }
-
-                if (m_mouseOverWidget != NULL)
-                {
-                    m_mouseOverWidget->onMouseLeave();
-                    m_mouseOverWidget->decRefCount();
-                }
-
-                m_mouseOverWidget = destWidget;
-                if (m_mouseOverWidget != NULL)
-                {
-                    m_mouseOverWidget->onMouseEnter();
-                }
-            }
-
+            setMouseOver(destWidget);
             if (m_dragSurface != NULL)
             {
                 MouseEvent* mouseEvent = (MouseEvent*)event;

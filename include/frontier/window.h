@@ -137,6 +137,8 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     void setActiveWidget(Widget* widget);
     Widget* getActiveWidget() const { return m_activeWidget; }
     void setMotionWidget(Widget* widget);
+    void setMouseOver(Widget* widget);
+    Widget* getMouseOverWidget() { return m_mouseOverWidget; }
 
     void dragWidget(Widget* widget);
 

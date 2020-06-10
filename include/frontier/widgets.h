@@ -134,8 +134,6 @@ class Widget : public FrontierObject, public Geek::Logger
     Geek::FontHandle* m_cachedTextFont;
     uint64_t m_cachedTextFontTimestamp;
 
-    bool m_mouseOver;
-
     sigc::signal<void, bool> m_mouseEnterSignal;
     sigc::signal<void> m_activeSignal;
     sigc::signal<void> m_inactiveSignal;
@@ -344,7 +342,7 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual bool isVisible(Frontier::Widget* child = NULL);
 
     /// Return whether the mouse is currently over this Widget
-    bool isMouseOver() { return m_mouseOver; }
+    bool isMouseOver();
 
     /// Return whether the Widget is in a selected state or not
     bool isSelected() { return m_selected; }
