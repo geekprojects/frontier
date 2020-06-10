@@ -279,8 +279,8 @@ void List::clearSelected(ListItem* item)
         {
             item->clearSelected(false);
         }
-        setDirty(DIRTY_CONTENT);
     }
+    setDirty(DIRTY_CONTENT);
 }
 
 ListItem::ListItem(FrontierApp* ui) : Widget(ui, L"ListItem")
@@ -309,8 +309,8 @@ void ListItem::setSelected(bool updateList)
     if (updateList && m_list != NULL)
     {
         m_list->setSelected(this);
-        setDirty(DIRTY_CONTENT);
     }
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 void ListItem::clearSelected(bool updateList)
@@ -320,8 +320,8 @@ void ListItem::clearSelected(bool updateList)
     if (updateList && m_list != NULL)
     {
         m_list->clearSelected(this);
-        setDirty(DIRTY_CONTENT);
     }
+    setDirty(DIRTY_CONTENT | DIRTY_STYLE);
 }
 
 Widget* ListItem::handleEvent(Frontier::Event* event)
