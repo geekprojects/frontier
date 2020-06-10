@@ -46,7 +46,7 @@ void ResizeableFrame::addWithSize(Widget* widget, int setPc)
 
         float pc = 100.0 / (float)m_children.size();
 
-        int i;
+        unsigned int i;
         for (i = 0; i < m_children.size(); i++)
         {
             m_sizes.push_back(pc);
