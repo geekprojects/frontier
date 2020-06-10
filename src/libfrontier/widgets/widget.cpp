@@ -505,10 +505,9 @@ void Widget::clearDirty()
 {
     m_dirty = 0;
 
-    vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
+    for (Widget* child : m_children)
     {
-        (*it)->clearDirty();
+        child->clearDirty();
     }
 }
 

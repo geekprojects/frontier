@@ -55,9 +55,8 @@ void List::calculateSize()
     m_listMutex->lock();
 
     vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
+    for (Widget* item : m_children)
     {
-        Widget* item = *it;
         if (item->isDirty(DIRTY_SIZE))
         {
             item->calculateSize();
@@ -115,7 +114,7 @@ void List::layout()
     m_listMutex->lock();
     int idx;
     vector<Widget*>::iterator it;
-    for (it = m_children.begin(), idx = 0; it != m_children.end(); it++, idx++)
+    for (it = m_children.begin(), idx = 0; it != m_children.end(); ++it, idx++)
     {
         Widget* item = *it;
 
@@ -169,7 +168,7 @@ bool List::draw(Surface* surface, Rect visible)
     m_listMutex->lock();
     int idx;
     vector<Widget*>::iterator it;
-    for (it = m_children.begin(), idx = 0; it != m_children.end(); it++, idx++)
+    for (it = m_children.begin(), idx = 0; it != m_children.end(); ++it, idx++)
     {
         Widget* item = *it;
 #if 0
@@ -208,10 +207,8 @@ Widget* List::handleEvent(Event* event)
 
         m_listMutex->lock();
 
-        vector<Widget*>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); it++)
+        for (Widget* child : m_children)
         {
-            Widget* child = *it;
             if (child->intersects(mouseEvent->x, mouseEvent->y))
             {
                 m_listMutex->unlock();

@@ -582,7 +582,7 @@ void Tabs::closeTab(Widget* widget, bool emitChangeSignal)
     vector<Tab*>::iterator it;
 
     unsigned int i;
-    for (i = 0, it = m_tabs.begin(); it != m_tabs.end(); it++, i++)
+    for (i = 0, it = m_tabs.begin(); it != m_tabs.end(); ++it, i++)
     {
         Tab* tab = *it;
         if (tab->getContent() == widget)

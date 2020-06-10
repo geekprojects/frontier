@@ -46,8 +46,8 @@ void ResizeableFrame::addWithSize(Widget* widget, int setPc)
 
         float pc = 100.0 / (float)m_children.size();
 
-        vector<Widget*>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); it++)
+        int i;
+        for (i = 0; i < m_children.size(); i++)
         {
             m_sizes.push_back(pc);
         }
@@ -99,7 +99,7 @@ void ResizeableFrame::layout()
     int i;
 
     // First, work out if we have any children that are too big or too small
-    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    for (it = m_children.begin(), i = 0; it != m_children.end(); ++it, ++i)
     {
         Widget* child = *it;
         Size childMinSize = child->getMinSize();
@@ -163,7 +163,7 @@ void ResizeableFrame::layout()
     }
 
     // Actually set the child sizes and positions
-    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    for (it = m_children.begin(), i = 0; it != m_children.end(); ++it, ++i)
     {
         Widget* child = *it;
 
@@ -305,10 +305,8 @@ Widget* ResizeableFrame::handleEvent(Event* event)
 
         if (!m_dragging)
         {
-            vector<Widget*>::iterator it;
-            for (it = m_children.begin(); it != m_children.end(); it++)
+            for (Widget* child : m_children)
             {
-                Widget* child = *it;
                 if (child->intersects(x, y))
                 {
                     return child->handleEvent(event);
@@ -319,7 +317,8 @@ Widget* ResizeableFrame::handleEvent(Event* event)
 
             // Is the mouse pointer between children?
             int pos;
-            for (it = m_children.begin(), pos = 0; (it + 1) != m_children.end(); it++, pos++)
+            vector<Widget*>::iterator it;
+            for (it = m_children.begin(), pos = 0; (it + 1) != m_children.end(); ++it, pos++)
             {
                 Widget* child = *it;
                 Vector2D childPos = child->getAbsolutePosition();

@@ -257,7 +257,7 @@ Widget* Tab::handleEvent(Event* event)
                 m_mouseDown = false;
                 return NULL;
             }
-            else if (mouseButtonEvent->direction)
+            else
             {
                 m_mouseDown = true;
                 m_mouseDownPos = Vector2D(mouseButtonEvent->x, mouseButtonEvent->y);

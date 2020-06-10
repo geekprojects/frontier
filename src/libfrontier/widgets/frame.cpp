@@ -66,7 +66,7 @@ void Frame::add(Widget* widget)
 void Frame::remove(Widget* widget)
 {
     vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
+    for (it = m_children.begin(); it != m_children.end(); ++it)
     {
         Widget* child = *it;
         if (child == widget)
@@ -110,10 +110,8 @@ void Frame::calculateSize()
     m_maxSize.set(0, 0);
 
     BoxModel boxModel = getBoxModel();
-    vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
+    for (Widget* child : m_children)
     {
-        Widget* child = *it;
         if (child->isDirty())
         {
             child->calculateSize();
@@ -224,10 +222,8 @@ void Frame::layout()
 
     int min = 0;
 
-    vector<Widget*>::iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++)
+    for (Widget* child : m_children)
     {
-        Widget* child = *it;
         Size childMinSize = child->getMinSize();
         Size childMaxSize = child->getMaxSize();
 
@@ -248,8 +244,9 @@ void Frame::layout()
 
     int i;
 
-int majorTotal = 0;
-    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    int majorTotal = 0;
+    vector<Widget*>::iterator it;
+    for (it = m_children.begin(), i = 0; it != m_children.end(); ++it, i++)
     {
         Widget* child = *it;
 
@@ -356,7 +353,7 @@ int majorTotal = 0;
         majorPos = (majorWidgetSize / 2) - (majorTotal / 2);
     }
 
-    for (it = m_children.begin(), i = 0; it != m_children.end(); it++, i++)
+    for (it = m_children.begin(), i = 0; it != m_children.end(); ++it, i++)
     {
         Widget* child = *it;
         Size size = child->getSize();
@@ -396,10 +393,8 @@ Widget* Frame::handleEvent(Event* event)
         int x = mouseEvent->x;
         int y = mouseEvent->y;
 
-        vector<Widget*>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); it++)
+        for (Widget* child : m_children)
         {
-            Widget* child = *it;
             if (child->intersects(x, y))
             {
                 return child->handleEvent(event);
