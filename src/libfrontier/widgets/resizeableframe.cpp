@@ -68,6 +68,11 @@ void ResizeableFrame::layout()
 
     BoxModel boxModel = getBoxModel();
 
+    if (!isDirty(DIRTY_SIZE))
+    {
+        return;
+    }
+
     if (m_horizontal)
     {
         major = m_setSize.width - boxModel.getWidth();
