@@ -447,16 +447,6 @@ Widget* Tabs::handleEvent(Event* event)
             x -= tabsRect.x;
             y -= tabsRect.y;
 
-            int tabPos;
-            if (isHorizontal())
-            {
-               tabPos = x;
-            }
-            else
-            {
-               tabPos = y;
-            }
- 
             if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON)
             {
                 MouseButtonEvent* mouseButtonEvent = (MouseButtonEvent*)event;
@@ -480,14 +470,6 @@ Widget* Tabs::handleEvent(Event* event)
                         }
 
                         return m_collapseButtonWidget->handleEvent(event);
-                    }
-                    if (isHorizontal())
-                    {
-                        tabPos -= tabsRect.height;
-                    }
-                    else
-                    {
-                        tabPos -= tabsRect.width;
                     }
                 }
 
