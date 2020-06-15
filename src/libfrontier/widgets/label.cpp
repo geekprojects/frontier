@@ -163,7 +163,7 @@ bool Label::draw(Surface* surface)
     drawBorder(surface);
 
     BoxModel boxModel = getBoxModel();
-    int y = boxModel.marginTop;
+    int y = boxModel.getTop();
 
     FontHandle* font = getTextFont();
 
@@ -207,7 +207,7 @@ bool Label::draw(Surface* surface)
                     x = (m_setSize.width / 2) - (w / 2);
                     break;
                 case ALIGN_RIGHT:
-                    x = (m_setSize.width - boxModel.marginRight) - w;
+                    x = (m_setSize.width - boxModel.getRight()) - w;
                     break;
             }
 
