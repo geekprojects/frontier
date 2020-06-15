@@ -182,6 +182,7 @@ void Grid::calculateSize()
         m_minSize.width += m_colMinSizes[col];
         m_maxSize.width += m_colMaxSizes[col];
     }
+
     int row;
     for (row = 0; row < gridSize.height; row++)
     {
@@ -189,7 +190,7 @@ void Grid::calculateSize()
         log(DEBUG, "Grid::calculateSize: Row %d: min=%d, max=%d", row, m_rowMinSizes[row], m_rowMaxSizes[row]);
 #endif
         m_minSize.height += m_rowMinSizes[row];
-        m_maxSize.height += m_rowMinSizes[row];
+        m_maxSize.height += m_rowMaxSizes[row];
     }
 
     BoxModel boxModel = getBoxModel();
