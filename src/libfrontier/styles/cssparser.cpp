@@ -16,6 +16,8 @@
 
 #include "cssparser.h"
 
+#define DEBUG_CSS_PARSER
+
 using namespace Frontier;
 using namespace antlr4;
 using namespace Geek;
@@ -119,9 +121,26 @@ void RuleSetListener::enterKnownRuleset(css3Parser::KnownRulesetContext * ctx)
 #ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::enterKnownRuleset:  -> Selector:\n");
 #endif
+
+        bool descendant = false;
+        for (css3Parser::CombinatorContext* combinator : selector->combinator())
+        {
+            printf("RuleSetListener::enterKnownRuleset:  -> Selector: combinator: %p\n", combinator);
+            if (combinator->Greater() != NULL)
+            {
+                printf("RuleSetListener::enterKnownRuleset:  -> Selector: combinator: Greater than!!\n");
+                descendant = true;
+            }
+            else
+            {
+                printf("RuleSetListener::enterKnownRuleset:  -> Selector: combinator: Unknown type!\n");
+            }
+        }
+
         for (css3Parser::SimpleSelectorSequenceContext* sss : selector->simpleSelectorSequence())
         {
             StyleSelector selector;
+            selector.descendant = descendant;
 
             css3Parser::TypeSelectorContext* typeSelector = sss->typeSelector();
             if (typeSelector != NULL)

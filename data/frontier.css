@@ -13,10 +13,7 @@
     font-family: "System Font";
 }
 
-Frame {
-}
-
-Frame.root, Frame.nested {
+.root, Frame > Frame {
     margin: 0px;
 }
 

@@ -34,21 +34,25 @@ using namespace Geek::Gfx;
 Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui, L"Frame")
 {
     m_horizontal = horizontal;
+    m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierApp* ui, wstring widgetName, bool horizontal) : Widget(ui, widgetName)
 {
     m_horizontal = horizontal;
+    m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window, L"Frame")
 {
     m_horizontal = horizontal;
+    m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierWindow* window, wstring widgetName, bool horizontal) : Widget(window, widgetName)
 {
     m_horizontal = horizontal;
+    m_widgetNames.insert(L"Frame");
 }
 
 Frame::~Frame()
@@ -112,7 +116,7 @@ void Frame::calculateSize()
     BoxModel boxModel = getBoxModel();
     for (Widget* child : m_children)
     {
-        if (child->isDirty())
+        if (child->isDirty(DIRTY_SIZE) || child->isDirty(DIRTY_STYLE))
         {
             child->calculateSize();
         }

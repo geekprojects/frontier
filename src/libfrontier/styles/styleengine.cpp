@@ -186,12 +186,11 @@ bool StyleRule::matches(Widget* widget)
         matches = false;
         while (!matches && currentWidget != NULL)
         {
-            if (currentWidget == NULL)
+            matches = selector.matches(currentWidget);
+            if (selector.descendant && !matches)
             {
                 break;
             }
-
-            matches = selector.matches(currentWidget);
             currentWidget = currentWidget->getParent();
 
             if (first)
@@ -234,7 +233,7 @@ bool StyleSelector::matches(Widget* widget)
     }
 
     bool hasType = (widgetType.length() > 0);
-    bool matchType = (hasType && (widgetType == L"*" || widgetType == widget->getWidgetName()));
+    bool matchType = (hasType && (widgetType == L"*" || widget->instanceOf(widgetType)));
     if (hasType && !matchType)
     {
         return false;

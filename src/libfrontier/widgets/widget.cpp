@@ -55,6 +55,7 @@ void Widget::initWidget(FrontierApp* app, wstring widgetName)
 {
     m_app = app;
     m_widgetName = widgetName;
+    m_widgetNames.insert(widgetName);
 
     m_window = NULL;
     m_parent = NULL;

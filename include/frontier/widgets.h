@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
 #include <frontier/frontier.h>
 #include <frontier/styles.h>
@@ -158,6 +159,9 @@ class Widget : public FrontierObject, public Geek::Logger
     /// The name of the type of widget
     std::wstring m_widgetName;
 
+    /// The widget types extended by this widget
+    std::set<std::wstring> m_widgetNames;
+
     /// Application-wide unique id for this widget
     std::wstring m_widgetId;
 
@@ -211,6 +215,9 @@ class Widget : public FrontierObject, public Geek::Logger
 
     /// Get the Widget type name
     std::wstring getWidgetName() { return m_widgetName; }
+
+    /// Return whether this Widget is or overrides the given widget name
+    virtual bool instanceOf(std::wstring widgetName) { return (m_widgetName == widgetName || m_widgetNames.count(widgetName) > 0); }
 
     /// Set application-specific data. The Widget and Frontier library should not touch this data
     void setPrivateData(void* data) { m_privateData = data; }

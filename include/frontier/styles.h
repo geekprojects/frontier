@@ -42,6 +42,7 @@ struct StyleSelector
     std::wstring className;
     std::wstring id;
     std::string state;
+    bool descendant;
 
     bool matches(Frontier::Widget* widget);
     std::wstring getKey();
