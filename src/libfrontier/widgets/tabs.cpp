@@ -666,9 +666,9 @@ void Tabs::setActiveTab(Tab* tab)
     m_activeTab->setSelected();
     m_activeTab->setDirty(DIRTY_ALL, true);
 
-    m_changeTabSignal.emit(m_activeTab->getContent());
+    setDirty(DIRTY_ALL, false);
 
-    setDirty();
+    m_changeTabSignal.emit(m_activeTab->getContent());
 }
 
 
