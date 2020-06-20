@@ -251,21 +251,20 @@ bool DemoApp::init()
         NumberInput* numberInput;
         numberFrame->add(new Label(this, L"Number Text:"));
         numberFrame->add(numberInput = new NumberInput(this));
-numberInput->setIntegerOnly(false);
-numberInput->setNumber(3.14);
+        numberInput->setIntegerOnly(false);
+        numberInput->setNumber(3.14);
         inputTab->add(numberFrame);
 
         Frame* numberFrame2 = new Frame(this, true);
         NumberInput* numberInput2;
         numberFrame2->add(new Label(this, L"Number Text:"));
         numberFrame2->add(numberInput2 = new NumberInput(this));
-numberInput2->setStyle("expand-horizontal", false);
-numberInput2->setIntegerOnly(true);
-numberInput2->setMax(99);
-numberInput2->setMaxLength(2);
-numberInput2->setNumber(99);
+        numberInput2->setStyle("expand-horizontal", false);
+        numberInput2->setIntegerOnly(true);
+        numberInput2->setMax(99);
+        numberInput2->setMaxLength(2);
+        numberInput2->setNumber(99);
         inputTab->add(numberFrame2);
-
 
         Frame* inputFrame3 = new Frame(this, true);
         inputFrame3->add(new Label(this, L"Date:"));
