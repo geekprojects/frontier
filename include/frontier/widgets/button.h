@@ -21,11 +21,14 @@ class Button : public Label
 {
  protected:
     ButtonType m_type;
+    bool m_emitAll;
 
  public:
     Button(FrontierApp* ui, std::wstring text, ButtonType type = BUTTON_NORMAL);
     Button(FrontierApp* ui, std::wstring widgetType, std::wstring text, ButtonType type = BUTTON_NORMAL);
     virtual ~Button();
+
+    void setEmitAll(bool emitAll) { m_emitAll = emitAll; }
 
     virtual Widget* handleEvent(Frontier::Event* event);
 

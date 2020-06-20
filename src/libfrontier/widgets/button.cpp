@@ -30,6 +30,7 @@ using namespace Geek::Gfx;
 Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Label(ui, L"Button", text)
 {
     m_type = type;
+    m_emitAll = false;
 }
 
 Button::Button(FrontierApp* ui, wstring widgetType, wstring text, ButtonType type) : Label(ui, widgetType, text)
@@ -39,6 +40,7 @@ Button::Button(FrontierApp* ui, wstring widgetType, wstring text, ButtonType typ
 
 Button::~Button()
 {
+    m_emitAll = false;
 }
 
 Widget* Button::handleEvent(Event* event)
@@ -58,7 +60,7 @@ Widget* Button::handleEvent(Event* event)
 
                         m_selected = mouseButtonEvent->direction;
 
-                        if (!m_selected)
+                        if (m_emitAll || !m_selected)
                         {
                             clickSignal().emit(this);
                         }
