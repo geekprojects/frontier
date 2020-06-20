@@ -80,11 +80,13 @@ void Tab::calculateSize()
         m_minSize.width += font->getPixelHeight();
         m_maxSize.set(m_minSize.width, maxTabSize);
     }
+    m_mouseDown = false;
 }
 
 void Tab::layout()
 {
     // Our owning Tabs widget handles the content!
+    m_mouseDown = false;
 }
 
 bool Tab::draw(Geek::Gfx::Surface* surface)
@@ -278,7 +280,7 @@ Widget* Tab::handleEvent(Event* event)
                 int diffX = abs((int)(mouseMotionEvent->x - m_mouseDownPos.x));
                 int diffY = abs((int)(mouseMotionEvent->y - m_mouseDownPos.y));
                 int diff = (int)sqrt((double)((diffX * diffX) + (diffY * diffY)));
-                if (diff > 5)
+                if (diff > 10)
                 {
                     log(DEBUG, "Dragging tab!! diff=%d", diff);
                     m_mouseDown = false;
