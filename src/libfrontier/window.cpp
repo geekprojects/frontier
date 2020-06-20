@@ -342,12 +342,15 @@ void FrontierWindow::hide()
 
 void FrontierWindow::setSize(Size size)
 {
-    m_size = size;
-    if (m_root != NULL)
+    if (size != m_size)
     {
-        m_root->setDirty(DIRTY_SIZE, true);
+        m_size = size;
+        if (m_root != NULL)
+        {
+            m_root->setDirty(DIRTY_ALL, true);
 
-        requestUpdate();
+            requestUpdate();
+        }
     }
 }
 
@@ -475,6 +478,7 @@ void FrontierWindow::update(bool force)
 
     m_updating = false;
     m_drawMutex->unlock();
+
 }
 
 void FrontierWindow::requestUpdate()
