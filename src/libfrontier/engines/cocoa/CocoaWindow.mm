@@ -408,16 +408,7 @@ bool CocoaWindow::init()
 
 bool CocoaWindow::update()
 {
-    Size winSize = m_window->getSize();
-    //setSize(winSize);
-
-#if 1
-    Size currentSize = getSize();
-    if (currentSize.width != winSize.width || currentSize.height != winSize.height)
-    {
-        setSize(winSize);
-    }
-#endif
+    setSize(m_window->getSize());
 
     drawSurface(m_window->getSurface());
 
@@ -517,14 +508,11 @@ void CocoaWindow::hide()
 
 Frontier::Size CocoaWindow::getSize()
 {
-#if 0
     CocoaNSWindow* window = (CocoaNSWindow*)m_cocoaWindow;
-    NSRect rect = [window contentRectForFrameRect:[window frame]];
-    printf("CocoaWindow::getSize: %d, %d\n", (int)rect.size.width, (int)rect.size.height);
-    return Frontier::Size(rect.size.width, rect.size.height);
-#else
-    return Frontier::Size(0, 0);
-#endif
+    NSRect rect = [window contentLayoutRect];
+    int width = rect.size.width;
+    int height = rect.size.height;
+    return Frontier::Size(width, height);
 }
 
 void CocoaWindow::setSize(Frontier::Size size)
