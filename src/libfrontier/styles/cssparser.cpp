@@ -16,7 +16,7 @@
 
 #include "cssparser.h"
 
-#define DEBUG_CSS_PARSER
+#undef DEBUG_CSS_PARSER
 
 using namespace Frontier;
 using namespace antlr4;
