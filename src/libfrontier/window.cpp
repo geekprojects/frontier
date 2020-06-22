@@ -26,6 +26,7 @@
 #include <frontier/contextmenu.h>
 #include <frontier/widgets/frame.h>
 
+#include <algorithm>
 #include <typeinfo>
 
 using namespace std;
@@ -398,15 +399,6 @@ void FrontierWindow::update(bool force)
     }
 
     m_drawMutex->lock();
-
-    bool hasModal = false;
-    for (Layer* layer : m_layers)
-    {
-        if (layer->isModal())
-        {
-            hasModal = true;
-        }
-    }
 
     bool updated = false;
     for (Layer* layer : m_layers)
