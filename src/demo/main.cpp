@@ -52,6 +52,7 @@ class DemoApp : public FrontierApp
 {
  private:
     FrontierWindow* m_mainWindow;
+    Layer* m_welcomeLayer;
     Tabs* m_tabs;
     Button* m_textButton1;
     Button* m_textButton2;
@@ -60,6 +61,7 @@ class DemoApp : public FrontierApp
 
     TooltipWindow* m_tooltipWindow;
 
+    void onWelcomeButton(Widget* button);
     void onTextButton1(Widget* button);
     void onTextButton2(Widget* button);
     void onIconButton(Widget* button);
@@ -308,12 +310,12 @@ bool DemoApp::init()
         m_tabs->addTab(L"ComboBox", comboBoxTab);
     }
 
-{
-Frame* colourTab = new Frame(this, false);
-//colourTab->add(new HSVWheel(this));
-colourTab->add(new ColourButton(this, Colour(128, 255, 128)));
+    {
+        Frame* colourTab = new Frame(this, false);
+        //colourTab->add(new HSVWheel(this));
+        colourTab->add(new ColourButton(this, Colour(128, 255, 128)));
         m_tabs->addTab(L"Colours", colourTab);
-}
+    }
 
     {
         Frame* terminalTab = new Frame(this, false);
@@ -408,10 +410,29 @@ colourTab->add(new ColourButton(this, Colour(128, 255, 128)));
     m_mainWindow = new FrontierWindow(this, L"Frontier Demo", WINDOW_NORMAL);
     m_mainWindow->setContent(rootFrame);
 
+    m_welcomeLayer = new Layer(this);
+    m_welcomeLayer->setHorizontalAlign(ALIGN_CENTER);
+    m_welcomeLayer->setVerticalAlign(ALIGN_MIDDLE);
+    m_welcomeLayer->setModal(true);
+
+    Frame* layerFrame = new Frame(this, false);
+    layerFrame->add(new Label(this, L"Welcome to Frontier!"));
+    Button* button = new Button(this, L"Go away!");
+        button->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onWelcomeButton));
+    layerFrame->add(button);
+    m_welcomeLayer->setContentRoot(layerFrame);
+    m_mainWindow->addLayer(m_welcomeLayer);
+
     m_mainWindow->show();
 
     m_tooltipWindow = new TooltipWindow(this);
     return true;
+}
+
+void DemoApp::onWelcomeButton(Widget* button)
+{
+    log(DEBUG, "onWelcomeButton: Here!");
+    m_mainWindow->removeLayer(m_welcomeLayer);
 }
 
 void DemoApp::onIconButton(Widget* button)

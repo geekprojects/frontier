@@ -27,6 +27,7 @@
 
 #include <frontier/frontier.h>
 #include <frontier/styles.h>
+#include <frontier/types.h>
 
 #include <sigc++/sigc++.h>
 
@@ -35,39 +36,6 @@
 namespace Frontier {
 
 class Menu;
-
-/**
- * \brief Specifies how to align text and objects horizontally
- */
-enum HorizontalAlign
-{
-    ALIGN_LEFT, ///< Align left
-    ALIGN_CENTER, ///< Align centrally
-    ALIGN_RIGHT ///< Align right
-};
-
-/**
- * \brief Specifies how to align text and objects vertically
- */
-enum VerticalAlign
-{
-    ALIGN_TOP, ///< Align top
-    ALIGN_MIDDLE, ///< Align middle vertically
-    ALIGN_BOTTOM ///< Align bottom
-};
-
-/**
- * \enum Frontier::DirtyFlag
- * \brief Describes what aspects of a widget are "dirty"
- */
-enum DirtyFlag
-{
-    DIRTY_SIZE = 0x1,   ///< The size of the widget or its children have changed
-    DIRTY_CONTENT = 0x2, ///< Just the contents of the widget needs redrawing
-    DIRTY_STYLE = 0x4, ///< States on which style rules may apply have changed
-
-    DIRTY_ALL = 0xff ///< All aspects of the widget are dirty
-};
 
 /**
  * \brief Describes and caches the CSS box model of a widget

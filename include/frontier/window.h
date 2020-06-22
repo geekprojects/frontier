@@ -28,6 +28,7 @@
 #include <frontier/utils.h>
 #include <frontier/events.h>
 #include <frontier/theme.h>
+#include <frontier/layer.h>
 
 #include <sigc++/sigc++.h>
 
@@ -84,9 +85,11 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     std::wstring m_title;
     int m_flags;
     bool m_visible;
-    Frontier::Size m_size;
 
-    Frame* m_root;
+    Layer* m_rootLayer;
+    std::vector<Layer*> m_layers;
+
+    sigc::signal<void> m_closeSignal;
     Widget* m_content;
     Widget* m_activeWidget;
     Widget* m_mouseOverWidget;
@@ -94,10 +97,10 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     uint64_t m_motionTime;
     Frontier::WindowCursor m_currentCursor;
 
-    Geek::Gfx::Surface* m_surface;
     uint64_t m_updateTimestamp;
     Geek::Mutex* m_drawMutex;
     bool m_updating;
+    Geek::Gfx::Surface* m_windowSurface;
 
     Widget* m_dragWidget;
     Geek::Gfx::Surface* m_dragSurface;
@@ -106,7 +109,6 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     Menu* m_menu;
     MenuList* m_menuBar;
 
-    sigc::signal<void> m_closeSignal;
     sigc::signal<void> m_showSignal;
     sigc::signal<bool> m_gainedFocusSignal;
     sigc::signal<bool> m_lostFocusSignal;
@@ -152,14 +154,18 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     FrontierApp* getApp() const { return m_app; }
 
     void setSize(Frontier::Size size);
-    Frontier::Size getSize() const { return m_size; }
-    Geek::Gfx::Surface* getSurface() const { return m_surface; }
+    Frontier::Size getSize() const { return m_rootLayer->getRect().getSize(); }
+    Geek::Gfx::Surface* getSurface() { return m_windowSurface; }
     float getScaleFactor();
     Geek::Mutex* getDrawMutex() { return m_drawMutex; }
 
     Menu* getMenu() { return m_menu; }
     void setMenu(Menu* menu);
     void openContextMenu(Geek::Vector2D pos, Menu* menu);
+
+    void addLayer(Layer* layer);
+    void removeLayer(Layer* layer);
+    std::vector<Layer*>& getLayers() { return m_layers; }
 
     void postEvent(Frontier::Event* event);
     virtual bool handleEvent(Frontier::Event* event);

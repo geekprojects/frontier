@@ -51,28 +51,27 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_dragWidget = NULL;
     m_dragSurface = NULL;
 
-    m_surface = NULL;
     m_updateTimestamp = 0;
     m_drawMutex = Geek::Thread::createMutex();
     m_updating = false;
+    m_windowSurface = NULL;
 
     m_menuBar = NULL;
     m_menu = NULL;
 
-    m_size.set(640, 480);
-
-    m_root = new Frame(app, false);
-    m_root->incRefCount();
-    m_root->setWindow(this);
-    m_root->setWidgetClass(L"root");
-
-    //m_root->setStyle(STYLE_PADDING, 2);
-    //m_root->setStyle(STYLE_MARGIN, 0);
+    m_rootLayer = new Layer(app, true);
+    m_rootLayer->incRefCount();
+    m_rootLayer->setSize(Size(640, 480));
+    m_rootLayer->setWindow(this);
+    Frame* rootFrame = new Frame(app, false);
+    m_rootLayer->setContentRoot(rootFrame);
+    m_layers.push_back(m_rootLayer);
+    rootFrame->setWidgetClass(L"root");
 
     if (hasBorder() && !m_app->getEngine()->providesMenus())
     {
         m_menuBar = new MenuList(m_app, NULL, true);
-        m_root->add(m_menuBar);
+        rootFrame->add(m_menuBar);
     }
 
     m_app->addWindow(this);
@@ -80,9 +79,9 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
 
 FrontierWindow::~FrontierWindow()
 {
-    if (m_root != NULL)
+    for (Layer* layer : m_layers)
     {
-        m_root->decRefCount();
+        layer->decRefCount();
     }
 
     if (m_content != NULL)
@@ -105,11 +104,6 @@ FrontierWindow::~FrontierWindow()
     {
         m_motionWidget->decRefCount();
         m_motionWidget = NULL;
-    }
-
-    if (m_surface != NULL)
-    {
-        delete m_surface;
     }
 
     delete m_engineWindow;
@@ -152,16 +146,17 @@ Geek::Vector2D FrontierWindow::getPosition()
 Frontier::Rect FrontierWindow::getRect()
 {
     Vector2D pos = getPosition();
-    return Rect(pos.x, pos.y, m_size.width, m_size.height);
+    return Rect(pos.x, pos.y, m_rootLayer->getRect().width, m_rootLayer->getRect().height);
 }
 
 void FrontierWindow::setContent(Widget* content)
 {
     m_drawMutex->lock();
 
+    Frame* rootFrame = (Frame*)m_rootLayer->getContentRoot();
     if (m_content != NULL)
     {
-        m_root->remove(m_content);
+        rootFrame->remove(m_content);
         m_content->decRefCount();
     }
 
@@ -170,8 +165,8 @@ void FrontierWindow::setContent(Widget* content)
     m_content->setWindow(this);
     m_content->setPosition(0, 0);
 
-    m_root->add(m_content);
-    m_root->setDirty(DIRTY_ALL, true);
+    rootFrame->add(m_content);
+    rootFrame->setDirty(DIRTY_ALL, true);
 
     m_drawMutex->unlock();
 }
@@ -326,7 +321,11 @@ void FrontierWindow::show()
 
     m_showSignal.emit();
 
-    m_root->setDirty();
+    for (Layer* layer : m_layers)
+    {
+        layer->getContentRoot()->setDirty();
+    }
+
     update();
 }
 
@@ -342,15 +341,12 @@ void FrontierWindow::hide()
 
 void FrontierWindow::setSize(Size size)
 {
-    if (size != m_size)
+    if (size != m_rootLayer->getRect().getSize())
     {
-        m_size = size;
-        if (m_root != NULL)
-        {
-            m_root->setDirty(DIRTY_ALL, true);
+        m_rootLayer->setSize(size);
+        m_rootLayer->getContentRoot()->setDirty(DIRTY_ALL, true);
 
-            requestUpdate();
-        }
+        requestUpdate();
     }
 }
 
@@ -403,78 +399,80 @@ void FrontierWindow::update(bool force)
 
     m_drawMutex->lock();
 
-    if (m_root->isDirty(DIRTY_SIZE) || m_root->isDirty(DIRTY_STYLE))
+    bool hasModal = false;
+    for (Layer* layer : m_layers)
     {
-        m_root->calculateSize();
-
-        Size min = m_root->getMinSize();
-        Size max = m_root->getMaxSize();
-
-        Size size = m_size;
-        size.setMax(min);
-        size.setMin(max);
-
-        if (!(m_flags & WINDOW_FULL_SCREEN))
+        if (layer->isModal())
         {
-            m_size = m_root->setSize(size);
+            hasModal = true;
         }
-        else
-        {
-            m_root->setSize(size);
-        }
-
-#if 0
-        log(DEBUG, "update: min=%s, max=%s", min.toString().c_str(), max.toString().c_str());
-        log(DEBUG, "update: Updating window size: %s", m_size.toString().c_str());
-#endif
-
-        m_root->setPosition(0, 0);
-        m_root->layout();
-
-        // Make sure we redraw
-        m_root->setDirty(DIRTY_CONTENT);
-
-        //updateCursor();
     }
 
-    float scale = m_engineWindow->getScaleFactor();
-
-    if (m_surface == NULL || (int)m_surface->getWidth() != (m_size.width * scale) || (int)m_surface->getHeight() != (m_size.height * scale))
+    bool updated = false;
+    for (Layer* layer : m_layers)
     {
-        if (m_surface != NULL)
-        {
-            delete m_surface;
-        }
-
-        if (scale > 1.0)
-        {
-            m_surface = new HighDPISurface(m_size.width, m_size.height, 4);
-        }
-        else
-        {
-            m_surface = new Surface(m_size.width, m_size.height, 4);
-        }
-
-        m_root->setDirty(DIRTY_SIZE | DIRTY_CONTENT, true);
+        updated |= layer->update();
     }
 
-    if (m_root->isDirty() || force)
+    if (updated || force)
     {
-        if (m_root->isDirty(DIRTY_SIZE))
+        Surface* surface = Surface::updateSurface(
+            m_windowSurface,
+            m_rootLayer->getRect().width,
+            m_rootLayer->getRect().height,
+            getScaleFactor());
+
+        if (surface != NULL)
         {
-            m_root->setDirty(DIRTY_SIZE, true);
+            m_windowSurface = surface;
         }
-        m_root->draw(m_surface);
+
+        Rect rootRect = m_rootLayer->getRect();
+        for (Layer* layer : m_layers)
+        {
+            Rect layerRect = layer->getRect();
+            switch (layer->getHorizontalAlign())
+            {
+                case ALIGN_LEFT:
+                    layerRect.x = 0;
+                    break;
+                case ALIGN_CENTER:
+                    layerRect.x = (rootRect.width / 2) - (layerRect.width / 2);
+                    break;
+                case ALIGN_RIGHT:
+                    layerRect.x = rootRect.width - layerRect.width;
+                    break;
+            }
+
+            switch (layer->getVerticalAlign())
+            {
+                case ALIGN_TOP:
+                    layerRect.y = 0;
+                    break;
+                case ALIGN_MIDDLE:
+                    layerRect.y = (rootRect.height / 2) - (layerRect.height / 2);
+                    break;
+                case ALIGN_BOTTOM:
+                    layerRect.y = rootRect.height - layerRect.height;
+                    break;
+            }
+            layer->setRect(layerRect);
+
+            if (layer->isModal())
+            {
+                m_windowSurface->darken();
+            }
+
+            m_windowSurface->blit(layerRect.x, layerRect.y, layer->getSurface(), false);
+        }
 
         m_engineWindow->update();
     }
 
     if (m_dragSurface != NULL)
     {
-        m_surface->blit(m_dragPosition.x, m_dragPosition.y, m_dragSurface);
+        m_windowSurface->blit(m_dragPosition.x, m_dragPosition.y, m_dragSurface);
     }
-
-    m_root->clearDirty();
 
     m_updating = false;
     m_drawMutex->unlock();
@@ -562,7 +560,7 @@ bool FrontierWindow::handleEvent(Event* event)
 
             if (!mouseEvent->direction && m_dragWidget != NULL)
             {
-                Widget* accepted = dragOver(m_dragPosition, m_root, true);
+                Widget* accepted = dragOver(m_dragPosition, m_rootLayer->getContentRoot(), true);
                 if (accepted == NULL)
                 {
                     // No one wanted this widget :(
@@ -580,26 +578,70 @@ bool FrontierWindow::handleEvent(Event* event)
             }
         } // Fall through
         case FRONTIER_EVENT_MOUSE_SCROLL:
+        {
+            MouseEvent* mouseEvent = (MouseEvent*)event;
             updateActive = true;
-            destWidget = m_root->handleEvent(event);
+            int origX = mouseEvent->x;
+            int origY = mouseEvent->y;
+            vector<Layer*>::reverse_iterator rit;
+            for (rit = m_layers.rbegin(); rit != m_layers.rend(); rit++)
+            {
+                Layer* layer = *rit;
+                if (layer->getRect().intersects(origX, origY))
+                {
+                    mouseEvent->x = origX - layer->getRect().x;
+                    mouseEvent->y = origY - layer->getRect().y;
+                    destWidget = layer->getContentRoot()->handleEvent(event);
+                    if (destWidget != NULL)
+                    {
+                        break;
+                    }
+                }
+                if (layer->isModal())
+                {
+                    break;
+                }
+            }
             setMouseOver(destWidget);
-           break;
+        } break;
 
         case FRONTIER_EVENT_MOUSE_MOTION:
-            destWidget = m_root->handleEvent(event);
+        {
+            MouseEvent* mouseEvent = (MouseEvent*)event;
+            int origX = mouseEvent->x;
+            int origY = mouseEvent->y;
+
+            vector<Layer*>::reverse_iterator rit;
+            for (rit = m_layers.rbegin(); rit != m_layers.rend(); rit++)
+            {
+                Layer* layer = *rit;
+                if (layer->getRect().intersects(origX, origY))
+                {
+                    mouseEvent->x = origX - layer->getRect().x;
+                    mouseEvent->y = origY - layer->getRect().y;
+                    destWidget = m_rootLayer->getContentRoot()->handleEvent(event);
+                    if (destWidget != NULL)
+                    {
+                        break;
+                    }
+                }
+                if (layer->isModal())
+                {
+                    break;
+                }
+            }
 
             setMouseOver(destWidget);
             if (m_dragSurface != NULL)
             {
-                MouseEvent* mouseEvent = (MouseEvent*)event;
                 m_dragPosition.x = mouseEvent->x;
                 m_dragPosition.y = mouseEvent->y;
                 forceUpdate = true;
-                dragOver(m_dragPosition, m_root, false);
+                dragOver(m_dragPosition, m_rootLayer->getContentRoot(), false);
             }
 
             updateCursor();
-            break;
+        } break;
 
         case FRONTIER_EVENT_KEY:
             if (m_activeWidget != NULL)
@@ -611,7 +653,7 @@ bool FrontierWindow::handleEvent(Event* event)
                 KeyEvent* keyEvent = (KeyEvent*)event;
                 if (keyEvent->direction && keyEvent->key == KC_TAB)
                 {
-                    m_root->activateNext(NULL);
+                    m_rootLayer->getContentRoot()->activateNext(NULL);
                 }
             }
             break;
@@ -628,7 +670,7 @@ bool FrontierWindow::handleEvent(Event* event)
         }
     }
 
-    bool updateRequired = m_root->isDirty();
+    bool updateRequired = m_rootLayer->getContentRoot()->isDirty();
     if (destWidget != NULL || updateRequired || updateActive || forceUpdate)
     {
         if (updateActive &&
@@ -677,5 +719,34 @@ Vector2D FrontierWindow::getScreenPosition(Vector2D pos)
     screenPos += pos;
 
     return screenPos;
+}
+
+void FrontierWindow::addLayer(Layer* layer)
+{
+    m_layers.push_back(layer);
+    layer->setWindow(this);
+    layer->incRefCount();
+
+    Widget* root = layer->getContentRoot();
+    root->setDirty();
+    root->setWidgetClass(L"root");
+    m_rootLayer->getContentRoot()->setDirty(DIRTY_CONTENT);
+
+    requestUpdate();
+}
+
+void FrontierWindow::removeLayer(Layer* layer)
+{
+    vector<Layer*>::iterator it = find(m_layers.begin(), m_layers.end(), layer);
+    if (it == m_layers.end())
+    {
+        return;
+    }
+
+    m_layers.erase(it);
+
+    m_rootLayer->getContentRoot()->setDirty(DIRTY_CONTENT);
+
+    requestUpdate();
 }
 

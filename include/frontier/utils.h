@@ -158,6 +158,11 @@ struct Rect
         height = _height;
     }
 
+    Size getSize()
+    {
+        return Size(width, height);
+    }
+
     bool intersects(int _x, int _y)
     {
         return (_x >= x && _y >= y && _x < (x + width) && _y < (y + height));

@@ -32,6 +32,7 @@
 #include <geek/gfx-surface.h>
 #include <geek/fonts.h>
 
+#include <frontier/types.h>
 #include <frontier/utils.h>
 #include <frontier/events.h>
 #include <frontier/theme.h>

@@ -10,6 +10,7 @@ list(APPEND libfrontier_srcs
     contextmenu.cpp
     icon.cpp
     object.cpp
+    layer.cpp
     utils.cpp
     engines/test/test_engine.cpp
     engines/embedded/embedded_window.cpp
