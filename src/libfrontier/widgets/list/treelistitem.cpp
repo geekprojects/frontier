@@ -96,7 +96,6 @@ void TreeListItem::layout()
     int y = m_titleHeight;
     if (m_open)
     {
-        vector<Widget*>::iterator it;
         for (Widget* item : m_children)
         {
             Size itemMin = item->getMinSize();
@@ -134,10 +133,8 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
 
     if (m_open)
     {
-        vector<Widget*>::iterator it;
-        for (it = m_children.begin(); it != m_children.end(); it++)
+        for (Widget* item : m_children)
         {
-            Widget* item = *it;
 #if 0
             log(DEBUG, "draw: item: %d, %d size=%d,%d", item->getX(), item->getY(), item->getWidth(), item->getHeight());
 #endif
@@ -185,10 +182,8 @@ Widget* TreeListItem::handleEvent(Frontier::Event* event)
             int x = mouseEvent->x;
             int y = mouseEvent->y;
 
-            vector<Widget*>::iterator it;
-            for (it = m_children.begin(); it != m_children.end(); it++)
+            for (Widget* child : m_children)
             {
-                Widget* child = *it;
                 if (child->intersects(x, y))
                 {
                     return child->handleEvent(event);
