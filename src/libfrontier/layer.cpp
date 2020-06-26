@@ -3,9 +3,10 @@
 #include <frontier/widgets.h>
 
 using namespace Frontier;
+using namespace Geek;
 using namespace Geek::Gfx;
 
-Layer::Layer(FrontierApp* app, bool primary)
+Layer::Layer(FrontierApp* app, bool primary) : Logger(L"Layer")
 {
     m_app = app;
     m_primary = primary;
@@ -79,8 +80,8 @@ bool Layer::update()
             if (!m_window->isFullScreen())
             {
                 size = m_root->setSize(size);
-m_rect.width = size.width;
-m_rect.height = size.height;
+                m_rect.width = size.width;
+                m_rect.height = size.height;
             }
             else
             {
@@ -90,8 +91,8 @@ m_rect.height = size.height;
         else
         {
             m_root->setSize(min);
-m_rect.width = min.width;
-m_rect.height = min.height;
+            m_rect.width = min.width;
+            m_rect.height = min.height;
         }
 
 #if 0
@@ -109,7 +110,7 @@ m_rect.height = min.height;
     }
 
     Surface* surface = Surface::updateSurface(m_surface, m_rect.width, m_rect.height, scale);
-    if (surface != NULL)
+    if (surface != m_surface)
     {
         m_surface = surface;
         m_root->setDirty(DIRTY_SIZE | DIRTY_CONTENT, true);

@@ -32,7 +32,7 @@ namespace Frontier {
 class Widget;
 class FrontierWindow;
 
-class Layer : public FrontierObject
+class Layer : public FrontierObject, Geek::Logger
 {
  private:
     FrontierApp* m_app;

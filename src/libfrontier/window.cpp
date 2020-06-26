@@ -414,7 +414,7 @@ void FrontierWindow::update(bool force)
             m_rootLayer->getRect().height,
             getScaleFactor());
 
-        if (surface != NULL)
+        if (surface != m_windowSurface)
         {
             m_windowSurface = surface;
         }
