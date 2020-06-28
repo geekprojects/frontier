@@ -100,6 +100,17 @@ void Widget::layout()
 {
 }
 
+void Widget::setPosition(int x, int y)
+{
+    if (m_position.x != x || m_position.y != y)
+    {
+        // We will need to redraw the new position!
+        setDirty(DIRTY_CONTENT, true);
+        m_position.x = x;
+        m_position.y = y;
+    }
+}
+
 Size Widget::setSize(Size size)
 {
     // Clip the specified size to our min/max

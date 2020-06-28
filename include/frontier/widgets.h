@@ -197,7 +197,7 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual std::vector<Widget*> getChildren() { return m_children; }
 
     /// Return whether this Widget contains any children
-    virtual bool hasChildren() { return !m_children.empty(); }
+    virtual bool hasChildren() { return !(getChildren().empty()); }
 
     /// Calculate the minimum and maximum size this Widget can be
     virtual void calculateSize();
@@ -209,7 +209,7 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual bool draw(Geek::Gfx::Surface* surface);
 
     /// Set the position of the widget relative to it's parent Widget. Should only used by layout()
-    void setPosition(int x, int y) { m_position.x = x; m_position.y = y; }
+    void setPosition(int x, int y);
 
     /// Set the size of the widget. Should only used by layout()
     Frontier::Size setSize(Frontier::Size size);
