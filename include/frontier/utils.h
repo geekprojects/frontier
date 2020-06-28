@@ -1,6 +1,6 @@
 /*
  * Frontier - A toolkit for creating simple OS-independent user interfaces
- * Copyright (C) 2018 Ian Parker <ian@geekprojects.com>
+ * Copyright (C) 2018,2020 Ian Parker <ian@geekprojects.com>
  *
  * This file is part of Frontier.
  *
