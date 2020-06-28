@@ -101,7 +101,6 @@ bool Layer::update()
 #endif
 
         m_root->setPosition(0, 0);
-        m_root->layout();
 
         // Make sure we redraw
         m_root->setDirty(DIRTY_CONTENT);
