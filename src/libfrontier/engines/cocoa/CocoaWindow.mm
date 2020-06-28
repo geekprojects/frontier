@@ -109,14 +109,14 @@ using namespace Geek;
 
     if (m_image != NULL)
     {
-        CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext]     graphicsPort];
+        CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
         if (context==nil) {
             NSLog(@"context failed");
             return;
         }
 
-        float width = [self frame].size.width;// / 2;
-        float height = [self frame].size.height;// / 2;
+        float width = [self frame].size.width;
+        float height = [self frame].size.height;
         CGRect renderRect = CGRectMake(0., 0., width, height);
 
         CGContextDrawImage(context, renderRect, m_image);
@@ -125,6 +125,11 @@ using namespace Geek;
 
 - (void)setImage:(CGImageRef)image
 {
+    if (image == NULL || image == m_image)
+    {
+        return;
+    }
+
     if (m_image != NULL)
     {
         CGImageRelease(m_image);
@@ -392,7 +397,10 @@ using namespace Geek;
 
 CocoaWindow::CocoaWindow(FrontierEngine* engine, FrontierWindow* window) : FrontierEngineWindow(engine, window)
 {
+    m_cocoaDataProviderSurface = NULL;
     m_cocoaDataProvider = NULL;
+    m_cocoaColourSpace = NULL;
+    m_cocoaDataProviderSize.set(0, 0);
 }
 
 CocoaWindow::~CocoaWindow()
@@ -461,6 +469,9 @@ bool CocoaWindow::createCocoaWindow()
     FrontierView* view = [[FrontierView alloc] initWithFrame:rect];
     [view setAcceptsTouchEvents:YES];
     m_cocoaView = view;
+    [view setEngineWindow: this];
+
+
     [[window contentView] addSubview: view];
     [window makeFirstResponder: view];
 
@@ -541,30 +552,40 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
     int height = surface->getHeight();
 
 #if 0
-    printf("CocoaWindow::drawSurface: width=%d, height=%d, highDPI=%d\n", width, height, surface->isHighDPI());
+    log(DEBUG, "drawSurface: width=%d (%d), height=%d, len=%d", width, width * 4, height, len);
 #endif
 
     int len = width * height * 4;
 
     // Create a CGImage with the pixel data
-    CGDataProviderRef provider = (CGDataProviderRef)m_cocoaDataProvider;
     CGColorSpaceRef colorspace = (CGColorSpaceRef)m_cocoaColourSpace;
-    if (m_cocoaDataProvider == NULL || m_cocoaDataProviderSurface != surface)
+    if (colorspace != NULL)
+    {
+        colorspace = (CGColorSpaceRef)m_cocoaColourSpace;
+    }
+    else
+    {
+        colorspace = CGColorSpaceCreateDeviceRGB();
+        m_cocoaColourSpace = colorspace;
+    }
+
+    CGDataProviderRef provider = (CGDataProviderRef)m_cocoaDataProvider;
+    if (m_cocoaDataProvider == NULL ||
+        m_cocoaDataProviderSurface != surface ||
+        m_cocoaDataProviderSize.width != width ||
+        m_cocoaDataProviderSize.height != height)
     {
         if (m_cocoaDataProvider != NULL)
         {
             CGDataProviderRelease(provider);
-            CGColorSpaceRelease(colorspace);
         }
-
         provider = CGDataProviderCreateWithData(NULL, surface->getData(), len, releaseCGData);
-        m_cocoaDataProvider = provider;
         CGDataProviderRetain(provider);
 
-        colorspace = CGColorSpaceCreateDeviceRGB();
-        m_cocoaColourSpace = colorspace;
-
+        m_cocoaDataProvider = provider;
         m_cocoaDataProviderSurface = surface;
+        m_cocoaDataProviderSize.width = width;
+        m_cocoaDataProviderSize.height = height;
     }
 
     CGImageRef image = CGImageCreate(
@@ -579,6 +600,10 @@ bool CocoaWindow::drawSurface(Geek::Gfx::Surface* surface)
         NULL,
         true,
         kCGRenderingIntentDefault);
+    if (image == NULL)
+    {
+        log(ERROR, "drawSurface: FAILED to create image! width=%d, height=%d, colorspace=%p", width, height, colorspace);
+    }
 
     FrontierView* view = (FrontierView*)m_cocoaView;
     [view setImage: image];

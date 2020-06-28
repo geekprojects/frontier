@@ -34,6 +34,8 @@ class CocoaWindow : public FrontierEngineWindow
     void* m_cocoaDataProvider;
     void* m_cocoaColourSpace;
 
+    Frontier::Size m_cocoaDataProviderSize;
+
     bool createCocoaWindow();
     bool drawSurface(Geek::Gfx::Surface* surface);
 
