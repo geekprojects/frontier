@@ -385,6 +385,11 @@ void Frame::layout()
 
         majorPos += childMajor + boxModel.paddingTop;
 
+        if (isDirty(DIRTY_SIZE))
+        {
+            child->setDirty(DIRTY_CONTENT, true);
+        }
+
         child->layout();
     }
 }
