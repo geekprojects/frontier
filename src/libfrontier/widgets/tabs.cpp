@@ -363,6 +363,11 @@ void Tabs::clearDirty()
     {
         tab->clearDirty();
     }
+
+    if (m_activeTab != NULL)
+    {
+        m_activeTab->clearDirty();
+    }
 }
 
 bool Tabs::draw(Surface* surface)
@@ -522,9 +527,14 @@ vector<Widget*> Tabs::getChildren()
 {
     vector<Widget*> children;
 
-    if (m_activeTab)
+    if (m_activeTab != NULL)
     {
         children.push_back(m_activeTab->getContent());
+    }
+
+    for (Tab* tab : m_tabs)
+    {
+        children.push_back(tab);
     }
 
     return children;
