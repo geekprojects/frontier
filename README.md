@@ -10,7 +10,7 @@ Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch
 * Very simple to use
 * Small
 * Styling and customisation using CSS
-* SDL, native MacOS (Cocoa) and OpenGL engines
+* SDL, native MacOS (Cocoa), X11 and OpenGL engines
 * sigc++ event handlers
 * High DPI support
 * Embeddable in to other applications (Games etc)
@@ -22,6 +22,7 @@ Frontier [![Build Status](https://travis-ci.org/geekprojects/frontier.svg?branch
 * freetype 2
 * libsigc++ 2.0
 * SDL (For the SDL engine)
+* X11 (For the X11 engine)
 * OpenGL (For OpenGL embedding)
 
 ##### Ubuntu

@@ -52,6 +52,13 @@ if (ENGINE MATCHES Cocoa)
     )
     add_definitions(-DFRONTIER_ENGINE_COCOA -Wno-deprecated-declarations)
     set(ENGINE_LIBRARIES "-framework AppKit")
+elseif (ENGINE MATCHES X11)
+    list(APPEND libfrontier_srcs
+        engines/x11/x11_engine.cpp
+        engines/x11/x11_window.cpp
+    )
+    add_definitions(-DFRONTIER_ENGINE_X11 -I${X11_INCLUDE_DIR})
+    set(ENGINE_LIBRARIES ${X11_LIBRARIES})
 elseif (ENGINE MATCHES SDL)
     list(APPEND libfrontier_srcs
         engines/sdl/sdl_engine.cpp

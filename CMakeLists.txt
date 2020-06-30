@@ -46,6 +46,8 @@ include_directories(
     ${ANTLR4_INCLUDE}
 )
 
+include(FindX11)
+
 # Engines
 if (NOT ENGINE)
     message(STATUS "Choosing engine for system: ${CMAKE_SYSTEM_NAME}")
@@ -62,6 +64,10 @@ message(STATUS "Engine: ${ENGINE}")
 
 if(ENGINE MATCHES "Cocoa")
 
+elseif(ENGINE MATCHES "X11")
+    if (NOT X11_FOUND)
+        message(FATAL_ERROR "X11 Engine requested but X11 hasn't been found")
+    endif()
 elseif(ENGINE MATCHES "SDL")
     pkg_check_modules(sdl2 REQUIRED sdl2)
 endif()
