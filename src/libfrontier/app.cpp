@@ -22,6 +22,7 @@
 #include <frontier/frontier.h>
 #include <frontier/contextmenu.h>
 #include <sys/time.h>
+#include <signal.h>
 
 #include <typeinfo>
 
@@ -43,6 +44,13 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Core;
 
+static FrontierApp* g_app = NULL;
+
+static void sigintHandler(int sig, siginfo_t* siginfo, void* context)
+{
+   g_app->quit(true);
+}
+
 FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
 {
     m_activeWindow = NULL;
@@ -54,6 +62,21 @@ FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
     m_fontManager = NULL;
 
     m_appMenu = NULL;
+
+    if (g_app == NULL)
+    {
+        struct sigaction act;
+        memset (&act, 0, sizeof(act));
+        act.sa_sigaction = sigintHandler;
+        act.sa_flags = SA_SIGINFO;
+        sigaction(SIGINT, &act, 0);
+    }
+    else
+    {
+        log(ERROR, "FrontierApp: There is more than one FrontierApp!");
+    }
+
+    g_app = this;
 }
 
 FrontierApp::~FrontierApp()
@@ -86,6 +109,7 @@ FrontierApp::~FrontierApp()
         log(Geek::DEBUG, "~FrontierApp: Leaked object %p: type=%s references=%d", obj, typeid(*obj).name(), obj->getRefCount());
     }
 
+    g_app = NULL;
 }
 
 void FrontierApp::setEngine(FrontierEngine* engine)
@@ -286,9 +310,9 @@ bool FrontierApp::main()
     }
 }
 
-bool FrontierApp::quit()
+bool FrontierApp::quit(bool force)
 {
-    return m_engine->quit();
+    return m_engine->quit(force);
 }
 
 void FrontierApp::update()

@@ -101,7 +101,7 @@ bool CocoaEngine::checkEvents()
     return run();
 }
 
-bool CocoaEngine::quit()
+bool CocoaEngine::quit(bool force)
 {
     NSApplication* app = (NSApplication*)m_application;
 

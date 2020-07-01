@@ -53,7 +53,7 @@ class CocoaEngine : public FrontierEngine
 
     virtual bool checkEvents();
 
-    virtual bool quit();
+    virtual bool quit(bool force = false);
 
     virtual std::string getConfigDir();
 

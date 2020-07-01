@@ -53,7 +53,7 @@ class FrontierEngine : public Geek::Logger
 
     virtual bool checkEvents();
 
-    virtual bool quit();
+    virtual bool quit(bool force = false);
 
     virtual std::string getConfigDir();
 

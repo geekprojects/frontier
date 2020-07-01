@@ -51,7 +51,7 @@ bool FrontierEngine::checkEvents()
     return false;
 }
 
-bool FrontierEngine::quit()
+bool FrontierEngine::quit(bool force)
 {
     log(WARN, "quit: Quit requested");
 

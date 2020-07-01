@@ -158,7 +158,7 @@ class FrontierApp : public Geek::Logger
     virtual bool main();
 
     /// Request that the app should quit
-    virtual bool quit();
+    virtual bool quit(bool force = false);
 
     /// Cause all Windows to be updated and redrawn
     void update();
