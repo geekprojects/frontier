@@ -55,6 +55,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     m_updateTimestamp = 0;
     m_drawMutex = Geek::Thread::createMutex();
     m_updating = false;
+    m_compositeSurface = false;
     m_windowSurface = NULL;
 
     m_menuBar = NULL;
@@ -406,17 +407,39 @@ void FrontierWindow::update(bool force)
         updated |= layer->update();
     }
 
+    if (m_layers.size() > 1)
+    {
+        if (!m_compositeSurface)
+        {
+            log(DEBUG, "update: Starting composite surface");
+        }
+        m_compositeSurface = true;
+    }
+    else
+    {
+        if (m_compositeSurface && m_windowSurface != NULL)
+        {
+            log(DEBUG, "update: Stopping composite surface");
+            delete m_windowSurface;
+            updated = true;
+        }
+        m_compositeSurface = false;
+    }
+
     if (updated || force)
     {
-        Surface* surface = Surface::updateSurface(
-            m_windowSurface,
-            m_rootLayer->getRect().width,
-            m_rootLayer->getRect().height,
-            getScaleFactor());
-
-        if (surface != m_windowSurface)
+        if (m_compositeSurface)
         {
-            m_windowSurface = surface;
+            Surface* surface = Surface::updateSurface(
+                m_windowSurface,
+                m_rootLayer->getRect().width,
+                m_rootLayer->getRect().height,
+                getScaleFactor());
+
+            if (surface != m_windowSurface)
+            {
+                m_windowSurface = surface;
+            }
         }
 
         Rect rootRect = m_rootLayer->getRect();
@@ -455,7 +478,14 @@ void FrontierWindow::update(bool force)
                 m_windowSurface->darken();
             }
 
-            m_windowSurface->blit(layerRect.x, layerRect.y, layer->getSurface(), false);
+            if (m_compositeSurface)
+            {
+                m_windowSurface->blit(layerRect.x, layerRect.y, layer->getSurface(), false);
+            }
+            else
+            {
+                m_windowSurface = layer->getSurface();
+            }
         }
 
         m_engineWindow->update();
