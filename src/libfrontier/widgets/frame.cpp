@@ -387,7 +387,7 @@ void Frame::layout()
 
         if (isDirty(DIRTY_SIZE))
         {
-            child->setDirty(DIRTY_CONTENT, true);
+            child->setDirty(DIRTY_CONTENT | DIRTY_SIZE, true);
         }
 
         child->layout();

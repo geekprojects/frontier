@@ -105,7 +105,7 @@ void Widget::setPosition(int x, int y)
     if (m_position.x != x || m_position.y != y)
     {
         // We will need to redraw the new position!
-        setDirty(DIRTY_CONTENT, true);
+        setDirty(DIRTY_CONTENT | DIRTY_SIZE, true);
         m_position.x = x;
         m_position.y = y;
     }

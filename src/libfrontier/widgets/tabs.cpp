@@ -463,7 +463,7 @@ Widget* Tabs::handleEvent(Event* event)
                         if (mouseButtonEvent->direction)
                         {
                             m_collapsed = !m_collapsed;
-                            setDirty();
+                            setDirty(DIRTY_CONTENT | DIRTY_STYLE);
                         }
                         if (m_collapsed)
                         {
@@ -676,7 +676,7 @@ void Tabs::setActiveTab(Tab* tab)
     m_activeTab->setSelected();
     m_activeTab->setDirty(DIRTY_ALL, true);
 
-    setDirty(DIRTY_ALL, false);
+    setDirty(DIRTY_CONTENT | DIRTY_SIZE, false);
 
     m_changeTabSignal.emit(m_activeTab->getContent());
 }
@@ -698,7 +698,7 @@ void Tabs::setActiveTab(Widget* tabContent)
             m_activeTab->setSelected();
             m_activeTab->setDirty(DIRTY_ALL, true);
 
-            setDirty();
+            setDirty(DIRTY_CONTENT | DIRTY_SIZE);
             return;
         }
         i++;
@@ -750,9 +750,7 @@ void Tabs::nextTab()
         idx = 0;
     }
 
-    m_activeTab = m_tabs[idx];
-
-    setDirty();
+    setActiveTab(m_tabs[idx]);
 }
 
 void Tabs::prevTab()
