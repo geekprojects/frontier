@@ -412,6 +412,7 @@ void FrontierWindow::update(bool force)
         if (!m_compositeSurface)
         {
             log(DEBUG, "update: Starting composite surface");
+            m_windowSurface = NULL;
         }
         m_compositeSurface = true;
     }
@@ -473,13 +474,12 @@ void FrontierWindow::update(bool force)
             }
             layer->setRect(layerRect);
 
-            if (layer->isModal())
-            {
-                m_windowSurface->darken();
-            }
-
             if (m_compositeSurface)
             {
+                if (layer->isModal())
+                {
+                    m_windowSurface->darken();
+                }
                 m_windowSurface->blit(layerRect.x, layerRect.y, layer->getSurface(), false);
             }
             else
