@@ -40,6 +40,7 @@ class CssParser : public Geek::Logger
     virtual ~CssParser();
 
     bool parse(std::string path);
+    bool parseString(std::string str);
 };
 
 };

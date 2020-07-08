@@ -124,6 +124,7 @@ class StyleEngine : public Geek::Logger
     bool init();
 
     bool parse(std::string path);
+    bool parseString(std::string css);
 
     void addRule(StyleRule* rule);
     StyleRule* findByKey(std::string key);

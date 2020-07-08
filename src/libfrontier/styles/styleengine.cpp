@@ -86,6 +86,24 @@ bool StyleEngine::parse(std::string path)
     return true;
 }
 
+bool StyleEngine::parseString(std::string str)
+{
+    bool res;
+    res = m_parser->parseString(str);
+    if (!res)
+    {
+        return false;
+    }
+
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    m_timestamp = tv.tv_sec * 1000l;
+    m_timestamp += tv.tv_usec / 1000l;
+
+    return true;
+}
+
+
 StyleRule* StyleEngine::findByKey(std::string key)
 {
     return NULL;

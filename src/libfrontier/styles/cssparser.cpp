@@ -592,3 +592,20 @@ bool CssParser::parse(std::string path)
     return true;
 }
 
+bool CssParser::parseString(std::string str)
+{
+    log(DEBUG, "Parsing string");
+
+    ANTLRInputStream* stream = new ANTLRInputStream(str);
+
+    css3Lexer lexer(stream);
+    CommonTokenStream tokens(&lexer);
+    css3Parser parser(&tokens);
+
+    tree::ParseTree *tree = parser.stylesheet();
+    RuleSetListener listener(m_styleEngine);
+    tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+
+    return true;
+}
+
