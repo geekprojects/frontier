@@ -72,7 +72,6 @@ bool OpenGLEngineWindow::update()
     {
         if (m_textureSurface != NULL)
         {
-            log(DEBUG, "update: Recreating surface: %d, %d != %d, %d",  m_textureSurface->getWidth(), m_textureSurface->getHeight(), textureWidth, textureHeight);
             delete m_textureSurface;
         }
         m_textureSurface = new Surface(textureWidth, textureHeight, 4);
@@ -118,7 +117,6 @@ bool OpenGLEngineWindow::update()
     for (OpenGLDirectWidget* widget: m_directWidgets)
     {
         Widget* fwidget = dynamic_cast<Widget*>(widget);
-        log(DEBUG, "update: fwidget=%p, visible=%d", fwidget, fwidget->isVisible());
         if (fwidget->isVisible())
         {
             widget->directDraw();

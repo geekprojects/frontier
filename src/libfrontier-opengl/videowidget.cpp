@@ -193,7 +193,6 @@ void VideoWidget::directBeforeDraw()
     size.height -= boxModel.getHeight();
     size.width *= scale;
     size.height *= scale;
-    log(DEBUG, "directBeforeDraw: Size: %d, %d", size.width, size.height);
 
     unsigned int textureWidth = powerOfTwo(size.width * scale);
     unsigned int textureHeight = powerOfTwo(size.height * scale);
@@ -296,7 +295,6 @@ void VideoWidget::directDraw()
 
     //position.y = (screenSize.height * 2) - position.y;
 
-    log(DEBUG, "drawDirect: %d, %d", position.x, position.y);
 #else
     Vector2D position(1, 1);
 #endif
