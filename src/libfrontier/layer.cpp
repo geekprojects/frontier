@@ -84,6 +84,8 @@ bool Layer::update()
 {
     float scale = m_window->getScaleFactor();
 
+    m_root->setWindow(m_window);
+
     if (m_root->isDirty(DIRTY_SIZE) || m_root->isDirty(DIRTY_STYLE))
     {
         m_root->calculateSize();

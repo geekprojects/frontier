@@ -752,6 +752,7 @@ void FrontierWindow::addLayer(Layer* layer)
     Widget* root = layer->getContentRoot();
     root->setDirty();
     root->setWidgetClass(L"root");
+    root->setWindow(this);
     m_rootLayer->getContentRoot()->setDirty(DIRTY_CONTENT);
 
     requestUpdate();
