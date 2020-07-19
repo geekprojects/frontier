@@ -50,6 +50,12 @@ class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
 class FrontierEngineSDL : public Frontier::FrontierEngine
 {
  private:
+
+    std::map<uint32_t, uint32_t> m_keycodeTable;
+
+    int m_lastMotion;
+    int m_lastMouseX;
+    int m_lastMouseY;
     std::string m_lastText;
     
     Frontier::KeyEvent* m_keyDownEvent;
@@ -62,6 +68,8 @@ class FrontierEngineSDL : public Frontier::FrontierEngine
 
     bool init();
     bool initWindow(Frontier::FrontierWindow* window);
+
+    bool quit(bool force = false);
 
     virtual bool checkEvents();
 

@@ -25,10 +25,9 @@ using namespace std;
 using namespace Geek;
 using namespace Frontier;
 
-#define SDLK_SCANCODE_MASK (1<<30)
-
 FrontierEngineSDL::FrontierEngineSDL(FrontierApp* app) : FrontierEngine(app)
 {
+    m_lastMotion = 0;
     m_lastText = "";
     m_keyDownEvent = NULL;
 }
@@ -48,6 +47,98 @@ bool FrontierEngineSDL::init()
     }
 
     m_redrawWindowEvent = SDL_RegisterEvents(1);
+
+    int i;
+    for (i = 32; i < 128; i++)
+    {
+        m_keycodeTable.insert(make_pair(i, i));
+    }
+    m_keycodeTable.insert(make_pair(SDLK_BACKSPACE, KC_BACKSPACE));
+    m_keycodeTable.insert(make_pair(SDLK_TAB, KC_TAB));
+    //m_keycodeTable.insert(make_pair(, KC_LINEFEED));
+    m_keycodeTable.insert(make_pair(SDLK_CLEAR, KC_CLEAR));
+    m_keycodeTable.insert(make_pair(SDLK_RETURN, KC_RETURN));
+    m_keycodeTable.insert(make_pair(SDLK_PAUSE, KC_PAUSE));
+    m_keycodeTable.insert(make_pair(SDLK_SCROLLLOCK, KC_SCROLL_LOCK));
+    m_keycodeTable.insert(make_pair(SDLK_SYSREQ, KC_SYS_REQ));
+    m_keycodeTable.insert(make_pair(SDLK_ESCAPE, KC_ESCAPE));
+    m_keycodeTable.insert(make_pair(SDLK_DELETE, KC_DELETE));
+    m_keycodeTable.insert(make_pair(SDLK_HOME, KC_HOME));
+    m_keycodeTable.insert(make_pair(SDLK_LEFT, KC_LEFT));
+    m_keycodeTable.insert(make_pair(SDLK_UP, KC_UP));
+    m_keycodeTable.insert(make_pair(SDLK_RIGHT, KC_RIGHT));
+    m_keycodeTable.insert(make_pair(SDLK_DOWN, KC_DOWN));
+    m_keycodeTable.insert(make_pair(SDLK_PRIOR, KC_PRIOR));
+    m_keycodeTable.insert(make_pair(SDLK_PAGEUP, KC_PAGE_UP));
+    //m_keycodeTable.insert(make_pair(, KC_NEXT));
+    m_keycodeTable.insert(make_pair(SDLK_PAGEDOWN, KC_PAGE_DOWN));
+    m_keycodeTable.insert(make_pair(SDLK_END, KC_END));
+    //m_keycodeTable.insert(make_pair(, KC_BEGIN));
+    m_keycodeTable.insert(make_pair(SDLK_SELECT, KC_SELECT));
+    m_keycodeTable.insert(make_pair(SDLK_PRINTSCREEN, KC_PRINT_SCREEN));
+    m_keycodeTable.insert(make_pair(SDLK_EXECUTE, KC_EXECUTE));
+    m_keycodeTable.insert(make_pair(SDLK_INSERT, KC_INSERT));
+    m_keycodeTable.insert(make_pair(SDLK_UNDO, KC_UNDO));
+    //m_keycodeTable.insert(make_pair(, KC_REDO));
+    //m_keycodeTable.insert(make_pair(, KC_MENU));
+    m_keycodeTable.insert(make_pair(SDLK_FIND, KC_FIND));
+    m_keycodeTable.insert(make_pair(SDLK_CANCEL, KC_CANCEL));
+    m_keycodeTable.insert(make_pair(SDLK_HELP, KC_HELP));
+    //m_keycodeTable.insert(make_pair(, KC_BREAK));
+    m_keycodeTable.insert(make_pair(SDLK_MODE, KC_MODE_SWITCH));
+    //m_keycodeTable.insert(make_pair(, KC_SCRIPT_SWITCH));
+    //m_keycodeTable.insert(make_pair(, KC_NUM_LOCK));
+
+    m_keycodeTable.insert(make_pair(SDLK_KP_SPACE, KC_KP_SPACE));
+    m_keycodeTable.insert(make_pair(SDLK_KP_TAB, KC_KP_TAB));
+    m_keycodeTable.insert(make_pair(SDLK_KP_ENTER, KC_KP_ENTER));
+    //m_keycodeTable.insert(make_pair(, KC_KP_F1));
+    //m_keycodeTable.insert(make_pair(, KC_KP_F2));
+    //m_keycodeTable.insert(make_pair(, KC_KP_F3));
+    //m_keycodeTable.insert(make_pair(, KC_KP_F4));
+    //m_keycodeTable.insert(make_pair(, KC_KP_HOME;
+    //m_keycodeTable.insert(make_pair(, KC_KP_LEFT));
+    //m_keycodeTable.insert(make_pair(, KC_KP_UP));
+    //m_keycodeTable.insert(make_pair(, KC_KP_RIGHT));
+    //m_keycodeTable.insert(make_pair(, KC_KP_DOWN));
+    //m_keycodeTable.insert(make_pair(, KC_KP_PRIOR));
+    //m_keycodeTable.insert(make_pair(, KC_KP_PAGE_UP));
+    //m_keycodeTable.insert(make_pair(, KC_KP_NEXT));
+    //m_keycodeTable.insert(make_pair(, KC_KP_PAGE_DOWN));
+    //m_keycodeTable.insert(make_pair(, KC_KP_END));
+    //m_keycodeTable.insert(make_pair(, KC_KP_BEGIN));
+    //m_keycodeTable.insert(make_pair(, KC_KP_INSERT));
+    //m_keycodeTable.insert(make_pair(, KC_KP_DELETE));
+    m_keycodeTable.insert(make_pair(SDLK_KP_EQUALS, KC_KP_EQUAL));
+    m_keycodeTable.insert(make_pair(SDLK_KP_MULTIPLY, KC_KP_MULTIPLY));
+    m_keycodeTable.insert(make_pair(SDLK_KP_PLUS, KC_KP_ADD));
+    m_keycodeTable.insert(make_pair(SDLK_KP_COMMA, KC_KP_COMMA));
+    m_keycodeTable.insert(make_pair(SDLK_KP_MINUS, KC_KP_SUBTRACT));
+    m_keycodeTable.insert(make_pair(SDLK_KP_DECIMAL, KC_KP_DECIMAL));
+    m_keycodeTable.insert(make_pair(SDLK_KP_DIVIDE, KC_KP_DIVIDE));
+    m_keycodeTable.insert(make_pair(SDLK_KP_0, KC_KP_0));
+    m_keycodeTable.insert(make_pair(SDLK_KP_1, KC_KP_1));
+    m_keycodeTable.insert(make_pair(SDLK_KP_2, KC_KP_2));
+    m_keycodeTable.insert(make_pair(SDLK_KP_3, KC_KP_3));
+    m_keycodeTable.insert(make_pair(SDLK_KP_4, KC_KP_4));
+    m_keycodeTable.insert(make_pair(SDLK_KP_5, KC_KP_5));
+    m_keycodeTable.insert(make_pair(SDLK_KP_6, KC_KP_6));
+    m_keycodeTable.insert(make_pair(SDLK_KP_7, KC_KP_7));
+    m_keycodeTable.insert(make_pair(SDLK_KP_8, KC_KP_8));
+    m_keycodeTable.insert(make_pair(SDLK_KP_8, KC_KP_9));
+
+    m_keycodeTable.insert(make_pair(SDLK_F1, KC_F1));
+    m_keycodeTable.insert(make_pair(SDLK_F2, KC_F2));
+    m_keycodeTable.insert(make_pair(SDLK_F3, KC_F3));
+    m_keycodeTable.insert(make_pair(SDLK_F4, KC_F4));
+    m_keycodeTable.insert(make_pair(SDLK_F5, KC_F5));
+    m_keycodeTable.insert(make_pair(SDLK_F6, KC_F6));
+    m_keycodeTable.insert(make_pair(SDLK_F7, KC_F7));
+    m_keycodeTable.insert(make_pair(SDLK_F8, KC_F8));
+    m_keycodeTable.insert(make_pair(SDLK_F9, KC_F9));
+    m_keycodeTable.insert(make_pair(SDLK_F10, KC_F10));
+    m_keycodeTable.insert(make_pair(SDLK_F11, KC_F11));
+    m_keycodeTable.insert(make_pair(SDLK_F12, KC_F12));
 
     return true;
 }
@@ -129,6 +220,28 @@ bool FrontierEngineSDL::checkEvents()
             mouseButtonEvent->y = event.button.y;
             log(DEBUG, "checkEvents: few=%p, x=%d, y=%d", few, mouseButtonEvent->x, mouseButtonEvent->y);
             few->getWindow()->handleEvent(mouseButtonEvent);
+            m_lastMouseX = event.button.x;
+            m_lastMouseY = event.button.y;
+        } break;
+
+        case SDL_MOUSEWHEEL:
+        {
+            FrontierEngineWindowSDL* few = getWindow(event.wheel.windowID);
+            if (few == NULL)
+            {
+                return true;
+            }
+
+            Frontier::MouseScrollEvent* mouseScrollEvent = new Frontier::MouseScrollEvent();
+            mouseScrollEvent->eventType = FRONTIER_EVENT_MOUSE_SCROLL;
+
+            mouseScrollEvent->x = m_lastMouseX;
+            mouseScrollEvent->y = m_lastMouseY;
+            mouseScrollEvent->scrollX = event.wheel.x * 2;
+            mouseScrollEvent->scrollY = event.wheel.y * 2;
+
+            few->getWindow()->handleEvent(mouseScrollEvent);
+
         } break;
 
 #if SDL_VERSION_ATLEAST(2, 0, 12)
@@ -151,16 +264,29 @@ bool FrontierEngineSDL::checkEvents()
             mouseButtonEvent->y = (uint32_t)(event.tfinger.y * (float)few->getWindow()->getSize().height);
             log(DEBUG, "checkEvents: SDL_FINGERx: few=%p, %0.2f, %0.2f -> x=%d, y=%d", few, event.tfinger.x, event.tfinger.y, mouseButtonEvent->x, mouseButtonEvent->y);
             few->getWindow()->handleEvent(mouseButtonEvent);
+
+            m_lastMouseX = mouseButtonEvent->x;
+            m_lastMouseY = mouseButtonEvent->y;
         } break;
 #endif
 
         case SDL_MOUSEMOTION:
         {
-            FrontierEngineWindowSDL* few = getWindow(event.button.windowID);
+            uint32_t now = SDL_GetTicks();
+            if (((now - event.motion.timestamp) > 50) && ((event.motion.timestamp - m_lastMotion) < 100))
+            {
+                log(DEBUG, "checkEvents: SDL_MOUSEMOTION: Ignoring!");
+                // It has been too long, ignore
+                return true;
+            }
+
+            FrontierEngineWindowSDL* few = getWindow(event.motion.windowID);
             if (few == NULL)
             {
                 return true;
             }
+
+            m_lastMotion = event.motion.timestamp;
 
             MouseMotionEvent* mouseMotionEvent = new MouseMotionEvent();
             mouseMotionEvent->eventType = FRONTIER_EVENT_MOUSE_MOTION;
@@ -176,43 +302,44 @@ bool FrontierEngineSDL::checkEvents()
             KeyEvent* keyEvent = new KeyEvent();
             keyEvent->eventType = FRONTIER_EVENT_KEY;
             keyEvent->direction = (event.type == SDL_KEYDOWN);
-            keyEvent->key = event.key.keysym.sym;
 
-            const char* scancodename = SDLCALL SDL_GetScancodeName(event.key.keysym.scancode);
-            const char* keyname = SDLCALL SDL_GetKeyName(event.key.keysym.sym);
-
-            if (event.type == SDL_KEYUP)
+            map<uint32_t, uint32_t>::iterator it = m_keycodeTable.find(event.key.keysym.sym);
+            if (it != m_keycodeTable.end())
             {
-                log(DEBUG,
-                    "checkEvents: SDL_KEYUP: scancode=0x%x (%s), sym=0x%x (%s): lastText=%s",
-                    event.key.keysym.scancode,
-                    scancodename,
-                    event.key.keysym.sym,
-                    keyname,
-                    m_lastText.c_str());
-                if (m_lastText.length() > 0)
+
+                keyEvent->key = it->second;
+                keyEvent->chr = 0;
+                if (!(event.key.keysym.sym & SDLK_SCANCODE_MASK) && iswprint(event.key.keysym.sym))
                 {
-                    keyEvent->chr = m_lastText.at(0);
+                    keyEvent->chr = event.key.keysym.sym;
                 }
-                m_lastText = "";
 
-                FrontierEngineWindowSDL* few = getWindow(event.key.windowID);
-                few->getWindow()->handleEvent(keyEvent);
-            }
-            else
-            {
-                if (isprint(event.key.keysym.sym) && !(event.key.keysym.sym & SDLK_SCANCODE_MASK))
+                keyEvent->modifiers = 0;
+                if (event.key.keysym.mod & KMOD_LSHIFT)
+                {
+                    keyEvent->modifiers |= KeyModifier::KMOD_SHIFT_L;
+                }
+                if (event.key.keysym.mod & KMOD_RSHIFT)
+                {
+                    keyEvent->modifiers |= KeyModifier::KMOD_SHIFT_R;
+                }
+
+                if (keyEvent->modifiers & (KeyModifier::KMOD_SHIFT_L | KeyModifier::KMOD_SHIFT_R))
+                {
+                    keyEvent->chr = toupper(keyEvent->chr);
+                }
+
+                if (event.type == SDL_KEYUP || (keyEvent->chr == 0))
+                {
+                    FrontierEngineWindowSDL* few = getWindow(event.key.windowID);
+                    few->getWindow()->handleEvent(keyEvent);
+                    m_lastText = "";
+                }
+                else if (event.type == SDL_KEYDOWN)
                 {
                     m_keyDownEvent = keyEvent;
                 }
-                else
-                {
-                    m_keyDownEvent = NULL;
-                    FrontierEngineWindowSDL* few = getWindow(event.key.windowID);
-                    few->getWindow()->handleEvent(keyEvent);
-                }
             }
-
         } break;
 
         case SDL_TEXTINPUT:
@@ -235,6 +362,7 @@ bool FrontierEngineSDL::checkEvents()
 
                 FrontierEngineWindowSDL* few = getWindow(event.key.windowID);
                 few->getWindow()->handleEvent(eventCopy);
+                m_keyDownEvent = NULL;
             }
             else
             {
@@ -287,6 +415,17 @@ bool FrontierEngineSDL::checkEvents()
             }
             break;
     }
+
+    return true;
+}
+
+bool FrontierEngineSDL::quit(bool force)
+{
+    SDL_Event event;
+    memset(&event, 0, sizeof(event));
+    event.type = SDL_QUIT;
+
+    SDL_PushEvent(&event);
 
     return true;
 }
