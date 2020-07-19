@@ -134,7 +134,6 @@ bool FrontierEngineWindowSDL::update()
         return false;
     }
 
-    log(DEBUG, "redraw: Done!");
     return true;
 }
 
