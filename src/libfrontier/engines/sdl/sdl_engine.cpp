@@ -21,6 +21,8 @@
 
 #include "sdl_engine.h"
 
+#include <wctype.h>
+
 using namespace std;
 using namespace Geek;
 using namespace Frontier;
