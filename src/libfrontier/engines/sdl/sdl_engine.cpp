@@ -382,6 +382,13 @@ bool FrontierEngineSDL::checkEvents()
 
             switch (event.window.event)
             {
+                case SDL_WINDOWEVENT_MOVED:
+                case SDL_WINDOWEVENT_ENTER:
+                case SDL_WINDOWEVENT_LEAVE:
+                case SDL_WINDOWEVENT_TAKE_FOCUS:
+                    // Ignore
+                    break;
+
                 case SDL_WINDOWEVENT_RESIZED:
                     few->getWindow()->setSize(Size(event.window.data1, event.window.data2));
                     few->getWindow()->update();
@@ -398,12 +405,23 @@ bool FrontierEngineSDL::checkEvents()
                     few->getWindow()->update(true);
                     break;
 
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                    m_app->setActiveWindow(few->getWindow());
+                    break;
+
+                case SDL_WINDOWEVENT_CLOSE:
+                    few->getWindow()->closeSignal().emit();
+                    break;
+
                 default:
                     log(ERROR, "checkEvents: SDL_WINDOWEVENT: Unknown event: %d", event.window.event);
                     break;
             }
         } break;
 
+        case SDL_AUDIODEVICEADDED:
+            // Ignore
+            break;
 
         default:
             if (event.type == m_redrawWindowEvent)
@@ -413,7 +431,7 @@ bool FrontierEngineSDL::checkEvents()
             }
             else
             {
-                log(ERROR, "checkEvents: Unhandled event: %d", event.type);
+                log(ERROR, "checkEvents: Unhandled event: 0x%x (%d)", event.type, event.type);
             }
             break;
     }
