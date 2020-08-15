@@ -51,7 +51,7 @@ bool FrontierEngineSDL::init()
     int i;
     for (i = 32; i < 128; i++)
     {
-        m_keycodeTable.insert(make_pair(i, i));
+        m_keycodeTable.insert(make_pair(i, toupper(i)));
     }
     m_keycodeTable.insert(make_pair(SDLK_BACKSPACE, KC_BACKSPACE));
     m_keycodeTable.insert(make_pair(SDLK_TAB, KC_TAB));
@@ -326,7 +326,7 @@ bool FrontierEngineSDL::checkEvents()
 
                 if (keyEvent->modifiers & (KeyModifier::KMOD_SHIFT_L | KeyModifier::KMOD_SHIFT_R))
                 {
-                    keyEvent->chr = toupper(keyEvent->chr);
+                    //keyEvent->chr = toupper(keyEvent->chr);
                 }
 
                 if (event.type == SDL_KEYUP || (keyEvent->chr == 0))
