@@ -142,6 +142,15 @@ void FrontierEngineWindowSDL::setPosition(unsigned int x, unsigned int y)
     SDL_SetWindowPosition(m_sdlWindow, x, y);
 }
 
+Geek::Vector2D FrontierEngineWindowSDL::getPosition()
+{
+    Vector2D pos;
+
+    SDL_GetWindowPosition(m_sdlWindow, &(pos.x), &(pos.y));
+
+    return pos;
+}
+
 void FrontierEngineWindowSDL::requestUpdate()
 {
     ((FrontierEngineSDL*)getEngine())->requestUpdate(this);

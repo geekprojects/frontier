@@ -43,6 +43,7 @@ class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
     virtual bool update();
 
     virtual void setPosition(unsigned int x, unsigned int y);
+    virtual Geek::Vector2D getPosition();
 
     virtual void requestUpdate();
 };
