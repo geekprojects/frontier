@@ -58,7 +58,7 @@ class VideoWidgetRenderer : public Geek::Thread
     virtual ~VideoWidgetRenderer();
 };
 
-VideoWidget::VideoWidget(Frontier::FrontierApp* app) : Widget(app, L"Video")
+VideoWidget::VideoWidget(Frontier::FrontierApp* app) : OpenGLDirectWidget(app, L"Video")
 {
     m_mpv = mpv_create();
     m_addedDirect = false;

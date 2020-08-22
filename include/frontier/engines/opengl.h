@@ -33,6 +33,7 @@
 #endif
 
 #include <frontier/frontier.h>
+#include <frontier/widgets.h>
 #include <frontier/engines/windowing.h>
 
 namespace Frontier
@@ -40,14 +41,17 @@ namespace Frontier
 
 class OpenGLEngine;
 
-class OpenGLDirectWidget
+class OpenGLDirectWidget : public Frontier::Widget
 {
  public:
-    OpenGLDirectWidget() {}
+    OpenGLDirectWidget(FrontierApp* ui, std::wstring name);
+    OpenGLDirectWidget(FrontierWindow* window, std::wstring name);
     virtual ~OpenGLDirectWidget() {}
 
     virtual void directBeforeDraw() = 0;
     virtual void directDraw() = 0;
+
+    void setViewport();
 };
 
 class OpenGLEngineWindow : public Frontier::WindowingEngineWindow
@@ -107,6 +111,28 @@ class OpenGLEngine : public WindowingEngine
     virtual ~OpenGLEngine();
 
     virtual bool initWindow(FrontierWindow* window);
+};
+
+class OpenGLTexture
+{
+private:
+    unsigned int m_texture;
+    unsigned int m_sampler;
+    bool m_textureValid;
+
+ protected:
+    Geek::Gfx::Surface* m_surface;
+
+    bool generateTexture();
+
+ public:
+    OpenGLTexture(Geek::Gfx::Surface* surface);
+    virtual ~OpenGLTexture();
+
+    void bind();
+
+    unsigned int getTexture() { return m_texture; }
+    unsigned int getSampler() { return m_sampler; }
 };
 
 };

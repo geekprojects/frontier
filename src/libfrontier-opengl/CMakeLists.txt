@@ -1,7 +1,7 @@
 
 add_definitions(-Wno-deprecated-declarations)
 
-set(opengl_SOURCES opengl_engine.cpp opengl_app.cpp opengl_window.cpp)
+set(opengl_SOURCES opengl_engine.cpp opengl_app.cpp opengl_window.cpp opengl_directwidget.cpp texture.cpp)
 
 if (mpv_FOUND)
     set(opengl_SOURCES ${opengl_SOURCES} videowidget.cpp)

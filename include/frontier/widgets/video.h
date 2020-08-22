@@ -26,7 +26,7 @@
 #include <mpv/client.h>
 #include <mpv/render_gl.h>
 
-class VideoWidget : public Frontier::Widget, public Frontier::OpenGLDirectWidget
+class VideoWidget : public Frontier::OpenGLDirectWidget
 {
  private:
     bool m_addedDirect;
