@@ -63,6 +63,9 @@ struct Value
 
             case STRING:
                 return std::get<std::wstring>(v);
+            default:
+                // This shouldn't happen!
+                return L"";
         }
     }
 
@@ -78,6 +81,10 @@ struct Value
 
             case STRING:
                 return wcstoul(std::get<std::wstring>(v).c_str(), NULL, 10);
+
+            default:
+                // This shouldn't happen!
+                return 0;
         }
     }
 
@@ -92,6 +99,7 @@ struct Value
                 return !!(std::get<int>(v));
 
             case STRING:
+            {
                 std::wstring str = std::get<std::wstring>(v);
                 if (str == L"true")
                 {
@@ -105,7 +113,11 @@ struct Value
                 {
                     return asInt() > 0;
                 }
-                break;
+            } break;
+
+            default:
+                // This shouldn't happen!
+                return false;
         }
     }
 };
