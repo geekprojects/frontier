@@ -28,6 +28,7 @@
 #include <functional>
 
 #include <geek/core-logger.h>
+#include <frontier/value.h>
 
 #define FRONTIER_COLOUR_TRANSPARENT 0xffffffff00000000ull
 #define FRONTIER_HORIZONTAL_ALIGN_LEFT 0
@@ -40,17 +41,6 @@
 namespace Frontier {
 
 class Widget;
-
-union StyleValue
-{
-    uint64_t value;
-    const char* str;
-    union
-    {
-        uint32_t value1;
-        uint32_t value2;
-    };
-};
 
 /**
  * \defgroup styles CSS Engine
@@ -78,7 +68,7 @@ class StyleRule
  private:
     uint64_t m_id;
     std::vector<StyleSelector> m_selectors;
-    std::unordered_map<std::string, int64_t> m_properties;
+    std::unordered_map<std::string, Value> m_properties;
 
  public:
     StyleRule() { m_id = 0; }
@@ -93,11 +83,11 @@ class StyleRule
     uint64_t getId() { return m_id; }
     std::wstring getKey();
 
-    void setProperty(std::string property, int64_t value);
-    void applyProperty(std::string property, int64_t value);
-    void applyProperty(std::string property, std::vector<int64_t> values);
-    void applyProperty(std::string property, int count, const int64_t* values);
-    std::unordered_map<std::string, int64_t> getProperties() { return m_properties; }
+    void setProperty(std::string property, Value value);
+    void applyProperty(std::string property, Value value);
+    void applyProperty(std::string property, std::vector<Value> values);
+    void applyProperty(std::string property, int count, const Value* values);
+    std::unordered_map<std::string, Value> getProperties() { return m_properties; }
 };
 
 class CssParser;
@@ -129,7 +119,7 @@ class StyleEngine : public Geek::Logger
     void addRule(StyleRule* rule);
     StyleRule* findByKey(std::string key);
 
-    std::unordered_map<std::string, int64_t> getProperties(Widget* widget);
+    std::unordered_map<std::string, Value> getProperties(Widget* widget);
     uint64_t getTimestamp() { return m_timestamp; }
 };
 

@@ -54,7 +54,6 @@ void List::calculateSize()
 
     m_listMutex->lock();
 
-    vector<Widget*>::iterator it;
     for (Widget* item : m_children)
     {
         if (item->isDirty(DIRTY_SIZE))

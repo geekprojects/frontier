@@ -254,11 +254,11 @@ void Tabs::calculateSize()
     m_minSize += activeMinSize;
     m_maxSize += activeMaxSize;
 
-    if (getStyle("expand-horizontal") == 1)
+    if (getStyle("expand-horizontal").asBool())
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
-    if (getStyle("expand-vertical") == 1)
+    if (getStyle("expand-vertical").asBool())
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
@@ -852,7 +852,7 @@ Size Tabs::getTabSize()
 
     int tabMajor = major / m_tabs.size();
 
-    int maxTabSize = m_tabs.at(0)->getStyle("max-width");
+    int maxTabSize = m_tabs.at(0)->getStyle("max-width").asInt();
     if (tabMajor > maxTabSize)
     {
         tabMajor = maxTabSize;

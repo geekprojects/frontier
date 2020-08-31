@@ -163,7 +163,7 @@ void StyleEngine::addRule(StyleRule* rule)
     std::sort(m_styleRules.begin(), m_styleRules.end(), compFunctor);
 }
 
-unordered_map<string, int64_t> StyleEngine::getProperties(Widget* widget)
+unordered_map<string, Value> StyleEngine::getProperties(Widget* widget)
 {
     vector<StyleRule*> matchedRules;
     for (pair<StyleRule*, int> rulePair : m_styleRules)
@@ -177,7 +177,7 @@ unordered_map<string, int64_t> StyleEngine::getProperties(Widget* widget)
 
     matchedRules.push_back(widget->getWidgetStyle());
 
-    unordered_map<string, int64_t> results;
+    unordered_map<string, Value> results;
     for (auto rule : matchedRules)
     {
 #ifdef DEBUG_STYLE_PROPERTIES

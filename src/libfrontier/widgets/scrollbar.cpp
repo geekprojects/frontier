@@ -52,7 +52,7 @@ ScrollBar::~ScrollBar()
 void ScrollBar::calculateSize()
 {
     Size borderSize = getBorderSize();
-    int scrollbarWidth = getStyle("scrollbar-width");
+    int scrollbarWidth = getStyle("scrollbar-width").asInt();
     m_minSize = borderSize;
     m_minSize.width += scrollbarWidth;
     m_minSize.height += scrollbarWidth;
@@ -75,8 +75,8 @@ bool ScrollBar::draw(Surface* surface)
     int pos = getControlPos(boxModel);
     int sizePix = getControlSize(boxModel);
 
-    int drawSize = getStyle("scrollbar-width");
-    uint32_t controlColor = getStyle("scrollbar-color");
+    int drawSize = getStyle("scrollbar-width").asInt();
+    uint32_t controlColor = getStyle("scrollbar-color").asInt();
 
     if (m_horizontal)
     {

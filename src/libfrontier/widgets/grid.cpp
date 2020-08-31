@@ -70,7 +70,7 @@ void Grid::clearChildren()
 
 void Grid::put(int x, int y, Widget* widget)
 {
-    uint32_t colour = getStyle("background-color");
+    uint32_t colour = getStyle("background-color").asInt();
     put(x, y, widget, colour);
 }
 

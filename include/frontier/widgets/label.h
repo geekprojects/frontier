@@ -23,6 +23,8 @@
 
 #include <frontier/widgets.h>
 
+#define FRONTIER_PROP_TEXT L"FRN_text"
+
 namespace Frontier
 {
 
@@ -37,13 +39,14 @@ namespace Frontier
 class Label : public Widget
 {
  private:
-    std::wstring m_text;
+    //std::wstring m_text;
     HorizontalAlign m_align;
     Icon* m_icon;
 
     int m_lineHeight;
 
  public:
+    Label(FrontierApp* ui);
     Label(FrontierApp* ui, std::wstring widgetName, std::wstring text);
     Label(FrontierApp* ui, std::wstring text);
     Label(FrontierApp* ui, std::wstring text, HorizontalAlign align);
@@ -52,7 +55,7 @@ class Label : public Widget
     virtual ~Label();
 
     void setText(std::wstring wtext);
-    std::wstring getText() { return m_text; }
+    std::wstring getText() { return getProperty(FRONTIER_PROP_TEXT).asString(); }
     void setAlign(HorizontalAlign align);
     void setIcon(Icon* icon);
 

@@ -333,7 +333,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 }
             }
 
-            int padding = (int)getStyle("padding-left");
+            int padding = (int)getStyle("padding-left").asInt();
 
             // Is the mouse pointer between children?
             int pos;

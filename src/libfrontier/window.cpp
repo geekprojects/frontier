@@ -73,6 +73,7 @@ FrontierWindow::FrontierWindow(FrontierApp* app, std::wstring title, int flags) 
     if (hasBorder() && !m_app->getEngine()->providesMenus())
     {
         m_menuBar = new MenuList(m_app, NULL, true);
+        m_menuBar->setWidgetClass(L"menuBar");
         rootFrame->add(m_menuBar);
     }
 

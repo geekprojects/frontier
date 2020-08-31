@@ -28,6 +28,7 @@
 #include <frontier/frontier.h>
 #include <frontier/styles.h>
 #include <frontier/types.h>
+#include <frontier/value.h>
 
 #include <sigc++/sigc++.h>
 
@@ -85,6 +86,8 @@ class Widget : public FrontierObject, public Geek::Logger
     void* m_privateData;
     Menu* m_contextMenu;
 
+    std::map<std::wstring, Value> m_properties;
+
     /// Set of all CSS classes associated with this widget
     std::set<std::wstring> m_widgetClasses;
 
@@ -95,7 +98,7 @@ class Widget : public FrontierObject, public Geek::Logger
     StyleRule m_widgetStyleProperties;
 
     /// Cached style properties
-    std::unordered_map<std::string, int64_t> m_cachedStyleProperties;
+    std::unordered_map<std::string, Value> m_cachedStyleProperties;
 
     /// Cached box model style properties
     BoxModel m_cachedBoxModel;
@@ -116,9 +119,9 @@ class Widget : public FrontierObject, public Geek::Logger
     void initWidget(FrontierApp* app, std::wstring widgetName);
     void callInit();
 
-    BoxModel& getBoxModel(std::unordered_map<std::string, int64_t>& properties);
-    int64_t getStyle(std::string style, std::unordered_map<std::string, int64_t>& properties);
-    bool hasStyle(std::string style, std::unordered_map<std::string, int64_t>& properties);
+    BoxModel& getBoxModel(std::unordered_map<std::string, Value>& properties);
+    Value getStyle(std::string style, std::unordered_map<std::string, Value>& properties);
+    bool hasStyle(std::string style, std::unordered_map<std::string, Value>& properties);
 
  protected:
     /// The Application that this widget belongs to
@@ -222,6 +225,12 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
 
     /*
+     * Properties
+     */
+    void setProperty(std::wstring property, Value value);
+    Value getProperty(std::wstring property);
+
+    /*
      * Style
      */
 
@@ -229,10 +238,10 @@ class Widget : public FrontierObject, public Geek::Logger
     bool hasStyle(std::string style);
 
     /// Return whether the value of the style set by the Style Sheet for this Widget
-    int64_t getStyle(std::string style);
+    Value getStyle(std::string style);
 
     /// Set the specified CSS property on this Widget
-    void setStyle(std::string style, int64_t value);
+    void setStyle(std::string style, Value value);
 
     /// Set the unique id of this Widget
     void setWidgetId(std::wstring id) { m_widgetId = id; }
@@ -256,7 +265,7 @@ class Widget : public FrontierObject, public Geek::Logger
     StyleRule* getWidgetStyle() { return &m_widgetStyleProperties; }
 
     // Return all style properties either directly or via CSS
-    std::unordered_map<std::string, int64_t>& getStyleProperties();
+    std::unordered_map<std::string, Value>& getStyleProperties();
 
     /// Return the CSS box model
     BoxModel& getBoxModel();
@@ -374,6 +383,51 @@ class Widget : public FrontierObject, public Geek::Logger
     virtual void dump(int level);
 };
 
+class WidgetInit
+{
+ private:
+ public:
+    WidgetInit() {}
+    virtual ~WidgetInit() {}
+
+    virtual Widget* create(FrontierApp* app) { return NULL; }
+
+    virtual const std::string getName() { return ""; }
+};
+
+class WidgetRegistry
+{
+ private:
+    std::map<std::string, WidgetInit*> m_widgets;
+
+ public:
+    WidgetRegistry();
+    virtual ~WidgetRegistry();
+
+    static void registerWidget(WidgetInit* init);
+    static Widget* createWidget(FrontierApp* app, std::string name);
+};
+
+#define FRONTIER_WIDGET(_name, _class)  \
+    class _name##Init : public Frontier::WidgetInit \
+    { \
+     private: \
+        static _name##Init* const init __attribute__ ((unused)); \
+     public: \
+        _name##Init() \
+        { \
+            WidgetRegistry::registerWidget(this); \
+        } \
+        const std::string getName() \
+        { \
+            return #_name; \
+        } \
+        _name* create(FrontierApp* app) \
+        { \
+            return new _name(app); \
+        } \
+    }; \
+    _name##Init* const _name##Init::init = new _name##Init();
 };
 
 #endif

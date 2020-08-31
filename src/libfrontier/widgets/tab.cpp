@@ -68,7 +68,7 @@ Tab::~Tab()
 void Tab::calculateSize()
 {
     BoxModel boxModel = getBoxModel();
-    int maxTabSize = getStyle("max-width");
+    int maxTabSize = getStyle("max-width").asInt();
 
     m_minSize.width = boxModel.getWidth();
     m_minSize.height = boxModel.getHeight();
@@ -191,7 +191,7 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
         textOffsetX = ((m_setSize.width / 2) - (labelHeight / 2));
     }
 
-    int colour = getStyle("text-color");
+    int colour = getStyle("text-color").asInt();
     font->write(
         surface,
         textOffsetX,

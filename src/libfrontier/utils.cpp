@@ -51,6 +51,24 @@ string Utils::wstring2string(wstring str)
     return out;
 }
 
+bool Utils::compare(std::string str1, std::wstring str2)
+{
+    if (str1.length() != str2.length())
+    {
+        return false;
+    }
+
+    int i;
+    for (i = 0; i < str1.length(); i++)
+    {
+        if (str1.at(i) != str2.at(i))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Utils::stacktrace()
 {
     char **strings;
@@ -69,4 +87,6 @@ void Utils::stacktrace()
         free(strings);
     }
 }
+
+
 

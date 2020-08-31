@@ -167,11 +167,11 @@ void Frame::calculateSize()
     m_maxSize.width += boxModel.getWidth();
     m_maxSize.height += boxModel.getHeight();
 
-    if (getStyle("expand-horizontal") == 1)
+    if (getStyle("expand-horizontal").asBool())
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
-    if (getStyle("expand-vertical") == 1)
+    if (getStyle("expand-vertical").asBool())
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
@@ -328,12 +328,12 @@ void Frame::layout()
     int horizontalAlign = FRONTIER_HORIZONTAL_ALIGN_LEFT;
     if (hasStyle("align-horizontal"))
     {
-        horizontalAlign = getStyle("align-horizontal");
+        horizontalAlign = getStyle("align-horizontal").asInt();
     }
     int verticalAlign = FRONTIER_VERTICAL_ALIGN_TOP;
     if (hasStyle("align-vertical"))
     {
-        verticalAlign = getStyle("align-vertical");
+        verticalAlign = getStyle("align-vertical").asInt();
     }
     int majorAlign;
     int minorAlign;

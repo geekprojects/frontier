@@ -177,6 +177,7 @@ class Utils
  public:
     static std::wstring string2wstring(std::string str);
     static std::string wstring2string(std::wstring str);
+    static bool compare(std::string str1, std::wstring str2);
 
     static void stacktrace();
 };

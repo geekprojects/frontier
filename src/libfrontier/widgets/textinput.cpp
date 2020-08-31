@@ -170,7 +170,7 @@ bool TextInput::draw(Surface* surface)
 
     if (hasStyle("background-color"))
     {
-        uint32_t backgroundColour = getStyle("background-color");
+        uint32_t backgroundColour = getStyle("background-color").asInt();
         m_textSurface->clear(backgroundColour);
     }
 

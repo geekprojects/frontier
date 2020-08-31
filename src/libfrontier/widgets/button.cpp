@@ -27,6 +27,12 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(Button, Frontier::Button)
+
+Button::Button(FrontierApp* ui) : Label(ui, L"Button", L"")
+{
+}
+
 Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Label(ui, L"Button", text)
 {
     m_type = type;

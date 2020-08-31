@@ -29,7 +29,7 @@ using namespace Geek::Gfx;
 
 Label::Label(FrontierApp* ui, wstring widgetName, wstring text) : Widget(ui, widgetName)
 {
-    m_text = text;
+    setProperty(FRONTIER_PROP_TEXT, Value(text));
     m_align = ALIGN_CENTER;
     m_icon = NULL;
 }
@@ -37,28 +37,28 @@ Label::Label(FrontierApp* ui, wstring widgetName, wstring text) : Widget(ui, wid
 
 Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {
-    m_text = text;
+    setProperty(FRONTIER_PROP_TEXT, Value(text));
     m_align = ALIGN_CENTER;
     m_icon = NULL;
 }
 
 Label::Label(FrontierApp* ui, wstring text, HorizontalAlign align) : Widget(ui, L"Label")
 {
-    m_text = text;
+    setProperty(FRONTIER_PROP_TEXT, Value(text));
     m_align = align;
     m_icon = NULL;
 }
 
 Label::Label(FrontierApp* ui, wstring text, Icon* icon) : Widget(ui, L"Label")
 {
-    m_text = text;
+    setProperty(FRONTIER_PROP_TEXT, Value(text));
     m_align = ALIGN_CENTER;
     m_icon = icon;
 }
 
 Label::Label(FrontierApp* ui, wstring text, HorizontalAlign align, Icon* icon) : Widget(ui, L"Label")
 {
-    m_text = text;
+    setProperty(FRONTIER_PROP_TEXT, Value(text));
     m_align = align;
     m_icon = NULL;
 }
@@ -69,9 +69,9 @@ Label::~Label()
 
 void Label::setText(std::wstring text)
 {
-    if (text != m_text)
+    //if (text != m_text)
     {
-        m_text = text;
+        setProperty(FRONTIER_PROP_TEXT, Value(text));
         setDirty();
     }
 }
@@ -96,13 +96,16 @@ void Label::calculateSize()
     unsigned int pos = 0;
     int lines = 1;
     wstring line = L"";
-    for (pos = 0; pos < m_text.length(); pos++)
+
+    wstring text = getProperty(FRONTIER_PROP_TEXT).asString();
+
+    for (pos = 0; pos < text.length(); pos++)
     {
-        if (m_text[pos] == '\n' || pos == m_text.length() - 1)
+        if (text[pos] == '\n' || pos == text.length() - 1)
         {
-            if (pos == m_text.length() - 1)
+            if (pos == text.length() - 1)
             {
-                line += m_text[pos];
+                line += text[pos];
             }
             else
             {
@@ -118,7 +121,7 @@ void Label::calculateSize()
         }
         else
         {
-            line += m_text[pos];
+            line += text[pos];
         }
     }
 
@@ -139,7 +142,7 @@ void Label::calculateSize()
     m_minSize.width += boxModel.getWidth();
     m_minSize.height = (m_lineHeight * lines) + boxModel.getHeight();
 
-    if (getStyle("expand-horizontal"))
+    if (getStyle("expand-horizontal").asBool())
     {
         m_maxSize.width = WIDGET_SIZE_UNLIMITED;
     }
@@ -148,7 +151,7 @@ void Label::calculateSize()
         m_maxSize.width = m_minSize.width;
     }
 
-    if (getStyle("expand-vertical"))
+    if (getStyle("expand-vertical").asBool())
     {
         m_maxSize.height = WIDGET_SIZE_UNLIMITED;
     }
@@ -166,12 +169,13 @@ bool Label::draw(Surface* surface)
     int y = boxModel.getTop();
 
     FontHandle* font = getTextFont();
+    wstring text = getProperty(FRONTIER_PROP_TEXT).asString();
 
     int lines = 1;
     unsigned int pos = 0;
-    for (pos = 0; pos < m_text.length(); pos++)
+    for (pos = 0; pos < text.length(); pos++)
     {
-        if (m_text[pos] == '\n')
+        if (text[pos] == '\n')
         {
             lines++;
         }
@@ -181,13 +185,13 @@ bool Label::draw(Surface* surface)
  
     int maxX = 0;
     wstring line = L"";
-    for (pos = 0; pos < m_text.length(); pos++)
+    for (pos = 0; pos < text.length(); pos++)
     {
-        if (m_text[pos] == '\n' || pos == m_text.length() - 1)
+        if (text[pos] == '\n' || pos == text.length() - 1)
         {
-            if (pos == m_text.length() - 1)
+            if (pos == text.length() - 1)
             {
-                line += m_text[pos];
+                line += text[pos];
             }
             int w = font->width(line);
             int x = 0;
@@ -228,7 +232,7 @@ bool Label::draw(Surface* surface)
         }
         else
         {
-            line += m_text[pos];
+            line += text[pos];
         }
     }
 
