@@ -5,6 +5,7 @@ dist: bionic
 arch:
   - amd64
   - arm64
+osx_image: xcode11.6
 
 matrix:
   exclude:
@@ -32,7 +33,7 @@ addons:
       - libtool
       - antlr@4
       - antlr4-cpp-runtime
-    update: true
+    #update: true
 
 install:
   - git clone https://github.com/geekprojects/libgeek.git; cd libgeek; mkdir build; cd build; cmake ..; make; if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install; else sudo make install; sudo ldconfig; fi; cd -
