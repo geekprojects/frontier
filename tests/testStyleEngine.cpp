@@ -18,18 +18,18 @@ TEST(StyleEngineTest, simple)
     FrontierApp* app = new TestApp();
 
     Widget* a = new Widget(app, L"WidgetA");
-    unordered_map<string, int64_t> props = se->getProperties(a);
+    unordered_map<string, Value> props = se->getProperties(a);
     EXPECT_EQ(2, props.size());
 
     {
         auto it = props.find("expand-horizontal");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(1, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(1, it->second.asInt());
     }
     {
         auto it = props.find("expand-vertical");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(0, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(0, it->second.asInt());
     }
 }
 
@@ -47,18 +47,18 @@ TEST(StyleEngineTest, nested1)
 
     Widget* a = new Widget(app, L"WidgetA");
     a->setParent(group1);
-    unordered_map<string, int64_t> props = se->getProperties(a);
+    unordered_map<string, Value> props = se->getProperties(a);
     EXPECT_EQ(2, props.size());
 
     {
         auto it = props.find("expand-horizontal");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(0, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(0, it->second.asInt());
     }
     {
         auto it = props.find("expand-vertical");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(1, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(1, it->second.asInt());
     }
 }
 
@@ -81,18 +81,18 @@ TEST(StyleEngineTest, nested2)
 
     Widget* a = new Widget(app, L"WidgetA");
     a->setParent(middle);
-    unordered_map<string, int64_t> props = se->getProperties(a);
+    unordered_map<string, Value> props = se->getProperties(a);
     EXPECT_EQ(2, props.size());
 
     {
         auto it = props.find("expand-horizontal");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(0, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(0, it->second.asInt());
     }
     {
         auto it = props.find("expand-vertical");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(1, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(1, it->second.asInt());
     }
 }
 
@@ -120,18 +120,18 @@ TEST(StyleEngineTest, nested3)
     Widget* b = new Widget(app, L"WidgetA");
     b->setParent(a);
 
-    unordered_map<string, int64_t> props = se->getProperties(b);
+    unordered_map<string, Value> props = se->getProperties(b);
     EXPECT_EQ(2, props.size());
 
     {
         auto it = props.find("expand-horizontal");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(0, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(0, it->second.asInt());
     }
     {
         auto it = props.find("expand-vertical");
-        EXPECT_NE(props.end(), it);
-        EXPECT_EQ(1, it->second);
+        EXPECT_TRUE(it != props.end());
+        EXPECT_EQ(1, it->second.asInt());
     }
 }
 
@@ -159,7 +159,7 @@ TEST(StyleEngineTest, nested4)
     Widget* b = new Widget(app, L"WidgetB");
     b->setParent(a);
 
-    unordered_map<string, int64_t> props = se->getProperties(b);
+    unordered_map<string, Value> props = se->getProperties(b);
     EXPECT_EQ(0, props.size());
 }
 
