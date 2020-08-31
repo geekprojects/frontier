@@ -58,7 +58,7 @@ bool Utils::compare(std::string str1, std::wstring str2)
         return false;
     }
 
-    int i;
+    unsigned int i;
     for (i = 0; i < str1.length(); i++)
     {
         if (str1.at(i) != str2.at(i))
