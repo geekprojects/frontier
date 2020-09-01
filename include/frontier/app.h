@@ -44,6 +44,7 @@ namespace Frontier
 class FrontierEngine;
 class FrontierApp;
 class Widget;
+class WidgetBuilder;
 class UITheme;
 class ContextMenu;
 class ColourPickerWindow;
@@ -80,6 +81,7 @@ class FrontierApp : public Geek::Logger
     UITheme* m_theme;
     StyleEngine* m_styleEngine;
     Geek::Core::TimerManager* m_timerManager;
+    WidgetBuilder* m_widgetBuilder;
 
     Menu* m_appMenu;
     ContextMenu* m_contextMenuWindow;
@@ -126,6 +128,8 @@ class FrontierApp : public Geek::Logger
 
     /// Return the Timer Manager
     Geek::Core::TimerManager* getTimerManager() { return m_timerManager; }
+
+    WidgetBuilder* getWidgetBuilder() { return m_widgetBuilder; }
 
     /// Get the current ContextMenu
     ContextMenu* getContextMenuWindow();

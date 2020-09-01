@@ -41,6 +41,7 @@ list(APPEND libfrontier_srcs
     widgets/list/menulist.cpp
     widgets/list/treelistitem.cpp
     widgets/registry.cpp
+    widgets/builder.cpp
     windows/datepicker.cpp
     windows/colourpicker.cpp
 )

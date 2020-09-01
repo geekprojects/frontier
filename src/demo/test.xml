@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Frame horizontal="false">
+    <Label text="This tab was created from an XML file!"/>
+    <Frame horizontal="true">
+        <Label text="Click this -->"/>
+        <Button id="this" text="This!"/>
+    </Frame>
+    <Frame horizontal="true">
+        <Label text="But NOT this -->"/>
+        <Button id="that" text="Noooo!"/>
+    </Frame>
+</Frame>

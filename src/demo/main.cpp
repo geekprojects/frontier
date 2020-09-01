@@ -39,7 +39,11 @@
 #include <frontier/widgets/date.h>
 #include <frontier/widgets/hsvwheel.h>
 #include <frontier/widgets/colourbutton.h>
+#include <frontier/widgets/builder.h>
 #include <frontier/windows/datepicker.h>
+
+#define STRINGIFY(x) XSTRINGIFY(x)
+#define XSTRINGIFY(x) #x
 
 using namespace std;
 using namespace Frontier;
@@ -315,6 +319,14 @@ bool DemoApp::init()
         //colourTab->add(new HSVWheel(this));
         colourTab->add(new ColourButton(this, Colour(128, 255, 128)));
         m_tabs->addTab(L"Colours", colourTab);
+    }
+
+    {
+        Widget* loadedWidget = getWidgetBuilder()->loadWidget(STRINGIFY(FRONTIER_SRC) "/src/demo/test.xml");
+        if (loadedWidget)
+        {
+            m_tabs->addTab(L"Loaded", loadedWidget);
+        }
     }
 
     {

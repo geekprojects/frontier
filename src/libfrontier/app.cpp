@@ -21,6 +21,7 @@
 
 #include <frontier/frontier.h>
 #include <frontier/contextmenu.h>
+#include <frontier/widgets/builder.h>
 #include <sys/time.h>
 #include <signal.h>
 
@@ -60,6 +61,8 @@ FrontierApp::FrontierApp(wstring name) : Logger(L"FrontierApp[" + name + L"]")
     m_engine = NULL;
     m_theme = NULL;
     m_fontManager = NULL;
+
+    m_widgetBuilder = new WidgetBuilder(this);
 
     m_appMenu = NULL;
 
