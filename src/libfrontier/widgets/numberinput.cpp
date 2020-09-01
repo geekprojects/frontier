@@ -31,6 +31,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace std;
 
+FRONTIER_WIDGET(NumberInput, Frontier::NumberInput)
+
 NumberInput::NumberInput(FrontierApp* app) : TextInput(app)
 {
     init();

@@ -121,7 +121,8 @@ class List : public Widget
     sigc::signal<void, ListItem*, Geek::Vector2D> m_contextMenuSignal;
 
  public:
-    List(FrontierApp* ui, bool horizontal = false);
+    List(FrontierApp* ui);
+    List(FrontierApp* ui, bool horizontal);
     List(FrontierWindow* window, bool horizontal = false);
     virtual ~List();
 

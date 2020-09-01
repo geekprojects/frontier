@@ -23,6 +23,8 @@
 
 #include <frontier/widgets.h>
 
+#define FRONTIER_PROP_HORIZONTAL L"horizontal"
+
 namespace Frontier
 {
 
@@ -33,10 +35,8 @@ namespace Frontier
  */
 class Frame : public Widget
 {
- protected:
-    bool m_horizontal;
-
  public:
+    Frame(FrontierApp* ui);
     Frame(FrontierApp* ui, bool horizontal);
     Frame(FrontierApp* ui, std::wstring widgetName, bool horizontal);
     Frame(FrontierWindow* ui, bool horizontal);

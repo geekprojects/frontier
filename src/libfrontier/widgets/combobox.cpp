@@ -27,6 +27,8 @@ using namespace std;
 using namespace Geek;
 using namespace Frontier;
 
+FRONTIER_WIDGET(ComboBox, Frontier::ComboBox)
+
 ComboBox::ComboBox(FrontierApp* ui) : Frame(ui, true)
 {
     initComboBox();

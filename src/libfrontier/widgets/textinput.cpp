@@ -29,6 +29,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(TextInput, Frontier::TextInput)
+
 static wstring wchar2wstring(wchar_t c)
 {
     wchar_t t[2];

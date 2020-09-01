@@ -31,27 +31,35 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(Frame, Frontier::Frame)
+
+Frame::Frame(FrontierApp* ui) : Widget(ui, L"Frame")
+{
+    setProperty(FRONTIER_PROP_HORIZONTAL, true);
+    m_widgetNames.insert(L"Frame");
+}
+
 Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui, L"Frame")
 {
-    m_horizontal = horizontal;
+    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
     m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierApp* ui, wstring widgetName, bool horizontal) : Widget(ui, widgetName)
 {
-    m_horizontal = horizontal;
+    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
     m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window, L"Frame")
 {
-    m_horizontal = horizontal;
+    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
     m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierWindow* window, wstring widgetName, bool horizontal) : Widget(window, widgetName)
 {
-    m_horizontal = horizontal;
+    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
     m_widgetNames.insert(L"Frame");
 }
 
@@ -128,7 +136,7 @@ void Frame::calculateSize()
         log(DEBUG, "calculateSize: %p: sizing child: %p: min=%s, max=%s", this, (*it), childMin.toString().c_str(), childMax.toString().c_str());
 #endif
 
-        if (m_horizontal)
+        if (getProperty(FRONTIER_PROP_HORIZONTAL).asBool())
         {
             m_minSize.setMaxHeight(childMin);
             m_maxSize.setMaxHeight(childMax);
@@ -199,7 +207,9 @@ void Frame::layout()
 
     BoxModel boxModel = getBoxModel();
 
-    if (m_horizontal)
+    bool horizontal = getProperty(FRONTIER_PROP_HORIZONTAL).asBool();
+
+    if (horizontal)
     {
         majorWidgetSize = m_setSize.width;
         minorWidgetSize = m_setSize.height;
@@ -231,8 +241,8 @@ void Frame::layout()
         Size childMinSize = child->getMinSize();
         Size childMaxSize = child->getMaxSize();
 
-        int childMajorMin = childMinSize.get(m_horizontal);
-        int childMajorMax = childMaxSize.get(m_horizontal);
+        int childMajorMin = childMinSize.get(horizontal);
+        int childMajorMax = childMaxSize.get(horizontal);
 
         min += childMajorMin;
         if (childMajorMax > q)
@@ -257,11 +267,11 @@ void Frame::layout()
         Size childMinSize = child->getMinSize();
         Size childMaxSize = child->getMaxSize();
 
-        int childMajorMin = childMinSize.get(m_horizontal);
-        int childMajorMax = childMaxSize.get(m_horizontal);
+        int childMajorMin = childMinSize.get(horizontal);
+        int childMajorMax = childMaxSize.get(horizontal);
 
-        int childMinorMin = childMinSize.get(!m_horizontal);
-        int childMinorMax = childMaxSize.get(!m_horizontal);
+        int childMinorMin = childMinSize.get(!horizontal);
+        int childMinorMax = childMaxSize.get(!horizontal);
 
         int childMajor = childMajorMin;
         int childMinor = minor;
@@ -305,7 +315,7 @@ void Frame::layout()
 #endif
 
         Size size;
-        if (m_horizontal)
+        if (horizontal)
         {
             size = Size(childMajor, childMinor);
         }
@@ -337,7 +347,7 @@ void Frame::layout()
     }
     int majorAlign;
     int minorAlign;
-    if (m_horizontal)
+    if (horizontal)
     {
         majorPos = boxModel.marginLeft;
         minorPos = boxModel.marginTop;
@@ -362,7 +372,7 @@ void Frame::layout()
         Widget* child = *it;
         Size size = child->getSize();
         int childMajor;
-        if (m_horizontal)
+        if (horizontal)
         {
             int childMinorPos = minorPos;
             if (minorAlign == FRONTIER_HORIZONTAL_ALIGN_CENTRE)

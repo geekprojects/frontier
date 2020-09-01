@@ -26,6 +26,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(Grid, Frontier::Grid)
+
 Grid::Grid(FrontierApp* app) : Widget(app, L"Grid")
 {
     m_colMinSizes = NULL;

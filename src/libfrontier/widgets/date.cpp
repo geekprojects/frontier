@@ -30,6 +30,18 @@ using namespace std::chrono;
 using namespace Frontier;
 using namespace Geek;
 
+FRONTIER_WIDGET(Date, Frontier::Date)
+
+Date::Date(FrontierApp* app) : Frame(app, L"Date", true)
+{
+    m_hasTime = false;
+    auto now = system_clock::now().time_since_epoch();
+    m_value = std::chrono::duration_cast<std::chrono::seconds>(now);
+    m_hasValue = false;
+
+    setup();
+}
+
 Date::Date(FrontierApp* app, bool hasTime) : Frame(app, L"Date", true)
 {
     m_hasTime = hasTime;

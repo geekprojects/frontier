@@ -26,6 +26,8 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(CheckBox, Frontier::CheckBox)
+
 CheckBox::CheckBox(FrontierApp* ui) : Button(ui, L"CheckBox", L"", BUTTON_TOGGLE)
 {
     m_icon = getApp()->getTheme()->getIcon(FRONTIER_ICON_CHECK);

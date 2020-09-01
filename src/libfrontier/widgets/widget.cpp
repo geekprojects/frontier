@@ -92,6 +92,14 @@ void Widget::init()
 {
 }
 
+void Widget::add(Widget* widget)
+{
+}
+
+void Widget::remove(Widget* widget)
+{
+}
+
 void Widget::calculateSize()
 {
 }
@@ -138,7 +146,7 @@ bool Widget::draw(Geek::Gfx::Surface* surface)
 
 void Widget::setProperty(std::wstring property, Value value)
 {
-    m_properties.insert(make_pair(property, value));
+    m_properties.insert_or_assign(property, value);
 }
 
 Value Widget::getProperty(std::wstring property)

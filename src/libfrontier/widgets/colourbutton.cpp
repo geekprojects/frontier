@@ -29,6 +29,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(ColourButton, Frontier::ColourButton)
+
 ColourButton::ColourButton(FrontierApp* app) : Button(app, L"ColourButton", L"")
 {
     m_colour = Colour(255, 255, 255);

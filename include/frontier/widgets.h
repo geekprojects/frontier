@@ -86,7 +86,7 @@ class Widget : public FrontierObject, public Geek::Logger
     void* m_privateData;
     Menu* m_contextMenu;
 
-    std::map<std::wstring, Value> m_properties;
+    std::unordered_map<std::wstring, Value> m_properties;
 
     /// Set of all CSS classes associated with this widget
     std::set<std::wstring> m_widgetClasses;
@@ -201,6 +201,10 @@ class Widget : public FrontierObject, public Geek::Logger
 
     /// Return whether this Widget contains any children
     virtual bool hasChildren() { return !(getChildren().empty()); }
+
+    virtual void add(Widget* widget);
+
+    virtual void remove(Widget* widget);
 
     /// Calculate the minimum and maximum size this Widget can be
     virtual void calculateSize();

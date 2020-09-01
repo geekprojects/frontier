@@ -57,6 +57,7 @@ class Date : public Frame
     void updateDateTime();
 
  public:
+    Date(FrontierApp* ui);
     Date(FrontierApp* ui, bool hasTime);
     Date(FrontierApp* ui, bool hasTime, std::chrono::seconds value);
     ~Date();

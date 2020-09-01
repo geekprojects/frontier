@@ -29,7 +29,15 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(ResizeableFrame, Frontier::ResizeableFrame)
+
 #undef DEBUG_RESIZEABLE_FRAME
+
+ResizeableFrame::ResizeableFrame(FrontierApp* app) : Frame(app, L"ResizeableFrame", true)
+{
+    m_dragging = false;
+    m_dragWidget = 0;
+}
 
 ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, L"ResizeableFrame", horizontal)
 {
@@ -93,7 +101,8 @@ void ResizeableFrame::layout()
         return;
     }
 
-    if (m_horizontal)
+    bool horizontal = getProperty(FRONTIER_PROP_HORIZONTAL).asBool();
+    if (horizontal)
     {
         major = m_setSize.width - boxModel.getWidth();
         minor = m_setSize.height - boxModel.getHeight();
@@ -125,8 +134,8 @@ void ResizeableFrame::layout()
         Size childMinSize = child->getMinSize();
         Size childMaxSize = child->getMaxSize();
 
-        int childMajorMin = childMinSize.get(m_horizontal);
-        int childMajorMax = childMaxSize.get(m_horizontal);
+        int childMajorMin = childMinSize.get(horizontal);
+        int childMajorMax = childMaxSize.get(horizontal);
 
         float pc = m_sizes.at(i);
         int childMajor = (int)((float)major * (pc / 100.0));
@@ -148,12 +157,12 @@ void ResizeableFrame::layout()
 
             // Borrow some space from a neighbour?
             float d;
-            d = borrow(i - 1, -extrapc, major, -1);
+            d = borrow(horizontal, i - 1, -extrapc, major, -1);
             extrapc += d;
             m_sizes[i] -= d;
             if (d != extrapc)
             {
-                d = borrow(i + 1, -extrapc, major, 1);
+                d = borrow(horizontal, i + 1, -extrapc, major, 1);
                 extrapc += d;
                 m_sizes[i] -= d;
             }
@@ -171,12 +180,12 @@ void ResizeableFrame::layout()
 
             // Give some space from a neighbour?
             float d;
-            d = borrow(i - 1, extrapc, major, -1);
+            d = borrow(horizontal, i - 1, extrapc, major, -1);
             extrapc -= d;
             m_sizes[i] -= d;
             if (extrapc > 0)
             {
-                d = borrow(i + 1, extrapc, major, 1);
+                d = borrow(horizontal, i + 1, extrapc, major, 1);
                 m_sizes[i] -= d;
             }
         }
@@ -191,7 +200,7 @@ void ResizeableFrame::layout()
         int childMajor = (int)((float)major * (pc / 100.0));
         int childMinor = minor;
 /*
-            int maxMinor = child->getMaxSize().get(!m_horizontal);
+            int maxMinor = child->getMaxSize().get(!horizontal);
             if (childMinor > maxMinor)
             {
                 childMinor = maxMinor;
@@ -203,7 +212,7 @@ void ResizeableFrame::layout()
 #endif
 
         Size size;
-        if (m_horizontal)
+        if (horizontal)
         {
             size = Size(childMajor, childMinor);
             child->setPosition(majorPos, minorPos);
@@ -221,7 +230,7 @@ void ResizeableFrame::layout()
     }
 }
 
-float ResizeableFrame::borrow(int which, float amount, int major, int direction)
+float ResizeableFrame::borrow(bool horizontal, int which, float amount, int major, int direction)
 {
     if (which < 0 || which >= (int)m_children.size())
     {
@@ -241,8 +250,8 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
     Size childMinSize = child->getMinSize();
     Size childMaxSize = child->getMaxSize();
 
-    int childMajorMin = childMinSize.get(m_horizontal);
-    int childMajorMax = childMaxSize.get(m_horizontal);
+    int childMajorMin = childMinSize.get(horizontal);
+    int childMajorMax = childMaxSize.get(horizontal);
 
     float pc = m_sizes.at(which);
     int childMajor = (int)((float)major * (pc / 100.0));
@@ -274,7 +283,7 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
         if (grow != amount)
         {
             // Check neighbour
-            grow += borrow(which + direction, amount - grow, major, direction);
+            grow += borrow(horizontal, which + direction, amount - grow, major, direction);
         }
 
         return grow;
@@ -305,7 +314,7 @@ float ResizeableFrame::borrow(int which, float amount, int major, int direction)
 #ifdef DEBUG_RESIZEABLE_FRAME
             log(DEBUG, "borrow:  -> Still got %0.2f%% to go, Checking neighbour", amount - shrink);
 #endif
-            float ns = borrow(which + direction, amount - shrink, major, direction);
+            float ns = borrow(horizontal, which + direction, amount - shrink, major, direction);
 #ifdef DEBUG_RESIZEABLE_FRAME
             log(DEBUG, "borrow:  -> Neighbour shrunk by %0.2f%%", ns);
 #endif
@@ -322,6 +331,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
         MouseEvent* mouseEvent = (MouseEvent*)event;
         int x = mouseEvent->x;
         int y = mouseEvent->y;
+        bool horizontal = getProperty(FRONTIER_PROP_HORIZONTAL).asBool();
 
         if (!m_dragging)
         {
@@ -344,8 +354,8 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 Vector2D childPos = child->getAbsolutePosition();
                 int width = child->getWidth();
                 int height = child->getHeight();
-                if ((m_horizontal && (x > childPos.x + width && x < childPos.x + width + padding)) ||
-                    (!m_horizontal && (y > childPos.y + height && y < childPos.y + height + padding)))
+                if ((horizontal && (x > childPos.x + width && x < childPos.x + width + padding)) ||
+                    (!horizontal && (y > childPos.y + height && y < childPos.y + height + padding)))
                 {
                     if (event->eventType == FRONTIER_EVENT_MOUSE_BUTTON && ((MouseButtonEvent*)event)->direction)
                     {
@@ -353,7 +363,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                         m_dragging = true;
                         m_dragWidget = pos;
                         Vector2D thisPos = getAbsolutePosition();
-                        if (m_horizontal)
+                        if (horizontal)
                         {
                             m_dragPos = x - thisPos.x;
                         }
@@ -391,7 +401,7 @@ Widget* ResizeableFrame::handleEvent(Event* event)
                 Vector2D thisPos = getAbsolutePosition();
                 float pc;
                 int pos;
-                if (m_horizontal)
+                if (horizontal)
                 {
                     pos = x - thisPos.x;
                     int diff = m_dragPos - pos;

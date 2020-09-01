@@ -26,6 +26,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(Scroller, Frontier::Scroller)
+
 Scroller::Scroller(FrontierApp* ui) : Widget(ui, L"Scroller")
 {
     initScroller(NULL);

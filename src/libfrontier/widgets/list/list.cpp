@@ -27,6 +27,15 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(List, Frontier::List)
+
+List::List(FrontierApp* ui) : Widget(ui, L"List")
+{
+    m_selected = NULL;
+    m_horizontal = false;
+    m_listMutex = Thread::createMutex();
+}
+
 List::List(FrontierApp* ui, bool horizontal) : Widget(ui, L"List")
 {
     m_selected = NULL;

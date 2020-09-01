@@ -27,13 +27,20 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_WIDGET(Label, Frontier::Label)
+
+Label::Label(FrontierApp* ui) : Widget(ui, L"Label")
+{
+    m_align = ALIGN_CENTER;
+    m_icon = NULL;
+}
+
 Label::Label(FrontierApp* ui, wstring widgetName, wstring text) : Widget(ui, widgetName)
 {
     setProperty(FRONTIER_PROP_TEXT, Value(text));
     m_align = ALIGN_CENTER;
     m_icon = NULL;
 }
-
 
 Label::Label(FrontierApp* ui, wstring text) : Widget(ui, L"Label")
 {

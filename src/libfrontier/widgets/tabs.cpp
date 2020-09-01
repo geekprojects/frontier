@@ -33,6 +33,8 @@ using namespace Geek::Gfx;
 
 #define TABS_WIDGET_NAME L"Tabs"
 
+FRONTIER_WIDGET(Tabs, Frontier::Tabs)
+
 Tabs::Tabs(FrontierApp* ui) : Widget(ui, TABS_WIDGET_NAME)
 {
     setup(false, false, TAB_TOP);

@@ -23,7 +23,7 @@
 
 #include <frontier/widgets.h>
 
-#define FRONTIER_PROP_TEXT L"FRN_text"
+#define FRONTIER_PROP_TEXT L"text"
 
 namespace Frontier
 {
