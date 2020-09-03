@@ -62,10 +62,12 @@ Widget* WidgetBuilder::walk(xmlDoc* doc, xmlNode* node, Widget* parent)
     Widget* widget = WidgetRegistry::createWidget(m_app, string((char*)(node->name)));
     log(DEBUG, "walk: Widget: %s = %p", node->name, widget);
 
-if (widget == NULL)
-{
-return new Label(m_app, L"?");
-}
+    if (widget == NULL)
+    {
+        return new Label(m_app, L"?");
+    }
+
+    widget->setParent(parent);
 
     xmlAttr* attr;
     for (attr = node->properties; attr != NULL; attr = attr->next)

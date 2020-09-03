@@ -23,6 +23,8 @@
 
 #include <frontier/widgets.h>
 
+#define FRONTIER_PROP_TITLE L"title"
+
 namespace Frontier
 {
 
@@ -46,17 +48,14 @@ enum TabPlacement
 class Tab : public Widget
 {
  protected:
-    Tabs* m_tabs;
-
-    std::wstring m_title;
     Icon* m_icon;
-    Widget* m_content;
     bool m_closeable;
 
     bool m_mouseDown;
     Geek::Vector2D m_mouseDownPos;
 
  public:
+    Tab(FrontierApp* app);
     Tab(Tabs* tabs, std::wstring title, Icon* icon, Widget* content, bool closeable);
     Tab(FrontierApp* app, std::wstring title, Icon* icon, Widget* content, bool closeable);
     virtual ~Tab();
@@ -68,15 +67,17 @@ class Tab : public Widget
 
     virtual Widget* handleEvent(Frontier::Event* event);
 
-    void setTabs(Tabs* tabs) { m_tabs = tabs; }
-
     void setTitle(std::wstring title);
-    std::wstring getTitle() { return m_title; }
+    std::wstring getTitle() { return getProperty(FRONTIER_PROP_TITLE).asString(); }
     void setIcon(Icon* icon);
     Icon* getIcon() { return m_icon; }
     bool isCloseable() { return m_closeable; }
-    void setContent(Widget* content);
-    Widget* getContent() { return m_content; }
+
+    Tabs* getTabs();
+
+    void add(Widget* content);
+    void setContent(Widget* content) { add(content); }
+    Widget* getContent() { if (m_children.empty()) { return NULL; } else { return m_children.at(0); } }
 
     void setSelected() { m_selected = true; setDirty(DIRTY_STYLE); }
     void clearSelected() { m_selected = false; setDirty(DIRTY_STYLE); }
@@ -148,6 +149,7 @@ class Tabs : public Widget
 
     virtual std::vector<Widget*> getChildren();
 
+    void add(Widget* content);
     Tab* addTab(std::wstring title, Widget* content, bool closeable = false);
     Tab* addTab(std::wstring title, Icon* icon, Widget* content, bool closeable = false);
     void closeTab(Widget* tab, bool emitChangeSignal = true);

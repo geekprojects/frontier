@@ -26,39 +26,40 @@ using namespace std;
 using namespace Geek;
 using namespace Frontier;
 
+FRONTIER_WIDGET(Tab, Frontier::Tab)
+
 #define TAB_SIZE 22
+
+Tab::Tab(FrontierApp* app)
+    : Widget(app, L"Tab")
+{
+    m_icon = NULL;
+    m_closeable = false;
+    m_mouseDown = false;
+}
 
 Tab::Tab(Tabs* tabs, wstring title, Icon* icon, Widget* content, bool closeable)
     : Widget(tabs->getApp(), L"Tab")
 {
-    m_tabs = tabs;
+    setParent(tabs);
 
-    m_title = title;
+    setTitle(title);
     m_icon = icon;
-    m_content = content;
     m_closeable = closeable;
     m_mouseDown = false;
 
-    m_content->setParent(m_tabs);
-    m_content->incRefCount();
-
-    m_children.push_back(content);
+    setContent(content);
 }
 
 Tab::Tab(FrontierApp* app, wstring title, Icon* icon, Widget* content, bool closeable)
     : Widget(app, L"Tab")
 {
-    m_tabs = NULL;
-
-    m_title = title;
+    setTitle(title);
     m_icon = icon;
-    m_content = content;
     m_closeable = closeable;
     m_mouseDown = false;
 
-    m_content->incRefCount();
-
-    m_children.push_back(content);
+    setContent(content);
 }
 
 Tab::~Tab()
@@ -76,9 +77,9 @@ void Tab::calculateSize()
     FontHandle* font = getTextFont();
 
     bool horizontal = true;
-    if (m_tabs != NULL)
+    if (m_parent != NULL)
     {
-        horizontal = m_tabs->isHorizontal();
+        horizontal = ((Tabs*)m_parent)->isHorizontal();
     }
     if (horizontal)
     {
@@ -114,14 +115,16 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
     BoxModel boxModel = getBoxModel();
     bool horizontal = true;
     int rotate = 0;
-    if (m_tabs != NULL)
+
+    Tabs* tabs = getTabs();
+    if (tabs != NULL)
     {
-        if (m_tabs->getTabPlacement() == TAB_LEFT)
+        if (tabs->getTabPlacement() == TAB_LEFT)
         {
             rotate = 90;
             horizontal = false;
         }
-        else if (m_tabs->getTabPlacement() == TAB_RIGHT)
+        else if (tabs->getTabPlacement() == TAB_RIGHT)
         {
             rotate = 270;
             horizontal = false;
@@ -196,7 +199,7 @@ bool Tab::draw(Geek::Gfx::Surface* surface)
         surface,
         textOffsetX,
         textOffsetY,
-        m_title.c_str(),
+        getProperty(FRONTIER_PROP_TITLE).asString().c_str(),
         colour,
         true,
         NULL,
@@ -233,6 +236,7 @@ Widget* Tab::handleEvent(Event* event)
 {
     if (event->is(FRONTIER_EVENT_MOUSE))
     {
+        Tabs* tabs = getTabs();
 
         MouseEvent* mouseEvent = (MouseEvent*)event;
         int x = mouseEvent->x;
@@ -249,7 +253,7 @@ Widget* Tab::handleEvent(Event* event)
             {
                 int closeWidth = m_app->getTheme()->getIconWidth(FRONTIER_ICON_WINDOW_CLOSE);
                 bool close = false;
-                if (m_tabs == NULL || m_tabs->isHorizontal())
+                if (tabs == NULL || tabs->isHorizontal())
                 {
                     close = (x > m_setSize.width - (closeWidth + 5));
                 }
@@ -260,9 +264,9 @@ Widget* Tab::handleEvent(Event* event)
 
                 if (close)
                 {
-                    if (!mouseButtonEvent->direction && m_tabs != NULL)
+                    if (!mouseButtonEvent->direction && tabs != NULL)
                     {
-                        m_tabs->closeTabSignal().emit(m_content);
+                        tabs->closeTabSignal().emit(getContent());
                     }
 
                     return this;
@@ -285,12 +289,12 @@ Widget* Tab::handleEvent(Event* event)
                 m_mouseDownPos = Vector2D(mouseButtonEvent->x, mouseButtonEvent->y);
             }
 
-            if (m_tabs != NULL)
+            if (tabs != NULL)
             {
-                m_tabs->setActiveTab(this);
+                tabs->setActiveTab(this);
             }
 
-            return m_content;
+            return getContent();
         }
         else if (event->eventType == FRONTIER_EVENT_MOUSE_MOTION)
         {
@@ -304,9 +308,9 @@ Widget* Tab::handleEvent(Event* event)
                 {
                     log(DEBUG, "Dragging tab!! diff=%d", diff);
                     m_mouseDown = false;
-                    if (m_tabs != NULL)
+                    if (tabs != NULL)
                     {
-                        m_tabs->closeTab(m_content, false);
+                        tabs->closeTab(getContent(), false);
                     }
                     getWindow()->dragWidget(this);
                 }
@@ -317,9 +321,37 @@ Widget* Tab::handleEvent(Event* event)
     return this;
 }
 
+void Tab::add(Widget* content)
+{
+    Widget* existing = getContent();
+    if (existing == content)
+    {
+        return;
+    }
+
+    if (existing != NULL)
+    {
+        existing->decRefCount();
+        m_children.clear();
+    }
+
+    content->incRefCount();
+    content->setParent(getParent());
+    m_children.push_back(content);
+}
+
+Tabs* Tab::getTabs()
+{
+    if (m_parent != NULL && typeid(*m_parent) == typeid(Tabs))
+    {
+        return (Tabs*)m_parent;
+    }
+    return NULL;
+}
+
 void Tab::setTitle(wstring title)
 {
-    m_title = title;
+    setProperty(FRONTIER_PROP_TITLE, Value(title));
     setDirty(DIRTY_CONTENT);
 }
 

@@ -542,6 +542,18 @@ vector<Widget*> Tabs::getChildren()
     return children;
 }
 
+void Tabs::add(Widget* widget)
+{
+    if (typeid(*widget) == typeid(Tab))
+    {
+        addTab((Tab*)widget, m_tabs.end());
+    }
+    else
+    {
+        addTab(L"", widget, true);
+    }
+}
+
 Tab* Tabs::addTab(std::wstring title, Widget* content, bool closeable)
 {
     return addTab(title, NULL, content, closeable);
