@@ -137,6 +137,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
 
     void setContent(Widget* widget);
     Widget* getContent() const { return m_content; }
+    Widget* findWidgetById(std::wstring id);
     void setActiveWidget(Widget* widget);
     Widget* getActiveWidget() const { return m_activeWidget; }
     void setMotionWidget(Widget* widget);

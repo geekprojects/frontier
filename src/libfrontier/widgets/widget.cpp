@@ -100,6 +100,24 @@ void Widget::remove(Widget* widget)
 {
 }
 
+Widget* Widget::findById(wstring id)
+{
+    if (m_widgetId == id)
+    {
+        return this;
+    }
+
+    for (Widget* child : getChildren())
+    {
+        Widget* widget = child->findById(id);
+        if (widget != NULL)
+        {
+            return widget;
+        }
+    }
+    return NULL;
+}
+
 void Widget::calculateSize()
 {
 }

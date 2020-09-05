@@ -204,6 +204,8 @@ class Widget : public FrontierObject, public Geek::Logger
 
     virtual void add(Widget* widget);
 
+    virtual Widget* findById(std::wstring id);
+
     virtual void remove(Widget* widget);
 
     /// Calculate the minimum and maximum size this Widget can be

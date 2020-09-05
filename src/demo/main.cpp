@@ -70,6 +70,7 @@ class DemoApp : public FrontierApp
     void onTextButton2(Widget* button);
     void onIconButton(Widget* button);
     void onDateButton(Widget* button);
+    void onThisButton(Widget* button);
 
     void onCloseTab(Widget* tab);
     void onContextMenu(ListItem* item, Geek::Vector2D pos);
@@ -323,9 +324,15 @@ bool DemoApp::init()
 
     {
         Widget* loadedWidget = getWidgetBuilder()->loadWidget(STRINGIFY(FRONTIER_SRC) "/src/demo/test.xml");
-        if (loadedWidget)
+        if (loadedWidget != NULL)
         {
             m_tabs->addTab(L"Loaded", loadedWidget);
+            Button* thisButton = (Button*)loadedWidget->findById(L"this");
+            log(DEBUG, "thisButton=%p", thisButton);
+            if (thisButton != NULL)
+            {
+                thisButton->clickSignal().connect(sigc::mem_fun(*this, &DemoApp::onThisButton));
+            }
         }
     }
 
@@ -474,6 +481,11 @@ void DemoApp::onDateButton(Widget* button)
 {
     DatePickerWindow* datePicker = new DatePickerWindow(this);
     datePicker->show();
+}
+
+void DemoApp::onThisButton(Widget* button)
+{
+    log(DEBUG, "onThisButton: Clicked!");
 }
 
 void DemoApp::onCloseTab(Widget* tab)

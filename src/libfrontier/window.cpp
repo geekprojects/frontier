@@ -174,6 +174,19 @@ void FrontierWindow::setContent(Widget* content)
     m_drawMutex->unlock();
 }
 
+Widget* FrontierWindow::findWidgetById(std::wstring id)
+{
+    for (Layer* layer : m_layers)
+    {
+        Widget* widget = layer->getContentRoot()->findById(id);
+if (widget != NULL)
+{
+return widget;
+}
+    }
+    return NULL;
+}
+
 void FrontierWindow::setActiveWidget(Widget* widget)
 {
     if (m_activeWidget == widget)
