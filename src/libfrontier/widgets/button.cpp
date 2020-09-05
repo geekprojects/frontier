@@ -31,6 +31,7 @@ FRONTIER_WIDGET(Button, Frontier::Button)
 
 Button::Button(FrontierApp* ui) : Label(ui, L"Button", L"")
 {
+    m_type = BUTTON_NORMAL;
 }
 
 Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Label(ui, L"Button", text)
