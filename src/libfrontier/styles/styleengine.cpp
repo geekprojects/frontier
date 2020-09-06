@@ -284,10 +284,8 @@ bool StyleSelector::matches(Widget* widget)
         return false;
     }
 
-    bool matchState = false;
     if (state.length() > 0)
     {
-        matchState = true;
         if (state == "active")
         {
             if (!widget->isActive())
