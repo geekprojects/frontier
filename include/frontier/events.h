@@ -59,6 +59,9 @@ struct Event
     EventType eventType;
     FrontierWindow* window;
 
+    Event() {}
+    virtual ~Event() {}
+
     bool is(EventCategory category)
     {
         return !!(((unsigned int)eventType & (unsigned int)FRONTIER_EVENT_MASK) == (unsigned int)category);
