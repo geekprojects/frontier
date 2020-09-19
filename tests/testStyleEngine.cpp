@@ -178,6 +178,6 @@ TEST(StyleEngineTest, wildcard)
     EXPECT_EQ(1, props.size());
     auto it = props.find("background-color");
     EXPECT_FALSE(it == props.end());
-    EXPECT_EQ(0xff0000, it->second.asInt());
+    EXPECT_EQ(0xffff0000, it->second.asInt());
 }
 
