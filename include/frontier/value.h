@@ -17,7 +17,7 @@ enum ValueType
 struct Value
 {
     ValueType type;
-    std::variant<int, std::wstring> v;
+    std::variant<int64_t, std::wstring> v;
 
     Value()
     {
@@ -57,7 +57,7 @@ struct Value
             case INT:
             {
                 wchar_t buf[256];
-                swprintf(buf, 256, L"%lld", std::get<int>(v));
+                swprintf(buf, 256, L"%lld", std::get<int64_t>(v));
                 return std::wstring(buf);
             } break;
 
@@ -77,7 +77,7 @@ struct Value
                 return 0;
 
             case INT:
-                return std::get<int>(v);
+                return std::get<int64_t>(v);
 
             case STRING:
                 return wcstoul(std::get<std::wstring>(v).c_str(), NULL, 10);
@@ -96,7 +96,7 @@ struct Value
                 return false;
 
             case INT:
-                return !!(std::get<int>(v));
+                return !!(std::get<int64_t>(v));
 
             case STRING:
             {

@@ -66,7 +66,7 @@ struct ShortcutProperty
 struct IdentValues
 {
     const char* ident;
-    int64_t value;
+    uint64_t value;
 } g_identValues[] =
 {
     {"true", 1},
@@ -82,7 +82,7 @@ struct IdentValues
 
     {"disc", 0x1},
 
-    {"transparent", (int64_t)FRONTIER_COLOUR_TRANSPARENT},
+    {"transparent", FRONTIER_COLOUR_TRANSPARENT},
 
     // Alignment
     {"left", 0},
@@ -316,7 +316,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
             hex = expandedHex.c_str();
         }
 
-        uint64_t rgb = strtol(hex.c_str(), NULL, 16);
+        uint64_t rgb = strtol(hex.c_str(), NULL, 16) & 0xffffff;
         rgb |= 0xff000000; // Set alpha
         return rgb;
     }
@@ -357,7 +357,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
             if (!strcmp(val.ident, identStr.c_str()))
             {
 #ifdef DEBUG_CSS_PARSER
-                printf("RuleSetListener::getTermValue:   -> Term: ident MAPPED to %lld\n", val.value);
+                printf("RuleSetListener::getTermValue:   -> Term: ident: %s MAPPED to %llx\n", val.ident, val.value);
 #endif
                 return val.value;
             }
