@@ -39,6 +39,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace std;
 
+FRONTIER_WIDGET(VideoWidget, Frontier::VideoWidget)
+
 static int powerOfTwo(int input)
 {
     int value = 1;
