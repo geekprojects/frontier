@@ -163,3 +163,21 @@ TEST(StyleEngineTest, nested4)
     EXPECT_EQ(0, props.size());
 }
 
+TEST(StyleEngineTest, wildcard)
+{
+    bool res;
+    StyleEngine* se = new StyleEngine();
+    res = se->parseString("* { background-color: #ff0000; }");
+    EXPECT_EQ(true, res);
+
+    FrontierApp* app = new TestApp();
+
+    Widget* a = new Widget(app, L"WidgetA");
+
+    unordered_map<string, Value> props = se->getProperties(a);
+    EXPECT_EQ(1, props.size());
+    auto it = props.find("background-color");
+    EXPECT_FALSE(it == props.end());
+    EXPECT_EQ(0xff0000, it->second.asInt());
+}
+
