@@ -8,11 +8,16 @@ using namespace Frontier;
 using namespace Geek;
 using namespace std;
 
+#define STRINGIFY(x) XSTRINGIFY(x)
+#define XSTRINGIFY(x) #x
+
+#define TEST_CSS (STRINGIFY(FRONTIER_SRC) "/tests/test.css")
+
 TEST(StyleEngineTest, simple)
 {
     bool res;
     StyleEngine* se = new StyleEngine();
-    res = se->parse("../tests/test.css");
+    res = se->parse(TEST_CSS);
     EXPECT_EQ(true, res);
 
     FrontierApp* app = new TestApp();
@@ -37,7 +42,7 @@ TEST(StyleEngineTest, nested1)
 {
     bool res;
     StyleEngine* se = new StyleEngine();
-    res = se->parse("../tests/test.css");
+    res = se->parse(TEST_CSS);
     EXPECT_EQ(true, res);
 
     FrontierApp* app = new TestApp();
@@ -66,7 +71,7 @@ TEST(StyleEngineTest, nested2)
 {
     bool res;
     StyleEngine* se = new StyleEngine();
-    res = se->parse("../tests/test.css");
+    res = se->parse(TEST_CSS);
     EXPECT_EQ(true, res);
 
     FrontierApp* app = new TestApp();
@@ -100,7 +105,7 @@ TEST(StyleEngineTest, nested3)
 {
     bool res;
     StyleEngine* se = new StyleEngine();
-    res = se->parse("../tests/test.css");
+    res = se->parse(TEST_CSS);
     EXPECT_EQ(true, res);
 
     FrontierApp* app = new TestApp();
@@ -139,7 +144,7 @@ TEST(StyleEngineTest, nested4)
 {
     bool res;
     StyleEngine* se = new StyleEngine();
-    res = se->parse("../tests/test.css");
+    res = se->parse(TEST_CSS);
     EXPECT_EQ(true, res);
 
     FrontierApp* app = new TestApp();
