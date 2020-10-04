@@ -99,7 +99,7 @@ class FrontierApp : public Geek::Logger
     std::vector<FrontierWindow*>& getWindows() { return m_windows; }
 
  public:
-    FrontierApp(std::wstring name);
+    explicit FrontierApp(std::wstring name);
     virtual ~FrontierApp();
 
     /// Return the name of the application
@@ -162,7 +162,7 @@ class FrontierApp : public Geek::Logger
     virtual bool main();
 
     /// Request that the app should quit
-    virtual bool quit(bool force = false);
+    virtual bool quit(bool force);
 
     /// Cause all Windows to be updated and redrawn
     void update();
@@ -194,6 +194,6 @@ class FrontierApp : public Geek::Logger
     virtual sigc::signal<void, FrontierWindow*> activeWindowChangedSignal() { return m_activeWindowChangedSignal; }
 };
 
-};
+}
 
 #endif

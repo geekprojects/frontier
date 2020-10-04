@@ -45,27 +45,26 @@ class ScrollBar : public Widget
     int getScaledValue(BoxModel& boxModel, int v);
     int getControlPos(BoxModel& boxModel);
     int getControlSize(BoxModel& boxModel);
-    int range() { return m_max - (m_min + m_size); }
+    int range() const { return m_max - (m_min + m_size); }
 
     sigc::signal<void, int> m_changedPositionSignal;
 
  public:
     ScrollBar(FrontierApp* ui, bool horizontal);
-    ScrollBar(FrontierWindow* window, bool horizontal);
-    virtual ~ScrollBar();
+    ~ScrollBar() override;
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     void set(int min, int max, int size);
     void setPos(int pos);
-    int getPos();
+    int getPos() const { return m_pos; }
 
     virtual sigc::signal<void, int> changedPositionSignal() { return m_changedPositionSignal; }
 };
 
-};
+}
 
 #endif

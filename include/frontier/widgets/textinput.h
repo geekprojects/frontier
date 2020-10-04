@@ -57,11 +57,9 @@ class TextInput : public Widget
     sigc::signal<void, TextInput*> m_signalTextChanged;
 
  public:
-    TextInput(FrontierApp* ui);
+    explicit TextInput(FrontierApp* ui);
     TextInput(FrontierApp* ui, std::wstring text);
-    TextInput(FrontierWindow* ui);
-    TextInput(FrontierWindow* ui, std::wstring text);
-    virtual ~TextInput();
+    ~TextInput() override;
 
     void setMaxLength(unsigned int maxLen)
     {
@@ -71,21 +69,21 @@ class TextInput : public Widget
     void setText(std::wstring wtext);
     std::wstring getText() { return m_text; }
 
-    bool hasSelection()
+    bool hasSelection() const
     {
         return (m_selectStart >= 0 && m_selectStart != m_selectEnd);
     }
     std::wstring getSelected();
     std::wstring cutSelected();
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
-    virtual void activateNext(Widget* activeChild = NULL);
+    void activateNext(Widget* activeChild) override;
 
-    virtual Frontier::WindowCursor getCursor() { return Frontier::CURSOR_EDIT; }
+    Frontier::WindowCursor getCursor() override { return Frontier::CURSOR_EDIT; }
 
     virtual bool isValid(std::wstring str);
 
@@ -93,6 +91,6 @@ class TextInput : public Widget
     sigc::signal<void, TextInput*> signalTextChanged() { return m_signalTextChanged; }
 };
 
-};
+}
 
 #endif

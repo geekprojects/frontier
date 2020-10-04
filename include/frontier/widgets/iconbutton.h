@@ -36,20 +36,15 @@ namespace Frontier
 class IconButton : public Button
 {
  private:
-    Icon* m_icon;
-
  public:
     IconButton(FrontierApp* ui, Icon* icon);
     IconButton(FrontierApp* ui, uint32_t icon);
-    virtual ~IconButton();
+    ~IconButton() override;
 
-    void setIcon(Icon* icon);
-    Icon* getIcon() { return m_icon; }
-
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 };
 
-};
+}
 
 #endif

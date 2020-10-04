@@ -36,24 +36,22 @@ namespace Frontier
 class Frame : public Widget
 {
  public:
-    Frame(FrontierApp* ui);
+    explicit Frame(FrontierApp* ui);
     Frame(FrontierApp* ui, bool horizontal);
     Frame(FrontierApp* ui, std::wstring widgetName, bool horizontal);
-    Frame(FrontierWindow* ui, bool horizontal);
-    Frame(FrontierWindow* ui, std::wstring widgetName, bool horizontal);
-    virtual ~Frame();
+    ~Frame() override;
 
-    virtual void add(Widget* widget);
-    virtual void remove(Widget* widget);
+    void add(Widget* widget) override;
+    void remove(Widget* widget) override;
 
-    virtual void calculateSize();
-    virtual void layout();
+    void calculateSize() override;
+    void layout() override;
 
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
-    virtual void activateNext(Widget* activeChild = NULL);
+    void activateNext(Widget* activeChild) override;
 };
 
 /**
@@ -64,9 +62,8 @@ class Frame : public Widget
 class HFrame : public Frame
 {
  public:
-    HFrame(FrontierApp* ui);
-    HFrame(FrontierWindow* ui);
-    virtual ~HFrame();
+    explicit HFrame(FrontierApp* ui) : Frame(ui, true) {}
+    ~HFrame() override = default;
 };
 
 /**
@@ -77,11 +74,10 @@ class HFrame : public Frame
 class VFrame : public Frame
 {
  public:
-    VFrame(FrontierApp* ui);
-    VFrame(FrontierWindow* ui);
-    virtual ~VFrame();
+    explicit VFrame(FrontierApp* ui) : Frame(ui, false) {}
+    ~VFrame() override = default;
 };
 
-};
+}
 
 #endif

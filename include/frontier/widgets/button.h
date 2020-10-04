@@ -44,18 +44,18 @@ class Button : public Label
     bool m_emitAll;
 
  public:
-    Button(FrontierApp* ui);
+    explicit Button(FrontierApp* ui);
     Button(FrontierApp* ui, std::wstring text, ButtonType type = BUTTON_NORMAL);
     Button(FrontierApp* ui, std::wstring widgetType, std::wstring text, ButtonType type = BUTTON_NORMAL);
-    virtual ~Button();
+    ~Button() override;
 
     void setEmitAll(bool emitAll) { m_emitAll = emitAll; }
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
-    virtual void activateNext(Widget* activeChild = NULL);
+    void activateNext(Widget* activeChild) override;
 };
 
-};
+}
 
 #endif

@@ -56,9 +56,9 @@ class TerminalProcess : public Geek::Thread, Geek::Logger
 
  public:
     TerminalProcess(Terminal* terminal, const char* command, std::vector<const char*> args, std::vector<const char*> env);
-    ~TerminalProcess();
+    ~TerminalProcess() override;
 
-    bool main();
+    bool main() override;
 
     void typeChar(wchar_t c);
 
@@ -106,14 +106,13 @@ class Terminal : public Widget
     uint32_t getColour8(int code, bool fg);
 
  public:
-    Terminal(FrontierApp* ui);
-    Terminal(FrontierWindow* ui);
-    virtual ~Terminal();
+    explicit Terminal(FrontierApp* ui);
+    ~Terminal() override;
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     void receiveChar(wchar_t c);
     void receiveChars(char* c, int length);
@@ -123,6 +122,6 @@ class Terminal : public Widget
     bool run(const char* command, std::vector<const char*> args, std::vector<const char*> env);
 };
 
-};
+}
 
 #endif

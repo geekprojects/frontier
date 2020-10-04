@@ -34,23 +34,7 @@ ComboBox::ComboBox(FrontierApp* ui) : Frame(ui, true)
     initComboBox();
 }
 
-ComboBox::ComboBox(FrontierWindow* ui) : Frame(ui, true)
-{
-    initComboBox();
-}
-
 ComboBox::ComboBox(FrontierApp* ui, vector<wstring> options) : Frame(ui, true)
-{
-    initComboBox();
-
-    for (wstring option : options)
-    {
-        addOption(option);
-    }
-    updateOptions();
-}
-
-ComboBox::ComboBox(FrontierWindow* ui, vector<wstring> options) : Frame(ui, true)
 {
     initComboBox();
 
@@ -89,7 +73,7 @@ void ComboBox::addOption(wstring text)
 
 void ComboBox::addOption(wstring text, void* data)
 {
-    ListItem* item = new TextListItem(m_comboBoxDropDown, text);
+    ListItem* item = new TextListItem(getApp(), text);
     item->setPrivateData(data);
     item->incRefCount();
     m_options.push_back(item);
@@ -198,8 +182,8 @@ ComboBoxDropDown::ComboBoxDropDown(FrontierApp* app) : FrontierWindow(app, L"", 
 {
     setSize(Size(20, 20));
 
-    Frame* frame = new Frame(this, false);
-    m_list = new List(this);
+    Frame* frame = new Frame(getApp(), false);
+    m_list = new List(getApp());
     frame->add(m_list);
     setContent(frame);
 }

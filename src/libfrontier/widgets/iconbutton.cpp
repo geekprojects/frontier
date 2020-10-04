@@ -28,27 +28,21 @@ using namespace Geek::Gfx;
 
 IconButton::IconButton(FrontierApp* ui, Icon* icon) : Button(ui, L"IconButton", L"")
 {
-    m_icon = icon;
+    setIcon(icon);
 }
 
 IconButton::IconButton(FrontierApp* ui, uint32_t iconId) : Button(ui, L"IconButton", L"")
 {
-    m_icon = ui->getTheme()->getIcon(iconId);
+    setIcon(ui->getTheme()->getIcon(iconId));
 }
 
 IconButton::~IconButton()
 {
 }
 
-void IconButton::setIcon(Icon* icon)
-{
-    m_icon = icon;
-    setDirty(DIRTY_SIZE | DIRTY_CONTENT);
-}
-
 void IconButton::calculateSize()
 {
-    m_minSize = m_icon->getSize();
+    m_minSize = getIcon()->getSize();
 
     Size borderSize = getBorderSize();
     m_minSize.width += borderSize.width;
@@ -64,13 +58,13 @@ void IconButton::calculateSize()
 
 bool IconButton::draw(Surface* surface)
 {
-    Size iconSize = m_icon->getSize();
+    Size iconSize = getIcon()->getSize();
     int x = (m_setSize.width / 2) - (iconSize.width / 2);
     int y = (m_setSize.height / 2) - (iconSize.height / 2);
 
     drawBorder(surface);
 
-    m_icon->draw(surface, x, y);
+    getIcon()->draw(surface, x, y);
 
     return true;
 }

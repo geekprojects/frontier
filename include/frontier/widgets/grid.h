@@ -51,13 +51,12 @@ class Grid : public Frontier::Widget
     void freeSizes();
     void clearChildren();
 
-    virtual void calculateSize();
-    virtual void layout();
+    void calculateSize() override;
+    void layout() override;
 
  public:
-    Grid(FrontierApp* app);
-    Grid(FrontierWindow* window);
-    virtual ~Grid();
+    explicit Grid(FrontierApp* app);
+    ~Grid() override;
 
     virtual void put(int x, int y, Widget* widget);
     virtual void put(int x, int y, Widget* widget, uint32_t background);
@@ -66,13 +65,13 @@ class Grid : public Frontier::Widget
     Size getGridSize();
     void clear();
 
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
-    virtual void activateNext(Widget* activeChild = NULL);
+    void activateNext(Widget* activeChild) override;
 };
 
-};
+}
 
 #endif

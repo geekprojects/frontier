@@ -22,8 +22,8 @@
 #include <frontier/frontier.h>
 #include <frontier/contextmenu.h>
 #include <frontier/widgets/builder.h>
-#include <sys/time.h>
 #include <signal.h>
+#include <sys/time.h>
 
 #include <typeinfo>
 
@@ -372,6 +372,6 @@ void FrontierApp::onAboutMenu(MenuItem* item)
 
 void FrontierApp::onQuitMenu(MenuItem* item)
 {
-    quit();
+    quit(false);
 }
 

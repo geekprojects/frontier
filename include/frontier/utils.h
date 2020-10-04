@@ -51,7 +51,7 @@ struct Size
         height = _h;
     }
 
-    std::string toString()
+    std::string toString() const
     {
         char buffer[32];
         snprintf(buffer, 32, "%d,%d", width, height);
@@ -102,7 +102,7 @@ struct Size
         }
     }
 
-    int get(bool isHoriz)
+    int get(bool isHoriz) const
     {
         if (isHoriz)
         {
@@ -120,12 +120,12 @@ struct Size
         this->height += rhs.height;
     }
 
-    bool operator== (const Size& rhs)
+    bool operator== (const Size& rhs) const
     {
         return (this->width == rhs.width && this->height == rhs.height);
     }
 
-    bool operator!= (const Size& rhs)
+    bool operator!= (const Size& rhs) const
     {
         return (this->width != rhs.width || this->height != rhs.height);
     }
@@ -158,12 +158,12 @@ struct Rect
         height = _height;
     }
 
-    Size getSize()
+    Size getSize() const
     {
         return Size(width, height);
     }
 
-    bool intersects(int _x, int _y)
+    bool intersects(int _x, int _y) const
     {
         return (_x >= x && _y >= y && _x < (x + width) && _y < (y + height));
     }
@@ -182,6 +182,6 @@ class Utils
     static void stacktrace();
 };
 
-};
+}
 
 #endif

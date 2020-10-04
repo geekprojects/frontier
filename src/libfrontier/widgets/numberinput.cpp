@@ -38,14 +38,7 @@ NumberInput::NumberInput(FrontierApp* app) : TextInput(app)
     init();
 }
 
-NumberInput::NumberInput(FrontierWindow* window) : TextInput(window)
-{
-    init();
-}
-
-NumberInput::~NumberInput()
-{
-}
+NumberInput::~NumberInput() = default;
 
 void NumberInput::init()
 {

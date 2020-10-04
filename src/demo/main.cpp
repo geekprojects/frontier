@@ -266,7 +266,7 @@ bool DemoApp::init()
         NumberInput* numberInput2;
         numberFrame2->add(new Label(this, L"Number Text:"));
         numberFrame2->add(numberInput2 = new NumberInput(this));
-        numberInput2->setStyle("expand-horizontal", false);
+        numberInput2->setStyle("expand-horizontal", Value(false));
         numberInput2->setIntegerOnly(true);
         numberInput2->setMax(99);
         numberInput2->setMaxLength(2);

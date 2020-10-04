@@ -38,16 +38,6 @@ Scroller::Scroller(FrontierApp* ui, Widget* child) : Widget(ui, L"Scroller")
     initScroller(child);
 }
 
-Scroller::Scroller(FrontierWindow* window) : Widget(window, L"Scroller")
-{
-    initScroller(NULL);
-}
-
-Scroller::Scroller(FrontierWindow* window, Widget* child) : Widget(window, L"Scroller")
-{
-    initScroller(child);
-}
-
 Scroller::~Scroller()
 {
     if (m_childSurface != NULL)

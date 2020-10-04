@@ -55,27 +55,27 @@ class Tab : public Widget
     Geek::Vector2D m_mouseDownPos;
 
  public:
-    Tab(FrontierApp* app);
+    explicit Tab(FrontierApp* app);
     Tab(Tabs* tabs, std::wstring title, Icon* icon, Widget* content, bool closeable);
     Tab(FrontierApp* app, std::wstring title, Icon* icon, Widget* content, bool closeable);
-    virtual ~Tab();
+    ~Tab() override;
 
-    virtual void calculateSize();
-    virtual void layout();
+    void calculateSize() override;
+    void layout() override;
 
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     void setTitle(std::wstring title);
     std::wstring getTitle() { return getProperty(FRONTIER_PROP_TITLE).asString(); }
     void setIcon(Icon* icon);
     Icon* getIcon() { return m_icon; }
-    bool isCloseable() { return m_closeable; }
+    bool isCloseable() const { return m_closeable; }
 
     Tabs* getTabs();
 
-    void add(Widget* content);
+    void add(Widget* content) override;
     void setContent(Widget* content) { add(content); }
     Widget* getContent() { if (m_children.empty()) { return NULL; } else { return m_children.at(0); } }
 
@@ -101,7 +101,6 @@ class Tabs : public Widget
     bool m_addButton;
     Icon* m_openIcon;
     Icon* m_closedIcon;
-    Icon* m_dropDownIcon;
     Frontier::IconButton* m_collapseButtonWidget;
     Frontier::IconButton* m_addButtonWidget;
 
@@ -123,33 +122,30 @@ class Tabs : public Widget
     void onAddTab(Widget* button);
 
  public:
-    Tabs(FrontierApp* app);
-    Tabs(FrontierWindow* app);
+    explicit Tabs(FrontierApp* app);
     Tabs(FrontierApp* app, bool collapsible, TabPlacement placement);
-    Tabs(FrontierWindow* window, bool collapsible, TabPlacement placement);
     Tabs(FrontierApp* app, bool collapsible, bool addButton, TabPlacement placement);
-    Tabs(FrontierWindow* window, bool collapsible, bool addButton, TabPlacement placement);
-    virtual ~Tabs();
+    ~Tabs() override;
 
-    virtual void init();
+    void init() override;
 
-    virtual void calculateSize();
-    virtual void layout();
-    virtual void clearDirty();
+    void calculateSize() override;
+    void layout() override;
+    void clearDirty() override;
 
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     void setCollapsible(bool collapsible);
-    bool isCollapsible() { return m_collapsible; }
+    bool isCollapsible() const { return m_collapsible; }
     void setTabPlacement(TabPlacement tabPlacement);
     TabPlacement getTabPlacement() { return m_placement; }
     bool isHorizontal() { return (m_placement == TAB_TOP || m_placement == TAB_BOTTOM); }
 
-    virtual std::vector<Widget*> getChildren();
+    std::vector<Widget*> getChildren() override;
 
-    void add(Widget* content);
+    void add(Widget* content) override;
     Tab* addTab(std::wstring title, Widget* content, bool closeable = false);
     Tab* addTab(std::wstring title, Icon* icon, Widget* content, bool closeable = false);
     void closeTab(Widget* tab, bool emitChangeSignal = true);
@@ -176,9 +172,9 @@ class Tabs : public Widget
     void nextTab();
     void prevTab();
 
-    virtual bool isVisible(Frontier::Widget* child = NULL);
+    bool isVisible(Frontier::Widget* child) override;
 
-    virtual void dump(int level);
+    void dump(int level) override;
 
     virtual sigc::signal<void, Widget*> changeTabSignal() { return m_changeTabSignal; }
     virtual sigc::signal<void, Widget*> closeTabSignal() { return m_closeTabSignal; }

@@ -61,7 +61,7 @@ bool FrontierColourPickerWindow::init()
 {
     setSize(Size(100, 100));
 
-    Frame* root = new Frame(this, false);
+    Frame* root = new Frame(getApp(), false);
     root->setWidgetClass(L"colourPicker");
 
     m_hsvWheel = new HSVWheel(getApp(), m_colour);

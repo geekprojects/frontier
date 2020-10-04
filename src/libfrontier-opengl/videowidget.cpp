@@ -141,10 +141,6 @@ void VideoWidget::init()
 
 }
 
-void VideoWidget::onShow()
-{
-}
-
 void VideoWidget::calculateSize()
 {
     if (!m_addedDirect)

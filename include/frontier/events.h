@@ -60,14 +60,13 @@ struct Event
     FrontierWindow* window;
 
     Event() {}
-    virtual ~Event() {}
+    virtual ~Event() = default;
 
-    bool is(EventCategory category)
+    bool is(EventCategory category) const
     {
-        return !!(((unsigned int)eventType & (unsigned int)FRONTIER_EVENT_MASK) == (unsigned int)category);
+        return ((unsigned int) eventType & (unsigned int) FRONTIER_EVENT_MASK) == (unsigned int) category;
     }
 };
-
 
 struct KeyEvent : Event
 {
@@ -100,7 +99,7 @@ struct MouseScrollEvent : MouseEvent
     int32_t scrollY;
 };
 
-};
+}
 
 #endif
 

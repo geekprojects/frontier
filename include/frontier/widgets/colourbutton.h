@@ -42,18 +42,18 @@ class ColourButton : public Frontier::Button
     void onClick(Widget* widget);
 
  public:
-    ColourButton(FrontierApp* app);
+    explicit ColourButton(FrontierApp* app);
     ColourButton(FrontierApp* app, Geek::Gfx::Colour colour);
-    virtual ~ColourButton();
+    ~ColourButton() override;
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 
     void setColour(Geek::Gfx::Colour colour);
 
     sigc::signal<void, Geek::Gfx::Colour> colourSelectedSignal() { return m_colourSelectedSignal; }
 };
 
-};
+}
 
 #endif

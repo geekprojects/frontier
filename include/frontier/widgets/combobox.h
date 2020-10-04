@@ -55,11 +55,9 @@ class ComboBox : public Frame
     void optionSelected(ListItem* option);
 
  public:
-    ComboBox(FrontierApp* ui);
-    ComboBox(FrontierWindow* ui);
+    explicit ComboBox(FrontierApp* ui);
     ComboBox(FrontierApp* ui, std::vector<std::wstring> options);
-    ComboBox(FrontierWindow* ui, std::vector<std::wstring> options);
-    virtual ~ComboBox();
+    ~ComboBox() override;
 
     void addOption(std::wstring text);
     void addOption(std::wstring text, void* data);
@@ -81,17 +79,17 @@ class ComboBoxDropDown : public FrontierWindow
     List* m_list;
 
  public:
-    ComboBoxDropDown(FrontierApp* app);
-    virtual ~ComboBoxDropDown();
+    explicit ComboBoxDropDown(FrontierApp* app);
+    ~ComboBoxDropDown() override;
 
-    virtual bool init();
+    bool init() override;
 
-    void lostFocus();
+    void lostFocus() override;
 
     List* getList() { return m_list; }
 };
 
 
-};
+}
 
 #endif

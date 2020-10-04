@@ -45,12 +45,6 @@ ResizeableFrame::ResizeableFrame(FrontierApp* ui, bool horizontal) : Frame(ui, L
     m_dragWidget = 0;
 }
 
-ResizeableFrame::ResizeableFrame(FrontierWindow* window, bool horizontal) : Frame(window, L"ResizeableFrame", horizontal)
-{
-    m_dragging = false;
-    m_dragWidget = 0;
-}
-
 ResizeableFrame::~ResizeableFrame()
 {
 }

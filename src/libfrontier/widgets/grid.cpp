@@ -36,14 +36,6 @@ Grid::Grid(FrontierApp* app) : Widget(app, L"Grid")
     m_rowMaxSizes = NULL;
 }
 
-Grid::Grid(FrontierWindow* window) : Widget(window, L"Grid")
-{
-    m_colMinSizes = NULL;
-    m_colMaxSizes = NULL;
-    m_rowMinSizes = NULL;
-    m_rowMaxSizes = NULL;
-}
-
 Grid::~Grid()
 {
     clearChildren();

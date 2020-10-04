@@ -22,6 +22,8 @@
 #include <frontier/frontier.h>
 #include <frontier/widgets/button.h>
 
+#include <utility>
+
 using namespace std;
 using namespace Frontier;
 using namespace Geek;
@@ -32,23 +34,22 @@ FRONTIER_WIDGET(Button, Frontier::Button)
 Button::Button(FrontierApp* ui) : Label(ui, L"Button", L"")
 {
     m_type = BUTTON_NORMAL;
+    m_emitAll = false;
 }
 
-Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Label(ui, L"Button", text)
+Button::Button(FrontierApp* ui, wstring text, ButtonType type) : Label(ui, L"Button", std::move(text))
 {
     m_type = type;
     m_emitAll = false;
 }
 
-Button::Button(FrontierApp* ui, wstring widgetType, wstring text, ButtonType type) : Label(ui, widgetType, text)
+Button::Button(FrontierApp* ui, wstring widgetType, wstring text, ButtonType type) : Label(ui, std::move(widgetType), std::move(text))
 {
     m_type = type;
-}
-
-Button::~Button()
-{
     m_emitAll = false;
 }
+
+Button::~Button() = default;
 
 Widget* Button::handleEvent(Event* event)
 {

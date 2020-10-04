@@ -72,7 +72,7 @@ class StyleRule
 
  public:
     StyleRule() { m_id = 0; }
-    virtual ~StyleRule() {}
+    virtual ~StyleRule() = default;
 
     const std::vector<StyleSelector>& getSelectors() { return  m_selectors; }
     void addSelector(StyleSelector selector);
@@ -80,13 +80,12 @@ class StyleRule
     bool matches(Frontier::Widget* widget);
 
     void setId(uint64_t id) { m_id = id; }
-    uint64_t getId() { return m_id; }
+    uint64_t getId() const { return m_id; }
     std::wstring getKey();
 
     void setProperty(std::string property, Value value);
     void applyProperty(std::string property, Value value);
     void applyProperty(std::string property, std::vector<Value> values);
-    void applyProperty(std::string property, int count, const Value* values);
     std::unordered_map<std::string, Value> getProperties() { return m_properties; }
 };
 
@@ -120,7 +119,7 @@ class StyleEngine : public Geek::Logger
     StyleRule* findByKey(std::string key);
 
     std::unordered_map<std::string, Value> getProperties(Widget* widget);
-    uint64_t getTimestamp() { return m_timestamp; }
+    uint64_t getTimestamp() const { return m_timestamp; }
 };
 
 };

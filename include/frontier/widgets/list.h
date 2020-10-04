@@ -38,18 +38,19 @@ class Menu;
 class ListItem : public Widget
 {
  protected:
-    List* m_list;
+    List* m_list{};
 
  public:
-    ListItem(FrontierApp* ui);
-    ListItem(FrontierWindow* ui);
-    virtual ~ListItem();
+    explicit ListItem(FrontierApp* ui);
+    ~ListItem() override;
 
     virtual void setList(List* list);
-    virtual void clearSelected(bool updateList = true);
-    virtual void setSelected(bool updateList = true);
+    void clearSelected() { clearSelected(true); }
+    virtual void clearSelected(bool updateList);
+    void setSelected() { setSelected(true); }
+    virtual void setSelected(bool updateList);
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 };
 
 /**
@@ -64,15 +65,13 @@ class TextListItem : public ListItem
  public:
     TextListItem(FrontierApp* ui, std::wstring text);
     TextListItem(FrontierApp* ui, Icon* icon, std::wstring text);
-    TextListItem(FrontierWindow* ui, std::wstring text);
-    TextListItem(FrontierWindow* ui, Icon* icon, std::wstring text);
-    virtual ~TextListItem();
+    ~TextListItem() override;
 
     void setText(std::wstring wtext);
     std::wstring getText() { return m_text; }
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 };
 
 /**
@@ -88,19 +87,17 @@ class TreeListItem : public TextListItem
  public:
     TreeListItem(FrontierApp* ui, std::wstring text);
     TreeListItem(FrontierApp* ui, Icon* icon, std::wstring text);
-    TreeListItem(FrontierWindow* ui, std::wstring text);
-    TreeListItem(FrontierWindow* ui, Icon* icon, std::wstring text);
-    virtual ~TreeListItem();
+    ~TreeListItem() override;
 
     void addItem(ListItem* item);
 
     void setOpen(bool open);
 
-    virtual void calculateSize();
-    virtual void layout();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    void layout() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     sigc::signal<void, ListItem*> expandSignal() { return m_expandSignal; }
 };
@@ -121,18 +118,17 @@ class List : public Widget
     sigc::signal<void, ListItem*, Geek::Vector2D> m_contextMenuSignal;
 
  public:
-    List(FrontierApp* ui);
+    explicit List(FrontierApp* ui);
     List(FrontierApp* ui, bool horizontal);
-    List(FrontierWindow* window, bool horizontal = false);
-    virtual ~List();
+    ~List() override;
 
-    bool isHorizontal() { return m_horizontal; }
+    bool isHorizontal() const { return m_horizontal; }
 
-    virtual void calculateSize();
-    virtual void layout();
-    virtual bool draw(Geek::Gfx::Surface* surface, Rect visible);
+    void calculateSize() override;
+    void layout() override;
+    bool draw(Geek::Gfx::Surface* surface, Rect visible) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     void clearItems(bool setDirty = true);
     void addItem(ListItem* item);
@@ -154,18 +150,16 @@ class MenuList : public List
 
  public:
     MenuList(FrontierApp* ui, Menu* menu, bool horizontal = false);
-    MenuList(FrontierWindow* window, Menu* menu, bool horizontal = false);
     MenuList(FrontierApp* ui, std::vector<MenuItem*> menu, bool horizontal = false);
-    MenuList(FrontierWindow* window, std::vector<MenuItem*> menu, bool horizontal = false);
-    virtual ~MenuList();
+    ~MenuList() override;
 
-    virtual void init();
+    void init() override;
 
-    virtual void calculateSize();
+    void calculateSize() override;
 
     void setMenu(std::vector<MenuItem*> m_menu);
 };
 
-};
+}
 
 #endif

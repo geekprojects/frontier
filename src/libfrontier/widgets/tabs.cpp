@@ -40,27 +40,12 @@ Tabs::Tabs(FrontierApp* ui) : Widget(ui, TABS_WIDGET_NAME)
     setup(false, false, TAB_TOP);
 }
 
-Tabs::Tabs(FrontierWindow* window) : Widget(window, TABS_WIDGET_NAME)
-{
-    setup(false, false, TAB_TOP);
-}
-
 Tabs::Tabs(FrontierApp* ui, bool collapsible, TabPlacement placement) : Widget(ui, TABS_WIDGET_NAME)
 {
     setup(collapsible, false, placement);
 }
 
-Tabs::Tabs(FrontierWindow* window, bool collapsible, TabPlacement placement) : Widget(window, TABS_WIDGET_NAME)
-{
-    setup(collapsible, false, placement);
-}
-
 Tabs::Tabs(FrontierApp* ui, bool collapsible, bool addButton, TabPlacement placement) : Widget(ui, TABS_WIDGET_NAME)
-{
-    setup(collapsible, addButton, placement);
-}
-
-Tabs::Tabs(FrontierWindow* window, bool collapsible, bool addButton, TabPlacement placement) : Widget(window, TABS_WIDGET_NAME)
 {
     setup(collapsible, addButton, placement);
 }
@@ -801,7 +786,7 @@ int Tabs::getTabIndex(Tab* tab)
 
 bool Tabs::isVisible(Widget* child)
 {
-    bool visible = Widget::isVisible();
+    bool visible = Widget::isVisible(child);
     if (child == NULL || !visible)
     {
         return visible;

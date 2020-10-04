@@ -31,21 +31,19 @@ struct Value
         v = o.v;
     }
 
-    Value(int64_t i)
+    explicit Value(int64_t i)
     {
         type = INT;
         v = i;
     }
 
-    Value(std::wstring str)
+    explicit Value(std::wstring str)
     {
         type = STRING;
         v = str;
     }
 
-    ~Value()
-    {
-    }
+    ~Value() = default;
 
     std::wstring asString()
     {
@@ -59,7 +57,7 @@ struct Value
                 wchar_t buf[256];
                 swprintf(buf, 256, L"%lld", std::get<int64_t>(v));
                 return std::wstring(buf);
-            } break;
+            }
 
             case STRING:
                 return std::get<std::wstring>(v);
@@ -113,7 +111,7 @@ struct Value
                 {
                     return asInt() > 0;
                 }
-            } break;
+            }
 
             default:
                 // This shouldn't happen!
@@ -122,6 +120,6 @@ struct Value
     }
 };
 
-};
+}
 
 #endif

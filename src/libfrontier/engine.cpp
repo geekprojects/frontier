@@ -31,9 +31,7 @@ FrontierEngine::FrontierEngine(FrontierApp* app) : Geek::Logger("FrontierEngine"
     m_app = app;
 }
 
-FrontierEngine::~FrontierEngine()
-{
-}
+FrontierEngine::~FrontierEngine() = default;
 
 bool FrontierEngine::init()
 {
@@ -62,7 +60,7 @@ string FrontierEngine::getConfigDir()
 {
     wstring name = m_app->getName();
 
-    string dirname = "";
+    string dirname;
     size_t i;
     for (i = 0; i < name.length(); i++)
     {
@@ -113,9 +111,7 @@ FrontierEngineWindow::FrontierEngineWindow(FrontierEngine* engine, FrontierWindo
      m_window = window;
 }
 
-FrontierEngineWindow::~FrontierEngineWindow()
-{
-}
+FrontierEngineWindow::~FrontierEngineWindow() = default;
 
 bool FrontierEngineWindow::init()
 {

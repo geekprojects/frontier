@@ -46,23 +46,23 @@ class Label : public Widget
     int m_lineHeight;
 
  public:
-    Label(FrontierApp* ui);
+    explicit Label(FrontierApp* ui);
     Label(FrontierApp* ui, std::wstring widgetName, std::wstring text);
     Label(FrontierApp* ui, std::wstring text);
     Label(FrontierApp* ui, std::wstring text, HorizontalAlign align);
     Label(FrontierApp* ui, std::wstring text, Icon* icon);
     Label(FrontierApp* ui, std::wstring text, HorizontalAlign align, Icon* icon);
-    virtual ~Label();
+    ~Label() override;
 
     void setText(std::wstring wtext);
     std::wstring getText() { return getProperty(FRONTIER_PROP_TEXT).asString(); }
-    void setAlign(HorizontalAlign align);
     void setIcon(Icon* icon);
+    Icon* getIcon() { return m_icon; }
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 };
 
-};
+}
 
 #endif

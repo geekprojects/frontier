@@ -35,31 +35,19 @@ FRONTIER_WIDGET(Frame, Frontier::Frame)
 
 Frame::Frame(FrontierApp* ui) : Widget(ui, L"Frame")
 {
-    setProperty(FRONTIER_PROP_HORIZONTAL, true);
+    setProperty(FRONTIER_PROP_HORIZONTAL, Value(true));
     m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierApp* ui, bool horizontal) : Widget(ui, L"Frame")
 {
-    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
+    setProperty(FRONTIER_PROP_HORIZONTAL, Value(horizontal));
     m_widgetNames.insert(L"Frame");
 }
 
 Frame::Frame(FrontierApp* ui, wstring widgetName, bool horizontal) : Widget(ui, widgetName)
 {
-    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
-    m_widgetNames.insert(L"Frame");
-}
-
-Frame::Frame(FrontierWindow* window, bool horizontal) : Widget(window, L"Frame")
-{
-    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
-    m_widgetNames.insert(L"Frame");
-}
-
-Frame::Frame(FrontierWindow* window, wstring widgetName, bool horizontal) : Widget(window, widgetName)
-{
-    setProperty(FRONTIER_PROP_HORIZONTAL, horizontal);
+    setProperty(FRONTIER_PROP_HORIZONTAL, Value(horizontal));
     m_widgetNames.insert(L"Frame");
 }
 
