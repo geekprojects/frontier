@@ -32,7 +32,7 @@ jobs:
     - name: Install dependencies
       run: >
         sudo apt-get update &&
-        sudo apt-get install libxml2-dev libpng-dev libjpeg-dev libjpeg-turbo8 sqlite3 libsqlite-dev libsigc++-2.0-dev libfreetype6-dev uuid-dev freeglut3-dev libantlr4-runtime-dev
+        sudo apt-get install libxml2-dev libpng-dev libjpeg-dev libjpeg-turbo8 sqlite3 libsqlite-dev libsigc++-2.0-dev libfreetype6-dev uuid-dev freeglut3-dev libantlr4-runtime-dev libsdl2-dev libmpv-dev
 
     - name: Install libgeek
       run: >
