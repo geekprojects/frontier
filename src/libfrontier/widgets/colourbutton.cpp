@@ -45,9 +45,7 @@ ColourButton::ColourButton(FrontierApp* app, Geek::Gfx::Colour colour) : Button(
     setup();
 }
 
-ColourButton::~ColourButton()
-{
-}
+ColourButton::~ColourButton() = default;
 
 void ColourButton::setup()
 {
@@ -74,8 +72,8 @@ bool ColourButton::draw(Surface* surface)
     BoxModel boxModel = getBoxModel();
     drawBorder(surface);
 
-    int colWidth = ((surface->getWidth() - (boxModel.getWidth() + boxModel.marginLeft)) / 3) * 2;
-    int colHeight = (surface->getHeight() - boxModel.getHeight());
+    unsigned int colWidth = ((surface->getWidth() - (boxModel.getWidth() + boxModel.marginLeft)) / 3) * 2;
+    unsigned int colHeight = (surface->getHeight() - boxModel.getHeight());
 
     surface->drawRectFilled(boxModel.getLeft(), boxModel.getTop(), colWidth, colHeight, m_colour.getInt32());
 
@@ -101,7 +99,7 @@ void ColourButton::setColour(Colour colour)
     m_colour = colour;
     setDirty(DIRTY_CONTENT);
 
-log(DEBUG, "setColour: colour: %s", colour.toHexString().c_str());
+    log(DEBUG, "setColour: colour: %s", colour.toHexString().c_str());
     m_colourSelectedSignal.emit(m_colour);
 
     getWindow()->requestUpdate();

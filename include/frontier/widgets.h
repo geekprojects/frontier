@@ -21,6 +21,7 @@
 #ifndef __FRONTIER_WIDGETS_H_
 #define __FRONTIER_WIDGETS_H_
 
+#include <utility>
 #include <vector>
 #include <map>
 #include <set>
@@ -58,13 +59,13 @@ struct BoxModel
     int borderBottomWidth;
     int borderLeftWidth;
 
-    int getTop() { return marginTop + paddingTop + borderTopWidth; }
-    int getRight() { return marginRight + paddingRight + borderRightWidth; }
-    int getBottom() { return marginBottom + paddingBottom + borderBottomWidth; }
-    int getLeft() { return marginLeft + paddingLeft + borderLeftWidth; }
+    int getTop() const { return marginTop + paddingTop + borderTopWidth; }
+    int getRight() const { return marginRight + paddingRight + borderRightWidth; }
+    int getBottom() const { return marginBottom + paddingBottom + borderBottomWidth; }
+    int getLeft() const { return marginLeft + paddingLeft + borderLeftWidth; }
 
-    int getWidth() { return getLeft() + getRight(); }
-    int getHeight() { return getTop() + getBottom(); }
+    int getWidth() const { return getLeft() + getRight(); }
+    int getHeight() const { return getTop() + getBottom(); }
 };
 
 /**
@@ -121,7 +122,7 @@ class Widget : public FrontierObject, public Geek::Logger
 
     BoxModel& getBoxModel(std::unordered_map<std::string, Value>& properties);
     Value getStyle(std::string style, std::unordered_map<std::string, Value>& properties);
-    bool hasStyle(std::string style, std::unordered_map<std::string, Value>& properties);
+    static bool hasStyle(std::string style, std::unordered_map<std::string, Value>& properties);
 
  protected:
     /// The Application that this widget belongs to
@@ -158,7 +159,7 @@ class Widget : public FrontierObject, public Geek::Logger
     Frontier::Size m_setSize;
 
     /// Flags indicating what aspects of this Widget are dirty
-    int m_dirty;
+    unsigned int m_dirty;
 
     /// True if this widget is in a selected state
     bool m_selected;
@@ -181,14 +182,13 @@ class Widget : public FrontierObject, public Geek::Logger
 
  public:
     Widget(FrontierApp* ui, std::wstring name);
-    Widget(FrontierWindow* window, std::wstring name);
-    virtual ~Widget();
+    ~Widget() override;
 
     /// Get the Widget type name
     std::wstring getWidgetName() { return m_widgetName; }
 
     /// Return whether this Widget is or overrides the given widget name
-    virtual bool instanceOf(std::wstring widgetName) { return (m_widgetName == widgetName || m_widgetNames.count(widgetName) > 0); }
+    virtual bool instanceOf(const std::wstring widgetName) { return (m_widgetName == widgetName || m_widgetNames.count(widgetName) > 0); }
 
     /// Set application-specific data. The Widget and Frontier library should not touch this data
     void setPrivateData(void* data) { m_privateData = data; }
@@ -204,7 +204,7 @@ class Widget : public FrontierObject, public Geek::Logger
 
     virtual void add(Widget* widget);
 
-    virtual Widget* findById(std::wstring id);
+    virtual Widget* findById (const std::wstring id);
 
     virtual void remove(Widget* widget);
 
@@ -250,7 +250,7 @@ class Widget : public FrontierObject, public Geek::Logger
     void setStyle(std::string style, Value value);
 
     /// Set the unique id of this Widget
-    void setWidgetId(std::wstring id) { m_widgetId = id; }
+    void setWidgetId(std::wstring id) { m_widgetId = std::move(id); }
 
     /// Get the uniqie id of this Widget
     std::wstring getWidgetId() { return m_widgetId; }
@@ -309,7 +309,7 @@ class Widget : public FrontierObject, public Geek::Logger
      * If children is true, recurse through children, otherwise, set on parent Widget
      * \see Frontier::DirtyFlag
      */
-    void setDirty(int flags, bool children = false);
+    void setDirty(unsigned int flags, bool children = false);
 
     /// Check if any dirty flags are set
     bool isDirty() const { return !!(m_dirty); }
@@ -327,15 +327,17 @@ class Widget : public FrontierObject, public Geek::Logger
     bool isActive();
 
     /// Activate the next Widget. Used with tabbing through Widgets
-    virtual void activateNext(Widget* activeChild = NULL);
+    void activateNext() { activateNext(NULL); }
+    virtual void activateNext(Widget* activeChild);
 
-    virtual bool isVisible(Frontier::Widget* child = NULL);
+    bool isVisible() { return isVisible(NULL); }
+    virtual bool isVisible(Frontier::Widget* child);
 
     /// Return whether the mouse is currently over this Widget
     bool isMouseOver();
 
     /// Return whether the Widget is in a selected state or not
-    bool isSelected() { return m_selected; }
+    bool isSelected() const { return m_selected; }
 
     /// Associate a Menu with this widget
     void setContextMenu(Menu* menu) { m_contextMenu = menu; }
@@ -393,8 +395,8 @@ class WidgetInit
 {
  private:
  public:
-    WidgetInit() {}
-    virtual ~WidgetInit() {}
+    WidgetInit() = default;
+    virtual ~WidgetInit() = default;
 
     virtual Widget* create(FrontierApp* app) { return NULL; }
 
@@ -434,6 +436,7 @@ class WidgetRegistry
         } \
     }; \
     _name##Init* const _name##Init::init = new _name##Init();
-};
+
+}
 
 #endif

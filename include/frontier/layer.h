@@ -47,12 +47,12 @@ class Layer : public FrontierObject, Geek::Logger
     Frontier::Rect m_rect;
 
  public:
-    Layer(FrontierApp* app, bool primary = false);
-    virtual ~Layer();
+    explicit Layer(FrontierApp* app, bool primary = false);
+    ~Layer() override;
 
-    bool isPrimary() { return m_primary; }
+    bool isPrimary() const { return m_primary; }
     void setModal(bool modal);
-    bool isModal() { return m_modal; }
+    bool isModal() const { return m_modal; }
 
     void setWindow(FrontierWindow* window);
     void setContentRoot(Widget* root);
@@ -72,6 +72,6 @@ class Layer : public FrontierObject, Geek::Logger
     bool update();
 };
 
-};
+}
 
 #endif

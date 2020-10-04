@@ -59,26 +59,6 @@ TextInput::TextInput(FrontierApp* ui, wstring text) : Widget(ui, L"TextInput")
     setText(text);
 }
 
-TextInput::TextInput(FrontierWindow* window) : Widget(window, L"TextInput")
-{
-    m_textSurface = NULL;
-    m_maxLength = 0;
-
-    m_surfaceMutex = Thread::createMutex();
-
-    setText(L"");
-}
-
-TextInput::TextInput(FrontierWindow* window, wstring text) : Widget(window, L"TextInput")
-{
-    m_textSurface = NULL;
-    m_maxLength = 0;
-
-    m_surfaceMutex = Thread::createMutex();
-
-    setText(text);
-}
-
 TextInput::~TextInput()
 {
     if (m_textSurface != NULL)

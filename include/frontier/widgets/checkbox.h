@@ -38,13 +38,13 @@ class CheckBox : public Button
     Icon* m_icon;
 
  public:
-    CheckBox(FrontierApp* app);
-    virtual ~CheckBox();
+    explicit CheckBox(FrontierApp* app);
+    ~CheckBox() override;
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 };
 
-};
+}
 
 #endif

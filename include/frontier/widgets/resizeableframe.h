@@ -41,22 +41,21 @@ class ResizeableFrame : public Frame
     int m_dragWidget;
     int m_dragPos;
 
-    virtual void layout();
+    void layout() override;
 
     float borrow(bool horizontal, int which, float amount, int major, int direction);
 
  public:
-    ResizeableFrame(FrontierApp* ui);
+    explicit ResizeableFrame(FrontierApp* ui);
     ResizeableFrame(FrontierApp* ui, bool horizontal);
-    ResizeableFrame(FrontierWindow* ui, bool horizontal);
-    virtual ~ResizeableFrame();
+    ~ResizeableFrame() override;
 
-    virtual void add(Widget* widget);
+    void add(Widget* widget) override;
     virtual void addWithSize(Widget* widget, int setPc);
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
-    virtual Frontier::WindowCursor getCursor()
+    Frontier::WindowCursor getCursor() override
     {
         if (getProperty(FRONTIER_PROP_HORIZONTAL).asBool())
         {
@@ -69,6 +68,6 @@ class ResizeableFrame : public Frame
     }
 };
 
-};
+}
 
 #endif

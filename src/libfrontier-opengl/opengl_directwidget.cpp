@@ -9,10 +9,6 @@ OpenGLDirectWidget::OpenGLDirectWidget(FrontierApp* ui, wstring name) : Widget(u
 {
 }
 
-OpenGLDirectWidget::OpenGLDirectWidget(FrontierWindow* window, wstring name) : Widget(window, name)
-{
-}
-
 void OpenGLDirectWidget::setViewport()
 {
 #if 1

@@ -33,9 +33,7 @@ CheckBox::CheckBox(FrontierApp* ui) : Button(ui, L"CheckBox", L"", BUTTON_TOGGLE
     m_icon = getApp()->getTheme()->getIcon(FRONTIER_ICON_CHECK);
 }
 
-CheckBox::~CheckBox()
-{
-}
+CheckBox::~CheckBox() = default;
 
 void CheckBox::calculateSize()
 {

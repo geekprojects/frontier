@@ -96,10 +96,10 @@ DatePickerWindow::~DatePickerWindow()
 
 bool DatePickerWindow::init()
 {
-    Frame* root = new Frame(this, false);
+    Frame* root = new Frame(getApp(), false);
     root->setWidgetClass(L"datePicker");
 
-    Frame* dateFrame = new Frame(this, true);
+    Frame* dateFrame = new Frame(getApp(), true);
     IconButton* prevButton;
     IconButton* nextButton;
     dateFrame->add(prevButton = new IconButton(getApp(), getApp()->getTheme()->getIcon(FRONTIER_ICON_ANGLE_LEFT)));
@@ -126,7 +126,7 @@ bool DatePickerWindow::init()
     prevButton->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onPrevMonth));
     nextButton->clickSignal().connect(sigc::mem_fun(*this, &DatePickerWindow::onNextMonth));
 
-    m_dayGrid = new Grid(this);
+    m_dayGrid = new Grid(getApp());
 
     root->add(m_dayGrid);
 

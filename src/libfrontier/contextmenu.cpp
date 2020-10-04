@@ -28,7 +28,7 @@ using namespace Frontier;
 using namespace Geek;
 
 
-ContextMenu::ContextMenu(FrontierApp* app, Menu* menu) : FrontierWindow(app, L"", 0)
+ContextMenu::ContextMenu(FrontierApp* app) : FrontierWindow(app, L"", 0)
 {
     m_menu = NULL;
     m_menuList = NULL;
@@ -40,9 +40,9 @@ ContextMenu::~ContextMenu()
 
 bool ContextMenu::init()
 {
-    Frame* frame = new Frame(this, false);
+    Frame* frame = new Frame(getApp(), false);
 
-    m_menuList = new MenuList(this, m_menu);
+    m_menuList = new MenuList(getApp(), m_menu);
     m_menuList->selectSignal().connect(sigc::mem_fun(*this, &ContextMenu::itemSelected));
     frame->add(m_menuList);
 

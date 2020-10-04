@@ -276,7 +276,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
 #ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term is not a KnownTerm: %s\n", typeid(*term0).name());
 #endif
-        return 0;
+        return Value(0);
     }
 
     css3Parser::KnownTermContext* term = (css3Parser::KnownTermContext*)term0;
@@ -286,7 +286,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
 #ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term: number=%s\n", numberStr.c_str());
 #endif
-        return atoi(numberStr.c_str());
+        return Value(atoi(numberStr.c_str()));
     }
     if (term->dimension() != NULL)
     {
@@ -294,7 +294,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
 #ifdef DEBUG_CSS_PARSER
         printf("RuleSetListener::getTermValue:   -> Term: dimension=%s\n", dimStr.c_str());
 #endif
-        return atoi(dimStr.c_str());
+        return Value(atoi(dimStr.c_str()));
     }
     if (term->hexcolor() != NULL)
     {
@@ -318,7 +318,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
 
         uint64_t rgb = strtol(hex.c_str(), NULL, 16) & 0xffffff;
         rgb |= 0xff000000; // Set alpha
-        return rgb;
+        return Value(rgb);
     }
     if (term->String() != NULL)
     {
@@ -334,7 +334,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
         {
             return getFontFamilyValue(str);
         }
-        return 0;
+        return Value(0);
     }
     if (term->ident() != NULL)
     {
@@ -359,7 +359,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
 #ifdef DEBUG_CSS_PARSER
                 printf("RuleSetListener::getTermValue:   -> Term: ident: %s MAPPED to %llx\n", val.ident, val.value);
 #endif
-                return val.value;
+                return Value(val.value);
             }
         }
 #ifdef DEBUG_CSS_PARSER
@@ -395,7 +395,7 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
 #ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::getTermValue:   -> function: RGB: 0x%llx\n", rgb);
 #endif
-            return rgb;
+            return Value(rgb);
         }
         else if (!strcmp("linear-gradient(", functionName.c_str()))
         {
@@ -408,22 +408,21 @@ Value RuleSetListener::getTermValue(string property, css3Parser::TermContext* te
                 gradient <<= 32;
                 gradient |= v;
             }
-            return gradient;
+            return Value(gradient);
         }
+#ifdef DEBUG_CSS_PARSER
         else
         {
-#ifdef DEBUG_CSS_PARSER
             printf("RuleSetListener::getTermValue:   -> function: Unknown function: %s\n", functionName.c_str());
             for (int value : funcValues)
             {
                 printf("RuleSetListener::getTermValue:     -> function: parameter: %d (0x%x)\n", value, value);
             }
-#endif
         }
-        return 0;
+#endif
     }
 
-    return 0;
+    return Value(0);
 }
 
 Value RuleSetListener::getFontFamilyValue(std::string fontFamily)
@@ -434,7 +433,7 @@ Value RuleSetListener::getFontFamilyValue(std::string fontFamily)
         int len = fontFamily.length();
         if (len <= 0)
         {
-            return 0;
+            return Value(0);
         }
 
         if (fontFamily.at(len - 1) == '"')

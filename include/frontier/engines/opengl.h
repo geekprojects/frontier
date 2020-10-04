@@ -49,8 +49,7 @@ class OpenGLDirectWidget : public Frontier::Widget
 {
  public:
     OpenGLDirectWidget(FrontierApp* ui, std::wstring name);
-    OpenGLDirectWidget(FrontierWindow* window, std::wstring name);
-    virtual ~OpenGLDirectWidget() {}
+    ~OpenGLDirectWidget() override = default;
 
     virtual void directBeforeDraw() = 0;
     virtual void directDraw() = 0;
@@ -65,18 +64,17 @@ class OpenGLEngineWindow : public Frontier::WindowingEngineWindow
     unsigned int m_sampler;
     float m_textureCoordX;
     float m_textureCoordY;
-    bool m_textureValid;
     Geek::Gfx::Surface* m_textureSurface;
 
     std::vector<OpenGLDirectWidget*> m_directWidgets;
 
  public:
     OpenGLEngineWindow(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window);
-    virtual ~OpenGLEngineWindow();
+    ~OpenGLEngineWindow() override;
 
-    virtual bool init();
+    bool init() override;
 
-    virtual bool update();
+    bool update() override;
 
     void addDirectWidget(OpenGLDirectWidget* widget) { m_directWidgets.push_back(widget); }
     std::vector<OpenGLDirectWidget*> getDirectWidgets() { return m_directWidgets; }
@@ -93,10 +91,10 @@ class OpenGLApp : public Frontier::FrontierApp
 
  public:
     OpenGLApp();
-    OpenGLApp(std::wstring appName);
-    virtual ~OpenGLApp();
+    explicit OpenGLApp(std::wstring appName);
+    ~OpenGLApp() override;
 
-    virtual bool init();
+    bool init() override;
 
     void setScreenSize(Size size);
 
@@ -111,10 +109,10 @@ class OpenGLEngine : public WindowingEngine
  protected:
 
  public:
-    OpenGLEngine(FrontierApp* app);
-    virtual ~OpenGLEngine();
+    explicit OpenGLEngine(FrontierApp* app);
+    ~OpenGLEngine() override;
 
-    virtual bool initWindow(FrontierWindow* window);
+    bool initWindow(FrontierWindow* window) override;
 };
 
 class OpenGLTexture
@@ -130,13 +128,13 @@ private:
     bool generateTexture();
 
  public:
-    OpenGLTexture(Geek::Gfx::Surface* surface);
+    explicit OpenGLTexture(Geek::Gfx::Surface* surface);
     virtual ~OpenGLTexture();
 
     void bind();
 
-    unsigned int getTexture() { return m_texture; }
-    unsigned int getSampler() { return m_sampler; }
+    unsigned int getTexture() const { return m_texture; }
+    unsigned int getSampler() const { return m_sampler; }
 };
 
 };

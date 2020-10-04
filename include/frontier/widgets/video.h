@@ -40,20 +40,19 @@ class VideoWidget : public Frontier::OpenGLDirectWidget
     unsigned int m_texture;
 
  protected:
-    virtual void init();
-    void onShow();
+    void init() override;
 
  public:
-    VideoWidget(Frontier::FrontierApp* app);
-    virtual ~VideoWidget();
+    explicit VideoWidget(Frontier::FrontierApp* app);
+    ~VideoWidget() override;
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual void directBeforeDraw();
-    virtual void directDraw();
+    void directBeforeDraw() override;
+    void directDraw() override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     void setFile(std::string file);
     void play();

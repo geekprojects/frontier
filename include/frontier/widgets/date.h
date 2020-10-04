@@ -57,21 +57,21 @@ class Date : public Frame
     void updateDateTime();
 
  public:
-    Date(FrontierApp* ui);
+    explicit Date(FrontierApp* ui);
     Date(FrontierApp* ui, bool hasTime);
     Date(FrontierApp* ui, bool hasTime, std::chrono::seconds value);
-    ~Date();
+    ~Date() override;
 
     void setup();
 
     void setHasValue(bool hasValue);
-    bool getHasValue() { return m_hasValue; }
+    bool getHasValue() const { return m_hasValue; }
     void setValue(std::chrono::seconds value);
     std::chrono::seconds getValue() { return m_value; }
 
     sigc::signal<void, std::chrono::seconds> signalValueChanged() { return m_signalValueChanged; }
 };
 
-};
+}
 
 #endif

@@ -35,27 +35,12 @@ MenuList::MenuList(FrontierApp* ui, Menu* menu, bool horizontal) : List(ui, hori
     }
 }
 
-MenuList::MenuList(FrontierWindow* window, Menu* menu, bool horizontal) : List(window, horizontal)
-{
-    if (menu != NULL)
-    {
-        m_menuItems = menu->getMenuItems();
-    }
-}
-
 MenuList::MenuList(FrontierApp* ui, std::vector<MenuItem*> menu, bool horizontal) : List(ui, horizontal)
 {
     m_menuItems = menu;
 }
 
-MenuList::MenuList(FrontierWindow* window, std::vector<MenuItem*> menu, bool horizontal) : List(window, horizontal)
-{
-    m_menuItems = menu;
-}
-
-MenuList::~MenuList()
-{
-}
+MenuList::~MenuList() = default;
 
 void MenuList::init()
 {

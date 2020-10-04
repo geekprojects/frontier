@@ -39,19 +39,7 @@ TreeListItem::TreeListItem(FrontierApp* ui, Icon* icon, std::wstring text) : Tex
     m_open = false;
 }
 
-TreeListItem::TreeListItem(FrontierWindow* win, std::wstring text) : TextListItem(win, text)
-{
-    m_open = false;
-}
-
-TreeListItem::TreeListItem(FrontierWindow* win, Icon* icon, std::wstring text) : TextListItem(win, icon, text)
-{
-    m_open = false;
-}
-
-TreeListItem::~TreeListItem()
-{
-}
+TreeListItem::~TreeListItem() = default;
 
 void TreeListItem::addItem(ListItem* item)
 {
@@ -138,8 +126,8 @@ bool TreeListItem::draw(Geek::Gfx::Surface* surface)
 #if 0
             log(DEBUG, "draw: item: %d, %d size=%d,%d", item->getX(), item->getY(), item->getWidth(), item->getHeight());
 #endif
-            SurfaceViewPort viewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
-            item->draw(&viewport);
+            SurfaceViewPort itemViewport(surface, item->getX(), item->getY(), item->getWidth(), item->getHeight());
+            item->draw(&itemViewport);
         }
     }
 
@@ -153,12 +141,12 @@ Widget* TreeListItem::handleEvent(Frontier::Event* event)
     {
         MouseEvent* mouseEvent = (MouseEvent*)event;
         Vector2D thisPos = getAbsolutePosition();
-        int widgetx = mouseEvent->x - thisPos.x;
-        int widgety = mouseEvent->y - thisPos.y;
+        unsigned int widgetX = mouseEvent->x - thisPos.x;
+        unsigned int widgetY = mouseEvent->y - thisPos.y;
 
-        if (widgety < m_titleHeight)
+        if (widgetY < m_titleHeight)
         {
-            if (widgetx > TREELISTITEM_INDENT)
+            if (widgetX > TREELISTITEM_INDENT)
             {
                 return TextListItem::handleEvent(event);
             }

@@ -42,18 +42,18 @@ class ContextMenu : public FrontierWindow
     MenuList* m_menuList;
 
  public:
-    ContextMenu(FrontierApp* app, Menu* menu = NULL);
-    virtual ~ContextMenu();
+    explicit ContextMenu(FrontierApp* app);
+    ~ContextMenu() override;
 
-    virtual bool init();
+    bool init() override;
 
-    void setMenu(Menu* menu);
+    void setMenu(Menu* menu) override;
 
-    void lostFocus();
+    void lostFocus() override;
 
     void itemSelected(ListItem* item);
 };
 
-};
+}
 
 #endif

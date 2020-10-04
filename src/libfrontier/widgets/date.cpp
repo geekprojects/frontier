@@ -67,7 +67,7 @@ Date::~Date()
 
 void Date::setup()
 {
-    getWidgetStyle()->applyProperty("margin", 0);
+    getWidgetStyle()->applyProperty("margin", Value(0));
 
     Icon* calendarIcon = getApp()->getTheme()->getIcon(FRONTIER_ICON_CALENDAR);
 
@@ -85,11 +85,11 @@ void Date::setup()
         add(m_hourInput);
 
         Label* startTimeSpacer = new Label(getApp(), L":");
-        startTimeSpacer->setStyle("expand-horizontal", false);
-        startTimeSpacer->setStyle("margin-left", 0);
-        startTimeSpacer->setStyle("margin-right", 0);
-        startTimeSpacer->setStyle("padding-left", 0);
-        startTimeSpacer->setStyle("padding-right", 0);
+        startTimeSpacer->setStyle("expand-horizontal", Value(false));
+        startTimeSpacer->setStyle("margin-left", Value(0));
+        startTimeSpacer->setStyle("margin-right", Value(0));
+        startTimeSpacer->setStyle("padding-left", Value(0));
+        startTimeSpacer->setStyle("padding-right", Value(0));
         add(startTimeSpacer);
 
         m_minuteInput = new NumberInput(getApp());

@@ -35,12 +35,6 @@ Widget::Widget(FrontierApp* ui, wstring widgetName) : Logger(L"Widget[" + widget
     initWidget(ui, widgetName);
 }
 
-Widget::Widget(FrontierWindow* window, wstring widgetName) : Logger(L"Widget[" + widgetName + L"]")
-{
-    initWidget(window->getApp(), widgetName);
-    m_window = window;
-}
-
 Widget::~Widget()
 {
     for (Widget* child : m_children)
@@ -100,7 +94,7 @@ void Widget::remove(Widget* widget)
 {
 }
 
-Widget* Widget::findById(wstring id)
+Widget* Widget::findById(const wstring id)
 {
     if (m_widgetId == id)
     {
@@ -225,7 +219,7 @@ bool Widget::drawBorder(Surface* surface)
         if (hasStyle("background-image", props))
         {
             // We only support basic linear gradients for now
-            uint64_t backgroundColour = getStyle("background-image", props).asInt();
+            backgroundColour = getStyle("background-image", props).asInt();
             uint32_t g1 = backgroundColour >> 32;
             uint32_t g2 = backgroundColour & 0xffffffff;
 
@@ -533,7 +527,7 @@ void Widget::setDirty()
     setDirty(DIRTY_SIZE | DIRTY_CONTENT | DIRTY_STYLE, false);
 }
 
-void Widget::setDirty(int dirty, bool children)
+void Widget::setDirty(unsigned int dirty, bool children)
 {
     callInit();
     m_dirty |= dirty;
@@ -667,7 +661,7 @@ bool Widget::isMouseOver()
 
 void Widget::dump(int level)
 {
-    string spaces = "";
+    string spaces;
     int i;
     for (i = 0; i < level; i++)
     {

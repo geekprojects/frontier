@@ -31,7 +31,6 @@ OpenGLEngineWindow::OpenGLEngineWindow(Frontier::FrontierEngine* engine, Frontie
     : WindowingEngineWindow(engine, window)
 {
     m_textureSurface = NULL;
-    m_textureValid = false;
 
     glGenTextures(1, &m_texture);
 }

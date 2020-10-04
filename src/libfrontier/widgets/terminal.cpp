@@ -57,14 +57,6 @@ Terminal::Terminal(FrontierApp* ui) : Widget(ui, L"Terminal")
     clear();
 }
 
-Terminal::Terminal(FrontierWindow* window) : Widget(window, L"Terminal")
-{
-    m_process = NULL;
-
-    reset();
-    clear();
-}
-
 Terminal::~Terminal()
 {
     if (m_process != NULL)

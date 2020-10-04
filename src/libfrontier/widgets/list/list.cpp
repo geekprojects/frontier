@@ -43,13 +43,6 @@ List::List(FrontierApp* ui, bool horizontal) : Widget(ui, L"List")
     m_listMutex = Thread::createMutex();
 }
 
-List::List(FrontierWindow* window, bool horizontal) : Widget(window, L"List")
-{
-    m_selected = NULL;
-    m_horizontal = horizontal;
-    m_listMutex = Thread::createMutex();
-}
-
 List::~List()
 {
     clearItems(false);
@@ -291,16 +284,10 @@ void List::clearSelected(ListItem* item)
 ListItem::ListItem(FrontierApp* ui) : Widget(ui, L"ListItem")
 {
     m_selected = false;
+    m_list = NULL;
 }
 
-ListItem::ListItem(FrontierWindow* win) : Widget(win, L"ListItem")
-{
-    m_selected = false;
-}
-
-ListItem::~ListItem()
-{
-}
+ListItem::~ListItem() = default;
 
 void ListItem::setList(List* list)
 {

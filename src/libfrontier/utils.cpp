@@ -87,6 +87,3 @@ void Utils::stacktrace()
         free(strings);
     }
 }
-
-
-

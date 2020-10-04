@@ -38,30 +38,29 @@ class NumberInput : public TextInput
     double m_max;
     bool m_integerOnly;
 
-    void init();
+    void init() override;
 
  public:
-    NumberInput(FrontierApp* ui);
-    NumberInput(FrontierWindow* ui);
-    virtual ~NumberInput();
+    explicit NumberInput(FrontierApp* ui);
+    ~NumberInput() override;
 
-    virtual void calculateSize();
+    void calculateSize() override;
 
     void setMin(double min);
-    double getMin() { return m_min; }
+    double getMin() const { return m_min; }
     void setMax(double max);
-    double getMax() { return m_max; }
+    double getMax() const { return m_max; }
     void setIntegerOnly(bool integerOnly) { m_integerOnly = integerOnly; }
-    bool getIntegerOnly() { return m_integerOnly; }
+    bool getIntegerOnly() const { return m_integerOnly; }
 
     void setNumber(int i);
     void setNumber(double d);
     int getInteger();
     double getDouble();
 
-    virtual bool isValid(std::wstring str);
+    bool isValid(std::wstring str) override;
 };
 
-};
+}
 
 #endif

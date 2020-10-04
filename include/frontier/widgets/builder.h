@@ -16,13 +16,13 @@ class WidgetBuilder : public Geek::Logger
     Widget* walk(xmlDoc* doc, xmlNode* node, Widget* parent);
 
  public:
-    WidgetBuilder(FrontierApp* app);
+    explicit WidgetBuilder(FrontierApp* app);
     ~WidgetBuilder();
 
     Widget* loadWidget(const char* file);
 };
 
-};
+}
 
 #endif
 

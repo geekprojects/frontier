@@ -45,6 +45,6 @@ class FrontierObject
     int getRefCount() { return m_referenceCount.load(); }
 };
 
-};
+}
 
 #endif

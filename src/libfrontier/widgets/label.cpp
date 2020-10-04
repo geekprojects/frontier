@@ -83,13 +83,10 @@ void Label::setText(std::wstring text)
     }
 }
 
-void Label::setAlign(HorizontalAlign align)
+void Label::setIcon(Icon* icon)
 {
-    if (align != m_align)
-    {
-        m_align = align;
-        setDirty(DIRTY_CONTENT);
-    }
+    m_icon = icon;
+    setDirty(DIRTY_SIZE | DIRTY_CONTENT);
 }
 
 void Label::calculateSize()

@@ -83,7 +83,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     FrontierApp* m_app;
 
     std::wstring m_title;
-    int m_flags;
+    unsigned int m_flags;
     bool m_visible;
 
     Layer* m_rootLayer;
@@ -124,7 +124,7 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
 
  public:
     FrontierWindow(FrontierApp* app, std::wstring title, int flags);
-    virtual ~FrontierWindow();
+    ~FrontierWindow() override;
 
     std::wstring getTitle() const { return m_title; }
     bool hasBorder() const { return !!(m_flags & WINDOW_BORDER); }
@@ -162,7 +162,8 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     Geek::Mutex* getDrawMutex() { return m_drawMutex; }
 
     Menu* getMenu() { return m_menu; }
-    void setMenu(Menu* menu);
+
+    virtual void setMenu(Menu* menu);
     void openContextMenu(Geek::Vector2D pos, Menu* menu);
 
     void addLayer(Layer* layer);
@@ -180,6 +181,6 @@ class FrontierWindow : public FrontierObject, public Geek::Logger
     Geek::Vector2D getScreenPosition(Geek::Vector2D windowPos);
 };
 
-};
+}
 
 #endif

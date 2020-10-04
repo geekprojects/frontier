@@ -44,18 +44,18 @@ class HSVWheel : public Widget
     void updateFromMouse(MouseEvent* mouseEvent);
 
  public:
-    HSVWheel(Frontier::FrontierApp* app);
+    explicit HSVWheel(Frontier::FrontierApp* app);
     HSVWheel(Frontier::FrontierApp* app, Geek::Gfx::Colour colour);
-    virtual ~HSVWheel();
+    ~HSVWheel() override;
 
-    virtual void calculateSize();
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    void calculateSize() override;
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     sigc::signal<void, Geek::Gfx::Colour> signalColourChanged() { return m_signalColourChanged; };
 };
 
-};
+}
 
 #endif

@@ -41,18 +41,6 @@ TextListItem::TextListItem(FrontierApp* ui, Icon* icon, std::wstring text) : Lis
     m_text = text;
 }
 
-TextListItem::TextListItem(FrontierWindow* window, std::wstring text) : ListItem(window)
-{
-    m_icon = NULL;
-    m_text = text;
-}
-
-TextListItem::TextListItem(FrontierWindow* window, Icon* icon, std::wstring text) : ListItem(window)
-{
-    m_icon = icon;
-    m_text = text;
-}
-
 TextListItem::~TextListItem()
 {
 }

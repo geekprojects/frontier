@@ -36,18 +36,7 @@ ScrollBar::ScrollBar(FrontierApp* ui, bool horizontal) : Widget(ui, L"ScrollBar"
     m_dragOffset = 0;
 }
 
-ScrollBar::ScrollBar(FrontierWindow* window, bool horizontal) : Widget(window, L"ScrollBar")
-{
-    m_horizontal = horizontal;
-    m_pos = 0;
-    m_size = 10;
-    m_dragging = false;
-    m_dragOffset = 0;
-}
-
-ScrollBar::~ScrollBar()
-{
-}
+ScrollBar::~ScrollBar() = default;
 
 void ScrollBar::calculateSize()
 {
@@ -242,11 +231,6 @@ void ScrollBar::setPos(int pos)
         m_pos = m_max - m_size;
     }
     setDirty(DIRTY_CONTENT);
-}
-
-int ScrollBar::getPos()
-{
-    return m_pos;
 }
 
 int ScrollBar::getScaledValue(BoxModel& boxModel, int v)

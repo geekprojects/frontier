@@ -33,17 +33,17 @@ class EmbeddedWindow : public Frontier::FrontierEngineWindow
 
  public:
     EmbeddedWindow(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window);
-    virtual ~EmbeddedWindow();
+    ~EmbeddedWindow() override;
 
-    virtual bool init();
-    virtual void show();
-    virtual void hide();
-    virtual bool update();
+    bool init() override;
+    void show() override;
+    void hide() override;
+    bool update() override;
 
-    virtual void setPosition(unsigned int x, unsigned int y) { m_position.x = x; m_position.y = y; }
-    virtual Geek::Vector2D getPosition() { return m_position; }
+    void setPosition(unsigned int x, unsigned int y) override { m_position.x = x; m_position.y = y; }
+    Geek::Vector2D getPosition() override { return m_position; }
 
-    virtual float getScaleFactor();
+    float getScaleFactor() override;
 };
 
 /**
@@ -58,29 +58,29 @@ class EmbeddedEngine : public FrontierEngine
     Frontier::Size m_screenSize;
 
  public:
-    EmbeddedEngine(FrontierApp* app);
-    virtual ~EmbeddedEngine();
+    explicit EmbeddedEngine(FrontierApp* app);
+    ~EmbeddedEngine() override;
 
-    virtual bool init();
+    bool init() override;
 
-    virtual bool initWindow(FrontierWindow* window);
+    bool initWindow(FrontierWindow* window) override;
 
-    virtual bool checkEvents();
+    bool checkEvents() override;
 
-    virtual std::string getConfigDir();
+    std::string getConfigDir() override;
 
     // Dialogs
-    virtual void message(std::string title, std::string message);
-    virtual bool confirmBox(std::string title, std::string message);
-    virtual std::string chooseFile(int flags, std::string path, std::string pattern);
+    void message(std::string title, std::string message) override;
+    bool confirmBox(std::string title, std::string message) override;
+    std::string chooseFile(int flags, std::string path, std::string pattern) override;
 
     void setScreenSize(Frontier::Size size) { m_screenSize = size; }
     Frontier::Size getScreenSize() { return m_screenSize; }
 
     void setScaleFactor(float factor) { m_scaleFactor = factor; }
-    float getScaleFactor() { return m_scaleFactor; }
+    float getScaleFactor() const { return m_scaleFactor; }
 };
 
-};
+}
 
 #endif

@@ -42,32 +42,28 @@ class Scroller : public Widget
     Size m_drawSize;
 
     void checkSurfaceSize(bool highDPI);
-    int getWidthOverhead() { return (m_vScrollBar->getWidth() - 2); }
 
     void initScroller(Widget* child);
 
  public:
-    Scroller(FrontierApp* ui);
+    explicit Scroller(FrontierApp* ui);
     Scroller(FrontierApp* ui, Widget* child);
-    Scroller(FrontierWindow* ui);
-    Scroller(FrontierWindow* ui, Widget* child);
-    virtual ~Scroller();
+    ~Scroller() override;
 
-    virtual void calculateSize();
-    virtual void layout();
-    //virtual void setWidth(int width);
+    void calculateSize() override;
+    void layout() override;
 
     int getPos() { return m_vScrollBar->getPos(); }
 
-    virtual bool draw(Geek::Gfx::Surface* surface);
+    bool draw(Geek::Gfx::Surface* surface) override;
 
-    virtual Widget* handleEvent(Frontier::Event* event);
+    Widget* handleEvent(Frontier::Event* event) override;
 
     void setChild(Widget* child);
 
-    virtual void dump(int level);
+    void dump(int level) override;
 };
 
-};
+}
 
 #endif

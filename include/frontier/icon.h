@@ -21,7 +21,6 @@
 #ifndef __FRONTIER_ICON_H_
 #define __FRONTIER_ICON_H_
 
-#include <stdint.h>
 #include <frontier/object.h>
 #include <frontier/fontawesome.h>
 #include <frontier/utils.h>
@@ -47,8 +46,8 @@ class Icon : public FrontierObject
     UITheme* m_theme;
     
  public:
-    Icon(UITheme* theme);
-    virtual ~Icon();
+    explicit Icon(UITheme* theme);
+    ~Icon() override;
 
     virtual Size getSize() = 0;
     virtual void draw(Geek::Gfx::Surface* surface, int x, int y) = 0;
@@ -66,10 +65,10 @@ class TextIcon : public Icon
 
  public:
     TextIcon(UITheme* theme, uint32_t icon);
-    virtual ~TextIcon();
+    ~TextIcon() override;
 
-    virtual Size getSize();
-    virtual void draw(Geek::Gfx::Surface* surface, int x, int y);
+    Size getSize() override;
+    void draw(Geek::Gfx::Surface* surface, int x, int y) override;
 };
 
 /**
@@ -85,12 +84,12 @@ class SurfaceIcon : public Icon
 
  public:
     SurfaceIcon(UITheme* theme, Geek::Gfx::Surface* surface);
-    virtual ~SurfaceIcon();
+    ~SurfaceIcon() override;
 
-    virtual Size getSize();
-    virtual void draw(Geek::Gfx::Surface* surface, int x, int y);
+    Size getSize() override;
+    void draw(Geek::Gfx::Surface* surface, int x, int y) override;
 };
 
-};
+}
 
 #endif

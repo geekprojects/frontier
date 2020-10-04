@@ -33,9 +33,8 @@ class WindowingEngine : public EmbeddedEngine
     std::deque<FrontierWindow*> m_windowOrder;
 
  public:
-    WindowingEngine(FrontierApp* app);
-    virtual ~WindowingEngine();
-
+    explicit WindowingEngine(FrontierApp* app);
+    ~WindowingEngine() override;
 
     void showWindow(FrontierWindow* window);
     void hideWindow(FrontierWindow* window);
@@ -53,15 +52,15 @@ class WindowingEngineWindow : public EmbeddedWindow
 
  public:
     WindowingEngineWindow(Frontier::FrontierEngine* engine, Frontier::FrontierWindow* window);
-    virtual ~WindowingEngineWindow();
+    ~WindowingEngineWindow() override;
 
-    virtual bool init();
+    bool init() override;
 
-    virtual void show();
-    virtual void hide();
+    void show() override;
+    void hide() override;
 };
 
 
-};
+}
 
 #endif

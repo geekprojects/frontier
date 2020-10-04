@@ -44,7 +44,7 @@ class FrontierEngine : public Geek::Logger
     FrontierApp* m_app;
 
  public:
-    FrontierEngine(FrontierApp* app);
+    explicit FrontierEngine(FrontierApp* app);
     virtual ~FrontierEngine();
 
     virtual bool init();
@@ -53,7 +53,7 @@ class FrontierEngine : public Geek::Logger
 
     virtual bool checkEvents();
 
-    virtual bool quit(bool force = false);
+    virtual bool quit(bool force);
 
     virtual std::string getConfigDir();
 
@@ -98,6 +98,6 @@ class FrontierEngineWindow : public Geek::Logger
     virtual void requestUpdate();
 };
 
-};
+}
 
 #endif
