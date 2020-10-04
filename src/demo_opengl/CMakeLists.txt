@@ -1,5 +1,6 @@
 
 add_definitions(-Wno-deprecated-declarations)
+add_definitions(-DFRONTIER_SRC=${PROJECT_SOURCE_DIR})
 if (mpv_FOUND)
     add_definitions(-DMPV_FOUND=1)
 endif()

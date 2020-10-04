@@ -31,8 +31,8 @@ class VideoWidget : public Frontier::OpenGLDirectWidget
  private:
     bool m_addedDirect;
     mpv_handle* m_mpv;
-    mpv_render_context* m_mpvGL;
-    unsigned int m_fbo;
+    mpv_render_context* m_mpvGL{};
+    unsigned int m_fbo{};
 
     std::string m_file;
 

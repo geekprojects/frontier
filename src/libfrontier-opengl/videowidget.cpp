@@ -52,14 +52,6 @@ static int powerOfTwo(int input)
     return value;
 }
 
-class VideoWidgetRenderer : public Geek::Thread
-{
- private:
- public:
-    VideoWidgetRenderer();
-    virtual ~VideoWidgetRenderer();
-};
-
 VideoWidget::VideoWidget(Frontier::FrontierApp* app) : OpenGLDirectWidget(app, L"Video")
 {
     m_mpv = mpv_create();
@@ -75,22 +67,17 @@ VideoWidget::VideoWidget(Frontier::FrontierApp* app) : OpenGLDirectWidget(app, L
 
     mpv_request_log_messages(m_mpv, "debug");
 
-glGenFramebuffers(1, &m_fbo);
+    glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     m_texture = 0;
-
 }
 
-VideoWidget::~VideoWidget()
-{
-}
+VideoWidget::~VideoWidget() = default;
 
 static void *get_proc_address_mpv(void *fn_ctx, const char *name)
 {
-    void* addr = dlsym(RTLD_DEFAULT, name);
-    printf("XXX: get_proc_address_mpv: %s -> %p\n", name, addr);
-    return addr;
+    return dlsym(RTLD_DEFAULT, name);
 }
 
 static void on_mpv_events(void *ctx)
@@ -138,7 +125,6 @@ void VideoWidget::init()
 
     mpv_set_wakeup_callback(m_mpv, on_mpv_events, this);
     mpv_render_context_set_update_callback(m_mpvGL, on_mpv_render_update, this);
-
 }
 
 void VideoWidget::calculateSize()
@@ -178,7 +164,6 @@ void VideoWidget::play()
 
 void VideoWidget::stop()
 {
-
 }
 
 void VideoWidget::directBeforeDraw()
@@ -192,8 +177,8 @@ void VideoWidget::directBeforeDraw()
     size.width *= scale;
     size.height *= scale;
 
-    unsigned int textureWidth = powerOfTwo(size.width * scale);
-    unsigned int textureHeight = powerOfTwo(size.height * scale);
+    int textureWidth = powerOfTwo(size.width);
+    int textureHeight = powerOfTwo(size.height);
 
     glPushAttrib(GL_ENABLE_BIT | GL_POLYGON_BIT);
     glDisable(GL_DEPTH_TEST);

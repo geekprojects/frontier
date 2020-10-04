@@ -30,6 +30,9 @@
 #include <frontier/widgets/video.h>
 #endif
 
+#define STRINGIFY(x) XSTRINGIFY(x)
+#define XSTRINGIFY(x) #x
+
 GLfloat g_xRotated = 0.0;
 GLfloat g_yRotated = 0.0;
 GLfloat g_zRotated = 0.0;
@@ -104,7 +107,7 @@ bool DemoWindow::init()
     videoFrame->add(new Label(getApp(), L"A video!"));
     VideoWidget* video;
     videoFrame->add(video = new VideoWidget(getApp()));
-    video->setFile("../src/demo_opengl/file_example_MP4_480_1_5MG.mp4");
+    video->setFile(STRINGIFY(FRONTIER_SRC) "/src/demo_opengl/file_example_MP4_480_1_5MG.mp4");
     video->play();
     videoFrame->add(new Label(getApp(), L"Yay!"));
     tabs->addTab(L"Video", videoFrame);

@@ -27,6 +27,7 @@ addons:
       - uuid-dev
       - freeglut3-dev
       - libantlr4-runtime-dev
+      - libmpv-dev
   homebrew:
     packages:
       - freetype
