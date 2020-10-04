@@ -141,8 +141,8 @@ Widget* TreeListItem::handleEvent(Frontier::Event* event)
     {
         MouseEvent* mouseEvent = (MouseEvent*)event;
         Vector2D thisPos = getAbsolutePosition();
-        unsigned int widgetX = mouseEvent->x - thisPos.x;
-        unsigned int widgetY = mouseEvent->y - thisPos.y;
+        int widgetX = (int)mouseEvent->x - thisPos.x;
+        int widgetY = (int)mouseEvent->y - thisPos.y;
 
         if (widgetY < m_titleHeight)
         {
