@@ -34,6 +34,10 @@ jobs:
         sudo apt-get update &&
         sudo apt-get install libxml2-dev libpng-dev libjpeg-dev libjpeg-turbo8 sqlite3 libsqlite-dev libsigc++-2.0-dev libfreetype6-dev uuid-dev freeglut3-dev libantlr4-runtime-dev
 
+    - name: Install libgeek
+      run: >
+        mkdir git clone https://github.com/geekprojects/libgeek.git; cd libgeek; mkdir build; cd build; cmake ..; make; sudo make install; sudo ldconfig; cd -
+
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
