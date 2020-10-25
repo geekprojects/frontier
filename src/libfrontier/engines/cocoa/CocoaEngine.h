@@ -44,25 +44,25 @@ class CocoaEngine : public FrontierEngine
     void onActiveWindowChanged(FrontierWindow* window);
 
  public:
-    CocoaEngine(FrontierApp* app);
-    virtual ~CocoaEngine();
+    explicit CocoaEngine(FrontierApp* app);
+    ~CocoaEngine() override;
 
-    virtual bool init();
+    bool init() override;
 
-    virtual bool initWindow(FrontierWindow* window);
+    bool initWindow(FrontierWindow* window) override;
 
-    virtual bool checkEvents();
+    bool checkEvents() override;
 
-    virtual bool quit(bool force = false);
+    bool quit(bool) override;
 
-    virtual std::string getConfigDir();
+    std::string getConfigDir() override;
 
-    virtual void message(std::string title, std::string message);
-    virtual bool confirmBox(std::string title, std::string message);
-    virtual std::string chooseFile(int flags, std::string path, std::string pattern);
-    virtual ColourPickerWindow* openColourPickerWindow(Geek::Gfx::Colour colour);
+    void message(std::string title, std::string message) override;
+    bool confirmBox(std::string title, std::string message) override;
+    std::string chooseFile(int flags, std::string path, std::string pattern) override;
+    ColourPickerWindow* openColourPickerWindow(Geek::Gfx::Colour colour) override;
 
-    bool providesMenus() { return true; }
+    bool providesMenus() override { return true; }
 
     void updateMenu(FrontierWindow* window);
 
@@ -74,8 +74,8 @@ class CocoaColourPickerWindow : public ColourPickerWindow
  private:
 
  public:
-    CocoaColourPickerWindow(Geek::Gfx::Colour colour);
-    virtual ~CocoaColourPickerWindow();
+    explicit CocoaColourPickerWindow(Geek::Gfx::Colour colour);
+    ~CocoaColourPickerWindow() override;
 };
 
 }

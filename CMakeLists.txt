@@ -76,6 +76,7 @@ endif()
 set(DATADIR ${CMAKE_INSTALL_PREFIX}/share/libfrontier)
 
 add_subdirectory(src/libfrontier)
+add_subdirectory(src/frontierserver)
 add_subdirectory(src/demo)
 add_subdirectory(data)
 add_subdirectory(tests)

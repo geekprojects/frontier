@@ -156,7 +156,6 @@ void CocoaEngine::updateMenu(Menu* frontierMenu)
     // Create NSMenu
     NSMenu* mainMenu = [[NSMenu alloc] init];
 
-
     if (frontierMenu != NULL && !frontierMenu->getMenuItems().empty())
     {
         MenuItem* firstItem = frontierMenu->getMenuItems().at(0);

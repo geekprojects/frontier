@@ -22,6 +22,7 @@
 #include <frontier/frontier.h>
 #include <frontier/widgets.h>
 #include <frontier/contextmenu.h>
+#include <frontier/protocol.h>
 
 #include <typeinfo>
 
@@ -677,3 +678,23 @@ void Widget::dump(int level)
     }
 }
 
+bool Widget::serialise(Geek::Data* data)
+{
+    data->append16(FRONTIER_TAG_WIDGET);
+    data->append16(FRONTIER_TAG_TYPE_STRUCT);
+    data->append16(FRONTIER_TAG_WIDGET_NAME);
+    data->append16(FRONTIER_TAG_TYPE_STRING);
+    data->append8(m_widgetName.length());
+    data->append((uint8_t*) m_widgetName.c_str(), m_widgetName.length() * sizeof(wchar_t));
+    data->append16(FRONTIER_TAG_WIDGET_CLASSES);
+    data->append16(FRONTIER_TAG_TYPE_ARRAY);
+    data->append16(m_widgetClasses.size());
+    for (wstring className : m_widgetClasses)
+    {
+        data->append16(FRONTIER_TAG_TYPE_STRING);
+        data->append8(className.length());
+        data->append((uint8_t*) className.c_str(), className.length() * sizeof(wchar_t));
+    }
+
+    return true;
+}

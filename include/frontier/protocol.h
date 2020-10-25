@@ -1,0 +1,26 @@
+#ifndef FRONTIER_PROTOCOL_H
+#define FRONTIER_PROTOCOL_H
+
+#include <geek/core-data.h>
+
+#define FRONTIER_TAG_END               0xffff
+#define FRONTIER_TAG_WIDGET            0x0100
+#define FRONTIER_TAG_WIDGET_NAME       0x0101
+#define FRONTIER_TAG_WIDGET_CLASSES    0x0102
+#define FRONTIER_TAG_WIDGET_STYLES     0x0103
+#define FRONTIER_TAG_WIDGET_ATTRIBUTES 0x0104
+#define FRONTIER_TAG_WIDGET_CHILDREN   0x0110
+
+#define FRONTIER_TAG_TYPE_NULL         0x0000
+#define FRONTIER_TAG_TYPE_STRUCT       0x0001
+#define FRONTIER_TAG_TYPE_STRING       0x0002
+#define FRONTIER_TAG_TYPE_INT32        0x0003
+#define FRONTIER_TAG_TYPE_INT64        0x0004
+#define FRONTIER_TAG_TYPE_ARRAY        0x0005
+
+namespace Frontier
+{
+
+}
+
+#endif //FRONTIER_PROTOCOL_H

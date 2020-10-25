@@ -31,6 +31,8 @@
 #include <frontier/types.h>
 #include <frontier/value.h>
 
+#include <geek/core-data.h>
+
 #include <sigc++/sigc++.h>
 
 #define WIDGET_SIZE_UNLIMITED 0xffff
@@ -389,6 +391,8 @@ class Widget : public FrontierObject, public Geek::Logger
 
     /// For debug. Dump this widget to stdout
     virtual void dump(int level);
+
+    bool serialise(Geek::Data* data);
 };
 
 class WidgetInit

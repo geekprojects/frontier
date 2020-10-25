@@ -192,6 +192,8 @@ class FrontierApp : public Geek::Logger
 
     /// Signal that fires when the active window changes
     virtual sigc::signal<void, FrontierWindow*> activeWindowChangedSignal() { return m_activeWindowChangedSignal; }
+
+    FrontierEngine* createNativeEngine();
 };
 
 }

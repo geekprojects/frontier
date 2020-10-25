@@ -17,6 +17,8 @@ list(APPEND libfrontier_srcs
     engines/embedded/embedded_engine.cpp
     engines/windowing/windowing_engine.cpp
     engines/windowing/windowing_window.cpp
+    engines/server/server_engine.cpp
+    engines/server/server_thread.cpp
     widgets/button.cpp
     widgets/iconbutton.cpp
     widgets/checkbox.cpp
@@ -72,7 +74,7 @@ endif()
 
 add_definitions(-DFONTSDIR=${DATADIR}/fonts)
 
-add_library(frontier SHARED ${libfrontier_srcs})
+add_library(frontier SHARED ${libfrontier_srcs} engines/server/server_engine.cpp)
 
 target_link_libraries(frontier ${libgeek_LDFLAGS} ${ANTLR4_LIBRARY} ${ENGINE_LIBRARIES} styles -lutil)
 

@@ -131,15 +131,11 @@ bool FrontierApp::init()
     // A custom app can set their own engine
     if (m_engine == NULL)
     {
-#ifdef FRONTIER_ENGINE_SDL
-        m_engine = new FrontierEngineSDL(this);
-#elif FRONTIER_ENGINE_COCOA
-        m_engine = new CocoaEngine(this);
-#elif FRONTIER_ENGINE_X11
-        m_engine = new X11Engine(this);
-#else
-#error No engine defined
-#endif
+        m_engine = createNativeEngine();
+        if (m_engine == NULL)
+        {
+            return false;
+        }
     }
 
     res = m_engine->init();
@@ -188,6 +184,21 @@ bool FrontierApp::init()
     m_timerManager->start();
 
     return true;
+}
+
+FrontierEngine* FrontierApp::createNativeEngine()
+{
+    FrontierEngine* engine = nullptr;
+#ifdef FRONTIER_ENGINE_SDL
+    engine = new FrontierEngineSDL(this);
+#elif FRONTIER_ENGINE_COCOA
+    engine = new CocoaEngine(this);
+#elif FRONTIER_ENGINE_X11
+    engine = new X11Engine(this);
+#else
+#error No engine defined
+#endif
+    return engine;
 }
 
 void FrontierApp::registerObject(FrontierObject* obj)
