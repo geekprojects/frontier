@@ -68,6 +68,15 @@ elseif (ENGINE MATCHES SDL)
     )
     add_definitions(-DFRONTIER_ENGINE_SDL ${sdl2_CFLAGS})
     set(ENGINE_LIBRARIES ${sdl2_LDFLAGS})
+elseif(ENGINE MATCHES Wayland)
+    list(APPEND libfrontier_srcs
+        engines/wayland/wayland_engine.cpp
+        engines/wayland/wayland_window.cpp
+        engines/wayland/xdg-shell-protocol.c
+        engines/wayland/wayland.h
+    )
+    add_definitions(-DFRONTIER_ENGINE_WAYLAND ${waylandclient_CFLAGS})
+    set(ENGINE_LIBRARIES ${waylandclient_LDFLAGS})
 endif()
 
 add_definitions(-DFONTSDIR=${DATADIR}/fonts)

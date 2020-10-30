@@ -33,6 +33,8 @@
 #   include "engines/cocoa/CocoaEngine.h"
 #elif FRONTIER_ENGINE_X11
 #   include "engines/x11/x11_engine.h"
+#elif FRONTIER_ENGINE_WAYLAND
+#   include "engines/wayland/wayland.h"
 #else
 #   error No engine defined
 #endif
@@ -137,6 +139,8 @@ bool FrontierApp::init()
         m_engine = new CocoaEngine(this);
 #elif FRONTIER_ENGINE_X11
         m_engine = new X11Engine(this);
+#elif FRONTIER_ENGINE_WAYLAND
+        m_engine = new WaylandEngine(this);
 #else
 #error No engine defined
 #endif
