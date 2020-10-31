@@ -29,6 +29,9 @@ pkg_check_modules(mpv mpv)
 
 pkg_check_modules(waylandclient wayland-client)
 
+# Check whether -lrt is required
+find_library(LIBRT rt)
+
 find_library(ANTLR4_LIBRARY NAMES antlr4-runtime )
 find_path(antlr4_INCLUDE_BASE NAMES antlr4-runtime/antlr4-runtime.h)
 if(antlr4_INCLUDE_BASE)

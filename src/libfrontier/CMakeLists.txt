@@ -83,6 +83,10 @@ add_definitions(-DFONTSDIR=${DATADIR}/fonts)
 
 add_library(frontier SHARED ${libfrontier_srcs})
 
+if(LIBRT)
+    target_link_libraries(target_name ${LIBRT})
+endif()
+
 target_link_libraries(frontier ${libgeek_LDFLAGS} ${ANTLR4_LIBRARY} ${ENGINE_LIBRARIES} styles -lutil)
 
 install(TARGETS frontier DESTINATION lib)
