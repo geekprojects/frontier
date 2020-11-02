@@ -29,12 +29,15 @@
 
 #ifdef FRONTIER_ENGINE_SDL
 #   include "engines/sdl/sdl_engine.h"
-#elif FRONTIER_ENGINE_COCOA
+#endif
+#if FRONTIER_ENGINE_COCOA
 #   include "engines/cocoa/CocoaEngine.h"
-#elif FRONTIER_ENGINE_X11
+#endif
+#if FRONTIER_ENGINE_X11
 #   include "engines/x11/x11_engine.h"
-#else
-#   error No engine defined
+#endif
+#if FRONTIER_ENGINE_WAYLAND
+#   include "engines/wayland/wayland.h"
 #endif
 
 #define STRINGIFY(x) XSTRINGIFY(x)
@@ -134,6 +137,7 @@ bool FrontierApp::init()
         m_engine = createNativeEngine();
         if (m_engine == NULL)
         {
+            log(ERROR, "Failed to create find engine: %s", engineName.c_str());
             return false;
         }
     }
@@ -188,17 +192,35 @@ bool FrontierApp::init()
 
 FrontierEngine* FrontierApp::createNativeEngine()
 {
-    FrontierEngine* engine = nullptr;
+    string engineName = STRINGIFY(ENGINE);
+    log(DEBUG, "createNativeEngine: Default engine: %s", engineName.c_str());
+
 #ifdef FRONTIER_ENGINE_SDL
-    engine = new FrontierEngineSDL(this);
-#elif FRONTIER_ENGINE_COCOA
-    engine = new CocoaEngine(this);
-#elif FRONTIER_ENGINE_X11
-    engine = new X11Engine(this);
-#else
-#error No engine defined
+    if (engineName == "SDL")
+    {
+        return new FrontierEngineSDL(this);
+    }
 #endif
-    return engine;
+#if FRONTIER_ENGINE_COCOA
+    if (engineName == "Cocoa")
+    {
+        return new CocoaEngine(this);
+    }
+#endif
+#if FRONTIER_ENGINE_X11
+    if (engineName == "X11")
+    {
+        return new X11Engine(this);
+    }
+#endif
+#if FRONTIER_ENGINE_WAYLAND
+    if (engineName == "Wayland")
+    {
+        return new WaylandEngine(this);
+    }
+#endif
+
+    return nullptr;
 }
 
 void FrontierApp::registerObject(FrontierObject* obj)
