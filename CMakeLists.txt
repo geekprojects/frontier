@@ -27,6 +27,10 @@ pkg_check_modules(libgeek REQUIRED libgeek)
 pkg_check_modules(freetype2 REQUIRED freetype2)
 pkg_check_modules(mpv mpv)
 
+
+# Check whether -lrt is required
+find_library(LIBRT rt)
+
 find_library(ANTLR4_LIBRARY NAMES antlr4-runtime )
 find_path(antlr4_INCLUDE_BASE NAMES antlr4-runtime/antlr4-runtime.h)
 if(antlr4_INCLUDE_BASE)
@@ -39,39 +43,58 @@ endif()
 add_definitions(${libgeek_CFLAGS} ${freetype2_CFLAGS})
 
 # Optional dependencies
-include(FindOpenGL)
-include(FindGLUT)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${ANTLR4_INCLUDE}
 )
 
-include(FindX11)
-
+#
 # Engines
+#
+
+# Check for various libraries used by engines
+include(FindX11)
+include(FindOpenGL)
+include(FindGLUT)
+pkg_check_modules(sdl2 sdl2)
+pkg_check_modules(waylandclient wayland-client)
+
+set (ENGINES "")
+# Check for engine support in rough order of priority
+if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    list(APPEND ENGINES "Cocoa")
+endif()
+if (sdl2_FOUND)
+    list(APPEND ENGINES "SDL")
+endif()
+if (waylandclient_FOUND)
+    list(APPEND ENGINES "Wayland")
+endif()
+if (X11_FOUND)
+    list(APPEND ENGINES "X11")
+endif()
+if (OPENGL_FOUND)
+    list(APPEND ENGINES "OpenGL")
+endif()
+
+if (NOT ENGINES)
+    message(FATAL_ERROR "Failed to find any engine to build")
+endif()
+
+message(STATUS "Found engines: ${ENGINES}")
+
 if (NOT ENGINE)
-    message(STATUS "Choosing engine for system: ${CMAKE_SYSTEM_NAME}")
-    if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-        SET(ENGINE "Cocoa")
-    else()
-        SET(ENGINE "SDL")
-    endif()
+    list(GET ENGINES 0 ENGINE)
 else()
     message(STATUS "User selected engine: ${ENGINE}")
-endif()
-
-message(STATUS "Engine: ${ENGINE}")
-
-if(ENGINE MATCHES "Cocoa")
-
-elseif(ENGINE MATCHES "X11")
-    if (NOT X11_FOUND)
-        message(FATAL_ERROR "X11 Engine requested but X11 hasn't been found")
+    list(FIND ENGINES ${ENGINE} IDX)
+    if (IDX EQUAL -1)
+        message(FATAL_ERROR "Unable to select engine '${ENGINE}' as default")
     endif()
-elseif(ENGINE MATCHES "SDL")
-    pkg_check_modules(sdl2 REQUIRED sdl2)
 endif()
+
+message(STATUS "Default Engine: ${ENGINE}")
 
 set(DATADIR ${CMAKE_INSTALL_PREFIX}/share/libfrontier)
 
@@ -80,7 +103,7 @@ add_subdirectory(src/demo)
 add_subdirectory(data)
 add_subdirectory(tests)
 
-if(OPENGL_FOUND)
+if(OpenGL IN_LIST ENGINES)
     add_subdirectory(src/libfrontier-opengl)
     if(GLUT_FOUND)
         add_subdirectory(src/demo_opengl)
@@ -114,4 +137,3 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${frontier_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${frontier_VERSION_MINOR}")
 include(CPack)
-

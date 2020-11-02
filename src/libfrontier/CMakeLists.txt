@@ -46,33 +46,53 @@ list(APPEND libfrontier_srcs
     windows/colourpicker.cpp
 )
 
-if (ENGINE MATCHES Cocoa)
+set(ENGINE_LIBRARIES "")
+if(Cocoa IN_LIST ENGINES)
     list(APPEND libfrontier_srcs
         engines/cocoa/CocoaEngine.mm
         engines/cocoa/utils.mm
         engines/cocoa/CocoaWindow.mm
     )
     add_definitions(-DFRONTIER_ENGINE_COCOA -Wno-deprecated-declarations)
-    set(ENGINE_LIBRARIES "-framework AppKit")
-elseif (ENGINE MATCHES X11)
+    list(APPEND ENGINE_LIBRARIES "-framework AppKit")
+endif()
+
+if(X11 IN_LIST ENGINES)
     list(APPEND libfrontier_srcs
         engines/x11/x11_engine.cpp
         engines/x11/x11_window.cpp
     )
     add_definitions(-DFRONTIER_ENGINE_X11 -I${X11_INCLUDE_DIR})
-    set(ENGINE_LIBRARIES ${X11_LIBRARIES})
-elseif (ENGINE MATCHES SDL)
+    list(APPEND ENGINE_LIBRARIES ${X11_LIBRARIES})
+endif()
+
+if(SDL IN_LIST ENGINES)
     list(APPEND libfrontier_srcs
         engines/sdl/sdl_engine.cpp
         engines/sdl/sdl_window.cpp
     )
     add_definitions(-DFRONTIER_ENGINE_SDL ${sdl2_CFLAGS})
-    set(ENGINE_LIBRARIES ${sdl2_LDFLAGS})
+    list(APPEND ENGINE_LIBRARIES ${sdl2_LDFLAGS})
 endif()
 
-add_definitions(-DFONTSDIR=${DATADIR}/fonts)
+if(Wayland IN_LIST ENGINES)
+    list(APPEND libfrontier_srcs
+        engines/wayland/wayland_engine.cpp
+        engines/wayland/wayland_window.cpp
+        engines/wayland/xdg-shell-protocol.c
+        engines/wayland/wayland.h
+    )
+    add_definitions(-DFRONTIER_ENGINE_WAYLAND ${waylandclient_CFLAGS})
+    list(APPEND ENGINE_LIBRARIES ${waylandclient_LDFLAGS})
+endif()
+
+add_definitions(-DFONTSDIR=${DATADIR}/fonts -DENGINE=${ENGINE})
 
 add_library(frontier SHARED ${libfrontier_srcs})
+
+if(LIBRT)
+    target_link_libraries(frontier ${LIBRT})
+endif()
 
 target_link_libraries(frontier ${libgeek_LDFLAGS} ${ANTLR4_LIBRARY} ${ENGINE_LIBRARIES} styles -lutil)
 
