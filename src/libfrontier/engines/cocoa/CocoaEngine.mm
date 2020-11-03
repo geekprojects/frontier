@@ -11,6 +11,8 @@ using namespace Frontier;
 using namespace Geek;
 using namespace Geek::Gfx;
 
+FRONTIER_ENGINE(Cocoa, Frontier::CocoaEngine)
+
 @interface MenuTarget : NSObject
 {
 }

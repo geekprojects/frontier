@@ -157,3 +157,35 @@ void FrontierEngineWindow::requestUpdate()
 {
 }
 
+static EngineRegistry* g_engineRegistry = NULL;
+
+EngineRegistry::EngineRegistry() : Logger("EngineRegistry")
+{
+}
+
+EngineRegistry::~EngineRegistry()
+{
+}
+
+void EngineRegistry::registerEngine(EngineInit* init)
+{
+    if (g_engineRegistry == NULL)
+    {
+        g_engineRegistry = new EngineRegistry();
+    }
+
+    g_engineRegistry->log(DEBUG, "registerEngine: %s", init->getName().c_str());
+
+    g_engineRegistry->m_engines.insert(make_pair(init->getName(), init));
+}
+
+FrontierEngine* EngineRegistry::createEngine(FrontierApp* app, std::string name)
+{
+    map<std::string, EngineInit*>::iterator it = g_engineRegistry->m_engines.find(name);
+    if (it != g_engineRegistry->m_engines.end())
+    {
+        EngineInit* init = it->second;
+        return init->create(app);
+    }
+    return NULL;
+}

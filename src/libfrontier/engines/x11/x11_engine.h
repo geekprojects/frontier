@@ -10,6 +10,9 @@
 #include <X11/Xos.h>
 #include <X11/extensions/XShm.h>
 
+namespace Frontier
+{
+
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 
 #define MWM_DECOR_ALL           (1L << 0)
@@ -84,5 +87,6 @@ class X11Engine : public Frontier::FrontierEngine
     XVisualInfo* getVisualInfo() { return &m_visualInfo; }
 };
 
+}
 
 #endif

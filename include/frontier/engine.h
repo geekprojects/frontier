@@ -98,6 +98,54 @@ class FrontierEngineWindow : public Geek::Logger
     virtual void requestUpdate();
 };
 
+class EngineInit
+{
+ private:
+ public:
+    EngineInit() = default;
+    virtual ~EngineInit() = default;
+
+    virtual FrontierEngine* create(FrontierApp* app) { return NULL; }
+
+    virtual const std::string getName() { return ""; }
+};
+
+class EngineRegistry : public Geek::Logger
+{
+ private:
+    std::map<std::string, EngineInit*> m_engines;
+
+ public:
+    EngineRegistry();
+    virtual ~EngineRegistry();
+
+    static void registerEngine(EngineInit* init);
+    static FrontierEngine* createEngine(FrontierApp* app, std::string name);
+};
+
+#define FRONTIER_ENGINE(_name, _class) \
+    namespace Frontier::Engine { \
+    class _name##EngineInit : public Frontier::EngineInit \
+    { \
+     private: \
+        static _name##EngineInit* const init __attribute__ ((unused)); \
+     public: \
+        _name##EngineInit() \
+        { \
+            EngineRegistry::registerEngine(this); \
+        } \
+        const std::string getName() \
+        { \
+            return #_name; \
+        } \
+        _class* create(FrontierApp* app) \
+        { \
+            return new _class(app); \
+        } \
+    }; \
+    _name##EngineInit* const _name##EngineInit::init = new _name##EngineInit(); \
+    };
+
 }
 
 #endif

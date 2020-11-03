@@ -5,6 +5,8 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek;
 
+FRONTIER_ENGINE(Wayland, Frontier::WaylandEngine)
+
 #define BTN_MOUSE		0x110
 #define BTN_LEFT		0x110
 #define BTN_RIGHT		0x111

@@ -5,6 +5,8 @@ using namespace std;
 using namespace Frontier;
 using namespace Geek;
 
+FRONTIER_ENGINE(X11, Frontier::X11Engine)
+
 X11Engine::X11Engine(FrontierApp* app) : FrontierEngine(app)
 {
 }

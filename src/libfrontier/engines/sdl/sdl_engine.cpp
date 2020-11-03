@@ -27,6 +27,8 @@ using namespace std;
 using namespace Geek;
 using namespace Frontier;
 
+FRONTIER_ENGINE(SDL, Frontier::FrontierEngineSDL)
+
 FrontierEngineSDL::FrontierEngineSDL(FrontierApp* app) : FrontierEngine(app)
 {
     m_lastMotion = 0;

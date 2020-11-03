@@ -28,6 +28,9 @@
 #include <SDL.h>
 #include <SDL_video.h>
 
+namespace Frontier
+{
+
 class FrontierEngineWindowSDL : public Frontier::FrontierEngineWindow
 {
  private:
@@ -58,7 +61,7 @@ class FrontierEngineSDL : public Frontier::FrontierEngine
     int m_lastMouseX;
     int m_lastMouseY;
     std::string m_lastText;
-    
+
     Frontier::KeyEvent* m_keyDownEvent;
 
     uint32_t m_redrawWindowEvent;
@@ -76,5 +79,7 @@ class FrontierEngineSDL : public Frontier::FrontierEngine
 
     void requestUpdate(FrontierEngineWindowSDL* window);
 };
+
+}
 
 #endif
