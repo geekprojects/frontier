@@ -64,7 +64,7 @@ if(X11 IN_LIST ENGINES)
         engines/x11/x11_engine.cpp
         engines/x11/x11_window.cpp
     )
-    add_definitions(-DFRONTIER_ENGINE_X11 -I${X11_INCLUDE_DIR})
+    #add_definitions(-DFRONTIER_ENGINE_X11 -I${X11_INCLUDE_DIR})
     list(APPEND ENGINE_LIBRARIES ${X11_LIBRARIES})
 endif()
 
@@ -86,6 +86,15 @@ if(Wayland IN_LIST ENGINES)
     )
     add_definitions(-DFRONTIER_ENGINE_WAYLAND ${waylandclient_CFLAGS})
     list(APPEND ENGINE_LIBRARIES ${waylandclient_LDFLAGS})
+endif()
+
+if(Awesome IN_LIST ENGINES)
+    list(APPEND libfrontier_srcs
+        engines/awesome/awesome_engine.cpp
+        engines/awesome/awesome_window.cpp
+    )
+    add_definitions(-DFRONTIER_ENGINE_AWESOME ${libawesome_CFLAGS})
+    list(APPEND ENGINE_LIBRARIES ${libawesome_LDFLAGS})
 endif()
 
 add_definitions(-DFONTSDIR=${DATADIR}/fonts -DENGINE=${ENGINE})

@@ -59,6 +59,7 @@ include(FindOpenGL)
 include(FindGLUT)
 pkg_check_modules(sdl2 sdl2)
 pkg_check_modules(waylandclient wayland-client)
+pkg_check_modules(libawesome libawesome)
 
 set (ENGINES "")
 # Check for engine support in rough order of priority
@@ -76,6 +77,9 @@ if (X11_FOUND)
 endif()
 if (OPENGL_FOUND)
     list(APPEND ENGINES "OpenGL")
+endif()
+if (libawesome_FOUND)
+    list(APPEND ENGINES "Awesome")
 endif()
 
 if (NOT ENGINES)
@@ -127,7 +131,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_EXTRACT_ALL YES)
 
     doxygen_add_docs(
-        doxygen
+        doxygen-frontier
         ${PROJECT_SOURCE_DIR}/include
         COMMENT "Generate man pages"
     )
