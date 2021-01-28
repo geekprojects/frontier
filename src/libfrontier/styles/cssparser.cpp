@@ -597,7 +597,7 @@ bool CssParser::parseString(std::string str)
 {
     log(DEBUG, "Parsing string");
 
-    ANTLRInputStream* stream = new ANTLRInputStream(str);
+    ANTLRInputStream* stream = new ANTLRInputStream(str.c_str(), str.length());
 
     css3Lexer lexer(stream);
     CommonTokenStream tokens(&lexer);
