@@ -116,8 +116,19 @@ bool TextInput::draw(Surface* surface)
 
     drawBorder(surface);
 
+    wstring drawText = m_text;
+    if (getStyle("type").asString() == L"password")
+    {
+        drawText = L"";
+        unsigned int i;
+        for (i = 0; i < m_text.length(); i++)
+        {
+            drawText += L"*";
+        }
+    }
+
     int lineHeight = font->getPixelHeight(72);
-    unsigned int textWidth = getTextWidth(font, m_text) + 4;
+    unsigned int textWidth = getTextWidth(font, drawText) + 4;
     unsigned int textHeight = lineHeight + 2;
 
     int selectStart = MIN(m_selectStart, m_selectEnd);
@@ -163,9 +174,9 @@ bool TextInput::draw(Surface* surface)
 
     unsigned int cursorX = 0;
     unsigned int pos = 0;
-    for (pos = 0; pos < m_text.length(); pos++)
+    for (pos = 0; pos < drawText.length(); pos++)
     {
-        wstring cstr = wchar2wstring(m_text.at(pos));
+        wstring cstr = wchar2wstring(drawText.at(pos));
         unsigned int width = font->width(cstr);
 
         if (hasSelection())
@@ -176,7 +187,7 @@ bool TextInput::draw(Surface* surface)
             }
         }
 
-        drawText(m_textSurface, x, y, cstr, font);
+        Widget::drawText(m_textSurface, x, y, cstr, font);
 
         if (pos == m_column)
         {
@@ -187,7 +198,7 @@ bool TextInput::draw(Surface* surface)
         m_charX.push_back(x);
     }
 
-    if (m_column == m_text.length())
+    if (m_column == drawText.length())
     {
         cursorX = x;
     }
@@ -487,7 +498,7 @@ int TextInput::getTextWidth(FontHandle* font, wstring text)
 {
     unsigned int pos = 0;
     int textWidth = 0;
-    for (pos = 0; pos < m_text.length(); pos++)
+    for (pos = 0; pos < text.length(); pos++)
     {
         int cw = font->width(wchar2wstring(text.at(pos)));
         textWidth += cw;
