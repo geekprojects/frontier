@@ -1,9 +1,5 @@
 
-#include "awesome.h"
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <cstdio>
-#include <unistd.h>
+#include <frontier/engines/awesome.h>
 
 using namespace Frontier;
 using namespace Geek;
@@ -12,7 +8,7 @@ using namespace std;
 
 FRONTIER_ENGINE(Awesome, Frontier::AwesomeEngine)
 
-AwesomeEngine::AwesomeEngine(FrontierApp* app) : FrontierEngine(app)
+[[maybe_unused]] AwesomeEngine::AwesomeEngine(FrontierApp* app) : FrontierEngine(app)
 {
     //m_messageSignal = Thread::createCondVar();
 }
@@ -73,6 +69,8 @@ bool AwesomeEngine::checkEvents()
         }
     }
     //log(DEBUG, "checkEvents: Got event! type=0x%x, window=%d (%p)", event->eventType, event->windowId, awesomeWindow);
+
+    bool handled = false;
     switch (event->eventType)
     {
         case Awesome::AWESOME_EVENT_MOUSE_BUTTON:
@@ -96,6 +94,7 @@ bool AwesomeEngine::checkEvents()
                     mouseButtonEvent->direction);
                     */
                 awesomeWindow->getWindow()->handleEvent(mouseButtonEvent);
+                handled = true;
             }
         } break;
 
@@ -115,10 +114,32 @@ bool AwesomeEngine::checkEvents()
                     mouseButtonEvent->y);
                     */
                 awesomeWindow->getWindow()->handleEvent(mouseButtonEvent);
+                handled = true;
             }
         } break;
+
+        case Awesome::AWESOME_EVENT_KEY:
+        {
+            if (awesomeWindow != nullptr)
+            {
+                KeyEvent* keyEvent = new KeyEvent();
+                keyEvent->eventType = FRONTIER_EVENT_KEY;
+                keyEvent->direction = event->key.direction;
+                keyEvent->key = event->key.key;
+                keyEvent->chr = event->key.chr;
+                keyEvent->modifiers = event->key.modifiers;
+                awesomeWindow->getWindow()->handleEvent(keyEvent);
+                handled = true;
+            }
+        } break;
+
         default:
             log(DEBUG, "checkEvents: Unhandled event: 0x%x", event->eventType);
+    }
+
+    if (!handled)
+    {
+        m_unhandledEventSignal.emit(event);
     }
 
     return true;

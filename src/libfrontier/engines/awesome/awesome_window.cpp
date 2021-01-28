@@ -1,4 +1,4 @@
-#include "awesome.h"
+#include "frontier/engines/awesome.h"
 #include <frontier/widgets.h>
 
 #include <wchar.h>
@@ -38,7 +38,7 @@ bool AwesomeWindow::init()
         createWindowRequest.flags |= Awesome::WINDOW_BORDER | Awesome::WINDOW_TITLE;
     }
 
-    wcsncpy(createWindowRequest.title, m_window->getTitle().c_str(), 100);
+    memcpy(createWindowRequest.title, m_window->getTitle().c_str(), m_window->getTitle().size());
 
     log(DEBUG, "init: Creating window...");
     WindowCreateResponse* windowCreateResponse = static_cast<WindowCreateResponse*>(connection->send(&createWindowRequest, sizeof(createWindowRequest)));
